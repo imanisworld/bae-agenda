@@ -1,0 +1,71 @@
+/**
+ * APP CONSTANTS
+ * Centralized values used across the codebase.
+ * Avoids magic strings scattered throughout components.
+ */
+
+// ---- Navigation --------------------------------------------
+export const PUBLIC_NAV = [
+  { label: 'Mixes',  href: '/mixes'   },
+  { label: 'Events', href: '/events'  },
+  { label: 'Book',   href: '/book'    },
+  { label: 'Connect', href: '/connect' },
+] as const
+
+export const ADMIN_NAV = [
+  { label: 'Dashboard', href: '/admin/dashboard', icon: '⊞'  },
+  { label: 'Bookings',  href: '/admin/bookings',  icon: '📋' },
+  { label: 'Events',    href: '/admin/events',    icon: '📅' },
+  { label: 'Clients',   href: '/admin/clients',   icon: '👤' },
+  { label: 'Payments',  href: '/admin/payments',  icon: '💰' },
+  { label: 'Content',   href: '/admin/content',   icon: '✏️' },
+] as const
+
+// ---- Booking -----------------------------------------------
+export const BOOKING_STATUSES = ['inquiry', 'confirmed', 'completed', 'cancelled'] as const
+
+export const BOOKING_STATUS_LABELS: Record<string, string> = {
+  inquiry:   'Inquiry',
+  confirmed: 'Confirmed',
+  completed: 'Completed',
+  cancelled: 'Cancelled',
+}
+
+// CSS color values for the Badge component (inline styles, not Tailwind utilities)
+export const BOOKING_STATUS_COLORS: Record<string, string> = {
+  inquiry:   'var(--gold)',
+  confirmed: 'var(--violet)',
+  completed: '#34d399',
+  cancelled: '#e85d75',
+}
+
+// ---- Packages ----------------------------------------------
+export const PACKAGES = [
+  { name: 'The Intro',      price: 300, hours: 2, desc: '2-hour set. Perfect for private events, brunches, and intimate gatherings.' },
+  { name: 'The Agenda',     price: 600, hours: 4, desc: '4-hour set. Full event coverage with sound coordination.' },
+  { name: 'Full Takeover',  price: null, hours: 6, desc: '6+ hours. Residencies, club nights, tours, and branded events.' },
+] as const
+
+// ---- Event Types -------------------------------------------
+export const EVENT_TYPES = [
+  'Birthday / Private Party',
+  'Wedding',
+  'Corporate Event',
+  'Club / Venue Night',
+  'Brunch / Day Party',
+  'Other',
+] as const
+
+// ---- Payment -----------------------------------------------
+export const PAYMENT_METHODS = ['cash', 'venmo', 'zelle', 'stripe', 'other'] as const
+export const PAYMENT_TYPES   = ['deposit', 'balance', 'full', 'refund'] as const
+
+// ---- Socials -----------------------------------------------
+export const SOCIALS = [
+  { label: 'Instagram', url: 'https://www.instagram.com/dj_b.a.e/',                      icon: '📸' },
+  { label: 'TikTok',    url: 'https://www.tiktok.com/@djbae1',                            icon: '🎵' },
+  { label: 'YouTube',   url: 'https://www.youtube.com/channel/UCjEiMW5l_Go9vSHudx5VPEw', icon: '▶️' },
+  { label: 'SoundCloud',url: 'https://soundcloud.com/djbae',                              icon: '☁️' },
+  { label: 'Facebook',  url: 'https://www.facebook.com/480641485716491',                  icon: '👤' },
+  { label: 'dot.cards', url: 'https://dot.cards/djbae',                                   icon: '🔗' },
+] as const

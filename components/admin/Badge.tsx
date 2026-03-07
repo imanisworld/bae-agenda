@@ -1,0 +1,56 @@
+/**
+ * BADGE — Admin Server Component
+ * Consistent status chips for bookings and payments.
+ * Pure CSS — no JS, safe in Server Components.
+ */
+
+type BadgeVariant =
+  | 'inquiry' | 'confirmed' | 'completed' | 'cancelled'   // booking
+  | 'pending'  | 'received'  | 'refunded'                  // payment DB
+  | 'paid'     | 'unpaid'    | 'partial'                   // payment UI labels
+
+const STYLES: Record<BadgeVariant, { color: string; bg: string; border: string }> = {
+  // Booking
+  inquiry:   { color: 'var(--gold)',   bg: 'rgba(201,168,76,0.10)',  border: 'rgba(201,168,76,0.30)'  },
+  confirmed: { color: 'var(--violet)', bg: 'rgba(155,93,229,0.10)',  border: 'rgba(155,93,229,0.30)'  },
+  completed: { color: '#34d399',       bg: 'rgba(52,211,153,0.10)',  border: 'rgba(52,211,153,0.30)'  },
+  cancelled: { color: '#e85d75',       bg: 'rgba(232,93,117,0.10)', border: 'rgba(232,93,117,0.30)'  },
+  // Payment (DB values)
+  pending:   { color: 'var(--gold)',   bg: 'rgba(201,168,76,0.10)',  border: 'rgba(201,168,76,0.30)'  },
+  received:  { color: '#34d399',       bg: 'rgba(52,211,153,0.10)',  border: 'rgba(52,211,153,0.30)'  },
+  refunded:  { color: '#e85d75',       bg: 'rgba(232,93,117,0.10)', border: 'rgba(232,93,117,0.30)'  },
+  // Payment (UI display labels)
+  paid:      { color: '#34d399',       bg: 'rgba(52,211,153,0.10)',  border: 'rgba(52,211,153,0.30)'  },
+  unpaid:    { color: '#e85d75',       bg: 'rgba(232,93,117,0.10)', border: 'rgba(232,93,117,0.30)'  },
+  partial:   { color: 'var(--gold)',   bg: 'rgba(201,168,76,0.10)',  border: 'rgba(201,168,76,0.30)'  },
+}
+
+interface BadgeProps {
+  variant: BadgeVariant
+  label?: string // override display text; defaults to the variant name
+}
+
+export default function Badge({ variant, label }: BadgeProps) {
+  const s = STYLES[variant]
+  const text = label ?? variant
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '3px 9px',
+        fontSize: '9px',
+        letterSpacing: '0.18em',
+        textTransform: 'uppercase',
+        fontWeight: 500,
+        color: s.color,
+        background: s.bg,
+        border: `1px solid ${s.border}`,
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {text}
+    </span>
+  )
+}
