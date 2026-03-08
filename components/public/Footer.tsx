@@ -31,7 +31,7 @@ export default function Footer() {
               </span>
             </Link>
             <p style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7, fontWeight: 300 }}>
-              Chicago's DJ, curator, and experience architect. Every set is built to be felt.
+              Chicago&apos;s DJ, curator, and experience architect. Every set is built to be felt.
             </p>
           </div>
 
@@ -86,9 +86,9 @@ export default function Footer() {
           <p style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
             © {CURRENT_YEAR} DJ B.A.E. · The Bae Agenda. All rights reserved.
           </p>
-          {/* Admin link — barely visible, .admin-link class in globals.css */}
-          <Link href="/admin/dashboard" className="admin-link">
-            Admin
+          {/* Portfolio demo link — real admin remains private */}
+          <Link href="/admin-demo" className="admin-link">
+            Admin Demo
           </Link>
         </div>
       </div>

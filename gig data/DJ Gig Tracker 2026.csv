@@ -1,0 +1,7 @@
+Date,Event/Venue,Client/Contact,Amount,Payment Status,Payment Method,Notes
+,Butler University,,$250,Pending Check,Check,Waiting for check to arrive
+,Unknown Event,,TBD,Not Paid - Write Off,,"Client never paid, moving on"
+2/13/2026,Punch Bowl Social - Galentine's,Becki Howard,$375,Invoiced,ACH,"Invoice #375, Due 2/26/26"
+2/6/2026,TBD Event,,$50,Paid,Cash,Paid $50 cash
+,,,,,,
+,,Total Confirmed:,$675,,,

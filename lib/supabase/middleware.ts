@@ -48,13 +48,6 @@ export async function updateSession(request: NextRequest) {
     // Treat as unauthenticated on any error
   }
 
-  // ── AUTH BYPASS — TEMPORARY DEV ONLY ──────────────────────────────────────
-  // TODO: Remove this bypass before launch. Re-enable the two blocks below.
-  // To restore auth: uncomment the two `if` blocks and delete the early return.
-  return supabaseResponse
-  // ── END BYPASS ─────────────────────────────────────────────────────────────
-
-  // eslint-disable-next-line no-unreachable
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
   const isLoginRoute = request.nextUrl.pathname === '/admin/login'
 

@@ -105,7 +105,7 @@ export default async function EventsPage() {
           </div>
         ) : (
           <div role="list">
-            {events.map((event, i) => {
+            {events.map((event) => {
               const { day, month, weekday, year } = formatEventDate(event.event_date)
               const location = [event.venue, event.city].filter(Boolean).join(' · ')
 

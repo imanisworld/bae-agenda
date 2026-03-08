@@ -16,6 +16,16 @@ interface ClientRow {
   created_at:     string
 }
 
+interface ClientQueryRow {
+  id: string
+  first_name: string
+  last_name: string | null
+  email: string
+  phone: string | null
+  created_at: string
+  bookings: Array<{ id: string }> | null
+}
+
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
@@ -30,7 +40,8 @@ async function getClients(): Promise<ClientRow[]> {
       .from('clients')
       .select('id, first_name, last_name, email, phone, created_at, bookings(id)')
       .order('created_at', { ascending: false })
-    return (data ?? []).map((c: any) => ({
+    const rows = (data ?? []) as ClientQueryRow[]
+    return rows.map((c) => ({
       id:            c.id,
       first_name:    c.first_name,
       last_name:     c.last_name,

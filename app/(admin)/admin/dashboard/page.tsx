@@ -44,6 +44,22 @@ interface DashboardStats {
   totalClients:     number
 }
 
+interface BookingQueryRow {
+  id: string
+  event_name: string
+  event_date: string
+  status: BookingStatus
+  clients: { first_name: string | null; last_name: string | null } | null
+}
+
+interface PaymentQueryRow {
+  id: string
+  amount: number
+  status: PaymentStatus
+  type: string
+  bookings: { event_name: string | null } | null
+}
+
 // ── Mock Data (shown when DB not connected) ───────────────────────────────────
 
 const MOCK_STATS: DashboardStats = {
@@ -134,7 +150,7 @@ async function getDashboardData() {
         pendingInquiries: pendingInquiries ?? 0,
         totalClients:     totalClients     ?? 0,
       },
-      recentBookings: (bookingRows ?? []).map((b: any) => ({
+      recentBookings: ((bookingRows ?? []) as BookingQueryRow[]).map((b) => ({
         id:          b.id,
         event_name:  b.event_name,
         event_date:  b.event_date,
@@ -144,7 +160,7 @@ async function getDashboardData() {
         status: b.status as BookingStatus,
       })) as RecentBooking[],
       upcomingEvents:   (eventRows   ?? []) as UpcomingEvent[],
-      paymentReminders: (paymentRows ?? []).map((p: any) => ({
+      paymentReminders: ((paymentRows ?? []) as PaymentQueryRow[]).map((p) => ({
         id:           p.id,
         booking_name: p.bookings?.event_name ?? 'Unknown',
         amount:       p.amount,

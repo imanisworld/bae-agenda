@@ -7,6 +7,7 @@
  * Falls back to CONTENT_DEFAULTS.about_quote if not set.
  */
 import { CONTENT_DEFAULTS } from '@/lib/content-schema'
+import Link from 'next/link'
 
 interface Props {
   aboutQuote?: string
@@ -124,6 +125,12 @@ export default function BuiltSection({ aboutQuote }: Props) {
             ))}
           </div>
 
+        </div>
+
+        <div style={{ marginTop: '34px' }}>
+          <Link href="/admin-demo" className="btn-ghost">
+            View Admin Demo <span aria-hidden="true">→</span>
+          </Link>
         </div>
       </div>
     </section>

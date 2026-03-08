@@ -19,6 +19,17 @@ interface PaymentRow {
   created_at:   string
 }
 
+interface PaymentQueryRow {
+  id: string
+  amount: number
+  type: string
+  method: string | null
+  status: PaymentStatus
+  paid_at: string | null
+  created_at: string
+  bookings: { event_name: string | null } | null
+}
+
 function fmtDate(iso: string | null) {
   if (!iso) return '—'
   return new Date(iso).toLocaleDateString('en-US', {
@@ -40,7 +51,8 @@ async function getPayments(): Promise<PaymentRow[]> {
       .from('payments')
       .select('id, amount, type, method, status, paid_at, created_at, bookings(event_name)')
       .order('created_at', { ascending: false })
-    return (data ?? []).map((p: any) => ({
+    const rows = (data ?? []) as PaymentQueryRow[]
+    return rows.map((p) => ({
       id:           p.id,
       booking_name: p.bookings?.event_name ?? 'Unknown',
       amount:       p.amount,

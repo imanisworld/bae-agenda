@@ -18,6 +18,16 @@ interface BookingRow {
   created_at:  string
 }
 
+interface BookingQueryRow {
+  id: string
+  event_name: string
+  event_date: string
+  package: string | null
+  status: BookingStatus
+  created_at: string
+  clients: { first_name: string | null; last_name: string | null } | null
+}
+
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
@@ -32,7 +42,8 @@ async function getBookings(): Promise<BookingRow[]> {
       .from('bookings')
       .select('id, event_name, event_date, package, status, created_at, clients(first_name, last_name)')
       .order('created_at', { ascending: false })
-    return (data ?? []).map((b: any) => ({
+    const rows = (data ?? []) as BookingQueryRow[]
+    return rows.map((b) => ({
       id:          b.id,
       event_name:  b.event_name,
       event_date:  b.event_date,

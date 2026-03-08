@@ -7,6 +7,7 @@
  * On fail: show inline error without revealing details.
  */
 import { useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -244,14 +245,14 @@ export default function AdminLoginPage() {
             color: 'var(--muted)',
           }}
         >
-          <a
+          <Link
             href="/"
             style={{ color: 'var(--muted)', textDecoration: 'none' }}
             onMouseOver={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--white)' }}
             onMouseOut={e => { (e.currentTarget as HTMLAnchorElement).style.color = 'var(--muted)' }}
           >
             ← Back to site
-          </a>
+          </Link>
         </p>
       </div>
     </div>
