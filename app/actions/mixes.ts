@@ -3,12 +3,12 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
-async function requireAuthedClient() {
+async function requireAuthedUser() {
   const supabase = await createClient()
   const { data } = await supabase.auth.getUser()
   if (!data.user) redirect('/admin/login')
-  return supabase
 }
 
 function optionalString(value: FormDataEntryValue | null): string | null {
@@ -38,7 +38,8 @@ function revalidateMixPaths() {
 }
 
 export async function createMixAction(formData: FormData) {
-  const supabase = await requireAuthedClient()
+  await requireAuthedUser()
+  const admin = createAdminClient()
 
   const titleRaw = formData.get('title')
   if (typeof titleRaw !== 'string' || !titleRaw.trim()) {
@@ -49,7 +50,7 @@ export async function createMixAction(formData: FormData) {
   const publishedAtInput = parseDateTimeLocal(formData.get('published_at'))
   const publishedAt = published ? publishedAtInput ?? new Date().toISOString() : null
 
-  await supabase.from('mixes').insert({
+  await admin.from('mixes').insert({
     title: titleRaw.trim(),
     description: optionalString(formData.get('description')),
     genre: optionalString(formData.get('genre')),
@@ -66,7 +67,8 @@ export async function createMixAction(formData: FormData) {
 }
 
 export async function updateMixAction(formData: FormData) {
-  const supabase = await requireAuthedClient()
+  await requireAuthedUser()
+  const admin = createAdminClient()
 
   const id = optionalString(formData.get('id'))
   const titleRaw = formData.get('title')
@@ -78,7 +80,7 @@ export async function updateMixAction(formData: FormData) {
   const publishedAtInput = parseDateTimeLocal(formData.get('published_at'))
   const publishedAt = published ? publishedAtInput ?? new Date().toISOString() : null
 
-  await supabase
+  await admin
     .from('mixes')
     .update({
       title: titleRaw.trim(),
@@ -99,35 +101,38 @@ export async function updateMixAction(formData: FormData) {
 }
 
 export async function deleteMixAction(formData: FormData) {
-  const supabase = await requireAuthedClient()
+  await requireAuthedUser()
+  const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirect('/admin/mixes')
 
-  await supabase.from('mixes').delete().eq('id', id)
+  await admin.from('mixes').delete().eq('id', id)
 
   revalidateMixPaths()
   redirect('/admin/mixes')
 }
 
 export async function toggleMixFeaturedAction(formData: FormData) {
-  const supabase = await requireAuthedClient()
+  await requireAuthedUser()
+  const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirect('/admin/mixes')
 
   const nextFeatured = formData.get('next_featured') === 'true'
-  await supabase.from('mixes').update({ is_featured: nextFeatured }).eq('id', id)
+  await admin.from('mixes').update({ is_featured: nextFeatured }).eq('id', id)
 
   revalidateMixPaths()
   redirect('/admin/mixes')
 }
 
 export async function toggleMixPublishedAction(formData: FormData) {
-  const supabase = await requireAuthedClient()
+  await requireAuthedUser()
+  const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirect('/admin/mixes')
 
   const nextPublished = formData.get('next_published') === 'true'
-  await supabase
+  await admin
     .from('mixes')
     .update({ published_at: nextPublished ? new Date().toISOString() : null })
     .eq('id', id)
