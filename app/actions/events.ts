@@ -3,25 +3,25 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { slugify } from '@/lib/utils'
 
-async function requireAuthedClient() {
+async function requireAuthedUser() {
   const supabase = await createClient()
   const { data } = await supabase.auth.getUser()
   if (!data.user) redirect('/admin/login')
-  return supabase
 }
 
 async function generateUniqueSlug(
+  admin: ReturnType<typeof createAdminClient>,
   title: string,
   excludeId?: string
 ): Promise<string> {
-  const supabase = await requireAuthedClient()
   const base = slugify(title) || 'event'
 
   for (let i = 0; i < 50; i += 1) {
     const candidate = i === 0 ? base : `${base}-${i + 1}`
-    let query = supabase.from('events').select('id').eq('slug', candidate).limit(1)
+    let query = admin.from('events').select('id').eq('slug', candidate).limit(1)
     if (excludeId) query = query.neq('id', excludeId)
     const { data, error } = await query
     if (!error && (!data || data.length === 0)) {
@@ -46,7 +46,8 @@ function optionalString(value: FormDataEntryValue | null): string | null {
 }
 
 export async function createEventAction(formData: FormData) {
-  const supabase = await requireAuthedClient()
+  await requireAuthedUser()
+  const admin = createAdminClient()
 
   const titleRaw = formData.get('title')
   const eventDate = parseDateTimeLocal(formData.get('event_date'))
@@ -55,9 +56,9 @@ export async function createEventAction(formData: FormData) {
   }
 
   const title = titleRaw.trim()
-  const slug = await generateUniqueSlug(title)
+  const slug = await generateUniqueSlug(admin, title)
 
-  await supabase.from('events').insert({
+  await admin.from('events').insert({
     title,
     slug,
     event_date: eventDate,
@@ -75,7 +76,8 @@ export async function createEventAction(formData: FormData) {
 }
 
 export async function updateEventAction(formData: FormData) {
-  const supabase = await requireAuthedClient()
+  await requireAuthedUser()
+  const admin = createAdminClient()
 
   const id = optionalString(formData.get('id'))
   const titleRaw = formData.get('title')
@@ -85,9 +87,9 @@ export async function updateEventAction(formData: FormData) {
   }
 
   const title = titleRaw.trim()
-  const slug = await generateUniqueSlug(title, id)
+  const slug = await generateUniqueSlug(admin, title, id)
 
-  await supabase
+  await admin
     .from('events')
     .update({
       title,
@@ -109,11 +111,12 @@ export async function updateEventAction(formData: FormData) {
 }
 
 export async function deleteEventAction(formData: FormData) {
-  const supabase = await requireAuthedClient()
+  await requireAuthedUser()
+  const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirect('/admin/events')
 
-  await supabase.from('events').delete().eq('id', id)
+  await admin.from('events').delete().eq('id', id)
 
   revalidatePath('/admin/events')
   revalidatePath('/events')
@@ -122,12 +125,13 @@ export async function deleteEventAction(formData: FormData) {
 }
 
 export async function toggleEventPublicAction(formData: FormData) {
-  const supabase = await requireAuthedClient()
+  await requireAuthedUser()
+  const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirect('/admin/events')
 
   const nextValue = formData.get('next_public') === 'true'
-  await supabase.from('events').update({ public: nextValue }).eq('id', id)
+  await admin.from('events').update({ public: nextValue }).eq('id', id)
 
   revalidatePath('/admin/events')
   revalidatePath('/events')
@@ -136,12 +140,13 @@ export async function toggleEventPublicAction(formData: FormData) {
 }
 
 export async function toggleEventFeaturedAction(formData: FormData) {
-  const supabase = await requireAuthedClient()
+  await requireAuthedUser()
+  const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirect('/admin/events')
 
   const nextValue = formData.get('next_featured') === 'true'
-  await supabase.from('events').update({ featured: nextValue }).eq('id', id)
+  await admin.from('events').update({ featured: nextValue }).eq('id', id)
 
   revalidatePath('/admin/events')
   revalidatePath('/events')
