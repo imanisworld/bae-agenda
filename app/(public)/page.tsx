@@ -7,8 +7,8 @@
  *   HeroSection    — full viewport, brand presence, CTAs (reads hero copy)
  *   MixesSection   — 3 featured mix cards
  *   EventsSection  — upcoming dates (live Supabase data)
- *   BookingSection — packages + booking CTA
- *   BuiltSection   — tech stack / "built from scratch"
+ *   BookingSection — packages + booking CTA (reads booking_email)
+ *   BuiltSection   — tech stack / "built from scratch" (reads about_quote)
  *   ConnectSection — social links / "stay connected" (reads social URLs)
  */
 import HeroSection    from '@/components/public/HeroSection'
@@ -19,12 +19,15 @@ import BuiltSection   from '@/components/public/BuiltSection'
 import ConnectSection from '@/components/public/ConnectSection'
 import { getContentMap } from '@/lib/db/content'
 
-// Keys needed on the homepage — all fetched in one Supabase query
+// All keys needed on the homepage — fetched in a single Supabase query.
+// Add new keys here when wiring new CMS fields to homepage sections.
 const HOME_CONTENT_KEYS = [
   'hero_title',
   'hero_subtitle',
   'hero_cta_primary',
   'hero_cta_secondary',
+  'about_quote',
+  'booking_email',
   'instagram_url',
   'soundcloud_url',
   'youtube_url',
@@ -47,8 +50,12 @@ export default async function HomePage() {
       />
       <MixesSection />
       <EventsSection />
-      <BookingSection />
-      <BuiltSection />
+      <BookingSection
+        bookingEmail={content.booking_email}
+      />
+      <BuiltSection
+        aboutQuote={content.about_quote}
+      />
       <ConnectSection
         socialOverrides={{
           instagram_url:  content.instagram_url,

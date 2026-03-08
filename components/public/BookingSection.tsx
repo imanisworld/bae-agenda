@@ -2,14 +2,33 @@
  * BOOKING SECTION — Server Component
  * Static packages + CTA. Phase 3: wire to booking form.
  * Hover states via CSS classes — no JS event handlers.
+ *
+ * Accepts optional CMS override for booking email.
+ * Falls back to CONTENT_DEFAULTS.booking_email if not set.
  */
-import Link from 'next/link'
 import { PACKAGES } from '@/lib/constants'
 import { formatCurrency } from '@/lib/utils'
+import { CONTENT_DEFAULTS } from '@/lib/content-schema'
+
+interface Props {
+  bookingEmail?: string
+}
 
 function PackageCard({
-  name, price, hours, desc, featured = false,
-}: { name: string; price: number | null; hours: number; desc: string; featured?: boolean }) {
+  name, price, hours, desc, featured = false, bookingEmail,
+}: {
+  name:         string
+  price:        number | null
+  hours:        number
+  desc:         string
+  featured?:    boolean
+  bookingEmail: string
+}) {
+  const subject = encodeURIComponent(`Booking Inquiry: ${name}`)
+  const href    = bookingEmail
+    ? `mailto:${bookingEmail}?subject=${subject}`
+    : '/#booking'
+
   return (
     <div style={{
       padding: '32px',
@@ -55,14 +74,16 @@ function PackageCard({
       </p>
 
       {/* CSS class handles hover — .pkg-btn and .pkg-btn-featured in globals.css */}
-      <Link href="/book" className={featured ? 'pkg-btn-featured' : 'pkg-btn'}>
+      <a href={href} className={featured ? 'pkg-btn-featured' : 'pkg-btn'}>
         Book This Package
-      </Link>
+      </a>
     </div>
   )
 }
 
-export default function BookingSection() {
+export default function BookingSection({ bookingEmail }: Props) {
+  const email = bookingEmail ?? CONTENT_DEFAULTS.booking_email
+
   return (
     <section id="booking" aria-label="Book DJ B.A.E." style={{
       background: 'var(--off-black)', borderTop: '1px solid var(--border)',
@@ -102,22 +123,28 @@ export default function BookingSection() {
               hours={pkg.hours}
               desc={pkg.desc}
               featured={i === 1}
+              bookingEmail={email}
             />
           ))}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-          {/* .btn-white hover in globals.css */}
-          <Link href="/book" className="btn-white">
+          {/* Primary CTA — opens email client with pre-filled subject */}
+          <a
+            href={email ? `mailto:${email}?subject=Booking%20Inquiry` : '/#booking'}
+            className="btn-white"
+          >
             Start Booking Process →
-          </Link>
+          </a>
 
-          <span style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
-            Questions?{' '}
-            <a href="mailto:bookings@thebaeagenda.com" className="inline-link">
-              bookings@thebaeagenda.com
-            </a>
-          </span>
+          {email && (
+            <span style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
+              Questions?{' '}
+              <a href={`mailto:${email}`} className="inline-link">
+                {email}
+              </a>
+            </span>
+          )}
         </div>
       </div>
     </section>

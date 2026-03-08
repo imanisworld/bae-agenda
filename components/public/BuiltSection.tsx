@@ -2,7 +2,15 @@
  * BUILT SECTION — Server Component
  * "Under The Hood" — tech stack showcase.
  * No JS event handlers; hover via CSS class.
+ *
+ * Accepts optional aboutQuote from site_content CMS.
+ * Falls back to CONTENT_DEFAULTS.about_quote if not set.
  */
+import { CONTENT_DEFAULTS } from '@/lib/content-schema'
+
+interface Props {
+  aboutQuote?: string
+}
 
 const STACK = [
   {
@@ -37,7 +45,9 @@ const STACK = [
   },
 ] as const
 
-export default function BuiltSection() {
+export default function BuiltSection({ aboutQuote }: Props) {
+  const bio = aboutQuote ?? CONTENT_DEFAULTS.about_quote
+
   return (
     <section
       id="built-by"
@@ -57,7 +67,7 @@ export default function BuiltSection() {
           alignItems: 'start',
         }}>
 
-          {/* Left — title */}
+          {/* Left — title + bio */}
           <div>
             <span className="section-label">Under The Hood</span>
             <h2 className="section-heading" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)' }}>
@@ -70,6 +80,17 @@ export default function BuiltSection() {
               This site was designed and developed by the same person behind the
               music. No templates. No drag-and-drop builders.
             </p>
+            {bio && (
+              <p style={{
+                fontSize: '13px', color: 'var(--muted)',
+                lineHeight: 1.75, marginTop: '20px',
+                paddingTop: '20px',
+                borderTop: '1px solid var(--border)',
+                fontStyle: 'italic',
+              }}>
+                {bio}
+              </p>
+            )}
           </div>
 
           {/* Right — tech grid */}

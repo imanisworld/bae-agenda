@@ -191,9 +191,16 @@ create policy "site_content_admin_all" on site_content for all using (auth.role(
 create policy "notes_admin_all"        on notes        for all using (auth.role() = 'authenticated');
 
 -- ── Seed: default site_content ───────────────────────────────────
+-- Keys match lib/content-schema.ts CONTENT_KEYS exactly.
+-- on conflict (key) do nothing — safe to re-run without overwriting edits.
 insert into site_content (key, label, value) values
-  ('bio',           'DJ Bio',            'Chicago-based DJ, curator, and experience architect.'),
-  ('tagline',       'Hero Tagline',      'Music is the agenda.'),
-  ('hero_cta',      'Hero CTA Text',     'Book Your Event'),
-  ('booking_intro', 'Booking Intro',     'Ready to elevate your event? Let''s talk.')
+  ('hero_title',         'Hero Title',        'THE BAE AGENDA'),
+  ('hero_subtitle',      'Hero Subtitle',     'From intimate gatherings to club takeovers — music is always the agenda.'),
+  ('hero_cta_primary',   'Primary Button',    'Book Your Event'),
+  ('hero_cta_secondary', 'Secondary Button',  'Listen to Mixes'),
+  ('about_quote',        'Bio / About',       'Chicago-based DJ, curator, and experience architect. Every set is built to be felt.'),
+  ('instagram_url',      'Instagram URL',     'https://www.instagram.com/dj_b.a.e/'),
+  ('soundcloud_url',     'SoundCloud URL',    'https://soundcloud.com/djbae'),
+  ('youtube_url',        'YouTube URL',       'https://www.youtube.com/channel/UCjEiMW5l_Go9vSHudx5VPEw'),
+  ('booking_email',      'Booking Email',     'bookings@thebaeagenda.com')
 on conflict (key) do nothing;

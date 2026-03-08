@@ -47,7 +47,7 @@ export type Database = {
           id:         string
           first_name: string
           last_name:  string | null
-          email:      string
+          email:      string | null  // nullable — not all gig contacts have email on record
           phone:      string | null
           notes:      string | null
           created_at: string
@@ -92,7 +92,7 @@ export type Database = {
           booking_id: string             // FK → bookings.id (required)
           amount:     number
           type:       'deposit' | 'balance' | 'full' | 'refund'
-          method:     'cash' | 'venmo' | 'zelle' | 'stripe' | 'other' | null
+          method:     'cash' | 'venmo' | 'zelle' | 'stripe' | 'check' | 'ach' | 'other' | null
           status:     'pending' | 'received' | 'refunded'
           paid_at:    string | null      // when payment was received
           notes:      string | null

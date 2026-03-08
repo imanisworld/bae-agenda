@@ -75,6 +75,8 @@
 
 html {
   scroll-behavior: smooth;
+  /* Reserve space for the fixed nav (68px) so anchors land below it */
+  scroll-padding-top: 68px;
 }
 
 body {
