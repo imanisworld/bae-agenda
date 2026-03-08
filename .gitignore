@@ -53,6 +53,9 @@ next-env.d.ts
 .bun/
 ~/.bun/
 
+# personal photos — keep most local, but allow the live hero image in git
+/public/photos/*
+!/public/photos/hero-bg.jpg
+/public/videos/
+
 # random temp files
-*.png
-*.jpg

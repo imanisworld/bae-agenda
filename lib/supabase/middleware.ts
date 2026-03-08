@@ -48,7 +48,8 @@ export async function updateSession(request: NextRequest) {
     // Treat as unauthenticated on any error
   }
 
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
+  const pathname = request.nextUrl.pathname
+  const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/')
   const isLoginRoute = request.nextUrl.pathname === '/admin/login'
 
   if (isAdminRoute && !isLoginRoute && !user) {

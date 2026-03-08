@@ -12,6 +12,11 @@ async function requireAuthedUser() {
   if (!data.user) redirect('/admin/login')
 }
 
+function redirectWithError(path: string, message: string) {
+  const params = new URLSearchParams({ error: message })
+  redirect(`${path}?${params.toString()}`)
+}
+
 async function generateUniqueSlug(
   admin: ReturnType<typeof createAdminClient>,
   title: string,
@@ -50,15 +55,15 @@ export async function createEventAction(formData: FormData) {
   const admin = createAdminClient()
 
   const titleRaw = formData.get('title')
+  const title = typeof titleRaw === 'string' ? titleRaw.trim() : ''
   const eventDate = parseDateTimeLocal(formData.get('event_date'))
-  if (typeof titleRaw !== 'string' || !titleRaw.trim() || !eventDate) {
-    redirect('/admin/events/new')
+  if (!title || !eventDate) {
+    redirectWithError('/admin/events', 'Title and date are required to create an event.')
   }
 
-  const title = titleRaw.trim()
   const slug = await generateUniqueSlug(admin, title)
 
-  await admin.from('events').insert({
+  const { error } = await admin.from('events').insert({
     title,
     slug,
     event_date: eventDate,
@@ -68,6 +73,9 @@ export async function createEventAction(formData: FormData) {
     public: formData.get('public') === 'on',
     featured: formData.get('featured') === 'on',
   })
+  if (error) {
+    redirectWithError('/admin/events', error.message || 'Unable to create event.')
+  }
 
   revalidatePath('/admin/events')
   revalidatePath('/events')
@@ -81,15 +89,15 @@ export async function updateEventAction(formData: FormData) {
 
   const id = optionalString(formData.get('id'))
   const titleRaw = formData.get('title')
+  const title = typeof titleRaw === 'string' ? titleRaw.trim() : ''
   const eventDate = parseDateTimeLocal(formData.get('event_date'))
-  if (!id || typeof titleRaw !== 'string' || !titleRaw.trim() || !eventDate) {
-    redirect('/admin/events')
+  if (!id || !title || !eventDate) {
+    redirectWithError('/admin/events', 'Title and date are required to update an event.')
   }
 
-  const title = titleRaw.trim()
-  const slug = await generateUniqueSlug(admin, title, id)
+  const slug = await generateUniqueSlug(admin, title, id ?? undefined)
 
-  await admin
+  const { error } = await admin
     .from('events')
     .update({
       title,
@@ -102,6 +110,9 @@ export async function updateEventAction(formData: FormData) {
       featured: formData.get('featured') === 'on',
     })
     .eq('id', id)
+  if (error) {
+    redirectWithError('/admin/events', error.message || 'Unable to update event.')
+  }
 
   revalidatePath('/admin/events')
   revalidatePath(`/admin/events/${id}`)
@@ -114,9 +125,12 @@ export async function deleteEventAction(formData: FormData) {
   await requireAuthedUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
-  if (!id) redirect('/admin/events')
+  if (!id) redirectWithError('/admin/events', 'Missing event id.')
 
-  await admin.from('events').delete().eq('id', id)
+  const { error } = await admin.from('events').delete().eq('id', id)
+  if (error) {
+    redirectWithError('/admin/events', error.message || 'Unable to delete event.')
+  }
 
   revalidatePath('/admin/events')
   revalidatePath('/events')
@@ -128,10 +142,13 @@ export async function toggleEventPublicAction(formData: FormData) {
   await requireAuthedUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
-  if (!id) redirect('/admin/events')
+  if (!id) redirectWithError('/admin/events', 'Missing event id.')
 
   const nextValue = formData.get('next_public') === 'true'
-  await admin.from('events').update({ public: nextValue }).eq('id', id)
+  const { error } = await admin.from('events').update({ public: nextValue }).eq('id', id)
+  if (error) {
+    redirectWithError('/admin/events', error.message || 'Unable to update event visibility.')
+  }
 
   revalidatePath('/admin/events')
   revalidatePath('/events')
@@ -143,10 +160,13 @@ export async function toggleEventFeaturedAction(formData: FormData) {
   await requireAuthedUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
-  if (!id) redirect('/admin/events')
+  if (!id) redirectWithError('/admin/events', 'Missing event id.')
 
   const nextValue = formData.get('next_featured') === 'true'
-  await admin.from('events').update({ featured: nextValue }).eq('id', id)
+  const { error } = await admin.from('events').update({ featured: nextValue }).eq('id', id)
+  if (error) {
+    redirectWithError('/admin/events', error.message || 'Unable to update featured state.')
+  }
 
   revalidatePath('/admin/events')
   revalidatePath('/events')

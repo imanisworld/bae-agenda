@@ -11,6 +11,11 @@ async function requireAuthedUser() {
   if (!data.user) redirect('/admin/login')
 }
 
+function redirectWithError(path: string, message: string) {
+  const params = new URLSearchParams({ error: message })
+  redirect(`${path}?${params.toString()}`)
+}
+
 function optionalString(value: FormDataEntryValue | null): string | null {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -42,16 +47,17 @@ export async function createMixAction(formData: FormData) {
   const admin = createAdminClient()
 
   const titleRaw = formData.get('title')
-  if (typeof titleRaw !== 'string' || !titleRaw.trim()) {
-    redirect('/admin/mixes/new')
+  const title = typeof titleRaw === 'string' ? titleRaw.trim() : ''
+  if (!title) {
+    redirectWithError('/admin/mixes', 'Title is required to create a mix.')
   }
 
   const published = formData.get('published') === 'on'
   const publishedAtInput = parseDateTimeLocal(formData.get('published_at'))
   const publishedAt = published ? publishedAtInput ?? new Date().toISOString() : null
 
-  await admin.from('mixes').insert({
-    title: titleRaw.trim(),
+  const { error } = await admin.from('mixes').insert({
+    title,
     description: optionalString(formData.get('description')),
     genre: optionalString(formData.get('genre')),
     duration: optionalNumber(formData.get('duration')),
@@ -61,6 +67,9 @@ export async function createMixAction(formData: FormData) {
     sort_order: optionalNumber(formData.get('sort_order')) ?? 0,
     published_at: publishedAt,
   })
+  if (error) {
+    redirectWithError('/admin/mixes', error.message || 'Unable to create mix.')
+  }
 
   revalidateMixPaths()
   redirect('/admin/mixes')
@@ -72,18 +81,19 @@ export async function updateMixAction(formData: FormData) {
 
   const id = optionalString(formData.get('id'))
   const titleRaw = formData.get('title')
-  if (!id || typeof titleRaw !== 'string' || !titleRaw.trim()) {
-    redirect('/admin/mixes')
+  const title = typeof titleRaw === 'string' ? titleRaw.trim() : ''
+  if (!id || !title) {
+    redirectWithError('/admin/mixes', 'Title is required to update a mix.')
   }
 
   const published = formData.get('published') === 'on'
   const publishedAtInput = parseDateTimeLocal(formData.get('published_at'))
   const publishedAt = published ? publishedAtInput ?? new Date().toISOString() : null
 
-  await admin
+  const { error } = await admin
     .from('mixes')
     .update({
-      title: titleRaw.trim(),
+      title,
       description: optionalString(formData.get('description')),
       genre: optionalString(formData.get('genre')),
       duration: optionalNumber(formData.get('duration')),
@@ -94,6 +104,9 @@ export async function updateMixAction(formData: FormData) {
       published_at: publishedAt,
     })
     .eq('id', id)
+  if (error) {
+    redirectWithError('/admin/mixes', error.message || 'Unable to update mix.')
+  }
 
   revalidateMixPaths()
   revalidatePath(`/admin/mixes/${id}`)
@@ -104,9 +117,12 @@ export async function deleteMixAction(formData: FormData) {
   await requireAuthedUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
-  if (!id) redirect('/admin/mixes')
+  if (!id) redirectWithError('/admin/mixes', 'Missing mix id.')
 
-  await admin.from('mixes').delete().eq('id', id)
+  const { error } = await admin.from('mixes').delete().eq('id', id)
+  if (error) {
+    redirectWithError('/admin/mixes', error.message || 'Unable to delete mix.')
+  }
 
   revalidateMixPaths()
   redirect('/admin/mixes')
@@ -116,10 +132,13 @@ export async function toggleMixFeaturedAction(formData: FormData) {
   await requireAuthedUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
-  if (!id) redirect('/admin/mixes')
+  if (!id) redirectWithError('/admin/mixes', 'Missing mix id.')
 
   const nextFeatured = formData.get('next_featured') === 'true'
-  await admin.from('mixes').update({ is_featured: nextFeatured }).eq('id', id)
+  const { error } = await admin.from('mixes').update({ is_featured: nextFeatured }).eq('id', id)
+  if (error) {
+    redirectWithError('/admin/mixes', error.message || 'Unable to update featured state.')
+  }
 
   revalidateMixPaths()
   redirect('/admin/mixes')
@@ -129,13 +148,16 @@ export async function toggleMixPublishedAction(formData: FormData) {
   await requireAuthedUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
-  if (!id) redirect('/admin/mixes')
+  if (!id) redirectWithError('/admin/mixes', 'Missing mix id.')
 
   const nextPublished = formData.get('next_published') === 'true'
-  await admin
+  const { error } = await admin
     .from('mixes')
     .update({ published_at: nextPublished ? new Date().toISOString() : null })
     .eq('id', id)
+  if (error) {
+    redirectWithError('/admin/mixes', error.message || 'Unable to update publish state.')
+  }
 
   revalidateMixPaths()
   redirect('/admin/mixes')

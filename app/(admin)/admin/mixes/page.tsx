@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
+import AdminNotice from '@/components/admin/AdminNotice'
 import { createClient } from '@/lib/supabase/server'
 import { toggleMixFeaturedAction, toggleMixPublishedAction } from '@/app/actions/mixes'
 
@@ -43,8 +44,19 @@ async function getMixes(): Promise<MixRow[]> {
   }
 }
 
-export default async function MixesAdminPage() {
+function getErrorMessage(errorParam: string | string[] | undefined) {
+  if (!errorParam) return null
+  return Array.isArray(errorParam) ? errorParam[0] ?? null : errorParam
+}
+
+export default async function MixesAdminPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ error?: string | string[] }>
+}) {
   const mixes = await getMixes()
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
+  const errorMessage = getErrorMessage(resolvedSearchParams?.error)
 
   return (
     <div style={{ padding: '40px 48px', maxWidth: '1120px' }}>
@@ -53,6 +65,8 @@ export default async function MixesAdminPage() {
         subtitle={mixes.length ? `${mixes.length} total` : undefined}
         action={{ label: 'New Mix', href: '/admin/mixes/new' }}
       />
+
+      {errorMessage && <AdminNotice message={errorMessage} />}
 
       <div className="admin-section" style={{ marginBottom: 0 }}>
         <div className="admin-section-header">

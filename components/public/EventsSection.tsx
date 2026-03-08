@@ -1,8 +1,8 @@
 /**
  * EVENTS SECTION — Async Server Component
- * Fetches the next 3 upcoming public events from Supabase.
- * Shows an empty state if no events are scheduled.
- * Hover states via CSS classes — no JS event handlers.
+ * Layout matches static site reference:
+ *   Left  (1fr) — "— EVENTS" label + large heading + description
+ *   Right (2fr) — event rows (gap: 2px) + placeholder + Instagram card + See All
  */
 import Link from 'next/link'
 import { getFeaturedEvents, type Event } from '@/lib/db/events'
@@ -21,87 +21,41 @@ function formatEventDate(isoDate: string): { day: string; month: string } {
 
 function EventRow({ title, event_date, venue, city, featured }: Event) {
   const { day, month } = formatEventDate(event_date)
-  const locationParts  = [venue, city].filter(Boolean).join(' · ')
+  const location       = [venue, city].filter(Boolean).join(', ')
 
   return (
-    <div style={{
-      display: 'grid',
-      gridTemplateColumns: '120px 1fr auto',
-      alignItems: 'center',
-      gap: '28px',
-      padding: '26px 30px',
-      borderBottom: '1px solid var(--border)',
-      background: featured ? 'rgba(155,93,229,0.06)' : 'transparent',
-    }}>
-      {/* Date */}
+    <div className={`ev-item${featured ? ' ev-featured' : ''}`}>
       <div>
-        <div style={{
-          fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(34px, 3.8vw, 52px)',
-          fontWeight: 600, color: '#a66bff', lineHeight: 0.9,
-        }}>
-          {day}
-        </div>
-        <div style={{
-          fontSize: '11px', letterSpacing: '0.22em',
-          color: 'var(--muted)', textTransform: 'uppercase', marginTop: '4px',
-        }}>
-          {month}
-        </div>
+        <span className="ev-day">{day}</span>
+        <span className="ev-month">{month}</span>
       </div>
-
-      {/* Info */}
       <div>
-        <div style={{
-          fontFamily: 'DM Sans, sans-serif', fontSize: 'clamp(22px, 2.4vw, 39px)',
-          fontWeight: 600, color: 'var(--white)', marginBottom: '4px',
-          letterSpacing: '0.01em',
-        }}>
-          {title}
-        </div>
-
-        <div style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
-          {locationParts || 'Location TBA'}
-
-          {featured && (
-            <span style={{
-              marginLeft: '8px', fontSize: '8px', letterSpacing: '0.15em',
-              textTransform: 'uppercase', color: 'var(--violet)',
-              border: '1px solid rgba(155,93,229,0.3)', padding: '2px 6px',
-            }}>
-              Featured
-            </span>
-          )}
-        </div>
+        <p className="ev-name">{title}</p>
+        <p className="ev-venue">{location || 'Location TBA'}</p>
       </div>
-
-      {/* Arrow — hover via CSS class */}
-      <Link href="/events" aria-label={`Details for ${title}`} className="event-arrow" style={{ fontSize: '36px', color: featured ? '#a66bff' : 'var(--muted)' }}>
+      <Link
+        href="/events"
+        aria-label={`Details for ${title}`}
+        className="ev-link"
+      >
         →
       </Link>
     </div>
   )
 }
 
-function EmptyState() {
+function PlaceholderRow() {
   return (
-    <div style={{
-      padding: '64px 0', textAlign: 'center',
-      borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)',
-    }}>
-      <p style={{ fontSize: '13px', color: 'var(--muted)', letterSpacing: '0.04em', lineHeight: 1.7 }}>
-        No upcoming events scheduled yet.
-        <br />
-        Follow on{' '}
-        <a
-          href="https://www.instagram.com/dj_b.a.e/"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-link"
-        >
-          Instagram
-        </a>
-        {' '}for announcements.
-      </p>
+    <div className="ev-item" style={{ opacity: 0.4 }}>
+      <div>
+        <span className="ev-day">?</span>
+        <span className="ev-month">TBA</span>
+      </div>
+      <div>
+        <p className="ev-name">Your Event Could Be Here</p>
+        <p className="ev-venue">Your City</p>
+      </div>
+      <Link href="/book" className="ev-link">→</Link>
     </div>
   )
 }
@@ -115,42 +69,81 @@ export default async function EventsSection() {
     <section id="events" aria-label="Upcoming Events" style={{
       background: 'var(--black)', borderTop: '1px solid var(--border)',
     }}>
-      <div className="section-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '34px', alignItems: 'start' }}>
+      <div className="section-container" style={{
+        display:             'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+        gap:                 '34px',
+        alignItems:          'start',
+      }}>
 
-        {/* Header */}
+        {/* ── Left: label + heading + description ── */}
         <div>
-          <div>
-            <span className="section-label">Events</span>
-            <h2 className="section-heading" style={{ marginBottom: '22px', fontSize: 'clamp(52px, 7vw, 110px)', lineHeight: 0.93 }}>
-              Upcoming<br />Dates
-            </h2>
+          {/* "— EVENTS" eyebrow */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+            <span style={{ width: '22px', height: '1px', background: 'var(--violet)', display: 'block', flexShrink: 0 }} />
+            <span style={{ fontSize: '10px', letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+              Events
+            </span>
           </div>
+
+          <h2 style={{
+            fontFamily:    'Conthrax, sans-serif',
+            fontSize:      'clamp(48px, 6vw, 80px)',
+            fontWeight:    600,
+            letterSpacing: '0.01em',
+            color:         'var(--white)',
+            lineHeight:    0.95,
+            marginBottom:  '24px',
+          }}>
+            Upcoming<br />Dates
+          </h2>
+
           <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, maxWidth: '320px' }}>
             Catch DJ B.A.E. live. Follow on social for last-minute announcements and pop-up sets.
           </p>
         </div>
 
-        <div>
-          <div style={{ border: '1px solid var(--border)', background: 'linear-gradient(180deg, rgba(12,12,12,0.98), rgba(8,8,8,0.98))' }}>
-            {events.length === 0 ? (
-              <EmptyState />
-            ) : (
-              <div role="list">
-                {events.map((event) => (
-                  <div key={event.id} role="listitem">
-                    <EventRow {...event} />
-                  </div>
-                ))}
-              </div>
-            )}
+        {/* ── Right: event rows + Instagram + SEE ALL ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+
+          {/* Event rows — 2px gap between each item */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {events.map((event) => (
+              <EventRow key={event.id} {...event} />
+            ))}
+            <PlaceholderRow />
           </div>
-          <div style={{ marginTop: '18px' }}>
+
+          {/* Instagram card */}
+          <a
+            href="https://www.instagram.com/dj_b.a.e/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="card-hover"
+            style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              border: '1px solid var(--border)', padding: '16px 20px', textDecoration: 'none',
+            }}
+          >
+            <div>
+              <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>
+                Follow for updates
+              </div>
+              <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '12px', fontWeight: 600, color: 'var(--white)' }}>
+                @dj_b.a.e
+              </div>
+            </div>
+            <span style={{ fontSize: '20px', color: 'var(--muted)' }}>→</span>
+          </a>
+
+          {/* See All */}
+          <div>
             <Link href="/events" className="view-all-link">
               See All Events →
             </Link>
           </div>
-        </div>
 
+        </div>
       </div>
     </section>
   )

@@ -1,100 +1,122 @@
 import Link from 'next/link'
 import { getFeaturedMixes } from '@/lib/db/mixes'
 
-const PLACEHOLDER_MIXES = [
-  { id: '1', genre: 'Hip-Hop · Drill', title: 'Street Archives Vol. 1', accentColor: 'var(--violet)' },
-  { id: '2', genre: 'R&B · Neo Soul', title: 'After Hours', accentColor: 'var(--gold)' },
-  { id: '3', genre: 'Afrobeats · Dancehall', title: 'World Tour', accentColor: 'var(--violet)' },
-] as const
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-function accentForIndex(i: number): string {
-  return i % 2 === 0 ? 'var(--violet)' : 'var(--gold)'
+type DataGenre = 'hiphop' | 'rnb' | 'afro'
+
+// ── Per-genre linear gradients (matches static site exactly) ──────────────────
+
+const CARD_GRADIENTS: Record<DataGenre, string> = {
+  hiphop: 'linear-gradient(135deg, #1a0a2e 0%, #0f0a1a 100%)',
+  rnb:    'linear-gradient(135deg, #1a1200 0%, #0f0e05 100%)',
+  afro:   'linear-gradient(135deg, #0a1a1a 0%, #050f0f 100%)',
 }
+
+// ── Placeholder data (shown when no mixes in DB) ──────────────────────────────
+
+const PLACEHOLDER_MIXES: Array<{
+  id:          string
+  genre:       string
+  title:       string
+  durationMin: number | null
+  year:        number | null
+  href:        string | null
+  dataGenre:   DataGenre
+}> = [
+  { id: '1', genre: 'Hip-Hop · Drill',      title: 'Street Archives Vol. 1', durationMin: null, year: null, href: null, dataGenre: 'hiphop' },
+  { id: '2', genre: 'R&B · Neo Soul',        title: 'After Hours',            durationMin: 72,   year: 2025, href: null, dataGenre: 'rnb'    },
+  { id: '3', genre: 'Afrobeats · Dancehall', title: 'World Tour',             durationMin: null, year: null, href: null, dataGenre: 'afro'   },
+]
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function genreToDataAttr(genre: string): DataGenre {
+  const g = genre.toLowerCase()
+  if (g.includes('hip') || g.includes('drill') || g.includes('rap') || g.includes('trap')) return 'hiphop'
+  if (g.includes('r&b') || g.includes('rnb') || g.includes('soul') || g.includes('neo'))   return 'rnb'
+  return 'afro'
+}
+
+// ── MixCard ───────────────────────────────────────────────────────────────────
 
 function MixCard({
   genre,
   title,
-  accentColor,
   href,
+  dataGenre,
+  durationMin,
+  year,
 }: {
-  genre: string
-  title: string
-  accentColor: string
-  href?: string | null
+  genre:       string
+  title:       string
+  href?:       string | null
+  dataGenre:   DataGenre
+  durationMin: number | null
+  year:        number | null
 }) {
-  const CardBody = (
+  const bg      = CARD_GRADIENTS[dataGenre]
+  const hasMeta = durationMin !== null || year !== null
+
+  const inner = (
     <>
-      <div
-        aria-hidden="true"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '2px',
-          background: accentColor,
-          opacity: 0.5,
-        }}
-      />
+      {/* Background gradient layer */}
+      <div className="mc-bg" style={{ background: bg }} />
 
-      <span
-        style={{
-          fontSize: '9px',
-          letterSpacing: '0.25em',
-          textTransform: 'uppercase',
-          color: accentColor,
-          fontWeight: 500,
-        }}
-      >
-        {genre}
-      </span>
+      {/* Bottom-to-top dark overlay */}
+      <div className="mc-overlay" />
 
-      <h3
-        style={{
-          fontFamily: 'Conthrax, sans-serif',
-          fontSize: 'clamp(22px, 2.5vw, 44px)',
-          fontWeight: 600,
-          color: '#3348ff',
-          letterSpacing: '0.03em',
-          lineHeight: 1.2,
-          marginTop: 'auto',
-        }}
-      >
-        {title}
-      </h3>
+      {/* Play button — centre, appears on hover */}
+      <div aria-hidden="true" className="mc-play" />
+
+      {/* Content pinned to bottom — slides up slightly on hover */}
+      <div className="mc-content">
+        <p className="mc-genre">{genre}</p>
+        <h3 className="mc-title">{title}</h3>
+
+        {hasMeta && (
+          <div className="mc-meta">
+            {durationMin !== null && <span>{durationMin} min</span>}
+            {durationMin !== null && year !== null && <span>·</span>}
+            {year !== null && <span>{year}</span>}
+            <span aria-hidden="true" className="mc-eq">
+              <span className="mc-eq-bar" />
+              <span className="mc-eq-bar" />
+              <span className="mc-eq-bar" />
+              <span className="mc-eq-bar" />
+              <span className="mc-eq-bar" />
+            </span>
+          </div>
+        )}
+      </div>
     </>
   )
 
-  const sharedStyle: React.CSSProperties = {
-    background: 'linear-gradient(165deg, rgba(8,8,8,0.95), rgba(15,15,15,0.96))',
-    border: '1px solid var(--border)',
-    minHeight: '420px',
-    padding: '36px',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '18px',
-    position: 'relative',
-    overflow: 'hidden',
-    textDecoration: 'none',
-  }
-
   if (href) {
     return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="card-hover" style={sharedStyle}>
-        {CardBody}
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mc-card"
+        data-genre={dataGenre}
+      >
+        {inner}
       </a>
     )
   }
 
   return (
-    <article className="card-hover" style={sharedStyle}>
-      {CardBody}
+    <article className="mc-card" data-genre={dataGenre}>
+      {inner}
     </article>
   )
 }
 
+// ── Section ───────────────────────────────────────────────────────────────────
+
 export default async function MixesSection() {
-  const mixes = await getFeaturedMixes(3)
+  const mixes       = await getFeaturedMixes(3)
   const hasLiveData = mixes.length > 0
 
   return (
@@ -103,31 +125,25 @@ export default async function MixesSection() {
       aria-label="Featured Mixes"
       style={{
         background: 'var(--off-black)',
-        position: 'relative',
-        borderTop: '1px solid var(--border)',
+        position:   'relative',
+        borderTop:  '1px solid var(--border)',
       }}
     >
       <div className="section-container">
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'flex-end',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            gap: '16px',
-          }}
-        >
+
+        {/* Header row */}
+        <div style={{
+          display: 'flex', alignItems: 'flex-end',
+          justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px',
+        }}>
           <div>
-            <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
-              Featured Mixes
-              <span className="eq-bars" aria-hidden="true">
-                <span className="eq-bar" />
-                <span className="eq-bar" />
-                <span className="eq-bar" />
-                <span className="eq-bar" />
-                <span className="eq-bar" />
+            {/* "— FEATURED MIXES" eyebrow */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+              <span style={{ width: '22px', height: '1px', background: 'var(--violet)', display: 'block', flexShrink: 0 }} />
+              <span style={{ fontSize: '10px', letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                Featured Mixes
               </span>
-            </span>
+            </div>
             <h2 className="section-heading" style={{ marginBottom: 0 }}>
               Recent Sets
             </h2>
@@ -139,26 +155,38 @@ export default async function MixesSection() {
 
         <div aria-hidden="true" style={{ height: '1px', background: 'var(--border)', margin: '32px 0 48px' }} />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0' }}>
+        {/* 3-column grid, 2px gap — matches static site */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2px' }}>
           {hasLiveData
-            ? mixes.map((mix, i) => (
-                <MixCard
-                  key={mix.id}
-                  genre={mix.genre ?? 'Open Format'}
-                  title={mix.title}
-                  accentColor={accentForIndex(i)}
-                  href={mix.embed_url}
-                />
-              ))
+            ? mixes.map((mix) => {
+                const dg          = genreToDataAttr(mix.genre ?? '')
+                const durationMin = mix.duration ? Math.round(mix.duration / 60) : null
+                const year        = mix.published_at ? new Date(mix.published_at).getFullYear() : null
+                return (
+                  <MixCard
+                    key={mix.id}
+                    genre={mix.genre ?? 'Open Format'}
+                    title={mix.title}
+                    href={mix.embed_url}
+                    dataGenre={dg}
+                    durationMin={durationMin}
+                    year={year}
+                  />
+                )
+              })
             : PLACEHOLDER_MIXES.map((mix) => (
                 <MixCard
                   key={mix.id}
                   genre={mix.genre}
                   title={mix.title}
-                  accentColor={mix.accentColor}
+                  href={mix.href}
+                  dataGenre={mix.dataGenre}
+                  durationMin={mix.durationMin}
+                  year={mix.year}
                 />
               ))}
         </div>
+
       </div>
     </section>
   )

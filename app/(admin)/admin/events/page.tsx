@@ -8,6 +8,7 @@
 import Link from 'next/link'
 import PageHeader      from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
+import AdminNotice     from '@/components/admin/AdminNotice'
 import { createClient } from '@/lib/supabase/server'
 import { toggleEventFeaturedAction, toggleEventPublicAction } from '@/app/actions/events'
 
@@ -45,8 +46,19 @@ async function getEvents(): Promise<EventRow[]> {
   }
 }
 
-export default async function EventsPage() {
+function getErrorMessage(errorParam: string | string[] | undefined) {
+  if (!errorParam) return null
+  return Array.isArray(errorParam) ? errorParam[0] ?? null : errorParam
+}
+
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ error?: string | string[] }>
+}) {
   const events = await getEvents()
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
+  const errorMessage = getErrorMessage(resolvedSearchParams?.error)
 
   return (
     <div style={{ padding: '40px 48px', maxWidth: '1120px' }}>
@@ -55,6 +67,8 @@ export default async function EventsPage() {
         subtitle={events.length ? `${events.length} total` : undefined}
         action={{ label: 'New Event', href: '/admin/events/new' }}
       />
+
+      {errorMessage && <AdminNotice message={errorMessage} />}
 
       <div className="admin-section" style={{ marginBottom: 0 }}>
         <div className="admin-section-header">
