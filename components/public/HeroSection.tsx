@@ -4,9 +4,8 @@
  *   Top-left  — eyebrow + large Conthrax headline
  *   Top-right — date pill + short descriptor text
  *   Centre    — open void with ambient glow (HeroGlowLayer)
- *   Bottom    — floating "Book Your Date" card above genre ticker
+ *   Bottom    — reserved motion area above genre ticker
  */
-import Link          from 'next/link'
 import Image         from 'next/image'
 import HeroGlowLayer from '@/components/effects/HeroGlowLayer'
 
@@ -26,8 +25,6 @@ const GENRES = ['HOUSE', 'DRILL', 'LATIN', 'TRAP', 'CLUB', 'HIP HOP', 'R&B', 'AF
 export default function HeroSection({ content = {} }: Props) {
   const title      = content.hero_title?.trim() || 'THE BAE AGENDA'
   const subtitle   = content.hero_subtitle    ?? 'Private events, club nights, weddings & branded experiences.'
-  const ctaPrimary = content.hero_cta_primary ?? 'Book Your Date'
-  const ctaSecondary = content.hero_cta_secondary?.trim() || 'Listen To Mixes'
 
   // Server-rendered — matches Farm Minerals date badge pattern
   const today = new Date().toLocaleDateString('en-US', {
@@ -164,101 +161,30 @@ export default function HeroSection({ content = {} }: Props) {
       {/* ── Centre void — glow fills this space ──────────── */}
       <div style={{ flex: 1 }} />
 
-      {/* ── Bottom — card + genre band ────────────────────── */}
+      {/* ── Bottom — motion stage + genre band ─────────────── */}
       <div style={{ position: 'relative', zIndex: 1 }}>
-
-        {/* Booking card — centred */}
         <div style={{
           padding:        '0 clamp(32px, 5vw, 72px) 44px',
           display:        'flex',
           justifyContent: 'center',
         }}>
           <div
+            className="hero-motion-stage"
             style={{
               display: 'flex',
-              alignItems: 'stretch',
+              alignItems: 'center',
               justifyContent: 'center',
-              gap: '12px',
-              flexWrap: 'wrap',
               width: '100%',
+              minHeight: '132px',
             }}
           >
-            <Link
-              href="/book"
-              className="hero-book-card"
-              style={{
-                display:        'flex',
-                alignItems:     'center',
-                justifyContent: 'space-between',
-                gap:            '52px',
-                background:     'rgba(255,255,255,0.04)',
-                border:         '1px solid rgba(255,255,255,0.1)',
-                borderRadius:   '6px',
-                padding:        '20px 24px',
-                textDecoration: 'none',
-                minWidth:       '340px',
-                backdropFilter: 'blur(16px)',
-              }}
-            >
-              <div>
-                <div style={{
-                  fontFamily:    'Conthrax, sans-serif',
-                  fontSize:      '13px',
-                  fontWeight:    600,
-                  letterSpacing: '0.06em',
-                  color:         'var(--white)',
-                  marginBottom:  '5px',
-                }}>
-                  {ctaPrimary}
-                </div>
-                <div style={{
-                  fontFamily:    'DM Sans, sans-serif',
-                  fontSize:      '11px',
-                  color:         'var(--muted)',
-                  letterSpacing: '0.02em',
-                }}>
-                  Inquiries open for 2026
-                </div>
-              </div>
-
-              <div aria-hidden="true" style={{
-                width:          '38px',
-                height:         '38px',
-                borderRadius:   '50%',
-                border:         '1px solid rgba(155,93,229,0.45)',
-                display:        'flex',
-                alignItems:     'center',
-                justifyContent: 'center',
-                color:          'var(--violet)',
-                fontSize:       '17px',
-                flexShrink:     0,
-              }}>
-                →
-              </div>
-            </Link>
-
-            <Link
-              href="/#mixes"
-              className="hero-book-card"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '20px 24px',
-                minWidth: '220px',
-                borderRadius: '6px',
-                border: '1px solid rgba(255,255,255,0.1)',
-                background: 'rgba(255,255,255,0.02)',
-                color: 'var(--white)',
-                textDecoration: 'none',
-                fontSize: '11px',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                backdropFilter: 'blur(16px)',
-              }}
-            >
-              {ctaSecondary}
-            </Link>
+            <div className="hero-motion-rig" aria-hidden="true">
+              <span className="hero-orbit hero-orbit-a" />
+              <span className="hero-orbit hero-orbit-b" />
+              <span className="hero-core" />
+              <span className="hero-pulse-line hero-pulse-line-a" />
+              <span className="hero-pulse-line hero-pulse-line-b" />
+            </div>
           </div>
         </div>
 

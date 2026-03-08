@@ -268,18 +268,15 @@ export default function BookPage() {
             </label>
           )}
 
-          <div style={responsiveGridStyle()}>
-            <label style={{ display: 'grid', gap: '8px' }}>
-              <span className="section-label" style={{ marginBottom: 0 }}>Venue / Address</span>
-              <input
-                value={form.venue}
-                onChange={(e) => updateField('venue', e.target.value)}
-                placeholder="Venue name or full address"
-                style={inputStyle()}
-              />
-            </label>
-            <div aria-hidden="true" />
-          </div>
+          <label style={{ display: 'grid', gap: '8px' }}>
+            <span className="section-label" style={{ marginBottom: 0 }}>Venue / Address</span>
+            <input
+              value={form.venue}
+              onChange={(e) => updateField('venue', e.target.value)}
+              placeholder="Venue name or full address"
+              style={inputStyle()}
+            />
+          </label>
 
           <label style={{ display: 'grid', gap: '8px' }}>
             <span className="section-label" style={{ marginBottom: 0 }}>Package</span>
@@ -318,11 +315,21 @@ export default function BookPage() {
             </p>
           )}
 
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-            <button type="submit" className="btn-primary" disabled={loading} style={{ opacity: loading ? 0.6 : 1 }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gap: '12px',
+            alignItems: 'stretch',
+          }}>
+            <button
+              type="submit"
+              className="btn-primary"
+              disabled={loading}
+              style={{ opacity: loading ? 0.6 : 1, width: '100%', textAlign: 'center' }}
+            >
               {loading ? 'Submitting...' : 'Submit Booking Request'}
             </button>
-            <Link href="/" className="btn-ghost">
+            <Link href="/" className="btn-ghost" style={{ width: '100%', justifyContent: 'center' }}>
               Back to homepage
             </Link>
           </div>
@@ -362,7 +369,7 @@ function buildDateOptions() {
   for (let i = 0; i < 365; i += 1) {
     const date = new Date(start)
     date.setDate(start.getDate() + i)
-    const value = date.toISOString().slice(0, 10)
+    const value = formatDateValue(date)
     const label = date.toLocaleDateString('en-US', {
       weekday: 'short',
       month: 'short',
@@ -396,4 +403,11 @@ function formatTimeLabel(hour: number, minute: number) {
   const normalizedHour = hour % 12 || 12
   const suffix = hour >= 12 ? 'PM' : 'AM'
   return `${normalizedHour}:${String(minute).padStart(2, '0')} ${suffix}`
+}
+
+function formatDateValue(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
 }

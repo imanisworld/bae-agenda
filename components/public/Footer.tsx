@@ -12,25 +12,24 @@ export default function Footer() {
   return (
     <footer aria-label="Site footer" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
 
-      {/* Main content */}
-      <div className="section-container" style={{ paddingTop: '72px', paddingBottom: '72px' }}>
+      <div className="section-container" style={{ paddingTop: '42px', paddingBottom: '34px' }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: '1fr auto auto',
-          gap: '64px', alignItems: 'start',
+          gridTemplateColumns: 'minmax(0, 1.2fr) repeat(2, minmax(120px, auto))',
+          gap: '36px', alignItems: 'start',
         }}>
 
           {/* Brand */}
-          <div style={{ maxWidth: '300px' }}>
-            <Link href="/" className="hover-link" style={{ display: 'inline-block', marginBottom: '12px' }}>
+          <div style={{ maxWidth: '280px' }}>
+            <Link href="/" className="hover-link" style={{ display: 'inline-block', marginBottom: '8px' }}>
               <span style={{
-                fontFamily: 'Conthrax, sans-serif', fontSize: '14px',
+                fontFamily: 'Conthrax, sans-serif', fontSize: '13px',
                 fontWeight: 600, letterSpacing: '0.18em', color: 'var(--white)',
               }}>
                 DJ <span style={{ color: 'var(--violet)' }}>B.A.E.</span>
               </span>
             </Link>
-            <p style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7, fontWeight: 300 }}>
+            <p style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.6, fontWeight: 300 }}>
               Chicago&apos;s DJ, curator, and experience architect. Every set is built to be felt.
             </p>
           </div>
@@ -41,10 +40,10 @@ export default function Footer() {
               Navigate
             </p>
             <nav aria-label="Footer navigation">
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {PUBLIC_NAV.map((item) => (
                   <li key={item.href}>
-                    <Link href={item.href} className="hover-link" style={{ fontSize: '12px', letterSpacing: '0.06em' }}>
+                    <Link href={item.href} className="hover-link" style={{ fontSize: '11px', letterSpacing: '0.06em' }}>
                       {item.label}
                     </Link>
                   </li>
@@ -58,17 +57,17 @@ export default function Footer() {
             <p style={{ fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--eyebrow)', marginBottom: '20px' }}>
               Connect
             </p>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {SOCIALS.map((social) => (
-                <li key={social.label}>
-                  <a
+              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {SOCIALS.map((social) => (
+                  <li key={social.label}>
+                    <a
                     href={social.url} target="_blank" rel="noopener noreferrer"
                     aria-label={social.label}
                     className="hover-link"
-                    style={{ fontSize: '12px', letterSpacing: '0.06em' }}
-                  >
-                    {social.label}
-                  </a>
+                      style={{ fontSize: '11px', letterSpacing: '0.06em' }}
+                    >
+                      {social.label}
+                    </a>
                 </li>
               ))}
             </ul>
@@ -77,13 +76,13 @@ export default function Footer() {
       </div>
 
       {/* Copyright bar */}
-      <div style={{ borderTop: '1px solid var(--border)', padding: '20px 64px' }}>
+      <div style={{ borderTop: '1px solid var(--border)', padding: '14px 32px' }}>
         <div style={{
           maxWidth: '1280px', margin: '0 auto',
           display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
           flexWrap: 'wrap', gap: '12px',
         }}>
-          <p style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
+          <p style={{ fontSize: '10px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
             © {CURRENT_YEAR} DJ B.A.E. · The Bae Agenda. All rights reserved.
           </p>
         </div>

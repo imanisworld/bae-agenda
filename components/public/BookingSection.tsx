@@ -6,6 +6,7 @@
  * Accepts optional CMS override for booking email.
  * Falls back to CONTENT_DEFAULTS.booking_email if not set.
  */
+import Link from 'next/link'
 import { PACKAGES } from '@/lib/constants'
 import { formatCurrency } from '@/lib/utils'
 import { CONTENT_DEFAULTS } from '@/lib/content-schema'
@@ -15,20 +16,14 @@ interface Props {
 }
 
 function PackageCard({
-  name, price, hours, desc, featured = false, bookingEmail,
+  name, price, hours, desc, featured = false,
 }: {
   name:         string
   price:        number | null
   hours:        number
   desc:         string
   featured?:    boolean
-  bookingEmail: string
 }) {
-  const subject = encodeURIComponent(`Booking Inquiry: ${name}`)
-  const href    = bookingEmail
-    ? `mailto:${bookingEmail}?subject=${subject}`
-    : '/#booking'
-
   return (
     <div style={{
       padding: '32px',
@@ -74,9 +69,9 @@ function PackageCard({
       </p>
 
       {/* CSS class handles hover — .pkg-btn and .pkg-btn-featured in globals.css */}
-      <a href={href} className={featured ? 'pkg-btn-featured' : 'pkg-btn'}>
+      <Link href="/book" className={featured ? 'pkg-btn-featured' : 'pkg-btn'}>
         Book This Package
-      </a>
+      </Link>
     </div>
   )
 }
@@ -123,19 +118,14 @@ export default function BookingSection({ bookingEmail }: Props) {
               hours={pkg.hours}
               desc={pkg.desc}
               featured={i === 1}
-              bookingEmail={email}
             />
           ))}
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-          {/* Primary CTA — opens email client with pre-filled subject */}
-          <a
-            href={email ? `mailto:${email}?subject=Booking%20Inquiry` : '/#booking'}
-            className="btn-white"
-          >
+          <Link href="/book" className="btn-white">
             Start Booking Process →
-          </a>
+          </Link>
 
           {email && (
             <span style={{ fontSize: '13px', color: 'rgba(245,245,240,0.78)', lineHeight: 1.6 }}>

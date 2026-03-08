@@ -56,8 +56,12 @@ export default function ConnectSection({ socialOverrides = {} }: Props) {
 
         {/* Social grid */}
         <div style={{
-          display: 'flex', flexWrap: 'wrap',
-          justifyContent: 'center', gap: '16px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(92px, 1fr))',
+          justifyContent: 'center',
+          gap: '18px',
+          maxWidth: '760px',
+          margin: '0 auto',
         }}>
           {socials.map(({ label, url, icon }) => (
             <a
@@ -67,17 +71,13 @@ export default function ConnectSection({ socialOverrides = {} }: Props) {
               rel="noopener noreferrer"
               aria-label={`DJ B.A.E. on ${label}`}
               className="social-card"
+              style={{ minWidth: 0 }}
             >
-              <span
-                aria-hidden="true"
-                style={{ fontSize: '22px', lineHeight: 1, display: 'block', marginBottom: '10px' }}
-              >
-                {icon}
-              </span>
+              <span className="social-orb" aria-hidden="true">{icon}</span>
               <span style={{
                 fontFamily: 'Conthrax, sans-serif',
-                fontSize: '10px', fontWeight: 600,
-                letterSpacing: '0.15em', textTransform: 'uppercase',
+                fontSize: '9px', fontWeight: 600,
+                letterSpacing: '0.12em', textTransform: 'uppercase',
                 color: 'var(--white)',
               }}>
                 {label}
