@@ -96,7 +96,7 @@ export default function HeroSection({ content = {} }: Props) {
           display: 'flex', alignItems: 'center',
           justifyContent: 'center', gap: '16px', flexWrap: 'wrap',
         }}>
-          <Link href="/#booking" className="btn-primary">
+          <Link href="/book" className="btn-primary">
             {ctaPrimary}
           </Link>
           <Link href="/#mixes" className="btn-ghost">

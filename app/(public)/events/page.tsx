@@ -227,7 +227,7 @@ export default async function EventsPage() {
           }}>
             Want to book a private event or collaborate?
           </p>
-          <Link href="/#booking" className="btn-primary">
+          <Link href="/book" className="btn-primary">
             Book Your Event
           </Link>
         </div>
