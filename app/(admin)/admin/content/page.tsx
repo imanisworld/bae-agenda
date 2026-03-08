@@ -1,15 +1,22 @@
 /**
- * ADMIN — CONTENT
- * Phase 1: Stub. Full implementation in Phase 3.
+ * ADMIN CONTENT EDITOR
+ * Allows editing core website copy stored in the site_content table.
+ * Changes go live on the public site immediately after saving.
  */
-import { ComingSoon } from '@/components/admin/ComingSoon'
+import PageHeader      from '@/components/admin/PageHeader'
+import ContentEditor   from '@/components/admin/ContentEditor'
+import { getAllContent } from '@/lib/db/content'
 
-export default function ContentPage() {
+export default async function ContentPage() {
+  const content = await getAllContent()
+
   return (
-    <ComingSoon
-      title="Content"
-      icon="✏️"
-      desc="Edit bio, mixes, packages, and other content shown on the public site."
-    />
+    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+      <PageHeader
+        title="Content Editor"
+        subtitle="Edit public-facing site copy. Changes go live immediately after saving."
+      />
+      <ContentEditor saved={content} />
+    </div>
   )
 }

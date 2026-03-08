@@ -2,10 +2,37 @@
  * CONNECT SECTION — Server Component
  * "Stay Connected" — social links grid.
  * Hover via CSS class; no JS event handlers.
+ *
+ * Accepts optional CMS overrides for instagram_url, soundcloud_url, youtube_url.
+ * All other social links remain from the SOCIALS constant.
  */
 import { SOCIALS } from '@/lib/constants'
 
-export default function ConnectSection() {
+interface SocialOverrides {
+  instagram_url?:  string
+  soundcloud_url?: string
+  youtube_url?:    string
+}
+
+interface Props {
+  socialOverrides?: SocialOverrides
+}
+
+/** Map from SOCIALS label → CMS key */
+const CMS_OVERRIDE_MAP: Record<string, keyof SocialOverrides> = {
+  Instagram:  'instagram_url',
+  SoundCloud: 'soundcloud_url',
+  YouTube:    'youtube_url',
+}
+
+export default function ConnectSection({ socialOverrides = {} }: Props) {
+  // Merge CMS overrides into SOCIALS — only override if the CMS value is non-empty
+  const socials = SOCIALS.map(s => {
+    const cmsKey = CMS_OVERRIDE_MAP[s.label]
+    const override = cmsKey ? socialOverrides[cmsKey] : undefined
+    return { ...s, url: override || s.url }
+  })
+
   return (
     <section
       id="connect"
@@ -32,7 +59,7 @@ export default function ConnectSection() {
           display: 'flex', flexWrap: 'wrap',
           justifyContent: 'center', gap: '16px',
         }}>
-          {SOCIALS.map(({ label, url, icon }) => (
+          {socials.map(({ label, url, icon }) => (
             <a
               key={label}
               href={url}
