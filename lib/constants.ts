@@ -6,10 +6,10 @@
 
 // ---- Navigation --------------------------------------------
 export const PUBLIC_NAV = [
-  { label: 'Mixes',  href: '/mixes'   },
-  { label: 'Events', href: '/events'  },
-  { label: 'Book',   href: '/book'    },
-  { label: 'Connect', href: '/connect' },
+  { label: 'Mixes',   href: '/#mixes'   },
+  { label: 'Events',  href: '/#events'  },
+  { label: 'Book',    href: '/#booking' },
+  { label: 'Connect', href: '/#connect' },
 ] as const
 
 export const ADMIN_NAV = [

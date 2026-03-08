@@ -1,8 +1,10 @@
 /**
  * HERO SECTION — Server Component
  * Full-viewport hero. Hover states via CSS classes (no JS event handlers).
+ * Glow blobs live in HeroGlowLayer (Client Component) for parallax + float.
  */
-import Link from 'next/link'
+import Link          from 'next/link'
+import HeroGlowLayer from '@/components/effects/HeroGlowLayer'
 
 export default function HeroSection() {
   return (
@@ -18,20 +20,7 @@ export default function HeroSection() {
       }}
     >
       <div className="noise-overlay" aria-hidden="true" />
-
-      {/* Violet glow — bottom right */}
-      <div aria-hidden="true" style={{
-        position: 'absolute', width: '70vw', height: '70vw',
-        background: 'radial-gradient(circle, rgba(155,93,229,0.13) 0%, transparent 68%)',
-        bottom: '-15%', right: '-15%', pointerEvents: 'none', zIndex: 0,
-      }} />
-
-      {/* Gold glow — top left */}
-      <div aria-hidden="true" style={{
-        position: 'absolute', width: '50vw', height: '50vw',
-        background: 'radial-gradient(circle, rgba(201,168,76,0.05) 0%, transparent 70%)',
-        top: '-5%', left: '-10%', pointerEvents: 'none', zIndex: 0,
-      }} />
+      <HeroGlowLayer />
 
       {/* Content */}
       <div style={{

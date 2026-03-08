@@ -65,7 +65,16 @@ export default function MixesSection() {
           justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px',
         }}>
           <div>
-            <span className="section-label">Featured Mixes</span>
+            <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
+              Featured Mixes
+              <span className="eq-bars" aria-hidden="true">
+                <span className="eq-bar" />
+                <span className="eq-bar" />
+                <span className="eq-bar" />
+                <span className="eq-bar" />
+                <span className="eq-bar" />
+              </span>
+            </span>
             <h2 className="section-heading" style={{ marginBottom: 0 }}>Latest Drops</h2>
           </div>
           <Link href="/mixes" className="view-all-link" style={{ marginBottom: '10px' }}>

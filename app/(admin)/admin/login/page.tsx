@@ -21,21 +21,33 @@ export default function AdminLoginPage() {
     e.preventDefault()
     setError('')
     setLoading(true)
+ try {
+  const supabase = createClient()
 
-    const supabase = createClient()
-    const { error: authError } = await supabase.auth.signInWithPassword({
+  const { data, error: authError } =
+    await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
-    if (authError) {
-      setError('Invalid credentials. Try again.')
-      setLoading(false)
-      return
-    }
+  console.log('signInWithPassword result:', { data, authError })
 
-    router.push('/admin/dashboard')
-    router.refresh()
+  if (authError) {
+    console.error('Supabase sign-in error:', authError)
+    setError(authError.message || 'Sign in failed.')
+    setLoading(false)
+    return
+  }
+
+  router.replace('/admin/dashboard')
+  router.refresh()
+  setLoading(false)
+
+} catch (err) {
+  console.error('Unexpected login error:', err)
+  setError('Unexpected error during sign in.')
+  setLoading(false)
+}
   }
 
   return (

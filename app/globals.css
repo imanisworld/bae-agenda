@@ -330,6 +330,59 @@ body {
 }
 .inline-link:hover { color: var(--white); }
 
+/* ── Social card (ConnectSection) ────────────────────────────────── */
+.social-card {
+  display: flex; flex-direction: column; align-items: center;
+  padding: 28px 32px; min-width: 120px;
+  background: var(--surface); border: 1px solid var(--border);
+  text-decoration: none;
+  transition: border-color var(--motion-fast) var(--ease-standard),
+              background   var(--motion-fast) var(--ease-standard);
+}
+.social-card:hover { border-color: rgba(155,93,229,0.4); background: var(--violet-dim); }
+
+/* ── Tech card (BuiltSection) ────────────────────────────────────── */
+.tech-card {
+  background: var(--surface); padding: 24px;
+  border: 1px solid transparent;
+  transition: border-color var(--motion-fast) var(--ease-standard);
+}
+.tech-card:hover { border-color: rgba(155,93,229,0.25); }
+
+/* ── Custom cursor ──────────────────────────────────────────────────── */
+/* Hide system cursor when our custom cursor is active */
+body.has-custom-cursor,
+body.has-custom-cursor * { cursor: none !important; }
+
+/* ── EQ bars (MixesSection animated music decor) ───────────────────── */
+.eq-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 14px;
+  vertical-align: middle;
+}
+.eq-bar {
+  display: inline-block;
+  width: 3px;
+  border-radius: 1px;
+  background: var(--violet);
+  opacity: 0.55;
+  animation: eq-bounce 0.8s ease-in-out infinite alternate;
+}
+.eq-bar:nth-child(1) { height: 6px;  animation-duration: 0.70s; animation-delay: -0.10s; }
+.eq-bar:nth-child(2) { height: 10px; animation-duration: 0.90s; animation-delay: -0.42s; }
+.eq-bar:nth-child(3) { height: 4px;  animation-duration: 0.60s; animation-delay: -0.05s; }
+.eq-bar:nth-child(4) { height: 8px;  animation-duration: 0.85s; animation-delay: -0.60s; }
+.eq-bar:nth-child(5) { height: 12px; animation-duration: 1.00s; animation-delay: -0.28s; }
+@keyframes eq-bounce {
+  from { height: 2px; }
+  to   { height: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eq-bar { animation: none !important; }
+}
+
 /* ── Admin UI ─────────────────────────────────────────────────────── */
 
 /* Table */

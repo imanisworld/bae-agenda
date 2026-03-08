@@ -1,19 +1,20 @@
+'use server'
 /**
  * AUTH SERVER ACTIONS
- * Server-side auth mutations called from Client Components.
- * 'use server' ensures these never run in the browser bundle.
+ * Called from the admin Sidebar logout form.
+ * 'use server' must be the first line so Next.js treats this as a server-only module.
+ * If it were not first, next/headers would end up in the client bundle → client-side crash.
  */
-'use server'
-
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
+import { redirect }     from 'next/navigation'
 
-/**
- * Sign out the current admin user and redirect to /admin/login.
- * Called from the Sidebar logout button.
- */
 export async function signOut() {
-  const supabase = await createClient()
-  await supabase.auth.signOut()
+  try {
+    const supabase = await createClient()
+    await supabase.auth.signOut()
+  } catch {
+    // If the session is already gone, still redirect to login
+  }
+  // redirect() must be outside try/catch — it throws a special NEXT_REDIRECT internally
   redirect('/admin/login')
 }

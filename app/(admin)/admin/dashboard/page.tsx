@@ -1,279 +1,370 @@
 /**
  * ADMIN DASHBOARD
- * Overview / home page of the admin panel.
- * Phase 1: Stat shell cards (static). Data-fetching added in Phase 2.
+ * Control room overview: stat cards, recent bookings, upcoming events, payment reminders.
+ * Server Component — data fetched server-side.
+ * Falls back to realistic mock data when Supabase is not yet connected.
  */
+import Link            from 'next/link'
+import StatCard        from '@/components/admin/StatCard'
+import Badge           from '@/components/admin/Badge'
+import PageHeader      from '@/components/admin/PageHeader'
 import { createClient } from '@/lib/supabase/server'
+import type { BookingStatus, PaymentStatus } from '@/types/index'
 
-// ── Stat card shape ──────────────────────────────────────────────
-interface StatCardProps {
-  label: string
-  value: string | number
-  sub?: string
-  accent?: 'violet' | 'gold' | 'default'
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+interface RecentBooking {
+  id:          string
+  event_name:  string
+  event_date:  string
+  client_name: string | null
+  status:      BookingStatus
 }
 
-function StatCard({ label, value, sub, accent = 'default' }: StatCardProps) {
-  const accentColor =
-    accent === 'violet'
-      ? 'var(--violet)'
-      : accent === 'gold'
-        ? 'var(--gold)'
-        : 'var(--white)'
-
-  return (
-    <div
-      style={{
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        padding: '24px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '8px',
-      }}
-    >
-      <div
-        style={{
-          fontSize: '10px',
-          letterSpacing: '0.2em',
-          textTransform: 'uppercase',
-          color: 'var(--muted)',
-        }}
-      >
-        {label}
-      </div>
-      <div
-        style={{
-          fontFamily: 'Conthrax, sans-serif',
-          fontSize: '28px',
-          fontWeight: 600,
-          color: accentColor,
-          lineHeight: 1,
-        }}
-      >
-        {value}
-      </div>
-      {sub && (
-        <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{sub}</div>
-      )}
-    </div>
-  )
+interface UpcomingEvent {
+  id:         string
+  title:      string
+  event_date: string
+  venue:      string | null
+  featured:   boolean
 }
 
-// ── Quick link card ──────────────────────────────────────────────
-function QuickLink({
-  href,
-  icon,
-  label,
-  desc,
-}: {
-  href: string
-  icon: string
-  label: string
-  desc: string
-}) {
-  return (
-    <a
-      href={href}
-      style={{
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: '16px',
-        padding: '20px 24px',
-        background: 'var(--surface)',
-        border: '1px solid var(--border)',
-        textDecoration: 'none',
-        transition: `border-color var(--motion-fast) var(--ease-standard),
-                     background var(--motion-fast) var(--ease-standard)`,
-      }}
-      onMouseEnter={(e) => {
-        ;(e.currentTarget as HTMLAnchorElement).style.borderColor =
-          'rgba(155,93,229,0.3)'
-        ;(e.currentTarget as HTMLAnchorElement).style.background =
-          'var(--violet-dim)'
-      }}
-      onMouseLeave={(e) => {
-        ;(e.currentTarget as HTMLAnchorElement).style.borderColor =
-          'var(--border)'
-        ;(e.currentTarget as HTMLAnchorElement).style.background =
-          'var(--surface)'
-      }}
-    >
-      <span style={{ fontSize: '20px', lineHeight: 1, marginTop: '2px' }}>
-        {icon}
-      </span>
-      <div>
-        <div
-          style={{
-            fontSize: '12px',
-            letterSpacing: '0.08em',
-            textTransform: 'uppercase',
-            color: 'var(--white)',
-            marginBottom: '4px',
-            fontWeight: 500,
-          }}
-        >
-          {label}
-        </div>
-        <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{desc}</div>
-      </div>
-    </a>
-  )
+interface PaymentReminder {
+  id:           string
+  booking_name: string
+  amount:       number
+  status:       PaymentStatus
+  type:         string
 }
 
-// ── Page ─────────────────────────────────────────────────────────
+interface DashboardStats {
+  upcomingEvents:   number
+  activeBookings:   number
+  pendingInquiries: number
+  totalClients:     number
+}
+
+// ── Mock Data (shown when DB not connected) ───────────────────────────────────
+
+const MOCK_STATS: DashboardStats = {
+  upcomingEvents:   4,
+  activeBookings:   7,
+  pendingInquiries: 3,
+  totalClients:     22,
+}
+
+const MOCK_BOOKINGS: RecentBooking[] = [
+  { id: 'm1', event_name: 'Birthday Celebration',    event_date: '2026-03-22', client_name: 'Marcus Webb',    status: 'inquiry'   },
+  { id: 'm2', event_name: 'House Music Brunch',      event_date: '2026-03-15', client_name: 'Nadia Thomas',   status: 'confirmed' },
+  { id: 'm3', event_name: 'Corporate After-Party',   event_date: '2026-04-05', client_name: 'Priya Sharma',   status: 'confirmed' },
+  { id: 'm4', event_name: 'Club Night at Spybar',    event_date: '2026-04-12', client_name: 'Jordan Lee',     status: 'inquiry'   },
+  { id: 'm5', event_name: 'Wedding Reception',       event_date: '2026-02-28', client_name: 'Destiny Brown',  status: 'completed' },
+]
+
+const MOCK_EVENTS: UpcomingEvent[] = [
+  { id: 'e1', title: 'The Agenda: Monthly Residency', event_date: '2026-03-21', venue: 'Spybar Chicago',        featured: true  },
+  { id: 'e2', title: 'Day Party Series Vol. 3',        event_date: '2026-04-04', venue: 'The Promontory',        featured: false },
+  { id: 'e3', title: 'Corporate After-Party',          event_date: '2026-04-17', venue: 'Ace Hotel Chicago',     featured: false },
+  { id: 'e4', title: 'Summer Kickoff Rooftop',         event_date: '2026-05-25', venue: 'Soho House Chicago',    featured: true  },
+]
+
+const MOCK_PAYMENTS: PaymentReminder[] = [
+  { id: 'p1', booking_name: 'Birthday Celebration',  amount: 300, status: 'pending', type: 'deposit' },
+  { id: 'p2', booking_name: 'House Music Brunch',    amount: 150, status: 'pending', type: 'balance' },
+  { id: 'p3', booking_name: 'Corporate After-Party', amount: 300, status: 'pending', type: 'deposit' },
+]
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    timeZone: 'America/Chicago',
+  })
+}
+
+function fmtCurrency(n: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency', currency: 'USD', maximumFractionDigits: 0,
+  }).format(n)
+}
+
+// ── Data ──────────────────────────────────────────────────────────────────────
+
+async function getDashboardData() {
+  try {
+    const supabase = await createClient()
+    const now = new Date().toISOString()
+
+    const [
+      { count: upcomingEvents   },
+      { count: activeBookings   },
+      { count: pendingInquiries },
+      { count: totalClients     },
+      { data: bookingRows       },
+      { data: eventRows         },
+      { data: paymentRows       },
+    ] = await Promise.all([
+      supabase.from('events').select('*', { count: 'exact', head: true })
+        .eq('public', true).gte('event_date', now),
+      supabase.from('bookings').select('*', { count: 'exact', head: true })
+        .eq('status', 'confirmed'),
+      supabase.from('bookings').select('*', { count: 'exact', head: true })
+        .eq('status', 'inquiry'),
+      supabase.from('clients').select('*', { count: 'exact', head: true }),
+      supabase.from('bookings')
+        .select('id, event_name, event_date, status, clients(first_name, last_name)')
+        .order('created_at', { ascending: false }).limit(5),
+      supabase.from('events')
+        .select('id, title, event_date, venue, featured')
+        .eq('public', true).gte('event_date', now)
+        .order('event_date', { ascending: true }).limit(4),
+      supabase.from('payments')
+        .select('id, amount, status, type, bookings(event_name)')
+        .eq('status', 'pending')
+        .order('created_at', { ascending: false }).limit(5),
+    ])
+
+    return {
+      connected: true,
+      mock: false,
+      stats: {
+        upcomingEvents:   upcomingEvents   ?? 0,
+        activeBookings:   activeBookings   ?? 0,
+        pendingInquiries: pendingInquiries ?? 0,
+        totalClients:     totalClients     ?? 0,
+      },
+      recentBookings: (bookingRows ?? []).map((b: any) => ({
+        id:          b.id,
+        event_name:  b.event_name,
+        event_date:  b.event_date,
+        client_name: b.clients
+          ? `${b.clients.first_name ?? ''} ${b.clients.last_name ?? ''}`.trim() || null
+          : null,
+        status: b.status as BookingStatus,
+      })) as RecentBooking[],
+      upcomingEvents:   (eventRows   ?? []) as UpcomingEvent[],
+      paymentReminders: (paymentRows ?? []).map((p: any) => ({
+        id:           p.id,
+        booking_name: p.bookings?.event_name ?? 'Unknown',
+        amount:       p.amount,
+        status:       p.status as PaymentStatus,
+        type:         p.type,
+      })) as PaymentReminder[],
+    }
+  } catch {
+    // DB not connected — return mock data so the dashboard feels operational
+    return {
+      connected: false,
+      mock: true,
+      stats:           MOCK_STATS,
+      recentBookings:  MOCK_BOOKINGS,
+      upcomingEvents:  MOCK_EVENTS,
+      paymentReminders: MOCK_PAYMENTS,
+    }
+  }
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
 export default async function DashboardPage() {
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const raw = await getDashboardData()
 
-  // Format today's date
+  // Use sample data whenever there's nothing real to show yet —
+  // either DB isn't connected, or connected but tables are still empty.
+  const isEmpty =
+    raw.recentBookings.length === 0 &&
+    raw.upcomingEvents.length  === 0 &&
+    raw.paymentReminders.length === 0
+
+  const usingSample = !raw.connected || isEmpty
+
+  const stats           = usingSample ? MOCK_STATS    : raw.stats
+  const recentBookings  = usingSample ? MOCK_BOOKINGS : raw.recentBookings
+  const upcomingEvents  = usingSample ? MOCK_EVENTS   : raw.upcomingEvents
+  const paymentReminders = usingSample ? MOCK_PAYMENTS : raw.paymentReminders
+
   const today = new Date().toLocaleDateString('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   })
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '1100px' }}>
-      {/* ── Page header ──────────────────────────────── */}
-      <div style={{ marginBottom: '40px' }}>
-        <h1
-          style={{
-            fontFamily: 'Conthrax, sans-serif',
-            fontSize: '22px',
-            fontWeight: 600,
-            letterSpacing: '0.05em',
-            color: 'var(--white)',
-            marginBottom: '6px',
-          }}
-        >
-          Dashboard
-        </h1>
-        <p style={{ fontSize: '12px', color: 'var(--muted)' }}>{today}</p>
-      </div>
+    <div style={{ padding: '40px 48px', maxWidth: '1120px' }}>
 
-      {/* ── Setup notice — shown until Supabase is connected ── */}
-      <div
-        style={{
-          background: 'rgba(201,168,76,0.08)',
-          border: '1px solid rgba(201,168,76,0.25)',
-          padding: '16px 20px',
-          marginBottom: '40px',
-          display: 'flex',
-          alignItems: 'flex-start',
-          gap: '12px',
-        }}
-      >
-        <span style={{ fontSize: '14px', marginTop: '1px' }}>⚠️</span>
-        <div>
-          <div
-            style={{
-              fontSize: '11px',
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              color: 'var(--gold)',
-              marginBottom: '4px',
-              fontWeight: 500,
-            }}
-          >
-            Supabase Setup Required
-          </div>
-          <div style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
-            Add your Supabase credentials to <code style={{ color: 'var(--white)', fontSize: '11px' }}>.env.local</code> and
-            run the database migration to see live data. Stats below are placeholders.
+      <PageHeader title="Dashboard" subtitle={today} />
+
+      {/* ── Status Banner ───────────────────────────────────────── */}
+      {usingSample && (
+        <div style={{
+          background: 'rgba(155,93,229,0.06)',
+          border: '1px solid rgba(155,93,229,0.18)',
+          padding: '14px 20px', marginBottom: '36px',
+          display: 'flex', alignItems: 'flex-start', gap: '12px',
+        }}>
+          <span style={{ fontSize: '13px', marginTop: '1px', flexShrink: 0, color: 'var(--violet)' }}>◈</span>
+          <div>
+            <div style={{
+              fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase',
+              color: 'var(--violet)', marginBottom: '4px', fontWeight: 500,
+            }}>
+              Preview Mode — Sample Data
+            </div>
+            <p style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+              {raw.connected
+                ? <>Run the migration SQL in Supabase to load live data. Sample data is shown until your first records are added.</>
+                : <>Add your Supabase credentials to <code style={{ color: 'var(--white)', fontSize: '11px' }}>.env.local</code> to activate live data.</>
+              }
+            </p>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* ── Stat cards ───────────────────────────────── */}
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-          gap: '16px',
-          marginBottom: '48px',
-        }}
-      >
+      {/* ── Stat Cards ──────────────────────────────────────────── */}
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+        gap: '16px', marginBottom: '40px',
+      }}>
         <StatCard
           label="Upcoming Events"
-          value="—"
-          sub="Next 30 days"
+          value={stats.upcomingEvents}
+          sub="Scheduled"
           accent="violet"
         />
         <StatCard
           label="Active Bookings"
-          value="—"
+          value={stats.activeBookings}
           sub="Confirmed"
           accent="violet"
         />
         <StatCard
-          label="Pending Inquiries"
-          value="—"
+          label="New Inquiries"
+          value={stats.pendingInquiries}
           sub="Needs response"
           accent="gold"
         />
         <StatCard
           label="Total Clients"
-          value="—"
+          value={stats.totalClients}
           sub="All time"
         />
       </div>
 
-      {/* ── Quick links ──────────────────────────────── */}
-      <div style={{ marginBottom: '16px' }}>
-        <h2
-          style={{
-            fontFamily: 'Conthrax, sans-serif',
-            fontSize: '12px',
-            letterSpacing: '0.15em',
-            textTransform: 'uppercase',
-            color: 'var(--muted)',
-            marginBottom: '16px',
-          }}
-        >
-          Quick Access
-        </h2>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-            gap: '12px',
-          }}
-        >
-          <QuickLink
-            href="/admin/bookings"
-            icon="📋"
-            label="Bookings"
-            desc="View and manage all booking requests"
-          />
-          <QuickLink
-            href="/admin/events"
-            icon="📅"
-            label="Events"
-            desc="Manage upcoming and past events"
-          />
-          <QuickLink
-            href="/admin/clients"
-            icon="👤"
-            label="Clients"
-            desc="Client records and contact history"
-          />
-          <QuickLink
-            href="/admin/payments"
-            icon="💰"
-            label="Payments"
-            desc="Track deposits, balances, and invoices"
-          />
-          <QuickLink
-            href="/admin/content"
-            icon="✏️"
-            label="Content"
-            desc="Edit public-facing site content"
-          />
+      {/* ── Recent Bookings ─────────────────────────────────────── */}
+      <div className="admin-section">
+        <div className="admin-section-header">
+          <span className="admin-section-title">Recent Bookings</span>
+          <Link href="/admin/bookings" className="admin-view-all">View All →</Link>
         </div>
+
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Event</th>
+                <th>Client</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {recentBookings.map((b) => (
+                <tr key={b.id}>
+                  <td style={{ fontWeight: 400 }}>{b.event_name}</td>
+                  <td className="muted">{b.client_name ?? '—'}</td>
+                  <td className="muted">{fmtDate(b.event_date)}</td>
+                  <td><Badge variant={b.status} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ── Two-column lower row ─────────────────────────────────── */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
+        gap: '24px',
+      }}>
+
+        {/* Upcoming Events */}
+        <div className="admin-section" style={{ marginBottom: 0 }}>
+          <div className="admin-section-header">
+            <span className="admin-section-title">Upcoming Events</span>
+            <Link href="/admin/events" className="admin-view-all">View All →</Link>
+          </div>
+
+          <div>
+            {upcomingEvents.map((ev, i) => (
+              <div key={ev.id} style={{
+                display: 'flex', alignItems: 'center',
+                justifyContent: 'space-between', gap: '12px',
+                padding: '14px 20px',
+                borderBottom: i < upcomingEvents.length - 1
+                  ? '1px solid var(--border)' : 'none',
+              }}>
+                <div>
+                  <div style={{ fontSize: '13px', color: 'var(--white)', marginBottom: '4px' }}>
+                    {ev.title}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
+                    {fmtDate(ev.event_date)}{ev.venue ? ` · ${ev.venue}` : ''}
+                  </div>
+                </div>
+                {ev.featured && (
+                  <span style={{
+                    fontSize: '8px', letterSpacing: '0.15em', textTransform: 'uppercase',
+                    color: 'var(--violet)', border: '1px solid rgba(155,93,229,0.3)',
+                    padding: '2px 7px', flexShrink: 0,
+                  }}>
+                    Featured
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Payment Reminders */}
+        <div className="admin-section" style={{ marginBottom: 0 }}>
+          <div className="admin-section-header">
+            <span className="admin-section-title">Payment Reminders</span>
+            <Link href="/admin/payments" className="admin-view-all">View All →</Link>
+          </div>
+
+          <div>
+            {paymentReminders.map((p, i) => (
+              <div key={p.id} style={{
+                display: 'flex', alignItems: 'center',
+                justifyContent: 'space-between', gap: '12px',
+                padding: '14px 20px',
+                borderBottom: i < paymentReminders.length - 1
+                  ? '1px solid var(--border)' : 'none',
+              }}>
+                <div>
+                  <div style={{ fontSize: '13px', color: 'var(--white)', marginBottom: '4px' }}>
+                    {p.booking_name}
+                  </div>
+                  <div style={{
+                    fontSize: '11px', color: 'var(--muted)', textTransform: 'capitalize',
+                  }}>
+                    {p.type}
+                  </div>
+                </div>
+                <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                  <div style={{
+                    fontFamily: 'Conthrax, sans-serif',
+                    fontSize: '13px', color: 'var(--gold)', marginBottom: '5px',
+                  }}>
+                    {fmtCurrency(p.amount)}
+                  </div>
+                  <Badge variant={p.status} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   )

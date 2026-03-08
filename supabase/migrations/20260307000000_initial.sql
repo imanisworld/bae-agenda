@@ -2,6 +2,11 @@
 -- THE BAE AGENDA — Initial Database Migration
 -- Canonical schema. Keep in sync with types/database.ts.
 --
+-- Fully idempotent — safe to re-run in the SQL Editor.
+-- All CREATE statements use IF NOT EXISTS / OR REPLACE.
+-- All triggers use CREATE OR REPLACE (Postgres 14+).
+-- All policies are dropped before re-creation.
+--
 -- Run via:  supabase db push
 -- Or paste into: Supabase dashboard → SQL Editor
 -- ============================================================
@@ -30,7 +35,7 @@ create table if not exists clients (
   updated_at   timestamptz not null default now()
 );
 
-create trigger clients_updated_at
+create or replace trigger clients_updated_at
   before update on clients
   for each row execute function touch_updated_at();
 
@@ -49,7 +54,7 @@ create table if not exists events (
   updated_at  timestamptz not null default now()
 );
 
-create trigger events_updated_at
+create or replace trigger events_updated_at
   before update on events
   for each row execute function touch_updated_at();
 
@@ -74,7 +79,7 @@ create table if not exists bookings (
   updated_at     timestamptz not null default now()
 );
 
-create trigger bookings_updated_at
+create or replace trigger bookings_updated_at
   before update on bookings
   for each row execute function touch_updated_at();
 
@@ -95,7 +100,7 @@ create table if not exists payments (
   updated_at   timestamptz not null default now()
 );
 
-create trigger payments_updated_at
+create or replace trigger payments_updated_at
   before update on payments
   for each row execute function touch_updated_at();
 
@@ -115,13 +120,12 @@ create table if not exists mixes (
   updated_at   timestamptz not null default now()
 );
 
-create trigger mixes_updated_at
+create or replace trigger mixes_updated_at
   before update on mixes
   for each row execute function touch_updated_at();
 
 -- ── Table: site_content ──────────────────────────────────────────
 -- Key/value store for editable public site copy (bio, tagline, etc.)
--- V1: plain text values. No type column — add richer support later if needed.
 create table if not exists site_content (
   id         uuid primary key default uuid_generate_v4(),
   key        text unique not null,          -- e.g. 'bio', 'tagline', 'hero_cta'
@@ -130,13 +134,12 @@ create table if not exists site_content (
   updated_at timestamptz not null default now()
 );
 
-create trigger site_content_updated_at
+create or replace trigger site_content_updated_at
   before update on site_content
   for each row execute function touch_updated_at();
 
 -- ── Table: notes ─────────────────────────────────────────────────
 -- Internal admin notes. Tied to a booking and/or client via direct FKs.
--- V1: no polymorphic linked_type — direct FK relationships are simpler and queryable.
 create table if not exists notes (
   id         uuid primary key default uuid_generate_v4(),
   booking_id uuid references bookings(id) on delete cascade,
@@ -153,6 +156,18 @@ alter table payments     enable row level security;
 alter table mixes        enable row level security;
 alter table site_content enable row level security;
 alter table notes        enable row level security;
+
+-- Drop policies before re-creating (makes this script re-runnable)
+drop policy if exists "events_public_read"    on events;
+drop policy if exists "mixes_public_read"     on mixes;
+drop policy if exists "site_content_public_read" on site_content;
+drop policy if exists "clients_admin_all"     on clients;
+drop policy if exists "events_admin_all"      on events;
+drop policy if exists "bookings_admin_all"    on bookings;
+drop policy if exists "payments_admin_all"    on payments;
+drop policy if exists "mixes_admin_all"       on mixes;
+drop policy if exists "site_content_admin_all" on site_content;
+drop policy if exists "notes_admin_all"       on notes;
 
 -- Public read: public events only
 create policy "events_public_read" on events

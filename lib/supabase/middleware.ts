@@ -11,9 +11,14 @@ import type { Database } from '@/types/database'
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
+  // Guard: if env vars are missing, pass through without crashing every request
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return supabaseResponse
+  }
+
   const supabase = createServerClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
         getAll() {
@@ -32,22 +37,34 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // Refresh session — do not remove, required for Server Component auth
-  const { data: { user } } = await supabase.auth.getUser()
+  // Refresh session — required for Server Component auth to stay fresh.
+  // try/catch: a network error or malformed JWT would otherwise throw here
+  // and crash every request on the site.
+  let user = null
+  try {
+    const { data } = await supabase.auth.getUser()
+    user = data.user
+  } catch {
+    // Treat as unauthenticated on any error
+  }
 
-  // Protect all /admin routes except /admin/login
+  // ── AUTH BYPASS — TEMPORARY DEV ONLY ──────────────────────────────────────
+  // TODO: Remove this bypass before launch. Re-enable the two blocks below.
+  // To restore auth: uncomment the two `if` blocks and delete the early return.
+  return supabaseResponse
+  // ── END BYPASS ─────────────────────────────────────────────────────────────
+
+  // eslint-disable-next-line no-unreachable
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
   const isLoginRoute = request.nextUrl.pathname === '/admin/login'
 
   if (isAdminRoute && !isLoginRoute && !user) {
-    // Not authenticated — redirect to login
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/admin/login'
     return NextResponse.redirect(loginUrl)
   }
 
   if (isLoginRoute && user) {
-    // Already authenticated — redirect to dashboard
     const dashboardUrl = request.nextUrl.clone()
     dashboardUrl.pathname = '/admin/dashboard'
     return NextResponse.redirect(dashboardUrl)

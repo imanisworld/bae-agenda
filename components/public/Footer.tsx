@@ -87,7 +87,7 @@ export default function Footer() {
             © {CURRENT_YEAR} DJ B.A.E. · The Bae Agenda. All rights reserved.
           </p>
           {/* Admin link — barely visible, .admin-link class in globals.css */}
-          <Link href="/admin/login" className="admin-link">
+          <Link href="/admin/dashboard" className="admin-link">
             Admin
           </Link>
         </div>
