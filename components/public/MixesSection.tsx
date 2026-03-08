@@ -2,23 +2,10 @@ import Link from 'next/link'
 import { getFeaturedMixes } from '@/lib/db/mixes'
 
 const PLACEHOLDER_MIXES = [
-  { id: '1', genre: 'Hip-Hop · Drill', title: 'Street Archives Vol. 1', durationLabel: '58 min', yearLabel: '2025', accentColor: 'var(--violet)' },
-  { id: '2', genre: 'R&B · Neo Soul', title: 'After Hours', durationLabel: '72 min', yearLabel: '2025', accentColor: 'var(--gold)' },
-  { id: '3', genre: 'Afrobeats · Dancehall', title: 'World Tour', durationLabel: '64 min', yearLabel: '2024', accentColor: 'var(--violet)' },
+  { id: '1', genre: 'Hip-Hop · Drill', title: 'Street Archives Vol. 1', accentColor: 'var(--violet)' },
+  { id: '2', genre: 'R&B · Neo Soul', title: 'After Hours', accentColor: 'var(--gold)' },
+  { id: '3', genre: 'Afrobeats · Dancehall', title: 'World Tour', accentColor: 'var(--violet)' },
 ] as const
-
-function formatDuration(seconds: number | null): string {
-  if (!seconds || seconds <= 0) return '—'
-  const mins = Math.round(seconds / 60)
-  return `${mins} min`
-}
-
-function getYearLabel(publishedAt: string | null): string {
-  if (!publishedAt) return '—'
-  const d = new Date(publishedAt)
-  if (Number.isNaN(d.getTime())) return '—'
-  return String(d.getFullYear())
-}
 
 function accentForIndex(i: number): string {
   return i % 2 === 0 ? 'var(--violet)' : 'var(--gold)'
@@ -27,15 +14,11 @@ function accentForIndex(i: number): string {
 function MixCard({
   genre,
   title,
-  durationLabel,
-  yearLabel,
   accentColor,
   href,
 }: {
   genre: string
   title: string
-  durationLabel: string
-  yearLabel: string
   accentColor: string
   href?: string | null
 }) {
@@ -69,39 +52,27 @@ function MixCard({
       <h3
         style={{
           fontFamily: 'Conthrax, sans-serif',
-          fontSize: 'clamp(16px, 2vw, 22px)',
+          fontSize: 'clamp(22px, 2.5vw, 44px)',
           fontWeight: 600,
-          color: 'var(--white)',
+          color: '#3348ff',
           letterSpacing: '0.03em',
           lineHeight: 1.2,
-          flex: 1,
+          marginTop: 'auto',
         }}
       >
         {title}
       </h3>
-
-      <div
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingTop: '16px',
-          borderTop: '1px solid var(--border)',
-        }}
-      >
-        <span style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.05em' }}>{durationLabel}</span>
-        <span style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.05em' }}>{yearLabel}</span>
-      </div>
     </>
   )
 
   const sharedStyle: React.CSSProperties = {
-    background: 'var(--surface)',
+    background: 'linear-gradient(165deg, rgba(8,8,8,0.95), rgba(15,15,15,0.96))',
     border: '1px solid var(--border)',
-    padding: '32px',
+    minHeight: '420px',
+    padding: '36px',
     display: 'flex',
     flexDirection: 'column',
-    gap: '16px',
+    gap: '18px',
     position: 'relative',
     overflow: 'hidden',
     textDecoration: 'none',
@@ -158,7 +129,7 @@ export default async function MixesSection() {
               </span>
             </span>
             <h2 className="section-heading" style={{ marginBottom: 0 }}>
-              Latest Drops
+              Recent Sets
             </h2>
           </div>
           <Link href="/mixes" className="view-all-link" style={{ marginBottom: '10px' }}>
@@ -168,15 +139,13 @@ export default async function MixesSection() {
 
         <div aria-hidden="true" style={{ height: '1px', background: 'var(--border)', margin: '32px 0 48px' }} />
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0' }}>
           {hasLiveData
             ? mixes.map((mix, i) => (
                 <MixCard
                   key={mix.id}
                   genre={mix.genre ?? 'Open Format'}
                   title={mix.title}
-                  durationLabel={formatDuration(mix.duration)}
-                  yearLabel={getYearLabel(mix.published_at)}
                   accentColor={accentForIndex(i)}
                   href={mix.embed_url}
                 />
@@ -186,8 +155,6 @@ export default async function MixesSection() {
                   key={mix.id}
                   genre={mix.genre}
                   title={mix.title}
-                  durationLabel={mix.durationLabel}
-                  yearLabel={mix.yearLabel}
                   accentColor={mix.accentColor}
                 />
               ))}

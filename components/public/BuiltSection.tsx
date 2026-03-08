@@ -132,7 +132,27 @@ export default function BuiltSection({ aboutQuote }: Props) {
             View Admin Demo <span aria-hidden="true">→</span>
           </Link>
         </div>
+
       </div>
+
+      {/*
+        ── FULL-WIDTH PHOTO AREA ─────────────────────────────────────
+        A large performance or venue photo spanning the full section width.
+        This space is intentionally generous — it can grow into a gallery,
+        a slideshow, or a press kit grid.
+
+        TO ADD A PHOTO: replace the photo-placeholder div with:
+          <img src="/photos/built-hero.jpg" alt="DJ B.A.E. performing at [venue]" />
+        Recommended: wide panoramic, 2400 × 1200 or similar. Dark scenes work best.
+        ─────────────────────────────────────────────────────────────
+      */}
+      <div className="built-photo-area photo-slot" aria-hidden="true">
+        <div className="photo-placeholder">
+          <span className="photo-placeholder-label">Performance Photo</span>
+          <span className="photo-placeholder-label" style={{ opacity: 0.55 }}>wide panoramic · 2400 × 1200 recommended</span>
+        </div>
+      </div>
+
     </section>
   )
 }

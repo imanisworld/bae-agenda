@@ -1,10 +1,15 @@
 /**
  * ADMIN — EVENTS
- * Full events table. Shows all events (public + private). Data fetched server-side.
+ * Events control table with quick actions:
+ * - create via /admin/events/new
+ * - edit via /admin/events/[id]
+ * - toggle public/featured inline
  */
+import Link from 'next/link'
 import PageHeader      from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import { createClient } from '@/lib/supabase/server'
+import { toggleEventFeaturedAction, toggleEventPublicAction } from '@/app/actions/events'
 
 interface EventRow {
   id:         string
@@ -48,6 +53,7 @@ export default async function EventsPage() {
       <PageHeader
         title="Events"
         subtitle={events.length ? `${events.length} total` : undefined}
+        action={{ label: 'New Event', href: '/admin/events/new' }}
       />
 
       <div className="admin-section" style={{ marginBottom: 0 }}>
@@ -71,6 +77,7 @@ export default async function EventsPage() {
                   <th>City</th>
                   <th>Visibility</th>
                   <th>Featured</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -86,22 +93,43 @@ export default async function EventsPage() {
                     <td className="muted">{ev.venue ?? '—'}</td>
                     <td className="muted">{ev.city  ?? '—'}</td>
                     <td>
-                      <span style={{
-                        fontSize: '9px', letterSpacing: '0.15em', textTransform: 'uppercase',
-                        color: ev.public ? '#34d399' : 'var(--muted)',
-                      }}>
-                        {ev.public ? 'Public' : 'Draft'}
-                      </span>
+                      <form action={toggleEventPublicAction}>
+                        <input type="hidden" name="id" value={ev.id} />
+                        <input type="hidden" name="next_public" value={String(!ev.public)} />
+                        <button
+                          type="submit"
+                          className="admin-btn-ghost"
+                          style={{
+                            padding: '4px 8px',
+                            fontSize: '9px',
+                            color: ev.public ? '#34d399' : 'var(--muted)',
+                          }}
+                        >
+                          {ev.public ? 'Public' : 'Draft'}
+                        </button>
+                      </form>
                     </td>
                     <td>
-                      {ev.featured && (
-                        <span style={{
-                          fontSize: '9px', letterSpacing: '0.15em', textTransform: 'uppercase',
-                          color: 'var(--violet)',
-                        }}>
-                          ★ Featured
-                        </span>
-                      )}
+                      <form action={toggleEventFeaturedAction}>
+                        <input type="hidden" name="id" value={ev.id} />
+                        <input type="hidden" name="next_featured" value={String(!ev.featured)} />
+                        <button
+                          type="submit"
+                          className="admin-btn-ghost"
+                          style={{
+                            padding: '4px 8px',
+                            fontSize: '9px',
+                            color: ev.featured ? 'var(--violet)' : 'var(--muted)',
+                          }}
+                        >
+                          {ev.featured ? '★ Featured' : 'Not Featured'}
+                        </button>
+                      </form>
+                    </td>
+                    <td>
+                      <Link href={`/admin/events/${ev.id}`} className="admin-view-all">
+                        Edit →
+                      </Link>
                     </td>
                   </tr>
                 ))}

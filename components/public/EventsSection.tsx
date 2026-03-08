@@ -25,20 +25,24 @@ function EventRow({ title, event_date, venue, city, featured }: Event) {
 
   return (
     <div style={{
-      display: 'grid', gridTemplateColumns: '80px 1fr auto',
-      alignItems: 'center', gap: '32px',
-      padding: '28px 0', borderBottom: '1px solid var(--border)',
+      display: 'grid',
+      gridTemplateColumns: '120px 1fr auto',
+      alignItems: 'center',
+      gap: '28px',
+      padding: '26px 30px',
+      borderBottom: '1px solid var(--border)',
+      background: featured ? 'rgba(155,93,229,0.06)' : 'transparent',
     }}>
       {/* Date */}
       <div>
         <div style={{
-          fontFamily: 'Conthrax, sans-serif', fontSize: '28px',
-          fontWeight: 600, color: 'var(--white)', lineHeight: 1,
+          fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(34px, 3.8vw, 52px)',
+          fontWeight: 600, color: '#a66bff', lineHeight: 0.9,
         }}>
           {day}
         </div>
         <div style={{
-          fontSize: '9px', letterSpacing: '0.2em',
+          fontSize: '11px', letterSpacing: '0.22em',
           color: 'var(--muted)', textTransform: 'uppercase', marginTop: '4px',
         }}>
           {month}
@@ -48,8 +52,9 @@ function EventRow({ title, event_date, venue, city, featured }: Event) {
       {/* Info */}
       <div>
         <div style={{
-          fontFamily: 'DM Sans, sans-serif', fontSize: '15px',
-          fontWeight: 400, color: 'var(--white)', marginBottom: '4px',
+          fontFamily: 'DM Sans, sans-serif', fontSize: 'clamp(22px, 2.4vw, 39px)',
+          fontWeight: 600, color: 'var(--white)', marginBottom: '4px',
+          letterSpacing: '0.01em',
         }}>
           {title}
         </div>
@@ -70,7 +75,7 @@ function EventRow({ title, event_date, venue, city, featured }: Event) {
       </div>
 
       {/* Arrow — hover via CSS class */}
-      <Link href="/events" aria-label={`Details for ${title}`} className="event-arrow">
+      <Link href="/events" aria-label={`Details for ${title}`} className="event-arrow" style={{ fontSize: '36px', color: featured ? '#a66bff' : 'var(--muted)' }}>
         →
       </Link>
     </div>
@@ -110,55 +115,41 @@ export default async function EventsSection() {
     <section id="events" aria-label="Upcoming Events" style={{
       background: 'var(--black)', borderTop: '1px solid var(--border)',
     }}>
-      <div className="section-container">
+      <div className="section-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '34px', alignItems: 'start' }}>
 
         {/* Header */}
-        <div style={{
-          display: 'flex', alignItems: 'flex-end',
-          justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px',
-        }}>
+        <div>
           <div>
             <span className="section-label">Events</span>
-            <h2 className="section-heading" style={{ marginBottom: 0 }}>Upcoming Dates</h2>
+            <h2 className="section-heading" style={{ marginBottom: '22px', fontSize: 'clamp(52px, 7vw, 110px)', lineHeight: 0.93 }}>
+              Upcoming<br />Dates
+            </h2>
           </div>
-          <Link href="/events" className="view-all-link" style={{ marginBottom: '10px' }}>
-            See All Events →
-          </Link>
+          <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, maxWidth: '320px' }}>
+            Catch DJ B.A.E. live. Follow on social for last-minute announcements and pop-up sets.
+          </p>
         </div>
 
-        <div aria-hidden="true" style={{
-          height: '1px', background: 'var(--border)', margin: '32px 0 0',
-        }} />
-
-        {/* Event list or empty state */}
-        {events.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div role="list">
-            {events.map((event) => (
-              <div key={event.id} role="listitem">
-                <EventRow {...event} />
+        <div>
+          <div style={{ border: '1px solid var(--border)', background: 'linear-gradient(180deg, rgba(12,12,12,0.98), rgba(8,8,8,0.98))' }}>
+            {events.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div role="list">
+                {events.map((event) => (
+                  <div key={event.id} role="listitem">
+                    <EventRow {...event} />
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
-        )}
-
-        {/* Footer note */}
-        <p style={{
-          marginTop: '32px', fontSize: '12px',
-          color: 'var(--muted)', letterSpacing: '0.04em', lineHeight: 1.6,
-        }}>
-          Follow on{' '}
-          <a
-            href="https://www.instagram.com/dj_b.a.e/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-link"
-          >
-            Instagram
-          </a>
-          {' '}for last-minute announcements and pop-up sets.
-        </p>
+          <div style={{ marginTop: '18px' }}>
+            <Link href="/events" className="view-all-link">
+              See All Events →
+            </Link>
+          </div>
+        </div>
 
       </div>
     </section>
