@@ -37,7 +37,7 @@ export default function Footer() {
 
           {/* Nav */}
           <div>
-            <p style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '20px' }}>
+            <p style={{ fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--eyebrow)', marginBottom: '20px' }}>
               Navigate
             </p>
             <nav aria-label="Footer navigation">
@@ -55,7 +55,7 @@ export default function Footer() {
 
           {/* Socials */}
           <div>
-            <p style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '20px' }}>
+            <p style={{ fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--eyebrow)', marginBottom: '20px' }}>
               Connect
             </p>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -80,16 +80,12 @@ export default function Footer() {
       <div style={{ borderTop: '1px solid var(--border)', padding: '20px 64px' }}>
         <div style={{
           maxWidth: '1280px', margin: '0 auto',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          display: 'flex', alignItems: 'center', justifyContent: 'flex-start',
           flexWrap: 'wrap', gap: '12px',
         }}>
           <p style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
             © {CURRENT_YEAR} DJ B.A.E. · The Bae Agenda. All rights reserved.
           </p>
-          {/* Portfolio demo link — real admin remains private */}
-          <Link href="/admin-demo" className="admin-link">
-            Admin Demo
-          </Link>
         </div>
       </div>
     </footer>

@@ -138,8 +138,8 @@ export default function BookingSection({ bookingEmail }: Props) {
           </a>
 
           {email && (
-            <span style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
-              Questions?{' '}
+            <span style={{ fontSize: '13px', color: 'rgba(245,245,240,0.78)', lineHeight: 1.6 }}>
+              Prefer email? Reach out directly at{' '}
               <a href={`mailto:${email}`} className="inline-link">
                 {email}
               </a>

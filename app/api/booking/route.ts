@@ -10,6 +10,7 @@ const bookingSchema = z.object({
   eventName: z.string().trim().min(2).max(160),
   eventType: z.string().trim().max(80).optional().or(z.literal('')),
   eventDate: z.string().trim().min(1),
+  eventTime: z.string().trim().max(20).optional().or(z.literal('')),
   venue: z.string().trim().max(160).optional().or(z.literal('')),
   city: z.string().trim().max(120).optional().or(z.literal('')),
   package: z.string().trim().max(120).optional().or(z.literal('')),
@@ -22,8 +23,9 @@ function normalizeOptional(value?: string): string | null {
   return trimmed.length ? trimmed : null
 }
 
-function toEventISO(dateValue: string): string | null {
-  const parsed = new Date(`${dateValue}T12:00:00`)
+function toEventISO(dateValue: string, timeValue?: string): string | null {
+  const normalizedTime = timeValue?.trim() ? `${timeValue.trim()}:00` : '12:00:00'
+  const parsed = new Date(`${dateValue}T${normalizedTime}`)
   if (Number.isNaN(parsed.getTime())) return null
   return parsed.toISOString()
 }
@@ -41,7 +43,7 @@ export async function POST(request: Request) {
     }
 
     const payload = parsed.data
-    const eventISO = toEventISO(payload.eventDate)
+    const eventISO = toEventISO(payload.eventDate, payload.eventTime)
     if (!eventISO) {
       return NextResponse.json(
         { error: 'Invalid event date.' },

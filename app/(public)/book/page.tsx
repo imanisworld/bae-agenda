@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { EVENT_TYPES, PACKAGES } from '@/lib/constants'
+import { formatCurrency } from '@/lib/utils'
 
 type FormState = {
   firstName: string
@@ -12,8 +13,10 @@ type FormState = {
   eventName: string
   eventType: string
   eventDate: string
+  eventTime: string
   venue: string
   city: string
+  customCity: string
   package: string
   notes: string
 }
@@ -26,11 +29,27 @@ const INITIAL_STATE: FormState = {
   eventName: '',
   eventType: '',
   eventDate: '',
+  eventTime: '',
   venue: '',
   city: '',
+  customCity: '',
   package: '',
   notes: '',
 }
+
+const CITY_OPTIONS = [
+  'Chicago, IL',
+  'Oak Park, IL',
+  'Evanston, IL',
+  'Naperville, IL',
+  'Schaumburg, IL',
+  'Milwaukee, WI',
+  'Indianapolis, IN',
+  'Other',
+] as const
+
+const DATE_OPTIONS = buildDateOptions()
+const TIME_OPTIONS = buildTimeOptions()
 
 export default function BookPage() {
   const [form, setForm] = useState<FormState>(INITIAL_STATE)
@@ -49,10 +68,14 @@ export default function BookPage() {
     setLoading(true)
 
     try {
+      const cityValue = form.city === 'Other' ? form.customCity.trim() : form.city
       const res = await fetch('/api/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          city: cityValue,
+        }),
       })
 
       const payload = (await res.json()) as { error?: string }
@@ -107,12 +130,12 @@ export default function BookPage() {
           style={{
             background: 'var(--surface)',
             border: '1px solid var(--border)',
-            padding: '28px',
+            padding: 'clamp(20px, 4vw, 28px)',
             display: 'grid',
             gap: '18px',
           }}
         >
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div style={responsiveGridStyle()}>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>First Name *</span>
               <input
@@ -132,7 +155,7 @@ export default function BookPage() {
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div style={responsiveGridStyle()}>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>Email *</span>
               <input
@@ -163,7 +186,7 @@ export default function BookPage() {
             />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div style={responsiveGridStyle()}>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>Event Type</span>
               <select
@@ -181,33 +204,81 @@ export default function BookPage() {
             </label>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>Event Date *</span>
-              <input
+              <select
                 required
-                type="date"
                 value={form.eventDate}
                 onChange={(e) => updateField('eventDate', e.target.value)}
                 style={inputStyle()}
-              />
+              >
+                <option value="">Select a date</option>
+                {DATE_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
+          <div style={responsiveGridStyle()}>
             <label style={{ display: 'grid', gap: '8px' }}>
-              <span className="section-label" style={{ marginBottom: 0 }}>Venue</span>
-              <input
-                value={form.venue}
-                onChange={(e) => updateField('venue', e.target.value)}
+              <span className="section-label" style={{ marginBottom: 0 }}>Event Time</span>
+              <select
+                value={form.eventTime}
+                onChange={(e) => updateField('eventTime', e.target.value)}
                 style={inputStyle()}
-              />
+              >
+                <option value="">Select a time</option>
+                {TIME_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             </label>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>City</span>
-              <input
+              <select
                 value={form.city}
-                onChange={(e) => updateField('city', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value
+                  updateField('city', value)
+                  if (value !== 'Other') updateField('customCity', '')
+                }}
+                style={inputStyle()}
+              >
+                <option value="">Select a city</option>
+                {CITY_OPTIONS.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          {form.city === 'Other' && (
+            <label style={{ display: 'grid', gap: '8px' }}>
+              <span className="section-label" style={{ marginBottom: 0 }}>City Name</span>
+              <input
+                value={form.customCity}
+                onChange={(e) => updateField('customCity', e.target.value)}
                 style={inputStyle()}
               />
             </label>
+          )}
+
+          <div style={responsiveGridStyle()}>
+            <label style={{ display: 'grid', gap: '8px' }}>
+              <span className="section-label" style={{ marginBottom: 0 }}>Venue / Address</span>
+              <input
+                value={form.venue}
+                onChange={(e) => updateField('venue', e.target.value)}
+                placeholder="Venue name or full address"
+                style={inputStyle()}
+              />
+            </label>
+            <div aria-hidden="true" />
           </div>
 
           <label style={{ display: 'grid', gap: '8px' }}>
@@ -220,7 +291,7 @@ export default function BookPage() {
               <option value="">Select a package</option>
               {PACKAGES.map((pkg) => (
                 <option key={pkg.name} value={pkg.name}>
-                  {pkg.name}
+                  {pkg.name} {pkg.price ? `(${formatCurrency(pkg.price)})` : '(Custom quote)'}
                 </option>
               ))}
             </select>
@@ -268,7 +339,61 @@ function inputStyle(): React.CSSProperties {
     border: '1px solid var(--border)',
     color: 'var(--white)',
     padding: '12px 14px',
-    fontSize: '14px',
+    minHeight: '48px',
+    fontSize: '16px',
     fontFamily: 'DM Sans, sans-serif',
+    borderRadius: '0',
+    appearance: 'none',
   }
+}
+
+function responsiveGridStyle(): React.CSSProperties {
+  return {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+    gap: '14px',
+  }
+}
+
+function buildDateOptions() {
+  const options: Array<{ value: string; label: string }> = []
+  const start = new Date()
+
+  for (let i = 0; i < 365; i += 1) {
+    const date = new Date(start)
+    date.setDate(start.getDate() + i)
+    const value = date.toISOString().slice(0, 10)
+    const label = date.toLocaleDateString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    })
+    options.push({ value, label })
+  }
+
+  return options
+}
+
+function buildTimeOptions() {
+  const options: Array<{ value: string; label: string }> = []
+
+  for (let hour = 10; hour <= 23; hour += 1) {
+    options.push({
+      value: `${String(hour).padStart(2, '0')}:00`,
+      label: formatTimeLabel(hour, 0),
+    })
+    options.push({
+      value: `${String(hour).padStart(2, '0')}:30`,
+      label: formatTimeLabel(hour, 30),
+    })
+  }
+
+  return options
+}
+
+function formatTimeLabel(hour: number, minute: number) {
+  const normalizedHour = hour % 12 || 12
+  const suffix = hour >= 12 ? 'PM' : 'AM'
+  return `${normalizedHour}:${String(minute).padStart(2, '0')} ${suffix}`
 }

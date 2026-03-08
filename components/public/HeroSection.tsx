@@ -88,10 +88,10 @@ export default function HeroSection({ content = {} }: Props) {
         <div>
           <p style={{
             fontFamily:    'DM Sans, sans-serif',
-            fontSize:      '9px',
-            letterSpacing: '0.4em',
+            fontSize:      '11px',
+            letterSpacing: '0.28em',
             textTransform: 'uppercase',
-            color:         'var(--muted)',
+            color:         'var(--eyebrow)',
             marginBottom:  '22px',
           }}>
             Chicago&nbsp;·&nbsp;DJ&nbsp;·&nbsp;Curator&nbsp;·&nbsp;Experience Architect
@@ -142,14 +142,19 @@ export default function HeroSection({ content = {} }: Props) {
           {/* Short descriptor */}
           <p style={{
             fontFamily:    'DM Sans, sans-serif',
-            fontSize:      '10px',
-            letterSpacing: '0.22em',
-            textTransform: 'uppercase',
-            color:         'var(--muted)',
-            lineHeight:    1.9,
+            fontSize:      'clamp(13px, 1.5vw, 15px)',
+            fontWeight:    500,
+            letterSpacing: '0.03em',
+            color:         'rgba(245,245,240,0.9)',
+            lineHeight:    1.7,
             textAlign:     'right',
-            maxWidth:      '260px',
+            maxWidth:      '340px',
             margin:        0,
+            padding:       '16px 18px',
+            border:        '1px solid rgba(255,255,255,0.12)',
+            background:    'rgba(8,8,8,0.34)',
+            backdropFilter:'blur(10px)',
+            textShadow:    '0 1px 16px rgba(0,0,0,0.45)',
           }}>
             {subtitle}
           </p>

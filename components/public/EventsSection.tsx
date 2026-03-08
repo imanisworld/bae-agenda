@@ -81,7 +81,7 @@ export default async function EventsSection() {
           {/* "— EVENTS" eyebrow */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
             <span style={{ width: '22px', height: '1px', background: 'var(--violet)', display: 'block', flexShrink: 0 }} />
-            <span style={{ fontSize: '10px', letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+            <span style={{ fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--eyebrow)' }}>
               Events
             </span>
           </div>
@@ -126,7 +126,7 @@ export default async function EventsSection() {
             }}
           >
             <div>
-              <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '4px' }}>
+              <div style={{ fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--eyebrow)', marginBottom: '6px' }}>
                 Follow for updates
               </div>
               <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '12px', fontWeight: 600, color: 'var(--white)' }}>
