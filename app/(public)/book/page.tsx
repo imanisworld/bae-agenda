@@ -16,7 +16,6 @@ type FormState = {
   eventTime: string
   venue: string
   city: string
-  customCity: string
   package: string
   notes: string
 }
@@ -32,7 +31,6 @@ const INITIAL_STATE: FormState = {
   eventTime: '',
   venue: '',
   city: '',
-  customCity: '',
   package: '',
   notes: '',
 }
@@ -45,11 +43,13 @@ const CITY_OPTIONS = [
   'Schaumburg, IL',
   'Milwaukee, WI',
   'Indianapolis, IN',
-  'Other',
 ] as const
 
 const DATE_OPTIONS = buildDateOptions()
 const TIME_OPTIONS = buildTimeOptions()
+const PACKAGE_OPTIONS = PACKAGES.map((pkg) =>
+  `${pkg.name}${pkg.price ? ` (${formatCurrency(pkg.price)})` : ' (Custom quote)'}`
+)
 
 export default function BookPage() {
   const [form, setForm] = useState<FormState>(INITIAL_STATE)
@@ -68,13 +68,16 @@ export default function BookPage() {
     setLoading(true)
 
     try {
-      const cityValue = form.city === 'Other' ? form.customCity.trim() : form.city
+      const normalizedTime = TIME_OPTIONS.find(
+        (option) => option.label === form.eventTime || option.value === form.eventTime
+      )?.value ?? form.eventTime
+
       const res = await fetch('/api/booking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...form,
-          city: cityValue,
+          eventTime: normalizedTime,
         }),
       })
 
@@ -189,18 +192,13 @@ export default function BookPage() {
           <div style={responsiveGridStyle()}>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>Event Type</span>
-              <select
+              <input
+                list="event-type-options"
                 value={form.eventType}
                 onChange={(e) => updateField('eventType', e.target.value)}
+                placeholder="Choose or type an event type"
                 style={inputStyle()}
-              >
-                <option value="">Select an event type</option>
-                {EVENT_TYPES.map((type) => (
-                  <option key={type} value={type}>
-                    {type}
-                  </option>
-                ))}
-              </select>
+              />
             </label>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>Event Date *</span>
@@ -223,50 +221,25 @@ export default function BookPage() {
           <div style={responsiveGridStyle()}>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>Event Time</span>
-              <select
+              <input
+                list="event-time-options"
                 value={form.eventTime}
                 onChange={(e) => updateField('eventTime', e.target.value)}
-                style={inputStyle()}
-              >
-                <option value="">Select a time</option>
-                {TIME_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label style={{ display: 'grid', gap: '8px' }}>
-              <span className="section-label" style={{ marginBottom: 0 }}>City</span>
-              <select
-                value={form.city}
-                onChange={(e) => {
-                  const value = e.target.value
-                  updateField('city', value)
-                  if (value !== 'Other') updateField('customCity', '')
-                }}
-                style={inputStyle()}
-              >
-                <option value="">Select a city</option>
-                {CITY_OPTIONS.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          {form.city === 'Other' && (
-            <label style={{ display: 'grid', gap: '8px' }}>
-              <span className="section-label" style={{ marginBottom: 0 }}>City Name</span>
-              <input
-                value={form.customCity}
-                onChange={(e) => updateField('customCity', e.target.value)}
+                placeholder="Choose or type a time"
                 style={inputStyle()}
               />
             </label>
-          )}
+            <label style={{ display: 'grid', gap: '8px' }}>
+              <span className="section-label" style={{ marginBottom: 0 }}>City</span>
+              <input
+                list="city-options"
+                value={form.city}
+                onChange={(e) => updateField('city', e.target.value)}
+                placeholder="Choose or type a city"
+                style={inputStyle()}
+              />
+            </label>
+          </div>
 
           <label style={{ display: 'grid', gap: '8px' }}>
             <span className="section-label" style={{ marginBottom: 0 }}>Venue / Address</span>
@@ -280,18 +253,13 @@ export default function BookPage() {
 
           <label style={{ display: 'grid', gap: '8px' }}>
             <span className="section-label" style={{ marginBottom: 0 }}>Package</span>
-            <select
+            <input
+              list="package-options"
               value={form.package}
               onChange={(e) => updateField('package', e.target.value)}
+              placeholder="Choose or type a package"
               style={inputStyle()}
-            >
-              <option value="">Select a package</option>
-              {PACKAGES.map((pkg) => (
-                <option key={pkg.name} value={pkg.name}>
-                  {pkg.name} {pkg.price ? `(${formatCurrency(pkg.price)})` : '(Custom quote)'}
-                </option>
-              ))}
-            </select>
+            />
           </label>
 
           <label style={{ display: 'grid', gap: '8px' }}>
@@ -333,6 +301,30 @@ export default function BookPage() {
               Back to homepage
             </Link>
           </div>
+
+          <datalist id="event-type-options">
+            {EVENT_TYPES.map((type) => (
+              <option key={type} value={type} />
+            ))}
+          </datalist>
+
+          <datalist id="event-time-options">
+            {TIME_OPTIONS.map((option) => (
+              <option key={option.value} value={option.label} />
+            ))}
+          </datalist>
+
+          <datalist id="city-options">
+            {CITY_OPTIONS.map((city) => (
+              <option key={city} value={city} />
+            ))}
+          </datalist>
+
+          <datalist id="package-options">
+            {PACKAGE_OPTIONS.map((option) => (
+              <option key={option} value={option} />
+            ))}
+          </datalist>
         </form>
       </div>
     </div>

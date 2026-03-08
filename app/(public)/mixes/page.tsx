@@ -2,6 +2,11 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getPublishedMixes } from '@/lib/db/mixes'
 
+const SOUNDCLOUD_PLAYLIST_URL = 'https://soundcloud.com/deejaybae/sets/mixes?si=057590d3680e4ebaba02a15c247b3e5a&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharin'
+const SOUNDCLOUD_PLAYER_SRC = 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%253Aplaylists%253A1935343495&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true'
+const YOUTUBE_PLAYLIST_URL = 'https://www.youtube.com/watch?v=2wKqMdJD3ts&list=PLItuH_cM_7fHGhBnBFM6zZY5w5sas9HYh'
+const YOUTUBE_EMBED_SRC = 'https://www.youtube.com/embed/2wKqMdJD3ts?list=PLItuH_cM_7fHGhBnBFM6zZY5w5sas9HYh'
+
 export const metadata: Metadata = {
   title: 'Mixes — DJ B.A.E.',
   description: 'Curated DJ mixes across hip-hop, R&B, Afrobeats, house, and more by DJ B.A.E.',
@@ -73,6 +78,149 @@ export default async function MixesPage() {
         </div>
 
         <div aria-hidden="true" style={{ height: '1px', background: 'var(--border)', marginBottom: '48px' }} />
+
+        <section
+          style={{
+            marginBottom: '40px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '20px',
+          }}
+        >
+          <article
+            style={{
+              border: '1px solid var(--border)',
+              background: 'var(--surface)',
+              padding: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              minHeight: '100%',
+            }}
+          >
+            <div style={{ minHeight: '86px' }}>
+              <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--violet)', marginBottom: '8px' }}>
+                SoundCloud
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
+                Inline playlist for the main mix catalog.
+              </p>
+            </div>
+
+            <div style={{ border: '1px solid var(--border)', background: '#111', overflow: 'hidden', minHeight: '300px' }}>
+              <iframe
+                title="DJ B.A.E. SoundCloud playlist"
+                width="100%"
+                height="300"
+                scrolling="no"
+                frameBorder="no"
+                allow="autoplay"
+                src={SOUNDCLOUD_PLAYER_SRC}
+                style={{ display: 'block' }}
+              />
+            </div>
+
+            <a href={SOUNDCLOUD_PLAYLIST_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ justifyContent: 'center', marginTop: 'auto' }}>
+              Open On SoundCloud
+            </a>
+          </article>
+
+          <article
+            style={{
+              border: '1px solid var(--border)',
+              background: 'var(--surface)',
+              padding: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              minHeight: '100%',
+            }}
+          >
+            <div style={{ minHeight: '86px' }}>
+              <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '8px' }}>
+                YouTube
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
+                Featured video and playlist inline.
+              </p>
+            </div>
+
+            <div style={{ border: '1px solid var(--border)', background: '#111', overflow: 'hidden', minHeight: '300px' }}>
+              <iframe
+                title="DJ B.A.E. YouTube playlist"
+                width="100%"
+                height="100%"
+                src={YOUTUBE_EMBED_SRC}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                style={{ display: 'block', border: 0, width: '100%', minHeight: '300px' }}
+              />
+            </div>
+
+            <a href={YOUTUBE_PLAYLIST_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ justifyContent: 'center', marginTop: 'auto' }}>
+              Open On YouTube
+            </a>
+          </article>
+
+          <article
+            style={{
+              border: '1px solid var(--border)',
+              background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(255,255,255,0.01))',
+              padding: '20px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              minHeight: '100%',
+            }}
+          >
+            <div style={{ minHeight: '86px' }}>
+              <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--eyebrow)', marginBottom: '8px' }}>
+                Inline First
+              </div>
+              <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
+                Use the players here first, then open the platform only when you want comments, sharing, or the full catalog view.
+              </p>
+            </div>
+
+            <div
+              style={{
+                border: '1px solid var(--border)',
+                background: 'rgba(8,8,8,0.26)',
+                minHeight: '300px',
+                padding: '20px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+                gap: '18px',
+              }}
+            >
+              <div style={{ display: 'grid', gap: '12px' }}>
+                {[
+                  'Inline players stay on-brand and keep people in the site flow.',
+                  'Platform links are there when someone wants the native app experience.',
+                  'Booking CTA stays visible beside the media instead of below the fold.',
+                ].map((point) => (
+                  <div key={point} style={{ fontSize: '13px', color: 'var(--white)', lineHeight: 1.7, paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+                    {point}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'grid', gap: '12px' }}>
+                <a href={SOUNDCLOUD_PLAYLIST_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ justifyContent: 'center' }}>
+                SoundCloud Catalog
+                </a>
+                <a href={YOUTUBE_PLAYLIST_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ justifyContent: 'center' }}>
+                  YouTube Playlist
+                </a>
+                <Link href="/book" className="btn-primary" style={{ textAlign: 'center' }}>
+                  Book a Set
+                </Link>
+              </div>
+            </div>
+          </article>
+        </section>
 
         {mixes.length === 0 ? (
           <div style={{ padding: '64px 0', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
@@ -168,7 +316,7 @@ export default async function MixesPage() {
 
                 {mix.embed_url && (
                   <a href={mix.embed_url} target="_blank" rel="noopener noreferrer" className="pkg-btn">
-                    Listen
+                    Open On Platform
                   </a>
                 )}
               </article>
@@ -188,11 +336,11 @@ export default async function MixesPage() {
           }}
         >
           <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7 }}>
-            Find the full catalog on SoundCloud.
+            Find the full catalog on SoundCloud when you want the platform view.
           </p>
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
             <a href="https://soundcloud.com/djbae" target="_blank" rel="noopener noreferrer" className="btn-primary">
-              Listen on SoundCloud
+              Open On SoundCloud
             </a>
             <Link href="/book" className="btn-ghost">
               Book a Set <span aria-hidden="true">→</span>

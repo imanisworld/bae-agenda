@@ -98,9 +98,6 @@ export default async function PortfolioPage() {
               {about}
             </div>
             <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <Link href="/press-kit" className="btn-primary">
-                Open Press Kit
-              </Link>
               <Link href="/admin-demo" className="btn-ghost">
                 View Admin Demo
               </Link>
@@ -114,9 +111,6 @@ export default async function PortfolioPage() {
         <section style={{ display: 'grid', gap: '18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
             <h2 className="section-heading" style={{ marginBottom: 0 }}>Selected Work</h2>
-            <Link href="/press-kit" className="view-all-link">
-              Press Kit →
-            </Link>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '18px' }}>
             {SELECTED_WORK.map((item) => (
