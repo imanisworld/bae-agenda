@@ -10,11 +10,14 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { PUBLIC_NAV } from '@/lib/constants'
 
 export default function Nav() {
+  const pathname = usePathname()
   const [scrolled,     setScrolled]     = useState(false)
   const [menuOpen,     setMenuOpen]     = useState(false)
+  const forceSolidNav = pathname !== '/'
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -38,9 +41,9 @@ export default function Nav() {
           position:    'fixed',
           top: 0, left: 0, right: 0,
           zIndex:      100,
-          background:  scrolled || menuOpen ? 'rgba(8,8,8,0.95)' : 'transparent',
-          backdropFilter: scrolled || menuOpen ? 'blur(14px)' : 'none',
-          borderBottom: scrolled || menuOpen ? '1px solid var(--border)' : '1px solid transparent',
+          background:  scrolled || menuOpen || forceSolidNav ? 'rgba(8,8,8,0.95)' : 'transparent',
+          backdropFilter: scrolled || menuOpen || forceSolidNav ? 'blur(14px)' : 'none',
+          borderBottom: scrolled || menuOpen || forceSolidNav ? '1px solid var(--border)' : '1px solid transparent',
           transition: `background var(--motion-medium) var(--ease-standard),
                        border-color var(--motion-medium) var(--ease-standard)`,
         }}

@@ -15,13 +15,7 @@ const CONTENT_KEYS = ['about_quote', 'booking_email'] as const
 
 function statCard(label: string, value: string, sub: string) {
   return (
-    <div
-      style={{
-        border: '1px solid var(--border)',
-        background: 'var(--surface)',
-        padding: '20px',
-      }}
-    >
+    <div className="build-console-module">
       <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '10px' }}>
         {label}
       </div>
@@ -57,11 +51,8 @@ export default async function PortfolioPage() {
           }}
         >
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-              <span style={{ width: '22px', height: '1px', background: 'var(--violet)', display: 'block', flexShrink: 0 }} />
-              <span style={{ fontSize: '10px', letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                Portfolio
-              </span>
+            <div className="hardware-heading">
+              <span className="section-label">Portfolio</span>
             </div>
             <h1
               style={{
@@ -75,7 +66,7 @@ export default async function PortfolioPage() {
             >
               Work,
               <br />
-              Systems,
+              <span className="hardware-title-accent">Systems,</span>
               <br />
               Process.
             </h1>
@@ -85,9 +76,9 @@ export default async function PortfolioPage() {
           </div>
 
           <div
+            className="build-console-copy"
             style={{
-              border: '1px solid var(--border)',
-              background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(255,255,255,0.01))',
+              background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(18,18,22,0.96))',
               padding: '18px',
               display: 'grid',
               gap: '16px',
@@ -97,13 +88,13 @@ export default async function PortfolioPage() {
               justifySelf: 'end',
             }}
           >
-            <div style={{ position: 'relative', minHeight: '200px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ position: 'relative', minHeight: '160px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
               <Image
                 src="/photos/IMG_1120.JPG.jpeg"
                 alt="DJ B.A.E. portfolio image"
                 fill
-                sizes="(max-width: 900px) 100vw, 420px"
-                style={{ objectFit: 'cover', objectPosition: 'center 26%' }}
+                sizes="(max-width: 900px) 100vw, 560px"
+                style={{ objectFit: 'cover', objectPosition: 'center 22%' }}
               />
               <div
                 aria-hidden="true"
@@ -114,7 +105,7 @@ export default async function PortfolioPage() {
                 }}
               />
             </div>
-            <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+            <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--gold)' }}>
               Portfolio Summary
             </div>
             <div style={{ fontSize: '14px', color: 'var(--white)', lineHeight: 1.75 }}>
@@ -133,16 +124,14 @@ export default async function PortfolioPage() {
 
         <section style={{ display: 'grid', gap: '18px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-            <h2 className="section-heading" style={{ marginBottom: 0 }}>Selected Work</h2>
+            <h2 className="section-heading" style={{ marginBottom: 0 }}>Selected <span className="hardware-title-accent">Work</span></h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: '18px' }}>
             {SELECTED_WORK.map((item) => (
               <article
                 key={item.id}
-                className="card-hover"
+                className="build-console-module card-hover"
                 style={{
-                  border: '1px solid var(--border)',
-                  background: 'var(--surface)',
                   padding: '22px',
                   display: 'grid',
                   gap: '14px',
@@ -184,8 +173,8 @@ export default async function PortfolioPage() {
         </section>
 
         <section
+          className="build-console-module-grid"
           style={{
-            display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
             gap: '16px',
           }}
@@ -197,20 +186,19 @@ export default async function PortfolioPage() {
         </section>
 
         <section
+          className="build-console-mixer"
           style={{
-            border: '1px solid var(--border)',
-            background: 'var(--off-black)',
             padding: '26px',
             display: 'grid',
             gap: '16px',
           }}
         >
-          <div style={{ fontSize: '10px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+          <div style={{ fontSize: '10px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--gold)' }}>
             Product Highlights
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
             {PORTFOLIO_HIGHLIGHTS.map((item) => (
-              <div key={item} style={{ border: '1px solid var(--border)', padding: '16px', background: 'rgba(255,255,255,0.01)' }}>
+              <div key={item} className="build-console-module" style={{ padding: '16px' }}>
                 <div style={{ fontSize: '13px', color: 'var(--white)', lineHeight: 1.7 }}>
                   {item}
                 </div>

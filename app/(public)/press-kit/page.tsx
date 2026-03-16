@@ -5,7 +5,6 @@ import PrintPressKitButton from '@/components/public/PrintPressKitButton'
 import { SELECTED_WORK } from '@/lib/portfolio-data'
 import { getContentMap } from '@/lib/db/content'
 import { getPublishedMixes } from '@/lib/db/mixes'
-import { SOCIALS } from '@/lib/constants'
 
 export const metadata: Metadata = {
   title: 'Press Kit — DJ B.A.E.',
@@ -43,17 +42,6 @@ export default async function PressKitPage() {
   const subtitle = content.hero_subtitle ?? 'Private events, club nights, weddings & branded experiences.'
   const about = content.about_quote ?? 'Chicago-based DJ, curator, and experience architect.'
   const bookingEmail = content.booking_email ?? ''
-
-  const socialMap = {
-    Instagram: content.instagram_url,
-    SoundCloud: content.soundcloud_url,
-    YouTube: content.youtube_url,
-  } as const
-
-  const socialLinks = SOCIALS.map((social) => ({
-    label: social.label,
-    href: socialMap[social.label as keyof typeof socialMap] ?? social.url,
-  }))
 
   const topMixes = mixes.slice(0, 2)
 

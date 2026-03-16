@@ -68,8 +68,13 @@ function MixCard({
       {/* Bottom-to-top dark overlay */}
       <div className="mc-overlay" />
 
-      {/* Play button — centre, appears on hover */}
-      <div aria-hidden="true" className="mc-play" />
+      {/* Transport button stack — CDJ-inspired overlay */}
+      <div aria-hidden="true" className="mc-play">
+        <span className="mc-play-cue">CUE</span>
+        <span className="mc-play-main">
+          <span className="mc-play-icon" />
+        </span>
+      </div>
 
       {/* Content pinned to bottom — slides up slightly on hover */}
       <div className="mc-content">

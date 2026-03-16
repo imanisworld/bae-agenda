@@ -7,30 +7,6 @@ export const metadata: Metadata = {
   description: 'Meet DJ B.A.E. and get a closer look at the sound, setup, and energy behind the agenda.',
 }
 
-const collageCards = [
-  {
-    label: 'Club Sets',
-    title: 'High-pressure transitions built for packed rooms.',
-    accent: 'var(--violet)',
-    background:
-      'linear-gradient(135deg, rgba(155,93,229,0.4), rgba(10,10,10,0.96) 58%)',
-  },
-  {
-    label: 'Private Events',
-    title: 'Polished curation for weddings, branded events, and celebrations.',
-    accent: 'var(--gold)',
-    background:
-      'linear-gradient(135deg, rgba(242,184,75,0.34), rgba(10,10,10,0.96) 60%)',
-  },
-  {
-    label: 'Open Format',
-    title: 'Hip-hop, R&B, house, Afrobeats, dancehall, and left turns when the room wants them.',
-    accent: '#55d6be',
-    background:
-      'linear-gradient(135deg, rgba(85,214,190,0.28), rgba(8,8,8,0.96) 60%)',
-  },
-]
-
 const techItems = [
   {
     label: 'Setup',
@@ -59,9 +35,8 @@ const LIVE_SET_EMBED_SRC = 'https://www.youtube.com/embed/videoseries?list=UUjEi
 
 function sectionLabel(text: string) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-      <span style={{ width: '22px', height: '1px', background: 'var(--violet)', display: 'block', flexShrink: 0 }} />
-      <span style={{ fontSize: '10px', letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+    <div className="hardware-heading">
+      <span className="section-label" style={{ color: 'var(--eyebrow)' }}>
         {text}
       </span>
     </div>
@@ -176,105 +151,114 @@ export default function MeetPage() {
           </div>
         </section>
 
-        <section style={{ display: 'grid', gap: '18px' }}>
-          {sectionLabel('Editorial View')}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '18px' }}>
-            {collageCards.map((card) => (
-              <article
-                key={card.label}
-                className="card-hover"
-                style={{
-                  minHeight: '240px',
-                  padding: '22px',
-                  border: '1px solid var(--border)',
-                  background: card.background,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'space-between',
-                }}
-              >
-                <span
-                  style={{
-                    fontSize: '9px',
-                    letterSpacing: '0.28em',
-                    textTransform: 'uppercase',
-                    color: card.accent,
-                  }}
-                >
-                  {card.label}
-                </span>
-                <h2
-                  style={{
-                    margin: 0,
-                    fontFamily: 'Conthrax, sans-serif',
-                    fontSize: 'clamp(18px, 2vw, 24px)',
-                    lineHeight: 1.2,
-                    color: 'var(--white)',
-                  }}
-                >
-                  {card.title}
-                </h2>
-              </article>
-            ))}
-          </div>
-        </section>
+        <section className="build-console">
+          <div className="build-console-topbar">
+            <div className="build-console-screen">
+              <div className="build-console-screen-label">Live Profile</div>
+              <div className="build-console-screen-value">Meet / Booth / Room Read</div>
+              <div className="build-console-screen-lines">
+                {techItems.map((item) => (
+                  <span key={item.label}>
+                    <strong>{item.label}</strong> {item.value}
+                  </span>
+                ))}
+              </div>
+            </div>
 
-        <section
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
-            gap: '24px',
-          }}
-        >
-          <div
-            style={{
-              border: '1px solid var(--border)',
-              background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(255,255,255,0.01))',
-              padding: '28px',
-            }}
-          >
-            {sectionLabel('Energy Behind The Agenda')}
-            <div
-              style={{
-                position: 'relative',
-                minHeight: '360px',
-                border: '1px solid rgba(255,255,255,0.08)',
-                background: '#050505',
-                overflow: 'hidden',
-              }}
-            >
-              <iframe
-                title="DJ B.A.E. live set reel"
-                src={LIVE_SET_EMBED_SRC}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-                style={{ display: 'block', width: '100%', height: '100%', minHeight: '360px', border: 0 }}
-              />
+            <div className="build-console-chip-row" aria-hidden="true">
+              <span>Club</span>
+              <span>Private</span>
+              <span>Travel</span>
+              <span>Host</span>
+            </div>
+
+            <div className="build-console-dial-cluster" aria-hidden="true">
+              <span className="build-console-dial" />
+              <span className="build-console-dial-label">Room Energy</span>
             </div>
           </div>
 
-          <div style={{ display: 'grid', gap: '16px' }}>
+          <div className="build-console-grid">
             <div
+              className="build-console-copy"
               style={{
-                border: '1px solid var(--border)',
-                background: 'var(--surface)',
-                padding: '24px',
+                background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(18,18,22,0.96))',
               }}
             >
-              {sectionLabel('Gear & Tech')}
-              <div style={{ display: 'grid', gap: '18px' }}>
+              {sectionLabel('Energy Behind The Agenda')}
+              <div
+                style={{
+                  position: 'relative',
+                  minHeight: '360px',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: '#050505',
+                  overflow: 'hidden',
+                }}
+              >
+                <iframe
+                  title="DJ B.A.E. live set reel"
+                  src={LIVE_SET_EMBED_SRC}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  style={{ display: 'block', width: '100%', height: '100%', minHeight: '360px', border: 0 }}
+                />
+              </div>
+            </div>
+
+            <div className="build-console-mixer">
+              <div className="build-console-fx-header">
+                <span>Set Architecture</span>
+                <div className="build-console-mini-chips">
+                  <span>Selection</span>
+                  <span>Timing</span>
+                  <span>Pressure</span>
+                </div>
+              </div>
+
+              <div className="build-console-module-grid">
                 {techItems.map((item) => (
-                  <div key={item.label}>
-                    <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '8px' }}>
-                      {item.label}
+                  <div key={item.label} className="build-console-module">
+                    <div className="build-console-module-top">
+                      <span className="build-console-module-category">{item.label}</span>
                     </div>
-                    <div style={{ fontSize: '13px', color: 'var(--white)', lineHeight: 1.7 }}>
+                    <div className="build-console-module-desc" style={{ minHeight: '72px' }}>
                       {item.value}
+                    </div>
+                    <div className="build-console-module-meter" aria-hidden="true">
+                      <span />
                     </div>
                   </div>
                 ))}
               </div>
+
+              <div style={{ marginTop: '16px' }}>
+                <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '12px' }}>
+                  Event Atmosphere
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px' }}>
+                  {atmosphereNotes.map((note, index) => (
+                    <div
+                      key={note}
+                      className="build-console-pad"
+                      style={{
+                        minHeight: '92px',
+                        background: index % 2 === 0 ? 'rgba(155,93,229,0.08)' : 'rgba(242,184,75,0.07)',
+                        borderColor: 'rgba(255,255,255,0.12)',
+                        alignItems: 'end',
+                        padding: '14px',
+                        aspectRatio: 'auto',
+                        textAlign: 'left',
+                        justifyItems: 'start',
+                        lineHeight: 1.35,
+                      }}
+                    >
+                      {note}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               <div style={{ marginTop: '18px' }}>
                 <a
                   href="https://www.youtube.com/@djb.a.e"
@@ -285,40 +269,6 @@ export default function MeetPage() {
                 >
                   Watch More Live Sets
                 </a>
-              </div>
-            </div>
-
-            <div
-              style={{
-                border: '1px solid var(--border)',
-                padding: '20px',
-                background:
-                  'linear-gradient(160deg, rgba(255,255,255,0.02), rgba(255,255,255,0)), radial-gradient(circle at 20% 10%, rgba(155,93,229,0.14), transparent 24%), #0b0b0b',
-                display: 'grid',
-                gap: '12px',
-              }}
-            >
-              <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                Event Atmosphere
-              </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px' }}>
-                {atmosphereNotes.map((note, index) => (
-                  <div
-                    key={note}
-                    style={{
-                      minHeight: '92px',
-                      border: '1px solid rgba(255,255,255,0.07)',
-                      background: index % 2 === 0 ? 'rgba(155,93,229,0.08)' : 'rgba(242,184,75,0.07)',
-                      padding: '14px',
-                      display: 'flex',
-                      alignItems: 'flex-end',
-                      color: 'var(--white)',
-                      fontSize: '12px',
-                    }}
-                  >
-                    {note}
-                  </div>
-                ))}
               </div>
             </div>
           </div>

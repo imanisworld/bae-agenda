@@ -404,32 +404,69 @@ body {
 
 .hero-turntable {
   display: block;
-  width: min(620px, 90vw);
+  width: min(520px, 86vw);
 }
 
 .hero-turntable-panel {
   position: relative;
-  height: 220px;
-  border-radius: 28px;
-  overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02)),
-    linear-gradient(135deg, rgba(18,18,24,0.9), rgba(10,10,14,0.68));
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: 0 28px 70px rgba(0,0,0,0.4);
-  backdrop-filter: blur(14px);
+  height: 250px;
+  overflow: visible;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+
+.hero-turntable-aura {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.hero-turntable-aura-a {
+  left: 42px;
+  top: 118px;
+  width: 118px;
+  height: 118px;
+  border-color: rgba(255,255,255,0.18);
+}
+
+.hero-turntable-aura-b {
+  left: 196px;
+  top: 96px;
+  width: 46px;
+  height: 46px;
+  border-color: rgba(180,180,186,0.42);
+}
+
+.hero-turntable-aura-b::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  margin-top: -4px;
+  border-radius: 50%;
+  background: var(--violet);
+  box-shadow: 0 0 16px rgba(155,93,229,0.35);
 }
 
 .hero-turntable-plinth {
   position: absolute;
-  inset: 16px 18px;
-  border-radius: 22px;
+  right: 0;
+  bottom: 30px;
+  width: 286px;
+  height: 122px;
+  border-radius: 0;
   background:
-    linear-gradient(135deg, rgba(238,238,232,0.94), rgba(215,212,205,0.82)),
-    radial-gradient(circle at 20% 18%, rgba(255,255,255,0.66), transparent 28%);
+    linear-gradient(180deg, rgba(12,12,16,0.98), rgba(7,7,10,0.98)),
+    linear-gradient(90deg, rgba(255,255,255,0.04), transparent 22%);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.62),
-    inset 0 -18px 28px rgba(0,0,0,0.08);
+    0 18px 36px rgba(0,0,0,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
 .hero-turntable-knob,
@@ -444,26 +481,35 @@ body {
 .hero-turntable-label-mark,
 .hero-turntable-shine,
 .hero-turntable-spindle,
-.hero-turntable-copy,
-.hero-turntable-copy span {
+.hero-turntable-copy {
   position: absolute;
   display: block;
 }
 
 .hero-turntable-record-window {
   position: absolute;
-  inset: -28px auto -28px 62px;
-  width: 320px;
-  overflow: hidden;
+  right: 10px;
+  bottom: 10px;
+  width: 228px;
+  height: 228px;
+  overflow: visible;
+}
+
+.hero-turntable-record-shadow {
+  position: absolute;
+  inset: 18px 20px 22px 16px;
+  display: block;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.28);
+  filter: blur(16px);
 }
 
 .hero-turntable-record {
   position: absolute;
   left: 0;
-  top: 50%;
-  width: 320px;
-  height: 320px;
-  margin-top: -160px;
+  top: 0;
+  width: 228px;
+  height: 228px;
   border-radius: 50%;
   background:
     radial-gradient(circle at 50% 50%, rgba(28,28,30,1) 0 16%, rgba(11,11,13,1) 17% 100%);
@@ -487,7 +533,7 @@ body {
 .hero-turntable-groove-c { inset: 78px; border-color: rgba(166,107,255,0.18); }
 
 .hero-turntable-label {
-  inset: 112px;
+  inset: 84px;
   border-radius: 50%;
   background:
     radial-gradient(circle at 34% 34%, rgba(255,255,255,0.1), transparent 22%),
@@ -542,19 +588,20 @@ body {
 }
 
 .hero-turntable-knob-left {
-  left: 38px;
+  right: 260px;
+  top: 156px;
 }
 
 .hero-turntable-knob-right {
-  right: 92px;
-  top: 42px;
+  right: 28px;
+  top: 24px;
   width: 22px;
   height: 22px;
 }
 
 .hero-turntable-switch {
-  left: 44px;
-  bottom: 42px;
+  right: 250px;
+  bottom: 74px;
   width: 36px;
   height: 16px;
   border-radius: 5px;
@@ -563,8 +610,8 @@ body {
 }
 
 .hero-turntable-arm-base {
-  right: 70px;
-  top: 42px;
+  right: 214px;
+  top: 132px;
   width: 34px;
   height: 34px;
   border-radius: 50%;
@@ -574,12 +621,12 @@ body {
 }
 
 .hero-turntable-arm {
-  right: 56px;
-  top: 51px;
-  width: 126px;
+  right: 144px;
+  top: 74px;
+  width: 150px;
   height: 14px;
   transform-origin: calc(100% - 18px) 50%;
-  transform: rotate(28deg);
+  transform: rotate(34deg);
   z-index: 3;
 }
 
@@ -588,7 +635,7 @@ body {
 }
 
 .hero-deck.is-paused .hero-turntable-arm {
-  transform: rotate(28deg);
+  transform: rotate(34deg);
 }
 
 .hero-turntable-arm-bar {
@@ -609,19 +656,20 @@ body {
 }
 
 .hero-turntable-copy {
-  right: 26px;
-  bottom: 24px;
-  width: 170px;
-  padding: 16px 16px 14px;
+  left: 286px;
+  bottom: -2px;
+  width: 206px;
+  padding: 16px 18px 14px;
   border-radius: 18px;
   background: rgba(16,16,20,0.72);
   border: 1px solid rgba(255,184,72,0.16);
   backdrop-filter: blur(10px);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
 }
 
 .hero-turntable-kicker {
-  position: relative;
   font-size: 9px;
   letter-spacing: 0.26em;
   text-transform: uppercase;
@@ -630,16 +678,14 @@ body {
 }
 
 .hero-turntable-title {
-  position: relative;
   font-family: 'Conthrax', sans-serif;
-  font-size: 15px;
+  font-size: 18px;
   line-height: 1.25;
   color: var(--white);
   margin-bottom: 8px;
 }
 
 .hero-turntable-text {
-  position: relative;
   font-size: 11px;
   line-height: 1.55;
   color: rgba(245,245,240,0.7);
@@ -655,7 +701,7 @@ body {
   right: clamp(14px, 2vw, 28px);
   top: 50%;
   transform: translateY(-50%);
-  z-index: 5;
+  z-index: 8;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -792,9 +838,9 @@ body {
 }
 
 @keyframes hero-needle-drop {
-  0% { transform: rotate(28deg); }
-  65% { transform: rotate(8deg); }
-  100% { transform: rotate(11deg); }
+  0% { transform: rotate(34deg); }
+  65% { transform: rotate(16deg); }
+  100% { transform: rotate(18deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -808,7 +854,7 @@ body {
   }
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1180px), (pointer: coarse) {
   .scroll-fader {
     display: none;
   }
@@ -816,59 +862,77 @@ body {
 
 @media (max-width: 800px) {
   .hero-turntable {
-    width: min(500px, 94vw);
+    width: min(390px, 92vw);
   }
 
   .hero-turntable-panel {
-    height: 176px;
-    border-radius: 22px;
+    height: 210px;
+  }
+
+  .hero-turntable-aura-a {
+    left: 24px;
+    top: 116px;
+    width: 92px;
+    height: 92px;
+  }
+
+  .hero-turntable-aura-b {
+    left: 150px;
+    top: 96px;
+    width: 34px;
+    height: 34px;
   }
 
   .hero-turntable-plinth {
-    inset: 12px;
+    right: 0;
+    bottom: 52px;
+    width: 206px;
+    height: 92px;
   }
 
   .hero-turntable-record-window {
-    left: 8px;
-    width: 224px;
+    right: 6px;
+    bottom: 40px;
+    width: 162px;
+    height: 162px;
   }
 
   .hero-turntable-record {
-    width: 224px;
-    height: 224px;
-    margin-top: -112px;
+    width: 162px;
+    height: 162px;
   }
 
   .hero-turntable-label {
-    inset: 78px;
+    inset: 58px;
   }
 
   .hero-turntable-arm-base {
-    right: 42px;
-    top: 28px;
+    right: 146px;
+    top: 114px;
     width: 28px;
     height: 28px;
   }
 
   .hero-turntable-arm {
-    right: 30px;
-    top: 35px;
-    width: 94px;
+    right: 88px;
+    top: 74px;
+    width: 104px;
   }
 
   .hero-turntable-copy {
-    right: 12px;
-    bottom: 12px;
-    width: 128px;
-    padding: 10px 11px;
+    left: 174px;
+    bottom: 0;
+    width: 178px;
+    padding: 12px 14px;
   }
 
   .hero-turntable-title {
-    font-size: 11px;
+    font-size: 15px;
   }
 
   .hero-turntable-text {
     font-size: 9px;
+    line-height: 1.45;
   }
 
   .hero-turntable-kicker {
@@ -876,18 +940,18 @@ body {
   }
 
   .hero-turntable-knob-left {
-    left: 22px;
-    top: 24px;
+    right: 176px;
+    top: 128px;
   }
 
   .hero-turntable-knob-right {
-    right: 62px;
-    top: 32px;
+    right: 18px;
+    top: 20px;
   }
 
   .hero-turntable-switch {
-    left: 26px;
-    bottom: 28px;
+    right: 168px;
+    bottom: 100px;
   }
 }
 
@@ -1634,29 +1698,40 @@ body.has-custom-cursor * { cursor: none !important; }
 
 .mc-play {
   position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%) scale(0.8);
-  width: 68px; height: 68px;
-  border: 1px solid rgba(255,255,255,0.24);
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
+  top: 18px;
+  right: 18px;
+  transform: scale(0.82);
+  width: 54px;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
   opacity: 0;
   transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+.mc-play-cue,
+.mc-play-main {
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
   backdrop-filter: blur(10px);
   background:
-    radial-gradient(circle at 30% 28%, rgba(255,255,255,0.92), rgba(214,220,228,0.94) 24%, rgba(126,134,145,0.96) 62%, rgba(232,236,241,0.96) 100%);
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,0.96), rgba(214,220,228,0.95) 22%, rgba(126,134,145,0.98) 62%, rgba(232,236,241,0.98) 100%);
   box-shadow:
     inset 0 2px 3px rgba(255,255,255,0.65),
     inset 0 -8px 12px rgba(71,79,90,0.22),
     0 10px 30px rgba(0,0,0,0.3);
-  pointer-events: none;
 }
-.mc-play::before {
+
+.mc-play-cue::before,
+.mc-play-main::before {
   content: '';
   position: absolute;
-  inset: 7px;
+  inset: 6px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.36);
+  border: 1px solid rgba(255,255,255,0.34);
   background:
     repeating-conic-gradient(
       from 0deg,
@@ -1665,16 +1740,54 @@ body.has-custom-cursor * { cursor: none !important; }
     );
   opacity: 0.5;
 }
-.mc-play::after {
-  content: '▶';
-  position: relative;
-  z-index: 1;
-  font-size: 16px;
-  margin-left: 4px;
-  color: rgba(36,42,52,0.92);
+
+.mc-play-cue {
+  width: 26px;
+  height: 26px;
+  font-size: 7px;
+  letter-spacing: 0.16em;
+  color: rgba(34,40,50,0.92);
   text-shadow: 0 1px 0 rgba(255,255,255,0.45);
 }
-.mc-card:hover .mc-play { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+.mc-play-main {
+  width: 54px;
+  height: 54px;
+}
+
+.mc-play-icon {
+  position: relative;
+  z-index: 1;
+  width: 20px;
+  height: 14px;
+}
+
+.mc-play-icon::before,
+.mc-play-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.mc-play-icon::before {
+  left: 0;
+  width: 0;
+  height: 0;
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 10px solid rgba(36,42,52,0.92);
+}
+
+.mc-play-icon::after {
+  right: 0;
+  width: 7px;
+  height: 14px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(36,42,52,0.92) 0 38%, transparent 38% 62%, rgba(36,42,52,0.92) 62% 100%);
+}
+
+.mc-card:hover .mc-play { opacity: 1; transform: scale(1); }
 
 .mc-content {
   position: absolute;

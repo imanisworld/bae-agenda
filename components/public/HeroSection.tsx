@@ -181,18 +181,18 @@ export default function HeroSection({ content = {} }: Props) {
       {/* ── Bottom — motion stage + genre band ─────────────── */}
       <div style={{ position: 'relative', zIndex: 1 }}>
         <div style={{
-          padding:        '0 clamp(32px, 5vw, 72px) 44px',
+          padding:        '0 clamp(32px, 5vw, 72px) 72px',
           display:        'flex',
-          justifyContent: 'center',
+          justifyContent: 'flex-end',
         }}>
           <div
             className="hero-motion-stage"
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'flex-end',
               width: '100%',
-              minHeight: '132px',
+              minHeight: '188px',
             }}
           >
             <HeroDeck />
