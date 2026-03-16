@@ -408,7 +408,9 @@ body {
 }
 
 .hero-turntable-panel {
+  display: block;
   position: relative;
+  width: 100%;
   height: 250px;
   overflow: visible;
   background: transparent;
