@@ -404,14 +404,14 @@ body {
 
 .hero-turntable {
   display: block;
-  width: min(520px, 86vw);
+  width: min(430px, 80vw);
 }
 
 .hero-turntable-panel {
   display: block;
   position: relative;
   width: 100%;
-  height: 250px;
+  height: 220px;
   overflow: visible;
   background: transparent;
   border: none;
@@ -419,60 +419,18 @@ body {
   backdrop-filter: none;
 }
 
-.hero-turntable-aura {
-  position: absolute;
-  display: block;
-  border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.14);
-}
-
-.hero-turntable-aura-a {
-  left: 42px;
-  top: 118px;
-  width: 118px;
-  height: 118px;
-  border-color: rgba(255,255,255,0.18);
-}
-
-.hero-turntable-aura-b {
-  left: 196px;
-  top: 96px;
-  width: 46px;
-  height: 46px;
-  border-color: rgba(180,180,186,0.42);
-}
-
-.hero-turntable-aura-b::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 8px;
-  height: 8px;
-  margin-left: -4px;
-  margin-top: -4px;
-  border-radius: 50%;
-  background: var(--violet);
-  box-shadow: 0 0 16px rgba(155,93,229,0.35);
-}
-
 .hero-turntable-plinth {
   position: absolute;
-  right: 0;
-  bottom: 30px;
-  width: 286px;
-  height: 122px;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  margin-left: 0;
   border-radius: 0;
-  background:
-    linear-gradient(180deg, rgba(12,12,16,0.98), rgba(7,7,10,0.98)),
-    linear-gradient(90deg, rgba(255,255,255,0.04), transparent 22%);
-  box-shadow:
-    0 18px 36px rgba(0,0,0,0.28),
-    inset 0 1px 0 rgba(255,255,255,0.04);
+  background: transparent;
+  box-shadow: none;
 }
 
-.hero-turntable-knob,
-.hero-turntable-switch,
 .hero-turntable-arm-base,
 .hero-turntable-arm,
 .hero-turntable-arm-bar,
@@ -482,24 +440,24 @@ body {
 .hero-turntable-label-ring,
 .hero-turntable-label-mark,
 .hero-turntable-shine,
-.hero-turntable-spindle,
-.hero-turntable-copy {
+.hero-turntable-spindle {
   position: absolute;
   display: block;
 }
 
 .hero-turntable-record-window {
   position: absolute;
-  right: 10px;
-  bottom: 10px;
-  width: 228px;
-  height: 228px;
+  left: 50%;
+  bottom: 20px;
+  width: 214px;
+  height: 214px;
+  margin-left: -12px;
   overflow: visible;
 }
 
 .hero-turntable-record-shadow {
   position: absolute;
-  inset: 18px 20px 22px 16px;
+  inset: 12px;
   display: block;
   border-radius: 50%;
   background: rgba(0,0,0,0.28);
@@ -508,10 +466,11 @@ body {
 
 .hero-turntable-record {
   position: absolute;
-  left: 0;
+  left: 50%;
   top: 0;
-  width: 228px;
-  height: 228px;
+  width: 214px;
+  height: 214px;
+  margin-left: -107px;
   border-radius: 50%;
   background:
     radial-gradient(circle at 50% 50%, rgba(28,28,30,1) 0 16%, rgba(11,11,13,1) 17% 100%);
@@ -535,7 +494,7 @@ body {
 .hero-turntable-groove-c { inset: 78px; border-color: rgba(166,107,255,0.18); }
 
 .hero-turntable-label {
-  inset: 84px;
+  inset: 78px;
   border-radius: 50%;
   background:
     radial-gradient(circle at 34% 34%, rgba(255,255,255,0.1), transparent 22%),
@@ -578,44 +537,12 @@ body {
   opacity: 0.58;
 }
 
-.hero-turntable-knob {
-  top: 32px;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, rgba(30,30,34,0.96), rgba(8,8,12,1));
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.12),
-    0 2px 3px rgba(0,0,0,0.22);
-}
-
-.hero-turntable-knob-left {
-  right: 260px;
-  top: 156px;
-}
-
-.hero-turntable-knob-right {
-  right: 28px;
-  top: 24px;
-  width: 22px;
-  height: 22px;
-}
-
-.hero-turntable-switch {
-  right: 250px;
-  bottom: 74px;
-  width: 36px;
-  height: 16px;
-  border-radius: 5px;
-  background: linear-gradient(180deg, rgba(35,35,42,1), rgba(9,9,12,1));
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
-}
-
 .hero-turntable-arm-base {
-  right: 214px;
-  top: 132px;
+  left: 50%;
+  top: 34px;
   width: 34px;
   height: 34px;
+  margin-left: -116px;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, rgba(38,38,44,1), rgba(10,10,14,1));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
@@ -623,25 +550,29 @@ body {
 }
 
 .hero-turntable-arm {
-  right: 144px;
-  top: 74px;
+  left: 50%;
+  top: 44px;
   width: 150px;
   height: 14px;
-  transform-origin: calc(100% - 18px) 50%;
-  transform: rotate(34deg);
+  margin-left: -106px;
+  transform-origin: 16px 50%;
+  transform: rotate(30deg) translateY(-1px);
   z-index: 3;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
 .hero-deck.is-playing .hero-turntable-arm {
-  animation: hero-needle-drop 1.4s var(--ease-spring) forwards;
+  animation: hero-needle-drop 720ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .hero-deck.is-paused .hero-turntable-arm {
-  transform: rotate(34deg);
+  animation: none;
+  transform: rotate(30deg) translateY(-1px);
 }
 
 .hero-turntable-arm-bar {
-  inset: 3px 18px 3px 0;
+  inset: 3px 20px 3px 12px;
   border-radius: 999px;
   background: linear-gradient(90deg, rgba(42,42,48,0.92), rgba(10,10,14,0.96));
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.16);
@@ -655,42 +586,16 @@ body {
   border-radius: 3px;
   background: linear-gradient(180deg, rgba(25,25,30,1), rgba(8,8,11,1));
   box-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  transform: translateY(-1px);
+  transition: transform 220ms ease-out 480ms;
 }
 
-.hero-turntable-copy {
-  left: 286px;
-  bottom: -2px;
-  width: 206px;
-  padding: 16px 18px 14px;
-  border-radius: 18px;
-  background: rgba(16,16,20,0.72);
-  border: 1px solid rgba(255,184,72,0.16);
-  backdrop-filter: blur(10px);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
-  display: flex;
-  flex-direction: column;
+.hero-deck.is-playing .hero-turntable-arm-head {
+  transform: translateY(2px);
 }
 
-.hero-turntable-kicker {
-  font-size: 9px;
-  letter-spacing: 0.26em;
-  text-transform: uppercase;
-  color: rgba(255,184,72,0.82);
-  margin-bottom: 10px;
-}
-
-.hero-turntable-title {
-  font-family: 'Conthrax', sans-serif;
-  font-size: 18px;
-  line-height: 1.25;
-  color: var(--white);
-  margin-bottom: 8px;
-}
-
-.hero-turntable-text {
-  font-size: 11px;
-  line-height: 1.55;
-  color: rgba(245,245,240,0.7);
+.hero-deck.is-paused .hero-turntable-arm-head {
+  transform: translateY(-1px);
 }
 
 .hero-deck:focus-visible .hero-turntable-panel {
@@ -840,9 +745,15 @@ body {
 }
 
 @keyframes hero-needle-drop {
-  0% { transform: rotate(34deg); }
-  65% { transform: rotate(16deg); }
-  100% { transform: rotate(18deg); }
+  0% {
+    transform: rotate(30deg) translateY(-1px);
+  }
+  78% {
+    transform: rotate(17deg) translateY(-1px);
+  }
+  100% {
+    transform: rotate(17deg) translateY(2px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -864,96 +775,53 @@ body {
 
 @media (max-width: 800px) {
   .hero-turntable {
-    width: min(390px, 92vw);
+    width: min(330px, 90vw);
   }
 
   .hero-turntable-panel {
-    height: 210px;
-  }
-
-  .hero-turntable-aura-a {
-    left: 24px;
-    top: 116px;
-    width: 92px;
-    height: 92px;
-  }
-
-  .hero-turntable-aura-b {
-    left: 150px;
-    top: 96px;
-    width: 34px;
-    height: 34px;
+    height: 168px;
   }
 
   .hero-turntable-plinth {
-    right: 0;
-    bottom: 52px;
-    width: 206px;
-    height: 92px;
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    margin-left: 0;
   }
 
   .hero-turntable-record-window {
-    right: 6px;
-    bottom: 40px;
-    width: 162px;
-    height: 162px;
+    left: 50%;
+    bottom: 18px;
+    width: 152px;
+    height: 152px;
+    margin-left: -6px;
   }
 
   .hero-turntable-record {
-    width: 162px;
-    height: 162px;
+    left: 50%;
+    width: 152px;
+    height: 152px;
+    margin-left: -76px;
   }
 
   .hero-turntable-label {
-    inset: 58px;
+    inset: 56px;
   }
 
   .hero-turntable-arm-base {
-    right: 146px;
-    top: 114px;
+    left: 50%;
+    top: 26px;
     width: 28px;
     height: 28px;
+    margin-left: -86px;
   }
 
   .hero-turntable-arm {
-    right: 88px;
-    top: 74px;
-    width: 104px;
-  }
-
-  .hero-turntable-copy {
-    left: 174px;
-    bottom: 0;
-    width: 178px;
-    padding: 12px 14px;
-  }
-
-  .hero-turntable-title {
-    font-size: 15px;
-  }
-
-  .hero-turntable-text {
-    font-size: 9px;
-    line-height: 1.45;
-  }
-
-  .hero-turntable-kicker {
-    font-size: 7px;
-  }
-
-  .hero-turntable-knob-left {
-    right: 176px;
-    top: 128px;
-  }
-
-  .hero-turntable-knob-right {
-    right: 18px;
-    top: 20px;
-  }
-
-  .hero-turntable-switch {
-    right: 168px;
-    bottom: 100px;
+    left: 50%;
+    top: 34px;
+    width: 106px;
+    margin-left: -78px;
   }
 }
 
@@ -1706,13 +1574,11 @@ body.has-custom-cursor * { cursor: none !important; }
   width: 54px;
   display: grid;
   justify-items: center;
-  gap: 4px;
   opacity: 0;
   transition: opacity 0.3s ease, transform 0.3s ease;
   pointer-events: none;
   z-index: 2;
 }
-.mc-play-cue,
 .mc-play-main {
   position: relative;
   display: grid;
@@ -1727,7 +1593,6 @@ body.has-custom-cursor * { cursor: none !important; }
     0 10px 30px rgba(0,0,0,0.3);
 }
 
-.mc-play-cue::before,
 .mc-play-main::before {
   content: '';
   position: absolute;
@@ -1741,15 +1606,6 @@ body.has-custom-cursor * { cursor: none !important; }
       rgba(0,0,0,0.04) 8deg 16deg
     );
   opacity: 0.5;
-}
-
-.mc-play-cue {
-  width: 26px;
-  height: 26px;
-  font-size: 7px;
-  letter-spacing: 0.16em;
-  color: rgba(34,40,50,0.92);
-  text-shadow: 0 1px 0 rgba(255,255,255,0.45);
 }
 
 .mc-play-main {

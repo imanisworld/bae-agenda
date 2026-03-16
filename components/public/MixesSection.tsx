@@ -70,7 +70,6 @@ function MixCard({
 
       {/* Transport button stack — CDJ-inspired overlay */}
       <div aria-hidden="true" className="mc-play">
-        <span className="mc-play-cue">CUE</span>
         <span className="mc-play-main">
           <span className="mc-play-icon" />
         </span>

@@ -15,18 +15,7 @@ export default function HeroDeck() {
     >
       <span className="hero-turntable" aria-hidden="true">
         <span className="hero-turntable-panel">
-          <span className="hero-turntable-aura hero-turntable-aura-a" />
-          <span className="hero-turntable-aura hero-turntable-aura-b" />
-
           <span className="hero-turntable-plinth" />
-
-          <span className="hero-turntable-copy">
-            <span className="hero-turntable-kicker">For the weekend</span>
-            <span className="hero-turntable-title">Cue it back up.</span>
-            <span className="hero-turntable-text">
-              {isPlaying ? 'Tap to pause motion' : 'Tap to resume motion'}
-            </span>
-          </span>
 
           <span className="hero-turntable-record-window">
             <span className="hero-turntable-record-shadow" />
@@ -48,10 +37,6 @@ export default function HeroDeck() {
             <span className="hero-turntable-arm-bar" />
             <span className="hero-turntable-arm-head" />
           </span>
-
-          <span className="hero-turntable-knob hero-turntable-knob-left" />
-          <span className="hero-turntable-knob hero-turntable-knob-right" />
-          <span className="hero-turntable-switch" />
         </span>
       </span>
     </button>

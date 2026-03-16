@@ -39,7 +39,6 @@ const GENRES = [
 
 export default function HeroSection({ content = {} }: Props) {
   const title      = content.hero_title?.trim() || 'THE BAE AGENDA'
-  const subtitle   = content.hero_subtitle    ?? 'Private events, club nights, weddings & branded experiences.'
 
   // Server-rendered — matches Farm Minerals date badge pattern
   const today = new Date().toLocaleDateString('en-US', {
@@ -146,33 +145,7 @@ export default function HeroSection({ content = {} }: Props) {
           </div>
         </div>
 
-        {/* Right — descriptor */}
-        <div style={{
-          display:       'flex',
-          flexDirection: 'column',
-          alignItems:    'flex-end',
-          gap:           '20px',
-        }}>
-          {/* Short descriptor */}
-          <p style={{
-            fontFamily:    'DM Sans, sans-serif',
-            fontSize:      'clamp(13px, 1.5vw, 15px)',
-            fontWeight:    500,
-            letterSpacing: '0.03em',
-            color:         'rgba(250,248,243,0.96)',
-            lineHeight:    1.7,
-            textAlign:     'right',
-            maxWidth:      '340px',
-            margin:        0,
-            padding:       '16px 18px',
-            border:        '1px solid rgba(255,255,255,0.18)',
-            background:    'rgba(18,18,22,0.32)',
-            backdropFilter:'blur(10px)',
-            textShadow:    '0 1px 16px rgba(0,0,0,0.45)',
-          }}>
-            {subtitle}
-          </p>
-        </div>
+        <div aria-hidden="true" />
       </div>
 
       {/* ── Centre void — glow fills this space ──────────── */}
