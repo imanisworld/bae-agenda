@@ -158,8 +158,10 @@ export default function Nav() {
           flexDirection: 'column',
           padding:    '40px 32px 48px',
           gap:        '8px',
-          transform:  menuOpen ? 'translateY(0)' : 'translateY(-110%)',
-          transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1)',
+          transform:  menuOpen ? 'translateY(0)' : 'translateY(calc(-100% - 80px))',
+          opacity:    menuOpen ? 1 : 0,
+          visibility: menuOpen ? 'visible' : 'hidden',
+          transition: 'transform 0.3s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease, visibility 0.2s ease',
           pointerEvents: menuOpen ? 'auto' : 'none',
         }}
       >

@@ -13,14 +13,10 @@ export default function Footer() {
     <footer aria-label="Site footer" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
 
       <div className="section-container" style={{ paddingTop: '42px', paddingBottom: '34px' }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))',
-          gap: '36px', alignItems: 'start',
-        }}>
+        <div className="footer-grid">
 
           {/* Brand */}
-          <div style={{ maxWidth: '280px' }}>
+          <div className="footer-brand" style={{ maxWidth: '280px' }}>
             <Link href="/" className="hover-link" style={{ display: 'inline-block', marginBottom: '8px' }}>
               <span style={{
                 fontFamily: 'Conthrax, sans-serif', fontSize: '13px',

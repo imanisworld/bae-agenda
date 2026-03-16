@@ -8,6 +8,8 @@
  */
 import Image         from 'next/image'
 import HeroGlowLayer from '@/components/effects/HeroGlowLayer'
+import HeroDeck      from '@/components/public/HeroDeck'
+import ScrollFader   from '@/components/public/ScrollFader'
 
 interface HeroContent {
   hero_title?:    string
@@ -80,6 +82,7 @@ export default function HeroSection({ content = {} }: Props) {
       {/* ── Effects ──────────────────────────────────────── */}
       <div className="noise-overlay" aria-hidden="true" />
       <HeroGlowLayer />
+      <ScrollFader />
 
       {/* ── Top bar ──────────────────────────────────────── */}
       <div
@@ -192,13 +195,7 @@ export default function HeroSection({ content = {} }: Props) {
               minHeight: '132px',
             }}
           >
-            <div className="hero-motion-rig" aria-hidden="true">
-              <span className="hero-orbit hero-orbit-a" />
-              <span className="hero-orbit hero-orbit-b" />
-              <span className="hero-core" />
-              <span className="hero-pulse-line hero-pulse-line-a" />
-              <span className="hero-pulse-line hero-pulse-line-b" />
-            </div>
+            <HeroDeck />
           </div>
         </div>
 

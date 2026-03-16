@@ -5,14 +5,19 @@
 import PageHeader      from '@/components/admin/PageHeader'
 import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
+import AdminNotice     from '@/components/admin/AdminNotice'
+import { createEventFromBookingAction, updateBookingStatusAction } from '@/app/actions/bookings'
 import { createClient } from '@/lib/supabase/server'
 import type { BookingStatus } from '@/types/index'
+import Link from 'next/link'
 
 interface BookingRow {
   id:          string
   event_name:  string
   event_date:  string
   event_timezone: string
+  venue:       string | null
+  city:        string | null
   client_name: string | null
   package:     string | null
   status:      BookingStatus
@@ -24,6 +29,8 @@ interface BookingQueryRow {
   event_name: string
   event_date: string
   event_timezone: string
+  venue: string | null
+  city: string | null
   package: string | null
   status: BookingStatus
   created_at: string
@@ -58,7 +65,7 @@ async function getBookings(): Promise<BookingRow[]> {
     const supabase = await createClient()
     const { data } = await supabase
       .from('bookings')
-      .select('id, event_name, event_date, event_timezone, package, status, created_at, clients(first_name, last_name)')
+      .select('id, event_name, event_date, event_timezone, venue, city, package, status, created_at, clients(first_name, last_name)')
       .order('created_at', { ascending: false })
     const rows = (data ?? []) as BookingQueryRow[]
     return rows.map((b) => ({
@@ -66,6 +73,8 @@ async function getBookings(): Promise<BookingRow[]> {
       event_name:  b.event_name,
       event_date:  b.event_date,
       event_timezone: b.event_timezone,
+      venue:       b.venue,
+      city:        b.city,
       client_name: b.clients
         ? `${b.clients.first_name ?? ''} ${b.clients.last_name ?? ''}`.trim() || null
         : null,
@@ -78,8 +87,49 @@ async function getBookings(): Promise<BookingRow[]> {
   }
 }
 
-export default async function BookingsPage() {
+function getErrorMessage(errorParam: string | string[] | undefined) {
+  if (!errorParam) return null
+  return Array.isArray(errorParam) ? errorParam[0] ?? null : errorParam
+}
+
+function getBookingActions(status: BookingStatus) {
+  if (status === 'inquiry') {
+    return [
+      { label: 'Confirm', nextStatus: 'confirmed' as const, tone: 'primary' as const },
+      { label: 'Cancel', nextStatus: 'cancelled' as const, tone: 'danger' as const },
+    ]
+  }
+
+  if (status === 'confirmed') {
+    return [
+      { label: 'Complete', nextStatus: 'completed' as const, tone: 'primary' as const },
+      { label: 'Cancel', nextStatus: 'cancelled' as const, tone: 'danger' as const },
+    ]
+  }
+
+  if (status === 'completed') {
+    return [
+      { label: 'Mark Confirmed', nextStatus: 'confirmed' as const, tone: 'ghost' as const },
+    ]
+  }
+
+  return [
+    { label: 'Reopen Inquiry', nextStatus: 'inquiry' as const, tone: 'ghost' as const },
+  ]
+}
+
+function canCreateEvent(status: BookingStatus) {
+  return status === 'confirmed' || status === 'completed'
+}
+
+export default async function BookingsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ error?: string | string[] }>
+}) {
   const bookings = await getBookings()
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
+  const errorMessage = getErrorMessage(resolvedSearchParams?.error)
 
   return (
     <div style={{ padding: '40px 48px', maxWidth: '1120px' }}>
@@ -87,6 +137,8 @@ export default async function BookingsPage() {
         title="Bookings"
         subtitle={bookings.length ? `${bookings.length} total` : undefined}
       />
+
+      {errorMessage && <AdminNotice message={errorMessage} />}
 
       <div className="admin-section" style={{ marginBottom: 0 }}>
         <div className="admin-section-header">
@@ -109,12 +161,20 @@ export default async function BookingsPage() {
                   <th>Package</th>
                   <th>Status</th>
                   <th>Submitted</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {bookings.map((b) => (
                   <tr key={b.id}>
-                    <td style={{ fontWeight: 400 }}>{b.event_name}</td>
+                    <td style={{ fontWeight: 400 }}>
+                      {b.event_name}
+                      {(b.venue || b.city) && (
+                        <div className="muted" style={{ marginTop: '4px' }}>
+                          {[b.venue, b.city].filter(Boolean).join(' · ')}
+                        </div>
+                      )}
+                    </td>
                     <td className="muted">{b.client_name ?? '—'}</td>
                     <td className="muted">
                       {fmtEventDate(b.event_date, b.event_timezone)}
@@ -125,6 +185,43 @@ export default async function BookingsPage() {
                     <td className="muted">{b.package ?? '—'}</td>
                     <td><Badge variant={b.status} /></td>
                     <td className="muted">{fmtSubmittedDate(b.created_at)}</td>
+                    <td>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        {getBookingActions(b.status).map((action) => (
+                          <form key={action.nextStatus} action={updateBookingStatusAction}>
+                            <input type="hidden" name="id" value={b.id} />
+                            <input type="hidden" name="next_status" value={action.nextStatus} />
+                            <button
+                              type="submit"
+                              className={action.tone === 'primary' ? 'admin-btn-primary' : 'admin-btn-ghost'}
+                              style={
+                                action.tone === 'danger'
+                                  ? {
+                                      color: '#e85d75',
+                                      borderColor: 'rgba(232,93,117,0.35)',
+                                    }
+                                  : action.tone === 'primary'
+                                    ? { padding: '7px 14px' }
+                                    : undefined
+                              }
+                            >
+                              {action.label}
+                            </button>
+                          </form>
+                        ))}
+                        {canCreateEvent(b.status) && (
+                          <form action={createEventFromBookingAction}>
+                            <input type="hidden" name="booking_id" value={b.id} />
+                            <button type="submit" className="admin-btn-ghost">
+                              Create Event
+                            </button>
+                          </form>
+                        )}
+                        <Link href={`/admin/bookings/${b.id}`} className="admin-view-all" style={{ alignSelf: 'center' }}>
+                          Edit →
+                        </Link>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

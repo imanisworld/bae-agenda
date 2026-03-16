@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { EVENT_TYPES, PACKAGES } from '@/lib/constants'
 import { formatCurrency } from '@/lib/utils'
+import TurnstileWidget from '@/components/public/TurnstileWidget'
 
 type FormState = {
   firstName: string
@@ -19,7 +20,20 @@ type FormState = {
   city: string
   package: string
   notes: string
+  website: string
+  startedAt: string
+  turnstileToken: string
 }
+
+type FieldKey =
+  | 'firstName'
+  | 'email'
+  | 'eventName'
+  | 'eventDate'
+  | 'timeZone'
+  | 'turnstileToken'
+
+type FieldErrors = Partial<Record<FieldKey, string>>
 
 const INITIAL_STATE: FormState = {
   firstName: '',
@@ -35,6 +49,9 @@ const INITIAL_STATE: FormState = {
   city: '',
   package: '',
   notes: '',
+  website: '',
+  startedAt: '',
+  turnstileToken: '',
 }
 
 const CITY_OPTIONS = [
@@ -70,14 +87,27 @@ const PACKAGE_OPTIONS = PACKAGES.map((pkg) =>
   `${pkg.name}${pkg.price ? ` (${formatCurrency(pkg.price)})` : ' (Custom quote)'}`
 )
 
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''
+
 export default function BookPage() {
-  const [form, setForm] = useState<FormState>(INITIAL_STATE)
+  const [form, setForm] = useState<FormState>(() => ({
+    ...INITIAL_STATE,
+    startedAt: String(Date.now()),
+  }))
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
+    if (key in fieldErrors) {
+      setFieldErrors((prev) => {
+        const next = { ...prev }
+        delete next[key as FieldKey]
+        return next
+      })
+    }
   }
 
   function updateCity(value: string) {
@@ -92,7 +122,25 @@ export default function BookPage() {
     e.preventDefault()
     setError('')
     setSuccess(false)
+    setFieldErrors({})
     setLoading(true)
+
+    const nextErrors: FieldErrors = {}
+    if (!form.firstName.trim()) nextErrors.firstName = 'First name is required.'
+    if (!form.email.trim()) nextErrors.email = 'Email is required.'
+    if (!form.eventName.trim()) nextErrors.eventName = 'Event name is required.'
+    if (!form.eventDate.trim()) nextErrors.eventDate = 'Event date is required.'
+    if (!form.timeZone.trim()) nextErrors.timeZone = 'Timezone is required.'
+    if (TURNSTILE_SITE_KEY && !form.turnstileToken.trim()) {
+      nextErrors.turnstileToken = 'Please complete the verification check.'
+    }
+
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors(nextErrors)
+      setError('Please complete the highlighted fields and try again.')
+      setLoading(false)
+      return
+    }
 
     try {
       const normalizedTime = TIME_OPTIONS.find(
@@ -108,16 +156,29 @@ export default function BookPage() {
         }),
       })
 
-      const payload = (await res.json()) as { error?: string }
+      const payload = (await res.json()) as { error?: string; fields?: string[] }
 
       if (!res.ok) {
+        if (payload.fields?.length) {
+          const fromServer: FieldErrors = {}
+          payload.fields.forEach((field) => {
+            if (field in form) {
+              fromServer[field as FieldKey] = 'Please review this field.'
+            }
+          })
+          setFieldErrors(fromServer)
+        }
         setError(payload.error ?? 'Could not submit booking request.')
         setLoading(false)
         return
       }
 
       setSuccess(true)
-      setForm(INITIAL_STATE)
+      setForm({
+        ...INITIAL_STATE,
+        startedAt: String(Date.now()),
+        turnstileToken: '',
+      })
       setLoading(false)
     } catch {
       setError('Unexpected error. Please try again.')
@@ -153,6 +214,9 @@ export default function BookPage() {
             Share your event details below. Requests are saved directly to the admin dashboard as
             new inquiries.
           </p>
+          <p style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6, maxWidth: '620px' }}>
+            This form uses basic spam protection and abuse checks so only real inquiries make it through.
+          </p>
         </div>
 
         <form
@@ -165,6 +229,24 @@ export default function BookPage() {
             gap: '18px',
           }}
         >
+          <input
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            name="website"
+            value={form.website}
+            onChange={(e) => updateField('website', e.target.value)}
+            style={{
+              position: 'absolute',
+              left: '-9999px',
+              width: '1px',
+              height: '1px',
+              opacity: 0,
+              pointerEvents: 'none',
+            }}
+          />
+          <input type="hidden" name="startedAt" value={form.startedAt} />
+
           <div style={responsiveGridStyle()}>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>First Name *</span>
@@ -172,8 +254,9 @@ export default function BookPage() {
                 required
                 value={form.firstName}
                 onChange={(e) => updateField('firstName', e.target.value)}
-                style={inputStyle()}
+                style={inputStyle(Boolean(fieldErrors.firstName))}
               />
+              {fieldErrors.firstName && <span style={fieldErrorStyle()}>{fieldErrors.firstName}</span>}
             </label>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>Last Name</span>
@@ -193,8 +276,9 @@ export default function BookPage() {
                 type="email"
                 value={form.email}
                 onChange={(e) => updateField('email', e.target.value)}
-                style={inputStyle()}
+                style={inputStyle(Boolean(fieldErrors.email))}
               />
+              {fieldErrors.email && <span style={fieldErrorStyle()}>{fieldErrors.email}</span>}
             </label>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>Phone</span>
@@ -212,8 +296,9 @@ export default function BookPage() {
               required
               value={form.eventName}
               onChange={(e) => updateField('eventName', e.target.value)}
-              style={inputStyle()}
+              style={inputStyle(Boolean(fieldErrors.eventName))}
             />
+            {fieldErrors.eventName && <span style={fieldErrorStyle()}>{fieldErrors.eventName}</span>}
           </label>
 
           <div style={responsiveGridStyle()}>
@@ -233,7 +318,7 @@ export default function BookPage() {
                 required
                 value={form.eventDate}
                 onChange={(e) => updateField('eventDate', e.target.value)}
-                style={inputStyle()}
+                style={inputStyle(Boolean(fieldErrors.eventDate))}
               >
                 <option value="">Select a date</option>
                 {DATE_OPTIONS.map((option) => (
@@ -242,6 +327,7 @@ export default function BookPage() {
                   </option>
                 ))}
               </select>
+              {fieldErrors.eventDate && <span style={fieldErrorStyle()}>{fieldErrors.eventDate}</span>}
             </label>
           </div>
 
@@ -262,9 +348,12 @@ export default function BookPage() {
                 list="city-options"
                 value={form.city}
                 onChange={(e) => updateCity(e.target.value)}
-                placeholder="Choose or type a city"
+                placeholder="Choose or type any city"
                 style={inputStyle()}
               />
+              <span style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+                Type any city you want. The list is only a shortcut.
+              </span>
             </label>
           </div>
 
@@ -274,7 +363,7 @@ export default function BookPage() {
               required
               value={form.timeZone}
               onChange={(e) => updateField('timeZone', e.target.value)}
-              style={inputStyle()}
+              style={inputStyle(Boolean(fieldErrors.timeZone))}
             >
               {TIME_ZONE_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
@@ -285,6 +374,7 @@ export default function BookPage() {
             <span style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
               Choose the timezone where the event will happen. Indianapolis is Eastern; Chicago is Central.
             </span>
+            {fieldErrors.timeZone && <span style={fieldErrorStyle()}>{fieldErrors.timeZone}</span>}
           </label>
 
           <label style={{ display: 'grid', gap: '8px' }}>
@@ -329,6 +419,20 @@ export default function BookPage() {
             </p>
           )}
 
+          {TURNSTILE_SITE_KEY && (
+            <div style={{ display: 'grid', gap: '10px' }}>
+              <span className="section-label" style={{ marginBottom: 0 }}>Verification</span>
+              <TurnstileWidget
+                siteKey={TURNSTILE_SITE_KEY}
+                onToken={(token) => updateField('turnstileToken', token)}
+              />
+              <span style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+                This helps keep spam and bot submissions out of the booking form.
+              </span>
+              {fieldErrors.turnstileToken && <span style={fieldErrorStyle()}>{fieldErrors.turnstileToken}</span>}
+            </div>
+          )}
+
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
@@ -338,7 +442,7 @@ export default function BookPage() {
             <button
               type="submit"
               className="btn-primary"
-              disabled={loading}
+              disabled={loading || Boolean(TURNSTILE_SITE_KEY && !form.turnstileToken)}
               style={{ opacity: loading ? 0.6 : 1, width: '100%', textAlign: 'center' }}
             >
               {loading ? 'Submitting...' : 'Submit Booking Request'}
@@ -377,11 +481,11 @@ export default function BookPage() {
   )
 }
 
-function inputStyle(): React.CSSProperties {
+function inputStyle(hasError = false): React.CSSProperties {
   return {
     width: '100%',
     background: 'var(--off-black)',
-    border: '1px solid var(--border)',
+    border: `1px solid ${hasError ? '#e85d75' : 'var(--border)'}`,
     color: 'var(--white)',
     padding: '12px 14px',
     minHeight: '48px',
@@ -389,6 +493,14 @@ function inputStyle(): React.CSSProperties {
     fontFamily: 'DM Sans, sans-serif',
     borderRadius: '0',
     appearance: 'none',
+  }
+}
+
+function fieldErrorStyle(): React.CSSProperties {
+  return {
+    fontSize: '12px',
+    color: '#ff8da0',
+    lineHeight: 1.5,
   }
 }
 

@@ -140,14 +140,13 @@ export default async function MixesSection() {
         }}>
           <div>
             {/* "— FEATURED MIXES" eyebrow */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-              <span style={{ width: '22px', height: '1px', background: 'var(--violet)', display: 'block', flexShrink: 0 }} />
-              <span style={{ fontSize: '10px', letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+            <div className="hardware-heading">
+              <span className="section-label" style={{ color: 'var(--eyebrow)' }}>
                 Featured Mixes
               </span>
             </div>
             <h2 className="section-heading" style={{ marginBottom: 0 }}>
-              Recent Sets
+              Recent <span className="hardware-title-accent">Sets</span>
             </h2>
           </div>
           <Link href="/mixes" className="view-all-link" style={{ marginBottom: '10px' }}>

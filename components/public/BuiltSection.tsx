@@ -59,71 +59,101 @@ export default function BuiltSection({ aboutQuote }: Props) {
     >
       <div className="section-container">
 
-        {/* Two-column header */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
-          gap: '40px',
-          alignItems: 'start',
-        }}>
+        <div className="build-console">
+          <div className="build-console-topbar">
+            <div className="build-console-screen">
+              <div className="build-console-screen-label">Signal Chain</div>
+              <div className="build-console-screen-value">Scratch Build / Live Stack</div>
+              <div className="build-console-screen-lines">
+                {STACK.slice(0, 4).map(({ category, name }) => (
+                  <span key={name}>
+                    <strong>{category}</strong> {name}
+                  </span>
+                ))}
+              </div>
+            </div>
 
-          {/* Left — title + bio */}
-          <div>
-            <span className="section-label" style={{ color: 'var(--violet)' }}>Under The Hood</span>
-            <h2 className="section-heading" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)' }}>
-              Built from<br />scratch.
-            </h2>
-            <p style={{
-              fontSize: '13px', color: 'var(--muted)',
-              lineHeight: 1.75, marginTop: '16px',
-            }}>
-              This site was designed and developed by the same person behind the
-              music. No templates. No drag-and-drop builders.
-            </p>
-            {bio && (
-              <p style={{
-                fontSize: '13px', color: 'var(--muted)',
-                lineHeight: 1.75, marginTop: '20px',
-                paddingTop: '20px',
-                borderTop: '1px solid var(--border)',
-                fontStyle: 'italic',
-              }}>
-                {bio}
-              </p>
-            )}
+            <div className="build-console-chip-row" aria-hidden="true">
+              <span>Next</span>
+              <span>TS</span>
+              <span>RLS</span>
+              <span>CMS</span>
+            </div>
+
+            <div className="build-console-dial-cluster" aria-hidden="true">
+              <span className="build-console-dial" />
+              <span className="build-console-dial-label">Echo Time</span>
+            </div>
           </div>
 
-          {/* Right — tech grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))',
-            gap: '10px',
-          }}>
-            {STACK.map(({ category, name, desc }) => (
-              <div key={name} className="tech-card">
-                <div style={{
-                  fontSize: '9px', letterSpacing: '0.2em', textTransform: 'uppercase',
-                  color: 'var(--violet)', marginBottom: '12px',
-                }}>
-                  {category}
-                </div>
-                <div style={{
-                  fontFamily: 'Conthrax, sans-serif',
-                  fontSize: '11px', fontWeight: 600,
-                  color: 'var(--white)', marginBottom: '8px',
-                  lineHeight: 1.3,
-                }}>
-                  {name}
-                </div>
-                <div style={{
-                  fontSize: '11px', color: 'var(--muted)', lineHeight: 1.65,
-                }}>
-                  {desc}
+          <div className="build-console-grid">
+            <div className="build-console-copy">
+              <div className="hardware-heading">
+                <span className="section-label" style={{ color: 'var(--eyebrow)' }}>Under The Hood</span>
+              </div>
+              <h2 className="section-heading" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)', marginBottom: '18px' }}>
+                Built from<br /><span className="hardware-title-accent">scratch.</span>
+              </h2>
+              <p className="build-console-body">
+                This site was designed and developed by the same person behind the
+                music. No templates. No drag-and-drop builders.
+              </p>
+              {bio && (
+                <p className="build-console-quote">
+                  {bio}
+                </p>
+              )}
+
+              <div className="build-console-pad-bank" aria-hidden="true">
+                <span className="build-console-pad is-lit">UI</span>
+                <span className="build-console-pad">CMS</span>
+                <span className="build-console-pad">Auth</span>
+                <span className="build-console-pad">DB</span>
+              </div>
+            </div>
+
+            <div className="build-console-mixer">
+              <div className="build-console-fx-header">
+                <span>Live Modules</span>
+                <div className="build-console-mini-chips">
+                  <span>Fast</span>
+                  <span>Typed</span>
+                  <span>Secure</span>
                 </div>
               </div>
-            ))}
-          </div>
 
+              <div className="build-console-module-grid">
+                {STACK.map(({ category, name, desc }, index) => (
+                  <div key={name} className="build-console-module">
+                    <div className="build-console-module-top">
+                      <span className="build-console-module-category">{category}</span>
+                      <span className="build-console-module-index">{String(index + 1).padStart(2, '0')}</span>
+                    </div>
+                    <div className="build-console-module-name">{name}</div>
+                    <div className="build-console-module-desc">{desc}</div>
+                    <div className="build-console-module-meter" aria-hidden="true">
+                      <span />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="build-console-knob-row" aria-hidden="true">
+                <div className="build-console-knob-unit">
+                  <span className="build-console-knob" />
+                  <span className="build-console-knob-text">Speed</span>
+                </div>
+                <div className="build-console-knob-unit">
+                  <span className="build-console-knob" />
+                  <span className="build-console-knob-text">Scale</span>
+                </div>
+                <div className="build-console-knob-unit">
+                  <span className="build-console-knob" />
+                  <span className="build-console-knob-text">Polish</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>

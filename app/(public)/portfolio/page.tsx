@@ -66,10 +66,11 @@ export default async function PortfolioPage() {
             <h1
               style={{
                 fontFamily: 'Conthrax, sans-serif',
-                fontSize: 'clamp(34px, 6vw, 72px)',
+                fontSize: 'clamp(34px, 5.2vw, 64px)',
                 lineHeight: 0.95,
                 color: 'var(--white)',
                 margin: '0 0 18px',
+                maxWidth: '7.2ch',
               }}
             >
               Work,
@@ -78,7 +79,7 @@ export default async function PortfolioPage() {
               <br />
               Process.
             </h1>
-            <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '620px' }}>
+            <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px' }}>
               This route exists to show the deeper work behind the public site: selected event work, booking flow thinking, content systems, and the product decisions that make the brand usable.
             </p>
           </div>
@@ -90,15 +91,19 @@ export default async function PortfolioPage() {
               padding: '18px',
               display: 'grid',
               gap: '16px',
+              alignSelf: 'stretch',
+              maxWidth: '560px',
+              width: '100%',
+              justifySelf: 'end',
             }}
           >
-            <div style={{ position: 'relative', minHeight: '220px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div style={{ position: 'relative', minHeight: '200px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
               <Image
                 src="/photos/IMG_1120.JPG.jpeg"
                 alt="DJ B.A.E. portfolio image"
                 fill
                 sizes="(max-width: 900px) 100vw, 420px"
-                style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
+                style={{ objectFit: 'cover', objectPosition: 'center 26%' }}
               />
               <div
                 aria-hidden="true"
@@ -115,13 +120,13 @@ export default async function PortfolioPage() {
             <div style={{ fontSize: '14px', color: 'var(--white)', lineHeight: 1.75 }}>
               {about}
             </div>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
               <Link href="/admin-demo" className="btn-ghost">
                 View Admin Demo
               </Link>
-            </div>
-            <div style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.7 }}>
-              Contact: {bookingEmail}
+              <div style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.7 }}>
+                Contact: {bookingEmail}
+              </div>
             </div>
           </div>
         </section>

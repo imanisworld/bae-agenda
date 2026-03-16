@@ -51,6 +51,8 @@ const atmosphereNotes = [
   'Peak-hour pressure',
   'Clean handoffs',
   'Mic-ready hosting',
+  'Crowd resets',
+  'Closing lift',
 ]
 
 const LIVE_SET_EMBED_SRC = 'https://www.youtube.com/embed/videoseries?list=UUjEiMW5l_Go9vSHudx5VPEw'
@@ -299,7 +301,7 @@ export default function MeetPage() {
               <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)' }}>
                 Event Atmosphere
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(140px, 100%), 1fr))', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px' }}>
                 {atmosphereNotes.map((note, index) => (
                   <div
                     key={note}

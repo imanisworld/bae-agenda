@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendBookingNotifications } from '@/lib/notifications'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 
 const bookingSchema = z.object({
   firstName: z.string().trim().min(1).max(80),
@@ -17,7 +18,42 @@ const bookingSchema = z.object({
   city: z.string().trim().max(120).optional().or(z.literal('')),
   package: z.string().trim().max(120).optional().or(z.literal('')),
   notes: z.string().trim().max(2000).optional().or(z.literal('')),
+  website: z.string().trim().max(200).optional().or(z.literal('')),
+  startedAt: z.string().trim().max(30).optional().or(z.literal('')),
+  turnstileToken: z.string().trim().max(2048).optional().or(z.literal('')),
 })
+
+async function verifyTurnstileToken(token: string, ip?: string) {
+  const secret = process.env.TURNSTILE_SECRET_KEY
+  if (!secret) return { ok: true, configured: false }
+
+  if (!token.trim()) {
+    return { ok: false, configured: true }
+  }
+
+  try {
+    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        secret,
+        response: token,
+        ...(ip ? { remoteip: ip } : {}),
+      }).toString(),
+    })
+
+    if (!response.ok) return { ok: false, configured: true }
+
+    const data = (await response.json()) as { success?: boolean }
+    return { ok: Boolean(data.success), configured: true }
+  } catch {
+    return { ok: false, configured: true }
+  }
+}
+
+const BOOKING_WINDOW_MS = 15 * 60 * 1000
+const BOOKING_LIMIT = 5
+const MIN_SUBMIT_MS = 1500
 
 function normalizeOptional(value?: string): string | null {
   if (!value) return null
@@ -144,17 +180,67 @@ function toEventISO(dateValue: string, timeZone: string, timeValue?: string): st
 
 export async function POST(request: Request) {
   try {
+    const origin = request.headers.get('origin')
+    const host = request.headers.get('host')
+    if (origin && host) {
+      const originHost = new URL(origin).host
+      if (originHost !== host) {
+        return NextResponse.json({ error: 'Invalid submission origin.' }, { status: 403 })
+      }
+    }
+
+    const clientIp = getClientIp(request.headers)
+    const rateLimit = checkRateLimit(`booking:${clientIp}`, BOOKING_LIMIT, BOOKING_WINDOW_MS)
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { error: 'Too many booking requests. Please wait a few minutes and try again.' },
+        {
+          status: 429,
+          headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) },
+        }
+      )
+    }
+
     const json = (await request.json()) as unknown
     const parsed = bookingSchema.safeParse(json)
 
     if (!parsed.success) {
+      const fields = parsed.error.issues
+        .map((issue) => issue.path[0])
+        .filter((field): field is string => typeof field === 'string')
+
       return NextResponse.json(
-        { error: 'Please check your form fields and try again.' },
+        { error: 'Please check the highlighted form fields and try again.', fields },
         { status: 400 }
       )
     }
 
     const payload = parsed.data
+    if (payload.website?.trim()) {
+      return NextResponse.json({ success: true }, { status: 201 })
+    }
+
+    const startedAtMs = Number(payload.startedAt)
+    if (
+      payload.startedAt &&
+      Number.isFinite(startedAtMs) &&
+      startedAtMs > 0 &&
+      Date.now() - startedAtMs < MIN_SUBMIT_MS
+    ) {
+      return NextResponse.json(
+        { error: 'Submission blocked. Please try again.' },
+        { status: 400 }
+      )
+    }
+
+    const turnstile = await verifyTurnstileToken(payload.turnstileToken ?? '', clientIp)
+    if (!turnstile.ok && turnstile.configured) {
+      return NextResponse.json(
+        { error: 'Verification failed. Please try again.' },
+        { status: 400 }
+      )
+    }
+
     const eventISO = toEventISO(payload.eventDate, payload.timeZone, payload.eventTime)
     if (!eventISO) {
       return NextResponse.json(

@@ -22,6 +22,17 @@ const CONTENT_KEYS = [
   'youtube_url',
 ] as const
 
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '2px' }}>
+      <div style={{ width: '18px', height: '2px', background: '#b8820e', flexShrink: 0 }} />
+      <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#b8820e', fontWeight: 600 }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 export default async function PressKitPage() {
   const [content, mixes] = await Promise.all([
     getContentMap([...CONTENT_KEYS]),
@@ -44,19 +55,19 @@ export default async function PressKitPage() {
     href: socialMap[social.label as keyof typeof socialMap] ?? social.url,
   }))
 
-  const topMixes = mixes.slice(0, 3)
+  const topMixes = mixes.slice(0, 2)
 
   return (
-    <div style={{ background: '#ece8df', minHeight: '100vh', color: '#111', padding: 'clamp(20px, 5vw, 40px) 20px' }}>
+    <div className="press-kit-page" style={{ background: '#ece8df', minHeight: '100vh', color: '#111', padding: 'calc(68px + clamp(20px, 5vw, 32px)) 20px clamp(20px, 5vw, 40px)' }}>
       <div style={{ maxWidth: '1180px', margin: '0 auto', display: 'grid', gap: '24px' }}>
-        <div className="print-hide" style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+        <div className="print-hide" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <Link
             href="/portfolio"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '14px 22px',
+              padding: '12px 18px',
               background: '#111',
               color: '#f4f1eb',
               textDecoration: 'none',
@@ -66,9 +77,14 @@ export default async function PressKitPage() {
               textTransform: 'uppercase',
             }}
           >
-            Back To Portfolio
+            ← Portfolio
           </Link>
-          <PrintPressKitButton />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#666' }}>
+              Press Kit
+            </div>
+            <PrintPressKitButton />
+          </div>
         </div>
 
         <article
@@ -83,9 +99,10 @@ export default async function PressKitPage() {
           }}
         >
           <div
+            className="press-kit-left"
             style={{
               position: 'relative',
-              minHeight: '920px',
+              minHeight: '760px',
               background: 'linear-gradient(180deg, rgba(16,16,20,0.16), rgba(16,16,20,0.4)), #111',
               color: '#fffdfa',
               display: 'grid',
@@ -112,33 +129,30 @@ export default async function PressKitPage() {
               style={{
                 position: 'relative',
                 zIndex: 1,
-                padding: '32px',
+                padding: '24px',
                 display: 'grid',
-                gap: '18px',
+                gap: '14px',
               }}
             >
               <div style={{ fontSize: '10px', letterSpacing: '0.32em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.78)' }}>
                 Official Press Kit
               </div>
               <div style={{ display: 'grid', gap: '6px' }}>
-                <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(44px, 5vw, 86px)', lineHeight: 0.92 }}>
+                <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(36px, 4.5vw, 68px)', lineHeight: 0.92 }}>
                   DJ
                   <br />
                   B.A.E.
                 </div>
-                <div style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#b97dff' }}>
-                  Club Sets • Private Events • Branded Experiences
-                </div>
               </div>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {['Open Format', 'House', 'Hip-Hop', 'R&B', 'Global Club'].map((item) => (
+                {['Open Format', 'House', 'Hip-Hop', 'R&B', 'Afrobeats', 'Dancehall'].map((item) => (
                   <span
                     key={item}
                     style={{
-                      fontSize: '10px',
+                      fontSize: '9px',
                       letterSpacing: '0.16em',
                       textTransform: 'uppercase',
-                      padding: '8px 10px',
+                      padding: '6px 8px',
                       border: '1px solid rgba(255,255,255,0.16)',
                       background: 'rgba(255,255,255,0.06)',
                     }}
@@ -151,119 +165,96 @@ export default async function PressKitPage() {
           </div>
 
           <div
+            className="press-kit-right"
             style={{
-              padding: 'clamp(24px, 4vw, 36px)',
+              padding: 'clamp(20px, 3vw, 28px)',
               display: 'grid',
-              gap: '24px',
-              background:
-                'linear-gradient(180deg, rgba(255,255,255,0.42), rgba(255,255,255,0.1)), linear-gradient(135deg, rgba(112,68,255,0.08), rgba(0,0,0,0) 55%)',
+              gap: '18px',
+              background: 'linear-gradient(160deg, rgba(255,255,255,0.55) 0%, rgba(248,245,239,0.95) 100%)',
             }}
           >
             <header style={{ display: 'grid', gap: '12px' }}>
-              <div style={{ fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#666' }}>
-                Press Kit
-              </div>
-              <h1 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(30px, 4vw, 60px)', lineHeight: 0.94, margin: 0 }}>
+              <SectionLabel>Press Kit</SectionLabel>
+              <h1 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(26px, 3.2vw, 46px)', lineHeight: 0.94, margin: 0 }}>
                 {title}
               </h1>
-              <p style={{ fontSize: '14px', lineHeight: 1.75, color: '#262626', maxWidth: '580px', margin: 0 }}>
+              <p style={{ fontSize: '13px', lineHeight: 1.65, color: '#262626', maxWidth: '560px', margin: 0 }}>
                 {subtitle}
               </p>
             </header>
 
             <section style={{ display: 'grid', gap: '12px' }}>
-              <div style={{ fontSize: '10px', letterSpacing: '0.24em', textTransform: 'uppercase', color: '#6d6d6d' }}>
-                Artist Bio
-              </div>
-              <p style={{ fontSize: '14px', lineHeight: 1.8, margin: 0, color: '#1f1f1f' }}>
+              <SectionLabel>Artist Bio</SectionLabel>
+              <p style={{ fontSize: '13px', lineHeight: 1.65, margin: 0, color: '#1f1f1f' }}>
                 {about}
               </p>
-              <p style={{ fontSize: '13px', lineHeight: 1.7, margin: 0, color: '#444' }}>
+              <p style={{ fontSize: '12px', lineHeight: 1.6, margin: 0, color: '#444' }}>
                 Available for club nights, private events, weddings, branded activations, and curated experiences built around room energy and clean execution.
               </p>
             </section>
 
-            <section
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(min(210px, 100%), 1fr))',
-                gap: '14px',
-              }}
-            >
-              <div style={{ background: 'rgba(17,17,17,0.04)', border: '1px solid rgba(0,0,0,0.1)', padding: '16px' }}>
-                <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#7a7a7a', marginBottom: '10px' }}>
-                  Booking
-                </div>
-                <div style={{ fontSize: '13px', lineHeight: 1.7 }}>
-                  {bookingEmail ? (
-                    <a href={`mailto:${bookingEmail}`} style={{ color: '#6132ff', textDecoration: 'none', fontWeight: 600 }}>
-                      {bookingEmail}
-                    </a>
-                  ) : (
-                    <span>Available on request</span>
-                  )}
-                </div>
-              </div>
-              <div style={{ background: 'rgba(17,17,17,0.04)', border: '1px solid rgba(0,0,0,0.1)', padding: '16px' }}>
-                <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#7a7a7a', marginBottom: '10px' }}>
-                  Links
-                </div>
-                <div style={{ display: 'grid', gap: '6px', fontSize: '13px', lineHeight: 1.6 }}>
-                  {socialLinks.slice(0, 4).map((social) => (
-                    <a key={social.label} href={social.href} target="_blank" rel="noopener noreferrer" style={{ color: '#1a1a1a', textDecoration: 'none' }}>
-                      {social.label}
-                    </a>
+            <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', alignItems: 'start' }}>
+              <div style={{ display: 'grid', gap: '10px' }}>
+                <SectionLabel>Featured Mixes</SectionLabel>
+                <div style={{ display: 'grid', gap: '8px' }}>
+                  {topMixes.map((mix, index) => (
+                    <div
+                      key={mix.id}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '28px 1fr',
+                        gap: '8px',
+                        alignItems: 'start',
+                        paddingBottom: '8px',
+                        borderBottom: index < topMixes.length - 1 ? '1px solid rgba(0,0,0,0.08)' : 'none',
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          display: 'grid',
+                          placeItems: 'center',
+                          background: '#111',
+                          color: '#fffdfa',
+                          fontSize: '10px',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {index + 1}
+                      </div>
+                      <div style={{ display: 'grid', gap: '3px' }}>
+                        <div style={{ fontSize: '12px', fontWeight: 600 }}>{mix.title}</div>
+                        <div style={{ fontSize: '10px', color: '#555' }}>{mix.genre ?? 'Open Format'}</div>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
-            </section>
 
-            <section style={{ display: 'grid', gap: '14px' }}>
-              <div style={{ fontSize: '10px', letterSpacing: '0.24em', textTransform: 'uppercase', color: '#6d6d6d' }}>
-                Featured Mixes
-              </div>
               <div style={{ display: 'grid', gap: '10px' }}>
-                {topMixes.map((mix, index) => (
-                  <div
-                    key={mix.id}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '32px 1fr',
-                      gap: '12px',
-                      alignItems: 'start',
-                      paddingBottom: '10px',
-                      borderBottom: index < topMixes.length - 1 ? '1px solid rgba(0,0,0,0.08)' : 'none',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: '32px',
-                        height: '32px',
-                        display: 'grid',
-                        placeItems: 'center',
-                        background: '#111',
-                        color: '#fffdfa',
-                        fontSize: '11px',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {index + 1}
-                    </div>
-                    <div style={{ display: 'grid', gap: '4px' }}>
-                      <div style={{ fontSize: '14px', fontWeight: 600 }}>{mix.title}</div>
-                      <div style={{ fontSize: '12px', color: '#555' }}>{mix.genre ?? 'Open Format'}</div>
-                    </div>
+                <SectionLabel>Booking</SectionLabel>
+                <div style={{ background: 'rgba(17,17,17,0.04)', border: '1px solid rgba(0,0,0,0.1)', padding: '14px' }}>
+                  <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#7a7a7a', marginBottom: '8px' }}>
+                    Email
                   </div>
-                ))}
+                  <div style={{ fontSize: '12px', lineHeight: 1.6 }}>
+                    {bookingEmail ? (
+                      <a href={`mailto:${bookingEmail}`} style={{ color: '#111', textDecoration: 'none', fontWeight: 600 }}>
+                        {bookingEmail}
+                      </a>
+                    ) : (
+                      <span>Available on request</span>
+                    )}
+                  </div>
+                </div>
               </div>
             </section>
 
             <section style={{ display: 'grid', gap: '14px' }}>
-              <div style={{ fontSize: '10px', letterSpacing: '0.24em', textTransform: 'uppercase', color: '#6d6d6d' }}>
-                Selected Work
-              </div>
+              <SectionLabel>Selected Work</SectionLabel>
               <div style={{ display: 'grid', gap: '12px' }}>
-                {SELECTED_WORK.slice(0, 2).map((item) => (
+                {SELECTED_WORK.map((item) => (
                   <div key={item.id} style={{ padding: '14px 0', borderTop: '1px solid rgba(0,0,0,0.1)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '6px' }}>
                       <strong style={{ fontSize: '14px' }}>{item.title}</strong>

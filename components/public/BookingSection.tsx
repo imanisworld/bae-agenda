@@ -92,7 +92,9 @@ export default function BookingSection({ bookingEmail }: Props) {
 
       <div className="section-container" style={{ position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: '640px', marginBottom: '64px' }}>
-          <span className="section-label">Book The Bae</span>
+          <div className="hardware-heading">
+            <span className="section-label">Book The Bae</span>
+          </div>
           <h2 style={{
             fontFamily: 'Conthrax, sans-serif',
             fontSize: 'clamp(22px, 4.5vw, 56px)', fontWeight: 600,
