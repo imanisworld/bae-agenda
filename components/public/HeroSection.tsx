@@ -66,14 +66,14 @@ export default function HeroSection({ content = {} }: Props) {
         fill
         priority
         aria-hidden="true"
-        style={{ objectFit: 'cover', objectPosition: 'center 35%', opacity: 0.45 }}
+        style={{ objectFit: 'cover', objectPosition: 'center 35%', opacity: 0.56 }}
       />
 
       {/* Dark gradient overlay — keeps text readable */}
       <div aria-hidden="true" style={{
         position:   'absolute',
         inset:      0,
-        background: 'linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.4) 40%, rgba(0,0,0,0.75) 80%, rgba(0,0,0,0.92) 100%)',
+        background: 'linear-gradient(to bottom, rgba(8,8,10,0.38) 0%, rgba(8,8,10,0.22) 38%, rgba(8,8,10,0.56) 78%, rgba(8,8,10,0.76) 100%)',
         zIndex:     0,
       }} />
 
@@ -95,7 +95,7 @@ export default function HeroSection({ content = {} }: Props) {
         }}
       >
         {/* Left — eyebrow + headline */}
-        <div>
+        <div style={{ display: 'grid', gap: '18px' }}>
           <p style={{
             fontFamily:    'DM Sans, sans-serif',
             fontSize:      'clamp(9px, 2.4vw, 11px)',
@@ -123,46 +123,47 @@ export default function HeroSection({ content = {} }: Props) {
               </span>
             ))}
           </h1>
+
+          <div style={{
+            display:       'inline-flex',
+            alignItems:    'center',
+            justifySelf:   'start',
+            width:         'fit-content',
+            background:    'rgba(255,255,255,0.05)',
+            border:        '1px solid rgba(255,255,255,0.14)',
+            borderRadius:  '100px',
+            padding:       '7px 16px',
+            fontSize:      '11px',
+            fontFamily:    'DM Sans, sans-serif',
+            color:         'rgba(250,248,243,0.88)',
+            letterSpacing: '0.01em',
+            whiteSpace:    'nowrap',
+          }}>
+            {today}
+          </div>
         </div>
 
-        {/* Right — date pill + descriptor */}
+        {/* Right — descriptor */}
         <div style={{
           display:       'flex',
           flexDirection: 'column',
           alignItems:    'flex-end',
           gap:           '20px',
         }}>
-          {/* Date badge */}
-          <div style={{
-            display:       'inline-flex',
-            alignItems:    'center',
-            background:    'rgba(255,255,255,0.06)',
-            border:        '1px solid rgba(255,255,255,0.12)',
-            borderRadius:  '100px',
-            padding:       '10px 22px',
-            fontSize:      '13px',
-            fontFamily:    'DM Sans, sans-serif',
-            color:         'var(--white)',
-            letterSpacing: '0.01em',
-            whiteSpace:    'nowrap',
-          }}>
-            {today}
-          </div>
-
           {/* Short descriptor */}
           <p style={{
             fontFamily:    'DM Sans, sans-serif',
             fontSize:      'clamp(13px, 1.5vw, 15px)',
             fontWeight:    500,
             letterSpacing: '0.03em',
-            color:         'rgba(245,245,240,0.9)',
+            color:         'rgba(250,248,243,0.96)',
             lineHeight:    1.7,
             textAlign:     'right',
             maxWidth:      '340px',
             margin:        0,
             padding:       '16px 18px',
-            border:        '1px solid rgba(255,255,255,0.12)',
-            background:    'rgba(8,8,8,0.34)',
+            border:        '1px solid rgba(255,255,255,0.18)',
+            background:    'rgba(18,18,22,0.32)',
             backdropFilter:'blur(10px)',
             textShadow:    '0 1px 16px rgba(0,0,0,0.45)',
           }}>

@@ -103,14 +103,13 @@ export default function Nav() {
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
             style={{
-              background: 'none',
-              border:     'none',
-              cursor:     'pointer',
-              padding:    '8px',
-              display:    'flex',
+              background:    'none',
+              border:        'none',
+              cursor:        'pointer',
+              padding:       '8px',
               flexDirection: 'column',
-              gap:        '5px',
-              alignItems: 'flex-end',
+              gap:           '5px',
+              alignItems:    'flex-end',
             }}
           >
             <span style={{

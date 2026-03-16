@@ -18,19 +18,19 @@
 /* ---- Design Tokens --------------------------------------- */
 @theme inline {
   /* Colors */
-  --color-bae-black:       #080808;
-  --color-bae-off-black:   #0f0f0f;
-  --color-bae-surface:     #141414;
-  --color-bae-white:       #f5f5f0;
-  --color-bae-muted:       rgba(245,245,240,0.45);
-  --color-bae-eyebrow:     rgba(245,245,240,0.72);
-  --color-bae-border:      rgba(255,255,255,0.07);
+  --color-bae-black:       #0d0d0f;
+  --color-bae-off-black:   #151518;
+  --color-bae-surface:     #1d1e22;
+  --color-bae-white:       #faf8f3;
+  --color-bae-muted:       rgba(250,248,243,0.68);
+  --color-bae-eyebrow:     rgba(250,248,243,0.84);
+  --color-bae-border:      rgba(255,255,255,0.14);
   --color-violet:          #9b5de5;
   --color-violet-light:    #b06ff0;
-  --color-violet-dim:      rgba(155,93,229,0.15);
-  --color-violet-glow:     rgba(155,93,229,0.35);
+  --color-violet-dim:      rgba(155,93,229,0.2);
+  --color-violet-glow:     rgba(155,93,229,0.42);
   --color-gold:            #c9a84c;
-  --color-gold-dim:        rgba(201,168,76,0.12);
+  --color-gold-dim:        rgba(201,168,76,0.16);
   --color-error:           #e85d75;
 
   /* Typography */
@@ -48,18 +48,18 @@
 
 /* ---- CSS Custom Properties (runtime access in JS) -------- */
 :root {
-  --black:        #080808;
-  --off-black:    #0f0f0f;
-  --surface:      #141414;
-  --border:       rgba(255,255,255,0.07);
-  --white:        #f5f5f0;
-  --muted:        rgba(245,245,240,0.45);
-  --eyebrow:      rgba(245,245,240,0.72);
+  --black:        #0d0d0f;
+  --off-black:    #151518;
+  --surface:      #1d1e22;
+  --border:       rgba(255,255,255,0.14);
+  --white:        #faf8f3;
+  --muted:        rgba(250,248,243,0.68);
+  --eyebrow:      rgba(250,248,243,0.84);
   --violet:       #9b5de5;
-  --violet-dim:   rgba(155,93,229,0.15);
-  --violet-glow:  rgba(155,93,229,0.35);
+  --violet-dim:   rgba(155,93,229,0.2);
+  --violet-glow:  rgba(155,93,229,0.42);
   --gold:         #c9a84c;
-  --gold-dim:     rgba(201,168,76,0.12);
+  --gold-dim:     rgba(201,168,76,0.16);
   --motion-fast:     150ms;
   --motion-medium:   300ms;
   --motion-slow:     600ms;
@@ -128,7 +128,7 @@ body {
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.04;
+  opacity: 0.03;
   pointer-events: none;
   z-index: 0;
 }
@@ -199,7 +199,7 @@ body {
 .nav-desktop   { display: flex; }
 .nav-hamburger { display: none; }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .nav-desktop   { display: none; }
   .nav-hamburger { display: flex; }
 }
@@ -548,10 +548,10 @@ body {
 /* ── Tech card (BuiltSection) ────────────────────────────────────── */
 .tech-card {
   background: var(--surface); padding: 24px;
-  border: 1px solid transparent;
+  border: 1px solid rgba(255,255,255,0.08);
   transition: border-color var(--motion-fast) var(--ease-standard);
 }
-.tech-card:hover { border-color: rgba(155,93,229,0.25); }
+.tech-card:hover { border-color: rgba(155,93,229,0.32); }
 
 /* ── Custom cursor ──────────────────────────────────────────────────── */
 /* Hide system cursor when our custom cursor is active */
@@ -709,12 +709,12 @@ body.has-custom-cursor * { cursor: none !important; }
   gap: 24px;
   align-items: center;
   padding: 24px;
-  background: #141414;
+  background: rgba(255,255,255,0.04);
   border: 1px solid transparent;
   transition: border-color 0.3s ease, background 0.3s ease;
 }
-.ev-item:hover { border-color: var(--border); background: rgba(155,93,229,0.05); }
-.ev-item.ev-featured { background: rgba(155,93,229,0.06); }
+.ev-item:hover { border-color: var(--border); background: rgba(155,93,229,0.09); }
+.ev-item.ev-featured { background: rgba(155,93,229,0.12); }
 
 .ev-day {
   font-family: 'Conthrax', sans-serif;
@@ -941,21 +941,21 @@ body.has-custom-cursor * { cursor: none !important; }
     radial-gradient(circle at 70% 20%, rgba(201,168,76,0.16), transparent 48%),
     radial-gradient(circle at 20% 80%, rgba(155,93,229,0.22), transparent 52%),
     linear-gradient(160deg, rgba(15,15,15,0.7), rgba(8,8,8,0.86)),
-    url('/photos/hero-1.jpg');
+    url('/photos/IMG_1118.JPG.jpeg');
 }
 
 .photo-art-2 {
   background-image:
     radial-gradient(circle at 15% 10%, rgba(155,93,229,0.26), transparent 50%),
     linear-gradient(145deg, rgba(10,10,10,0.8), rgba(8,8,8,0.95)),
-    url('/photos/hero-2.jpg');
+    url('/photos/IMG_1120.JPG.jpeg');
 }
 
 .photo-art-3 {
   background-image:
     radial-gradient(circle at 85% 12%, rgba(17,143,156,0.22), transparent 56%),
     linear-gradient(145deg, rgba(11,11,11,0.82), rgba(8,8,8,0.96)),
-    url('/photos/hero-3.jpg');
+    url('/photos/93857B7F-E4CA-4F51-BD81-68031362370D.JPG');
 }
 
 .photo-slot img {
@@ -1042,7 +1042,7 @@ body.has-custom-cursor * { cursor: none !important; }
   bottom: 0;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  background: rgba(8,8,8,0.88);
+  background: rgba(18,18,22,0.82);
   overflow: hidden;
   z-index: 3;
 }
@@ -1103,5 +1103,27 @@ body.has-custom-cursor * { cursor: none !important; }
     font-size: 10px;
     letter-spacing: 0.18em;
     padding-right: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .press-kit-sheet {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+
+  .print-hide {
+    display: none !important;
+  }
+
+  .press-kit-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    grid-template-columns: 0.9fr 1.1fr !important;
   }
 }

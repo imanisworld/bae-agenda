@@ -45,9 +45,8 @@ export const BOOKING_STATUS_COLORS: Record<string, string> = {
 
 // ---- Packages ----------------------------------------------
 export const PACKAGES = [
-  { name: '1 Hour Set',     price: 300, hours: 1, desc: 'Starting at $300. A focused set for pop-ins, launches, warmups, and short-format moments.' },
-  { name: '2 Hour Set',     price: 600, hours: 2, desc: 'A fuller room arc with more range to build, lift, and hold the energy.' },
-  { name: '3+ Hours / Custom',  price: null, hours: 3, desc: 'For weddings, brand events, club nights, long-form sets, and custom run-of-show needs.' },
+  { name: '$300 / Hour', price: 300, hours: 1, desc: 'Simple hourly booking for events that need flexible timing and a clean rate up front.' },
+  { name: 'Pick Your Event', price: null, hours: 1, desc: 'Tell us what you are planning and we will build the right format, timing, and setup around it.' },
 ] as const
 
 // ---- Event Types -------------------------------------------

@@ -32,7 +32,7 @@ function PackageCard({
     <div style={{
       padding: '32px',
       background: featured ? 'var(--violet-dim)' : 'transparent',
-      border: `1px solid ${featured ? 'rgba(155,93,229,0.35)' : 'var(--border)'}`,
+      border: `1px solid ${featured ? 'rgba(155,93,229,0.42)' : 'var(--border)'}`,
       display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative',
     }}>
       {featured && (
