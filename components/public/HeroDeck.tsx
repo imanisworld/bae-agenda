@@ -11,15 +11,15 @@ export default function HeroDeck() {
       className={`hero-deck ${isPlaying ? 'is-playing' : 'is-paused'}`}
       aria-pressed={isPlaying}
       aria-label={isPlaying ? 'Pause sound motion' : 'Play sound motion'}
-      onClick={() => setIsPlaying((value) => !value)}
+      onClick={() => setIsPlaying((v) => !v)}
     >
       <span className="hero-turntable" aria-hidden="true">
         <span className="hero-turntable-panel">
-          <span className="hero-turntable-plinth" />
-          <span className="hero-turntable-knob hero-turntable-knob-left" />
-          <span className="hero-turntable-knob hero-turntable-knob-right" />
-          <span className="hero-turntable-switch" />
 
+          {/* Plinth — off-white body of the turntable */}
+          <span className="hero-turntable-plinth" />
+
+          {/* Record window — vinyl spins when is-playing */}
           <span className="hero-turntable-record-window">
             <span className="hero-turntable-record">
               <span className="hero-turntable-groove hero-turntable-groove-a" />
@@ -34,21 +34,29 @@ export default function HeroDeck() {
             </span>
           </span>
 
+          {/* Tonearm base + arm — needle drops on play */}
           <span className="hero-turntable-arm-base" />
           <span className="hero-turntable-arm">
             <span className="hero-turntable-arm-bar" />
             <span className="hero-turntable-arm-head" />
           </span>
 
+          {/* Control knobs */}
+          <span className="hero-turntable-knob hero-turntable-knob-left" />
+          <span className="hero-turntable-knob hero-turntable-knob-right" />
+
+          {/* On/Off switch */}
+          <span className="hero-turntable-switch" />
+
+          {/* Info card */}
           <span className="hero-turntable-copy">
-            <span className="hero-turntable-kicker">Drop The Needle</span>
-            <span className="hero-turntable-title">
-              {isPlaying ? 'Now plating music' : 'Cue it back up'}
-            </span>
+            <span className="hero-turntable-kicker">For the weekend</span>
+            <span className="hero-turntable-title">Cue it back up.</span>
             <span className="hero-turntable-text">
-              {isPlaying ? 'Tap to pause the spin.' : 'Tap to drop the needle again.'}
+              {isPlaying ? 'Tap to pause motion' : 'Tap to resume motion'}
             </span>
           </span>
+
         </span>
       </span>
     </button>

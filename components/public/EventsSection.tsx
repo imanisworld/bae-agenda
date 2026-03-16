@@ -79,8 +79,11 @@ export default async function EventsSection() {
         {/* ── Left: label + heading + description ── */}
         <div>
           {/* "— EVENTS" eyebrow */}
-          <div className="hardware-heading">
-            <span className="section-label">Events</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
+            <span style={{ width: '22px', height: '1px', background: 'var(--violet)', display: 'block', flexShrink: 0 }} />
+            <span style={{ fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--eyebrow)' }}>
+              Events
+            </span>
           </div>
 
           <h2 style={{
@@ -92,7 +95,7 @@ export default async function EventsSection() {
             lineHeight:    0.95,
             marginBottom:  '24px',
           }}>
-            Upcoming<br /><span className="hardware-title-accent">Dates</span>
+            Upcoming<br />Dates
           </h2>
 
           <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, maxWidth: '320px' }}>

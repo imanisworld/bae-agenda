@@ -951,6 +951,13 @@ body {
     justify-content: center;
     text-align: center;
   }
+
+  /* Tighten section padding on mobile */
+  #mixes .section-container,
+  #built-by .section-container {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
 }
 
 .event-arrow {
@@ -1517,10 +1524,19 @@ body {
     font-size: 9px;
   }
 
-  .build-console-module-grid,
-  .build-console-knob-row,
-  .build-console-pad-bank {
+  /* knob row stacks vertically but module-grid stays 2 columns */
+  .build-console-knob-row {
     grid-template-columns: 1fr;
+  }
+
+  /* Keep pad bank as 4 columns — square aspect-ratio would make them huge */
+  .build-console-pad-bank {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .build-console-pad {
+    aspect-ratio: auto;
+    min-height: 44px;
+    font-size: 9px;
   }
 
   .build-console-module-desc {
@@ -1620,17 +1636,44 @@ body.has-custom-cursor * { cursor: none !important; }
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%) scale(0.8);
-  width: 56px; height: 56px;
-  border: 1px solid rgba(255,255,255,0.3);
+  width: 68px; height: 68px;
+  border: 1px solid rgba(255,255,255,0.24);
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   opacity: 0;
   transition: opacity 0.3s ease, transform 0.3s ease;
   backdrop-filter: blur(10px);
-  background: rgba(155,93,229,0.2);
+  background:
+    radial-gradient(circle at 30% 28%, rgba(255,255,255,0.92), rgba(214,220,228,0.94) 24%, rgba(126,134,145,0.96) 62%, rgba(232,236,241,0.96) 100%);
+  box-shadow:
+    inset 0 2px 3px rgba(255,255,255,0.65),
+    inset 0 -8px 12px rgba(71,79,90,0.22),
+    0 10px 30px rgba(0,0,0,0.3);
   pointer-events: none;
 }
-.mc-play::after { content: '▶'; font-size: 14px; margin-left: 3px; color: var(--white); }
+.mc-play::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.36);
+  background:
+    repeating-conic-gradient(
+      from 0deg,
+      rgba(255,255,255,0.16) 0deg 8deg,
+      rgba(0,0,0,0.04) 8deg 16deg
+    );
+  opacity: 0.5;
+}
+.mc-play::after {
+  content: '▶';
+  position: relative;
+  z-index: 1;
+  font-size: 16px;
+  margin-left: 4px;
+  color: rgba(36,42,52,0.92);
+  text-shadow: 0 1px 0 rgba(255,255,255,0.45);
+}
 .mc-card:hover .mc-play { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
 .mc-content {
@@ -1700,6 +1743,31 @@ body.has-custom-cursor * { cursor: none !important; }
 @keyframes mc-eq-bounce {
   from { transform: scaleY(0.25); }
   to   { transform: scaleY(1); }
+}
+
+@media (max-width: 600px) {
+  /* Mix cards: cinematic ratio so 3 stacked cards don't fill 3 screens */
+  .mc-card { aspect-ratio: 16 / 7; }
+}
+
+@media (max-width: 480px) {
+  /* Build console: hide heavy topbar + module grid — show copy + pad bank only */
+  .build-console-topbar,
+  .build-console-mixer { display: none; }
+  .build-console-grid { display: block; }
+  .build-console-copy { border-radius: 18px; }
+
+  /* Pad bank: row of 4, no square aspect-ratio */
+  .build-console-pad-bank {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin-top: 20px;
+  }
+  .build-console-pad {
+    aspect-ratio: auto;
+    min-height: 40px;
+    padding: 8px 4px;
+    font-size: 9px;
+  }
 }
 
 /* ── Event items (matches static site) ───────────────────────────── */

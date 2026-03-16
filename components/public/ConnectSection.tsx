@@ -1,6 +1,6 @@
 /**
  * CONNECT SECTION — Server Component
- * "Stay Connected" — social links grid.
+ * "Stay Connected" — social links as DJ knobs.
  * Hover via CSS class; no JS event handlers.
  *
  * Accepts optional CMS overrides for instagram_url, soundcloud_url, youtube_url.
@@ -25,13 +25,14 @@ const CMS_OVERRIDE_MAP: Record<string, keyof SocialOverrides> = {
   YouTube:    'youtube_url',
 }
 
-const KNOB_TONES: Record<string, string> = {
-  Instagram: 'magenta',
-  TikTok: 'black',
-  YouTube: 'red',
-  SoundCloud: 'orange',
-  Facebook: 'blue',
-  'Dot.Cards': 'gold',
+/** Per-platform knob color class */
+const KNOB_COLOR: Record<string, string> = {
+  Instagram:  'social-knob-magenta',
+  TikTok:     'social-knob-black',
+  YouTube:    'social-knob-red',
+  SoundCloud: 'social-knob-orange',
+  Facebook:   'social-knob-blue',
+  'dot.cards':'social-knob-gold',
 }
 
 export default function ConnectSection({ socialOverrides = {} }: Props) {
@@ -54,10 +55,8 @@ export default function ConnectSection({ socialOverrides = {} }: Props) {
     >
       <div className="section-container" style={{ textAlign: 'center' }}>
 
-        <div className="hardware-heading" style={{ justifyContent: 'center' }}>
-          <span className="section-label" style={{ justifyContent: 'center' }}>Socials</span>
-        </div>
-        <h2 className="section-heading">Stay <span className="hardware-title-accent">Connected</span></h2>
+        <div className="hardware-heading" style={{ justifyContent: 'center' }}><span className="section-label">Socials</span></div>
+        <h2 className="section-heading">Stay Connected</h2>
 
         <p style={{
           fontSize: '14px', color: 'var(--muted)', lineHeight: 1.7,
@@ -66,16 +65,16 @@ export default function ConnectSection({ socialOverrides = {} }: Props) {
           Follow for mixes, event announcements, and behind the scenes.
         </p>
 
-        {/* Social grid */}
+        {/* Knob grid */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(92px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
           justifyContent: 'center',
           gap: '18px',
           maxWidth: '760px',
           margin: '0 auto',
         }}>
-          {socials.map(({ label, url, icon }, index) => (
+          {socials.map(({ label, url, icon }) => (
             <a
               key={label}
               href={url}
@@ -83,24 +82,19 @@ export default function ConnectSection({ socialOverrides = {} }: Props) {
               rel="noopener noreferrer"
               aria-label={`DJ B.A.E. on ${label}`}
               className="social-card"
-              style={{
-                minWidth: 0,
-                ['--social-knob-rotate' as string]: `${[-12, 8, -6, 12, -8, 10][index % 6]}deg`,
-                ['--social-knob-hover-rotate' as string]: `${[-20, 18, -14, 20, -16, 16][index % 6]}deg`,
-                ['--social-knob-lift' as string]: `${[2, -3, 1, -2, 3, -1][index % 6]}px`,
-              }}
+              style={{ minWidth: 0 }}
             >
-              <span className={`social-knob social-knob-${KNOB_TONES[label] ?? 'silver'}`} aria-hidden="true">
+              <span className={`social-knob ${KNOB_COLOR[label] ?? 'social-knob-silver'}`} aria-hidden="true">
                 <span className="social-knob-ridges" />
                 <span className="social-knob-cap">{icon}</span>
                 <span className="social-knob-indicator" />
               </span>
-              <span style={{
+              <span className="social-label" style={{
                 fontFamily: 'Conthrax, sans-serif',
                 fontSize: '9px', fontWeight: 600,
                 letterSpacing: '0.12em', textTransform: 'uppercase',
                 color: 'var(--white)',
-              }} className="social-label">
+              }}>
                 {label}
               </span>
             </a>
