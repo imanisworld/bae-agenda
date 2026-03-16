@@ -67,6 +67,7 @@ export type Database = {
           event_name:     string         // name of the event being booked for
           event_type:     string | null  // 'Birthday', 'Wedding', 'Corporate', etc.
           event_date:     string
+          event_timezone: string
           end_time:       string | null
           venue:          string | null
           city:           string | null

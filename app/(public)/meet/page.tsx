@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
@@ -33,7 +34,7 @@ const collageCards = [
 const techItems = [
   {
     label: 'Setup',
-    value: 'Club-ready digital workflow with flexible routing for venue sound and private production rigs.',
+    value: 'Controller, club booth, house mixer, or private-event rig. If there is a workable sound path, I can play on it.',
   },
   {
     label: 'Approach',
@@ -52,6 +53,8 @@ const atmosphereNotes = [
   'Mic-ready hosting',
 ]
 
+const LIVE_SET_EMBED_SRC = 'https://www.youtube.com/embed/videoseries?list=UUjEiMW5l_Go9vSHudx5VPEw'
+
 function sectionLabel(text: string) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
@@ -65,52 +68,48 @@ function sectionLabel(text: string) {
 
 export default function MeetPage() {
   return (
-    <div style={{ background: 'var(--black)', minHeight: '100vh', paddingTop: '120px' }}>
-      <div className="section-container" style={{ display: 'grid', gap: '32px' }}>
+    <div style={{ background: 'var(--black)', minHeight: '100vh', paddingTop: '68px' }}>
+      <div className="section-container" style={{ display: 'grid', gap: '32px', paddingTop: 0 }}>
         <section
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(280px, 420px) minmax(320px, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
             gap: '32px',
             alignItems: 'stretch',
           }}
         >
           <div
             style={{
-              minHeight: '520px',
+              minHeight: 'clamp(340px, 72vw, 520px)',
               border: '1px solid var(--border)',
-              background:
-                'radial-gradient(circle at 50% 25%, rgba(155,93,229,0.32), transparent 34%), linear-gradient(180deg, #181818, #080808 72%)',
               position: 'relative',
               overflow: 'hidden',
             }}
           >
+            <Image
+              src="/photos/PlexMix19-DJBAE.JPEG"
+              alt="DJ B.A.E. performing live"
+              fill
+              sizes="(max-width: 900px) 100vw, 420px"
+              style={{ objectFit: 'cover', objectPosition: 'center 18%' }}
+            />
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                inset: 0,
+                background:
+                  'linear-gradient(180deg, rgba(8,8,8,0.08), rgba(8,8,8,0.28) 55%, rgba(8,8,8,0.7) 100%)',
+              }}
+            />
             <div
               aria-hidden="true"
               style={{
                 position: 'absolute',
                 inset: '18px',
-                border: '1px solid rgba(255,255,255,0.08)',
+                border: '1px solid rgba(255,255,255,0.12)',
               }}
             />
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                inset: '14% 20% 0',
-                background:
-                  'radial-gradient(circle at 50% 18%, rgba(255,255,255,0.18), rgba(255,255,255,0.02) 28%, transparent 52%), linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0))',
-                filter: 'blur(0.5px)',
-              }}
-            />
-            <div style={{ position: 'absolute', left: '28px', bottom: '28px', right: '28px' }}>
-              <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.56)', marginBottom: '8px' }}>
-                Meet DJ B.A.E.
-              </div>
-              <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(28px, 4vw, 44px)', color: 'var(--white)', lineHeight: 1.05 }}>
-                Built for rooms that need range, timing, and control.
-              </div>
-            </div>
           </div>
 
           <div style={{ display: 'grid', alignContent: 'center', gap: '24px' }}>
@@ -142,21 +141,21 @@ export default function MeetPage() {
                 gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
                 gap: '14px',
               }}
-            >
-              <div style={{ border: '1px solid var(--border)', padding: '18px', background: 'var(--surface)' }}>
-                <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
-                  Cities
-                </div>
-                <div style={{ fontSize: '14px', color: 'var(--white)', lineHeight: 1.6 }}>
-                  Chicago roots with flexibility for destination bookings and recurring nights.
-                </div>
-              </div>
+              >
               <div style={{ border: '1px solid var(--border)', padding: '18px', background: 'var(--surface)' }}>
                 <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
                   Sound
                 </div>
                 <div style={{ fontSize: '14px', color: 'var(--white)', lineHeight: 1.6 }}>
                   Open-format backbone with real range across hip-hop, R&amp;B, house, Afrobeats, dancehall, and edits.
+                </div>
+              </div>
+              <div style={{ border: '1px solid var(--border)', padding: '18px', background: 'var(--surface)' }}>
+                <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
+                  Travel
+                </div>
+                <div style={{ fontSize: '14px', color: 'var(--white)', lineHeight: 1.6 }}>
+                  Available for local and travel bookings when the event is the right fit.
                 </div>
               </div>
             </div>
@@ -221,7 +220,7 @@ export default function MeetPage() {
         <section
           style={{
             display: 'grid',
-            gridTemplateColumns: 'minmax(280px, 1.2fr) minmax(280px, 0.8fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
             gap: '24px',
           }}
         >
@@ -238,41 +237,18 @@ export default function MeetPage() {
                 position: 'relative',
                 minHeight: '360px',
                 border: '1px solid rgba(255,255,255,0.08)',
-                background:
-                  'linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.44)), radial-gradient(circle at 30% 24%, rgba(155,93,229,0.38), transparent 26%), radial-gradient(circle at 74% 30%, rgba(242,184,75,0.22), transparent 20%), linear-gradient(135deg, #151515, #070707 68%)',
+                background: '#050505',
                 overflow: 'hidden',
               }}
             >
-              <div
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  inset: '20px',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                }}
+              <iframe
+                title="DJ B.A.E. live set reel"
+                src={LIVE_SET_EMBED_SRC}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                style={{ display: 'block', width: '100%', height: '100%', minHeight: '360px', border: 0 }}
               />
-              <div
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  right: '18px',
-                  bottom: '18px',
-                  fontFamily: 'Conthrax, sans-serif',
-                  fontSize: 'clamp(26px, 4vw, 42px)',
-                  letterSpacing: '0.12em',
-                  color: 'rgba(255,255,255,0.1)',
-                }}
-              >
-                B.A.E.
-              </div>
-              <div style={{ position: 'absolute', left: '24px', top: '24px' }}>
-                <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: '8px' }}>
-                  Performance Reel
-                </div>
-                <div style={{ fontSize: '14px', color: 'var(--white)', maxWidth: '300px', lineHeight: 1.7 }}>
-                  The live side is timing, recovery, and pressure control. The job is not just to play records. It is to keep the room in motion.
-                </div>
-              </div>
             </div>
           </div>
 
@@ -297,6 +273,17 @@ export default function MeetPage() {
                   </div>
                 ))}
               </div>
+              <div style={{ marginTop: '18px' }}>
+                <a
+                  href="https://www.youtube.com/@djb.a.e"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-ghost"
+                  style={{ justifyContent: 'center' }}
+                >
+                  Watch More Live Sets
+                </a>
+              </div>
             </div>
 
             <div
@@ -312,7 +299,7 @@ export default function MeetPage() {
               <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)' }}>
                 Event Atmosphere
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '10px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(140px, 100%), 1fr))', gap: '10px' }}>
                 {atmosphereNotes.map((note, index) => (
                   <div
                     key={note}

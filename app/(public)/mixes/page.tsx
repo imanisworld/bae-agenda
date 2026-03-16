@@ -6,6 +6,7 @@ const SOUNDCLOUD_PLAYLIST_URL = 'https://soundcloud.com/deejaybae/sets/mixes?si=
 const SOUNDCLOUD_PLAYER_SRC = 'https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/soundcloud%253Aplaylists%253A1935343495&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true'
 const YOUTUBE_PLAYLIST_URL = 'https://www.youtube.com/watch?v=2wKqMdJD3ts&list=PLItuH_cM_7fHGhBnBFM6zZY5w5sas9HYh'
 const YOUTUBE_EMBED_SRC = 'https://www.youtube.com/embed/2wKqMdJD3ts?list=PLItuH_cM_7fHGhBnBFM6zZY5w5sas9HYh'
+const SOUNDCLOUD_PROFILE_URL = 'https://soundcloud.com/deejaybae'
 
 export const metadata: Metadata = {
   title: 'Mixes — DJ B.A.E.',
@@ -36,10 +37,10 @@ export default async function MixesPage() {
       style={{
         background: 'var(--off-black)',
         minHeight: '100vh',
-        paddingTop: '120px',
+        paddingTop: '68px',
       }}
     >
-      <div className="section-container">
+      <div className="section-container" style={{ paddingTop: 0 }}>
         <div style={{ marginBottom: '56px' }}>
           <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
             Featured Mixes
@@ -83,7 +84,7 @@ export default async function MixesPage() {
           style={{
             marginBottom: '40px',
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))',
             gap: '20px',
           }}
         >
@@ -234,7 +235,7 @@ export default async function MixesPage() {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
               gap: '20px',
               marginBottom: '64px',
             }}
@@ -315,7 +316,12 @@ export default async function MixesPage() {
                 </div>
 
                 {mix.embed_url && (
-                  <a href={mix.embed_url} target="_blank" rel="noopener noreferrer" className="pkg-btn">
+                  <a
+                    href={SOUNDCLOUD_PROFILE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="pkg-btn"
+                  >
                     Open On Platform
                   </a>
                 )}
@@ -339,7 +345,7 @@ export default async function MixesPage() {
             Find the full catalog on SoundCloud when you want the platform view.
           </p>
           <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-            <a href="https://soundcloud.com/djbae" target="_blank" rel="noopener noreferrer" className="btn-primary">
+            <a href={SOUNDCLOUD_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
               Open On SoundCloud
             </a>
             <Link href="/book" className="btn-ghost">

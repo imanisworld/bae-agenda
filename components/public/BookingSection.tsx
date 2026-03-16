@@ -24,6 +24,10 @@ function PackageCard({
   desc:         string
   featured?:    boolean
 }) {
+  const hoursLabel = price === null
+    ? `${hours}+ Hours`
+    : `${hours} Hour${hours === 1 ? '' : 's'}`
+
   return (
     <div style={{
       padding: '32px',
@@ -46,7 +50,7 @@ function PackageCard({
         fontSize: '9px', letterSpacing: '0.25em', textTransform: 'uppercase',
         color: featured ? 'var(--violet)' : 'var(--muted)',
       }}>
-        {hours} Hours
+        {hoursLabel}
       </span>
 
       <h3 style={{
@@ -91,23 +95,23 @@ export default function BookingSection({ bookingEmail }: Props) {
           <span className="section-label">Book The Bae</span>
           <h2 style={{
             fontFamily: 'Conthrax, sans-serif',
-            fontSize: 'clamp(28px, 4.5vw, 56px)', fontWeight: 600,
+            fontSize: 'clamp(22px, 4.5vw, 56px)', fontWeight: 600,
             letterSpacing: '0.01em', color: 'var(--white)',
             lineHeight: 1.1, marginBottom: '20px',
           }}>
-            Ready to Elevate<br />
-            <span style={{ color: 'var(--violet)' }}>Your Event?</span>
+            Let&apos;s Build<br />
+            <span style={{ color: 'var(--violet)' }}>The Right Energy</span>
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.7, fontWeight: 300 }}>
-            From birthday parties to corporate events, weddings to club nights —
-            every set is built to be felt. Choose a package below or reach out
-            for a custom quote.
+            Short set, full night, or something custom. Choose a format below,
+            and we can shape the sound around the room, the crowd, and the way
+            you want the event to move.
           </p>
         </div>
 
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))',
           gap: '20px', marginBottom: '56px',
         }}>
           {PACKAGES.map((pkg, i) => (

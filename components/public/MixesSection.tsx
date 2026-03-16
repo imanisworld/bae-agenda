@@ -29,6 +29,8 @@ const PLACEHOLDER_MIXES: Array<{
   { id: '3', genre: 'Afrobeats · Dancehall', title: 'World Tour',             durationMin: null, year: null, href: null, dataGenre: 'afro'   },
 ]
 
+const SOUNDCLOUD_PROFILE_URL = 'https://soundcloud.com/deejaybae'
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function genreToDataAttr(genre: string): DataGenre {
@@ -156,7 +158,7 @@ export default async function MixesSection() {
         <div aria-hidden="true" style={{ height: '1px', background: 'var(--border)', margin: '32px 0 48px' }} />
 
         {/* 3-column grid, 2px gap — matches static site */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '2px' }}>
           {hasLiveData
             ? mixes.map((mix) => {
                 const dg          = genreToDataAttr(mix.genre ?? '')
@@ -167,7 +169,7 @@ export default async function MixesSection() {
                     key={mix.id}
                     genre={mix.genre ?? 'Open Format'}
                     title={mix.title}
-                    href={mix.embed_url}
+                    href={SOUNDCLOUD_PROFILE_URL}
                     dataGenre={dg}
                     durationMin={durationMin}
                     year={year}

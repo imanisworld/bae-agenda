@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { SELECTED_WORK, PORTFOLIO_HIGHLIGHTS } from '@/lib/portfolio-data'
 import { getPublishedMixes } from '@/lib/db/mixes'
@@ -45,12 +46,12 @@ export default async function PortfolioPage() {
   const bookingEmail = content.booking_email ?? 'Booking available on request.'
 
   return (
-    <div style={{ background: 'var(--black)', minHeight: '100vh', paddingTop: '120px' }}>
-      <div className="section-container" style={{ display: 'grid', gap: '36px' }}>
+    <div style={{ background: 'var(--black)', minHeight: '100vh', paddingTop: '68px' }}>
+      <div className="section-container" style={{ display: 'grid', gap: '36px', paddingTop: 0 }}>
         <section
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
             gap: '28px',
             alignItems: 'start',
           }}
@@ -86,11 +87,28 @@ export default async function PortfolioPage() {
             style={{
               border: '1px solid var(--border)',
               background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(255,255,255,0.01))',
-              padding: '24px',
+              padding: '18px',
               display: 'grid',
               gap: '16px',
             }}
           >
+            <div style={{ position: 'relative', minHeight: '220px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
+              <Image
+                src="/photos/IMG_1120.JPG.jpeg"
+                alt="DJ B.A.E. portfolio image"
+                fill
+                sizes="(max-width: 900px) 100vw, 420px"
+                style={{ objectFit: 'cover', objectPosition: 'center 20%' }}
+              />
+              <div
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  background: 'linear-gradient(180deg, rgba(8,8,8,0.08), rgba(8,8,8,0.22) 48%, rgba(8,8,8,0.64) 100%)',
+                }}
+              />
+            </div>
             <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)' }}>
               Portfolio Summary
             </div>
@@ -112,7 +130,7 @@ export default async function PortfolioPage() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
             <h2 className="section-heading" style={{ marginBottom: 0 }}>Selected Work</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '18px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: '18px' }}>
             {SELECTED_WORK.map((item) => (
               <article
                 key={item.id}
@@ -134,7 +152,7 @@ export default async function PortfolioPage() {
                   </h3>
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
-                  {item.location} · {item.year}
+                  {item.year}
                 </div>
                 <p style={{ fontSize: '13px', color: 'var(--white)', lineHeight: 1.7, margin: 0 }}>
                   {item.summary}

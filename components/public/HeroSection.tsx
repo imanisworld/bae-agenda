@@ -10,17 +10,30 @@ import Image         from 'next/image'
 import HeroGlowLayer from '@/components/effects/HeroGlowLayer'
 
 interface HeroContent {
-  hero_title?:         string
-  hero_subtitle?:      string
-  hero_cta_primary?:   string
-  hero_cta_secondary?: string
+  hero_title?:    string
+  hero_subtitle?: string
 }
 
 interface Props {
   content?: HeroContent
 }
 
-const GENRES = ['HOUSE', 'DRILL', 'LATIN', 'TRAP', 'CLUB', 'HIP HOP', 'R&B', 'AFROBEATS']
+const GENRES = [
+  'HOUSE',
+  'GARAGE',
+  'JUNGLE',
+  'JUKE',
+  'LOVERS ROCK',
+  'BAILE',
+  'BALLROOM',
+  'MIAMI BASS',
+  'ATL BASS',
+  'LATIN',
+  'LATIN HOUSE',
+  'SOCA',
+  'R&B',
+  'HIP HOP',
+]
 
 export default function HeroSection({ content = {} }: Props) {
   const title      = content.hero_title?.trim() || 'THE BAE AGENDA'
@@ -85,13 +98,13 @@ export default function HeroSection({ content = {} }: Props) {
         <div>
           <p style={{
             fontFamily:    'DM Sans, sans-serif',
-            fontSize:      '11px',
-            letterSpacing: '0.28em',
+            fontSize:      'clamp(9px, 2.4vw, 11px)',
+            letterSpacing: 'clamp(0.12em, 1.8vw, 0.28em)',
             textTransform: 'uppercase',
             color:         'var(--eyebrow)',
             marginBottom:  '22px',
           }}>
-            Chicago&nbsp;·&nbsp;DJ&nbsp;·&nbsp;Curator&nbsp;·&nbsp;Experience Architect
+            Chicago · DJ · Curator · <span style={{whiteSpace:'nowrap'}}>Experience Architect</span>
           </p>
 
           <h1 style={{

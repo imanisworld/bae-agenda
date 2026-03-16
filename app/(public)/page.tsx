@@ -4,7 +4,7 @@
  * Server component — fetches site_content once and passes to sections.
  *
  * Sections:
- *   HeroSection    — full viewport, brand presence, CTAs (reads hero copy)
+ *   HeroSection    — full viewport, brand presence (reads hero copy)
  *   MixesSection   — 3 featured mix cards
  *   EventsSection  — upcoming dates (live Supabase data)
  *   BookingSection — packages + booking CTA (reads booking_email)
@@ -24,8 +24,6 @@ import { getContentMap } from '@/lib/db/content'
 const HOME_CONTENT_KEYS = [
   'hero_title',
   'hero_subtitle',
-  'hero_cta_primary',
-  'hero_cta_secondary',
   'about_quote',
   'booking_email',
   'instagram_url',
@@ -42,10 +40,8 @@ export default async function HomePage() {
     <>
       <HeroSection
         content={{
-          hero_title:         content.hero_title,
-          hero_subtitle:      content.hero_subtitle,
-          hero_cta_primary:   content.hero_cta_primary,
-          hero_cta_secondary: content.hero_cta_secondary,
+          hero_title:    content.hero_title,
+          hero_subtitle: content.hero_subtitle,
         }}
       />
       <MixesSection />

@@ -42,20 +42,6 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         type:    'textarea',
         default: 'From intimate gatherings to club takeovers — music is always the agenda.',
       },
-      {
-        key:     'hero_cta_primary',
-        label:   'Primary Button',
-        hint:    'Main CTA button text (links to booking section)',
-        type:    'text',
-        default: 'Book Your Event',
-      },
-      {
-        key:     'hero_cta_secondary',
-        label:   'Secondary Button',
-        hint:    'Ghost button text (links to mixes section)',
-        type:    'text',
-        default: 'Listen to Mixes',
-      },
     ],
   },
   {
@@ -83,7 +69,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         key:     'soundcloud_url',
         label:   'SoundCloud URL',
         type:    'url',
-        default: 'https://soundcloud.com/djbae',
+        default: 'https://soundcloud.com/deejaybae',
       },
       {
         key:     'youtube_url',

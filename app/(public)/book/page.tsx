@@ -14,6 +14,7 @@ type FormState = {
   eventType: string
   eventDate: string
   eventTime: string
+  timeZone: string
   venue: string
   city: string
   package: string
@@ -29,6 +30,7 @@ const INITIAL_STATE: FormState = {
   eventType: '',
   eventDate: '',
   eventTime: '',
+  timeZone: 'America/Indiana/Indianapolis',
   venue: '',
   city: '',
   package: '',
@@ -45,6 +47,23 @@ const CITY_OPTIONS = [
   'Indianapolis, IN',
 ] as const
 
+const TIME_ZONE_OPTIONS = [
+  { value: 'America/Indiana/Indianapolis', label: 'Indianapolis (Eastern)' },
+  { value: 'America/Chicago', label: 'Chicago (Central)' },
+  { value: 'America/New_York', label: 'New York (Eastern)' },
+  { value: 'America/Los_Angeles', label: 'Los Angeles (Pacific)' },
+] as const
+
+const CITY_TIME_ZONE_MAP: Record<string, string> = {
+  'Chicago, IL': 'America/Chicago',
+  'Oak Park, IL': 'America/Chicago',
+  'Evanston, IL': 'America/Chicago',
+  'Naperville, IL': 'America/Chicago',
+  'Schaumburg, IL': 'America/Chicago',
+  'Milwaukee, WI': 'America/Chicago',
+  'Indianapolis, IN': 'America/Indiana/Indianapolis',
+}
+
 const DATE_OPTIONS = buildDateOptions()
 const TIME_OPTIONS = buildTimeOptions()
 const PACKAGE_OPTIONS = PACKAGES.map((pkg) =>
@@ -59,6 +78,14 @@ export default function BookPage() {
 
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
+  }
+
+  function updateCity(value: string) {
+    setForm((prev) => ({
+      ...prev,
+      city: value,
+      timeZone: CITY_TIME_ZONE_MAP[value] ?? prev.timeZone,
+    }))
   }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -103,10 +130,10 @@ export default function BookPage() {
       style={{
         background: 'var(--off-black)',
         minHeight: '100vh',
-        paddingTop: '120px',
+        paddingTop: '68px',
       }}
     >
-      <div className="section-container" style={{ maxWidth: '920px' }}>
+      <div className="section-container" style={{ maxWidth: '920px', paddingTop: 0 }}>
         <div style={{ marginBottom: '36px' }}>
           <span className="section-label">Booking Inquiry</span>
           <h1
@@ -234,12 +261,31 @@ export default function BookPage() {
               <input
                 list="city-options"
                 value={form.city}
-                onChange={(e) => updateField('city', e.target.value)}
+                onChange={(e) => updateCity(e.target.value)}
                 placeholder="Choose or type a city"
                 style={inputStyle()}
               />
             </label>
           </div>
+
+          <label style={{ display: 'grid', gap: '8px' }}>
+            <span className="section-label" style={{ marginBottom: 0 }}>Event Time Zone *</span>
+            <select
+              required
+              value={form.timeZone}
+              onChange={(e) => updateField('timeZone', e.target.value)}
+              style={inputStyle()}
+            >
+              {TIME_ZONE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+              Choose the timezone where the event will happen. Indianapolis is Eastern; Chicago is Central.
+            </span>
+          </label>
 
           <label style={{ display: 'grid', gap: '8px' }}>
             <span className="section-label" style={{ marginBottom: 0 }}>Venue / Address</span>

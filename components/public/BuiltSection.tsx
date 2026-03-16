@@ -62,14 +62,14 @@ export default function BuiltSection({ aboutQuote }: Props) {
         {/* Two-column header */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 2fr)',
-          gap: '80px',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
+          gap: '40px',
           alignItems: 'start',
         }}>
 
           {/* Left — title + bio */}
           <div>
-            <span className="section-label">Under The Hood</span>
+            <span className="section-label" style={{ color: 'var(--violet)' }}>Under The Hood</span>
             <h2 className="section-heading" style={{ fontSize: 'clamp(28px, 3.5vw, 44px)' }}>
               Built from<br />scratch.
             </h2>
@@ -96,8 +96,8 @@ export default function BuiltSection({ aboutQuote }: Props) {
           {/* Right — tech grid */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '2px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))',
+            gap: '10px',
           }}>
             {STACK.map(({ category, name, desc }) => (
               <div key={name} className="tech-card">

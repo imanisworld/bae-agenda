@@ -4,8 +4,9 @@ import PrintPressKitButton from '@/components/public/PrintPressKitButton'
 import { SELECTED_WORK } from '@/lib/portfolio-data'
 import { getContentMap } from '@/lib/db/content'
 import { getPublishedMixes } from '@/lib/db/mixes'
-import { getUpcomingEvents } from '@/lib/db/events'
 import { SOCIALS } from '@/lib/constants'
+
+const SOUNDCLOUD_PROFILE_URL = 'https://soundcloud.com/deejaybae'
 
 export const metadata: Metadata = {
   title: 'Press Kit — DJ B.A.E.',
@@ -23,10 +24,9 @@ const CONTENT_KEYS = [
 ] as const
 
 export default async function PressKitPage() {
-  const [content, mixes, events] = await Promise.all([
+  const [content, mixes] = await Promise.all([
     getContentMap([...CONTENT_KEYS]),
     getPublishedMixes(6),
-    getUpcomingEvents(6),
   ])
 
   const title = content.hero_title ?? 'THE BAE AGENDA'
@@ -46,7 +46,7 @@ export default async function PressKitPage() {
   }))
 
   return (
-    <div style={{ background: '#f4f1eb', minHeight: '100vh', color: '#111', padding: '40px 20px' }}>
+    <div style={{ background: '#f4f1eb', minHeight: '100vh', color: '#111', padding: 'clamp(20px, 5vw, 40px) 20px' }}>
       <div style={{ maxWidth: '980px', margin: '0 auto', display: 'grid', gap: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
           <Link
@@ -74,7 +74,7 @@ export default async function PressKitPage() {
           style={{
             background: '#fffdfa',
             border: '1px solid rgba(0,0,0,0.12)',
-            padding: '40px',
+            padding: 'clamp(22px, 4vw, 40px)',
             display: 'grid',
             gap: '28px',
           }}
@@ -94,10 +94,10 @@ export default async function PressKitPage() {
             </p>
           </header>
 
-          <section style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '24px' }}>
+          <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))', gap: '24px' }}>
             <div>
               <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginBottom: '10px' }}>
-                Overview
+                Short Bio
               </div>
               <p style={{ fontSize: '14px', lineHeight: 1.8, margin: 0 }}>
                 {about}
@@ -105,76 +105,22 @@ export default async function PressKitPage() {
             </div>
             <div>
               <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginBottom: '10px' }}>
-                Quick Facts
+                Booking Contact
               </div>
               <div style={{ display: 'grid', gap: '8px', fontSize: '13px', lineHeight: 1.7 }}>
-                <div>Selected Work Items: {SELECTED_WORK.length}</div>
-                <div>Published Mixes: {mixes.length}</div>
-                <div>Upcoming Public Events: {events.length}</div>
                 {bookingEmail && (
                   <div>
-                    Booking Contact:{' '}
                     <a href={`mailto:${bookingEmail}`} style={{ color: '#5a2dff', textDecoration: 'underline' }}>
                       {bookingEmail}
                     </a>
                   </div>
                 )}
+                <div>Available for club nights, private events, branded activations, and curated experiences.</div>
               </div>
-            </div>
-          </section>
-
-          <section>
-            <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginBottom: '12px' }}>
-              Selected Work
-            </div>
-            <div style={{ display: 'grid', gap: '12px' }}>
-              {SELECTED_WORK.map((item) => (
-                <div key={item.id} style={{ borderTop: '1px solid rgba(0,0,0,0.12)', paddingTop: '12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '6px' }}>
-                    <strong>{item.title}</strong>
-                    <span>{item.location} · {item.year}</span>
-                  </div>
-                  <div style={{ fontSize: '13px', color: '#444', marginBottom: '6px' }}>{item.category}</div>
-                  <p style={{ margin: 0, lineHeight: 1.7 }}>{item.summary}</p>
-                </div>
-              ))}
             </div>
           </section>
 
           <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
-            <div>
-              <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginBottom: '12px' }}>
-                Mixes
-              </div>
-              <div style={{ display: 'grid', gap: '8px', fontSize: '13px', lineHeight: 1.7 }}>
-                {mixes.slice(0, 4).map((mix) => (
-                  <div key={mix.id}>
-                    {mix.embed_url ? (
-                      <a href={mix.embed_url} target="_blank" rel="noopener noreferrer" style={{ color: '#5a2dff', textDecoration: 'underline' }}>
-                        {mix.title}
-                      </a>
-                    ) : (
-                      mix.title
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginBottom: '12px' }}>
-                Upcoming Dates
-              </div>
-              <div style={{ display: 'grid', gap: '8px', fontSize: '13px', lineHeight: 1.7 }}>
-                {events.slice(0, 4).map((event) => (
-                  <div key={event.id}>
-                    <a href="/events" style={{ color: '#5a2dff', textDecoration: 'underline' }}>
-                      {event.title}
-                    </a>
-                    {' '}· {new Date(event.event_date).toLocaleDateString('en-US')}
-                  </div>
-                ))}
-              </div>
-            </div>
             <div>
               <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginBottom: '12px' }}>
                 Socials
@@ -208,7 +154,45 @@ export default async function PressKitPage() {
                 ))}
               </div>
             </div>
+            <div>
+              <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginBottom: '12px' }}>
+                Mixes
+              </div>
+              <div style={{ display: 'grid', gap: '8px', fontSize: '13px', lineHeight: 1.7 }}>
+                {mixes.slice(0, 3).map((mix) => (
+                  <div key={mix.id}>
+                    <a
+                      href={SOUNDCLOUD_PROFILE_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: '#5a2dff', textDecoration: 'underline' }}
+                    >
+                      {mix.title}
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
           </section>
+
+          <section>
+            <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginBottom: '12px' }}>
+              Selected Work
+            </div>
+            <div style={{ display: 'grid', gap: '12px' }}>
+              {SELECTED_WORK.slice(0, 2).map((item) => (
+                <div key={item.id} style={{ borderTop: '1px solid rgba(0,0,0,0.12)', paddingTop: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '6px' }}>
+                    <strong>{item.title}</strong>
+                    <span>{item.location} · {item.year}</span>
+                  </div>
+                  <div style={{ fontSize: '13px', color: '#444', marginBottom: '6px' }}>{item.category}</div>
+                  <p style={{ margin: 0, lineHeight: 1.7 }}>{item.summary}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
         </article>
       </div>
     </div>

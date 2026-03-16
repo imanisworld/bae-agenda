@@ -194,6 +194,43 @@ body {
 }
 .nav-book:hover { background: var(--violet-light); }
 
+/* ---- Mobile nav ------------------------------------------------ */
+/* Desktop nav visible, hamburger hidden by default */
+.nav-desktop   { display: flex; }
+.nav-hamburger { display: none; }
+
+@media (max-width: 768px) {
+  .nav-desktop   { display: none; }
+  .nav-hamburger { display: flex; }
+}
+
+/* Drawer links */
+.nav-drawer-link {
+  text-decoration: none;
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(26px, 8vw, 36px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(245,245,240,0.55);
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: color 0.15s ease;
+}
+.nav-drawer-link:hover { color: var(--white); }
+
+.nav-drawer-book {
+  text-decoration: none;
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(26px, 8vw, 36px);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--violet);
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  transition: color 0.15s ease;
+}
+.nav-drawer-book:hover { color: var(--violet-light); }
+
 /* ---- Public section hover classes (Server Component safe) ----- */
 /* All hover effects live here — no onMouseEnter/onMouseLeave JS needed */
 
@@ -379,6 +416,18 @@ body {
 }
 .btn-white:hover { background: var(--violet); color: var(--white); }
 
+@media (max-width: 600px) {
+  .btn-primary,
+  .btn-ghost,
+  .btn-white,
+  .pkg-btn,
+  .pkg-btn-featured {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+}
+
 .event-arrow {
   color: var(--muted);
   text-decoration: none;
@@ -387,6 +436,28 @@ body {
   transition: color var(--motion-fast) var(--ease-standard);
 }
 .event-arrow:hover { color: var(--white); }
+
+.public-event-row {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  align-items: center;
+  gap: 40px;
+  padding: 32px 0;
+  border-bottom: 1px solid var(--border);
+  opacity: 1;
+}
+
+@media (max-width: 700px) {
+  .public-event-row {
+    grid-template-columns: 72px 1fr;
+    gap: 18px;
+    padding: 24px 0;
+  }
+
+  .public-event-arrow {
+    display: none;
+  }
+}
 
 .pkg-btn {
   display: block;
@@ -1020,5 +1091,17 @@ body.has-custom-cursor * { cursor: none !important; }
   .built-photo-area {
     height: 260px;
     margin-top: 40px;
+  }
+
+  .genre-track {
+    gap: 12px;
+    padding: 10px 0;
+    animation-duration: 26s;
+  }
+
+  .genre-chip {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    padding-right: 14px;
   }
 }

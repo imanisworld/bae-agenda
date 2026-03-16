@@ -17,6 +17,7 @@ interface RecentBooking {
   id:          string
   event_name:  string
   event_date:  string
+  event_timezone: string
   client_name: string | null
   status:      BookingStatus
 }
@@ -48,6 +49,7 @@ interface BookingQueryRow {
   id: string
   event_name: string
   event_date: string
+  event_timezone: string
   status: BookingStatus
   clients: { first_name: string | null; last_name: string | null } | null
 }
@@ -70,11 +72,11 @@ const MOCK_STATS: DashboardStats = {
 }
 
 const MOCK_BOOKINGS: RecentBooking[] = [
-  { id: 'm1', event_name: 'Birthday Celebration',    event_date: '2026-03-22', client_name: 'Marcus Webb',    status: 'inquiry'   },
-  { id: 'm2', event_name: 'House Music Brunch',      event_date: '2026-03-15', client_name: 'Nadia Thomas',   status: 'confirmed' },
-  { id: 'm3', event_name: 'Corporate After-Party',   event_date: '2026-04-05', client_name: 'Priya Sharma',   status: 'confirmed' },
-  { id: 'm4', event_name: 'Club Night at Spybar',    event_date: '2026-04-12', client_name: 'Jordan Lee',     status: 'inquiry'   },
-  { id: 'm5', event_name: 'Wedding Reception',       event_date: '2026-02-28', client_name: 'Destiny Brown',  status: 'completed' },
+  { id: 'm1', event_name: 'Birthday Celebration',    event_date: '2026-03-22', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Marcus Webb',    status: 'inquiry'   },
+  { id: 'm2', event_name: 'House Music Brunch',      event_date: '2026-03-15', event_timezone: 'America/Chicago', client_name: 'Nadia Thomas',   status: 'confirmed' },
+  { id: 'm3', event_name: 'Corporate After-Party',   event_date: '2026-04-05', event_timezone: 'America/Chicago', client_name: 'Priya Sharma',   status: 'confirmed' },
+  { id: 'm4', event_name: 'Club Night at Spybar',    event_date: '2026-04-12', event_timezone: 'America/Chicago', client_name: 'Jordan Lee',     status: 'inquiry'   },
+  { id: 'm5', event_name: 'Wedding Reception',       event_date: '2026-02-28', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Destiny Brown',  status: 'completed' },
 ]
 
 const MOCK_EVENTS: UpcomingEvent[] = [
@@ -92,10 +94,10 @@ const MOCK_PAYMENTS: PaymentReminder[] = [
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function fmtDate(iso: string) {
+function fmtDate(iso: string, timeZone = 'America/Indiana/Indianapolis') {
   return new Date(iso).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
-    timeZone: 'America/Chicago',
+    timeZone,
   })
 }
 
@@ -129,7 +131,7 @@ async function getDashboardData() {
         .eq('status', 'inquiry'),
       supabase.from('clients').select('*', { count: 'exact', head: true }),
       supabase.from('bookings')
-        .select('id, event_name, event_date, status, clients(first_name, last_name)')
+        .select('id, event_name, event_date, event_timezone, status, clients(first_name, last_name)')
         .order('created_at', { ascending: false }).limit(5),
       supabase.from('events')
         .select('id, title, event_date, venue, featured')
@@ -154,6 +156,7 @@ async function getDashboardData() {
         id:          b.id,
         event_name:  b.event_name,
         event_date:  b.event_date,
+        event_timezone: b.event_timezone,
         client_name: b.clients
           ? `${b.clients.first_name ?? ''} ${b.clients.last_name ?? ''}`.trim() || null
           : null,
@@ -287,7 +290,7 @@ export default async function DashboardPage() {
                 <tr key={b.id}>
                   <td style={{ fontWeight: 400 }}>{b.event_name}</td>
                   <td className="muted">{b.client_name ?? '—'}</td>
-                  <td className="muted">{fmtDate(b.event_date)}</td>
+                  <td className="muted">{fmtDate(b.event_date, b.event_timezone)}</td>
                   <td><Badge variant={b.status} /></td>
                 </tr>
               ))}

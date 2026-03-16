@@ -45,9 +45,9 @@ export const BOOKING_STATUS_COLORS: Record<string, string> = {
 
 // ---- Packages ----------------------------------------------
 export const PACKAGES = [
-  { name: 'The Intro',      price: 300, hours: 2, desc: '2-hour set. Perfect for private events, brunches, and intimate gatherings.' },
-  { name: 'The Agenda',     price: 600, hours: 4, desc: '4-hour set. Full event coverage with sound coordination.' },
-  { name: 'Full Takeover',  price: null, hours: 6, desc: '6+ hours. Residencies, club nights, tours, and branded events.' },
+  { name: '1 Hour Set',     price: 300, hours: 1, desc: 'Starting at $300. A focused set for pop-ins, launches, warmups, and short-format moments.' },
+  { name: '2 Hour Set',     price: 600, hours: 2, desc: 'A fuller room arc with more range to build, lift, and hold the energy.' },
+  { name: '3+ Hours / Custom',  price: null, hours: 3, desc: 'For weddings, brand events, club nights, long-form sets, and custom run-of-show needs.' },
 ] as const
 
 // ---- Event Types -------------------------------------------
@@ -69,7 +69,7 @@ export const SOCIALS = [
   { label: 'Instagram', url: 'https://www.instagram.com/dj_b.a.e/',                      icon: '📸' },
   { label: 'TikTok',    url: 'https://www.tiktok.com/@djbae1',                            icon: '🎵' },
   { label: 'YouTube',   url: 'https://www.youtube.com/channel/UCjEiMW5l_Go9vSHudx5VPEw', icon: '▶️' },
-  { label: 'SoundCloud',url: 'https://soundcloud.com/djbae',                              icon: '☁️' },
+  { label: 'SoundCloud',url: 'https://soundcloud.com/deejaybae',                           icon: '☁️' },
   { label: 'Facebook',  url: 'https://www.facebook.com/480641485716491',                  icon: '👤' },
   { label: 'dot.cards', url: 'https://dot.cards/djbae',                                   icon: '🔗' },
 ] as const

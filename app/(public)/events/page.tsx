@@ -31,9 +31,9 @@ export default async function EventsPage() {
     <div style={{
       background: 'var(--black)',
       minHeight: '100vh',
-      paddingTop: '120px',
+      paddingTop: '68px',
     }}>
-      <div className="section-container">
+      <div className="section-container" style={{ paddingTop: 0 }}>
 
         {/* Header */}
         <div style={{ marginBottom: '56px' }}>
@@ -113,15 +113,7 @@ export default async function EventsPage() {
                 <div
                   key={event.id}
                   role="listitem"
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: '96px 1fr auto',
-                    alignItems: 'center',
-                    gap: '40px',
-                    padding: '32px 0',
-                    borderBottom: '1px solid var(--border)',
-                    opacity: 1,
-                  }}
+                  className="public-event-row"
                 >
                   {/* Date block */}
                   <div>
@@ -201,7 +193,7 @@ export default async function EventsPage() {
                   {/* Arrow */}
                   <span
                     aria-hidden="true"
-                    className="event-arrow"
+                    className="event-arrow public-event-arrow"
                     style={{ pointerEvents: 'none' }}
                   >
                     →
@@ -228,7 +220,7 @@ export default async function EventsPage() {
             Want to book a private event or collaborate?
           </p>
           <Link href="/book" className="btn-primary">
-            Book Your Event
+            Start Booking Request
           </Link>
         </div>
 

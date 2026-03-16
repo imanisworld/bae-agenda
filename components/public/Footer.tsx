@@ -15,7 +15,7 @@ export default function Footer() {
       <div className="section-container" style={{ paddingTop: '42px', paddingBottom: '34px' }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.2fr) repeat(2, minmax(120px, auto))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))',
           gap: '36px', alignItems: 'start',
         }}>
 
