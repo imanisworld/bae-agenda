@@ -7,6 +7,8 @@ import PageHeader      from '@/components/admin/PageHeader'
 import ContentEditor   from '@/components/admin/ContentEditor'
 import { getAllContent } from '@/lib/db/content'
 
+export const dynamic = 'force-dynamic'
+
 export default async function ContentPage() {
   const content = await getAllContent()
 

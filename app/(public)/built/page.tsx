@@ -5,6 +5,8 @@ import { getContentMap } from '@/lib/db/content'
 import BuiltSection from '@/components/public/BuiltSection'
 import { PORTFOLIO_HIGHLIGHTS } from '@/lib/portfolio-data'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Built — DJ B.A.E.',
   description:

@@ -20,6 +20,8 @@ import BookingSection           from '@/components/public/BookingSection'
 import ConnectSection           from '@/components/public/ConnectSection'
 import { getContentMap }        from '@/lib/db/content'
 
+export const dynamic = 'force-dynamic'
+
 // All keys needed on the homepage — fetched in a single Supabase query.
 const HOME_CONTENT_KEYS = [
   'hero_title',

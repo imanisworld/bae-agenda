@@ -8,6 +8,8 @@ import type { Metadata } from 'next'
 import Link              from 'next/link'
 import { getUpcomingEvents } from '@/lib/db/events'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Events — DJ B.A.E.',
   description: 'Upcoming DJ sets, club nights, and appearances by DJ B.A.E. in Chicago and beyond.',

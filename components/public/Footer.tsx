@@ -4,7 +4,7 @@
  * Hover states via CSS classes — no JS event handlers.
  */
 import Link from 'next/link'
-import { PUBLIC_NAV, SOCIALS } from '@/lib/constants'
+import { PUBLIC_NAV } from '@/lib/constants'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
@@ -48,26 +48,6 @@ export default function Footer() {
             </nav>
           </div>
 
-          {/* Socials */}
-          <div>
-            <p style={{ fontSize: '11px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--eyebrow)', marginBottom: '20px' }}>
-              Connect
-            </p>
-              <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {SOCIALS.map((social) => (
-                  <li key={social.label}>
-                    <a
-                    href={social.url} target="_blank" rel="noopener noreferrer"
-                    aria-label={social.label}
-                    className="hover-link"
-                      style={{ fontSize: '11px', letterSpacing: '0.06em' }}
-                    >
-                      {social.label}
-                    </a>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
 
