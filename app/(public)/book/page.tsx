@@ -412,7 +412,7 @@ export default function BookPage() {
           )}
           {success && (
             <p style={{ color: '#34d399', fontSize: '13px' }}>
-              Booking request submitted. Check your admin bookings page for the new inquiry.
+              Request received! We'll review your details and be in touch within 24–48 hours.
             </p>
           )}
 
