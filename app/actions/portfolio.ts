@@ -5,6 +5,23 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+export interface PortfolioEntry {
+  id:         string
+  event_name: string
+  venue:      string | null
+  city:       string
+  state:      string | null
+  year:       number
+  date:       string | null
+  tags:       string[]
+  photo_url:  string | null
+  featured:   boolean
+  status:     string
+  notes:      string | null
+  created_at: string
+  updated_at: string
+}
+
 async function requireAuthedUser() {
   const supabase = await createClient()
   const { data } = await supabase.auth.getUser()
@@ -32,31 +49,56 @@ function parseTags(value: FormDataEntryValue | null): string[] {
 
 // ── Public read actions ──────────────────────────────────────────────────────
 
-export async function getPortfolioEntries() {
+export async function getPortfolioEntries(): Promise<PortfolioEntry[]> {
   try {
     const supabase = await createClient()
     const { data } = await supabase
       .from('portfolio_entries')
       .select('*')
+      .eq('status', 'published')
       .order('year', { ascending: false })
       .order('event_name', { ascending: true })
-    return data ?? []
+    return (data ?? []) as PortfolioEntry[]
   } catch {
     return []
   }
 }
 
-export async function getFeaturedPortfolioEntries() {
+export async function getFeaturedPortfolioEntries(): Promise<PortfolioEntry[]> {
   try {
     const supabase = await createClient()
     const { data } = await supabase
       .from('portfolio_entries')
       .select('*')
       .eq('featured', true)
+      .eq('status', 'published')
       .order('year', { ascending: false })
-    return data ?? []
+      .limit(6)
+    return (data ?? []) as PortfolioEntry[]
   } catch {
     return []
+  }
+}
+
+export async function getPortfolioStats() {
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase
+      .from('portfolio_entries')
+      .select('year, city, featured, status')
+    if (!data) return { total: 0, cities: 0, yearsActive: '—', featured: 0 }
+
+    const rows      = data as { year: number; city: string; featured: boolean; status: string }[]
+    const published = rows.filter((e) => e.status === 'published')
+    const years     = [...new Set(published.map((e) => e.year))]
+    const cities    = [...new Set(published.map((e) => e.city.split(',')[0].trim()))].length
+    const featured  = published.filter((e) => e.featured).length
+    const minYear   = years.length ? Math.min(...years) : new Date().getFullYear()
+    const yearsActive = `${minYear}–${new Date().getFullYear()}`
+
+    return { total: published.length, cities, yearsActive, featured }
+  } catch {
+    return { total: 0, cities: 0, yearsActive: '—', featured: 0 }
   }
 }
 
@@ -80,10 +122,12 @@ export async function createPortfolioEntryAction(formData: FormData) {
     city,
     year,
     venue:     optionalString(formData.get('venue')),
+    state:     optionalString(formData.get('state')),
     date:      optionalString(formData.get('date')),
     tags:      parseTags(formData.get('tags')),
     photo_url: optionalString(formData.get('photo_url')),
     featured:  formData.get('featured') === 'on',
+    status:    formData.get('status') === 'draft' ? 'draft' : 'published',
     notes:     optionalString(formData.get('notes')),
   })
 
@@ -118,10 +162,12 @@ export async function updatePortfolioEntryAction(formData: FormData) {
       city,
       year,
       venue:     optionalString(formData.get('venue')),
+      state:     optionalString(formData.get('state')),
       date:      optionalString(formData.get('date')),
       tags:      parseTags(formData.get('tags')),
       photo_url: optionalString(formData.get('photo_url')),
       featured:  formData.get('featured') === 'on',
+      status:    formData.get('status') === 'draft' ? 'draft' : 'published',
       notes:     optionalString(formData.get('notes')),
     })
     .eq('id', id)
@@ -168,6 +214,28 @@ export async function togglePortfolioFeaturedAction(formData: FormData) {
 
   if (error) {
     redirectWithError('/admin/portfolio', error.message || 'Unable to update featured state.')
+  }
+
+  revalidatePath('/admin/portfolio')
+  revalidatePath('/portfolio')
+  revalidatePath('/')
+  redirect('/admin/portfolio')
+}
+
+export async function togglePortfolioStatusAction(formData: FormData) {
+  await requireAuthedUser()
+  const admin = createAdminClient()
+  const id = optionalString(formData.get('id'))
+  if (!id) redirectWithError('/admin/portfolio', 'Missing entry id.')
+
+  const nextStatus = formData.get('next_status') === 'draft' ? 'draft' : 'published'
+  const { error } = await admin
+    .from('portfolio_entries')
+    .update({ status: nextStatus })
+    .eq('id', id)
+
+  if (error) {
+    redirectWithError('/admin/portfolio', error.message || 'Unable to update status.')
   }
 
   revalidatePath('/admin/portfolio')

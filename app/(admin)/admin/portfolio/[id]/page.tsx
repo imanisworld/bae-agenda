@@ -9,11 +9,13 @@ interface PortfolioEntry {
   event_name: string
   venue:      string | null
   city:       string
+  state:      string | null
   year:       number
   date:       string | null
   tags:       string[]
   photo_url:  string | null
   featured:   boolean
+  status:     string
   notes:      string | null
 }
 
@@ -105,6 +107,11 @@ export default async function EditPortfolioEntryPage({
           </div>
 
           <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">State</span>
+            <input name="state" defaultValue={entry.state ?? ''} style={inputStyle()} placeholder="IN" />
+          </label>
+
+          <label style={{ display: 'grid', gap: '7px' }}>
             <span className="admin-section-title">Tags (comma-separated)</span>
             <input
               name="tags"
@@ -133,10 +140,16 @@ export default async function EditPortfolioEntryPage({
             />
           </label>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
-            <input type="checkbox" name="featured" defaultChecked={entry.featured} />
-            Featured (shown in highlights grid)
-          </label>
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+              <input type="checkbox" name="featured" defaultChecked={entry.featured} />
+              Featured (shown in highlights grid)
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+              <input type="checkbox" name="status" value="draft" defaultChecked={entry.status === 'draft'} />
+              Draft (hidden from public)
+            </label>
+          </div>
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
             <button type="submit" className="admin-btn-primary">

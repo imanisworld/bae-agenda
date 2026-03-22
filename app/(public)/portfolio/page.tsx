@@ -1,43 +1,18 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { getPortfolioEntries, getFeaturedPortfolioEntries, getPortfolioStats } from '@/app/actions/portfolio'
+import PortfolioArchive from '@/components/public/PortfolioArchive'
 
 export const metadata: Metadata = {
-  title: 'Portfolio — DJ B.A.E.',
+  title: 'Portfolio — DJ B.A.E. | The Bae Agenda',
   description:
-    'From basements to festivals. A full gig history from DJ B.A.E. — Chicago, Indianapolis, and beyond.',
+    'Gig history, featured events, and full archive. DJ B.A.E. — Chicago, Indianapolis, ATL. Available for club nights, festivals, private events, and more.',
   openGraph: {
-    title: 'DJ B.A.E. — The Resume.',
+    title: 'DJ B.A.E. — Portfolio',
     description: 'From basements to festivals. Every room, every crowd.',
+    url: 'https://thebaeagenda.com/portfolio',
   },
-}
-
-interface PortfolioEntry {
-  id:         string
-  event_name: string
-  venue:      string | null
-  city:       string
-  year:       number
-  date:       string | null
-  tags:       string[]
-  photo_url:  string | null
-  featured:   boolean
-  notes:      string | null
-}
-
-async function getEntries(): Promise<PortfolioEntry[]> {
-  try {
-    const supabase = await createClient()
-    const { data } = await supabase
-      .from('portfolio_entries')
-      .select('*')
-      .order('year', { ascending: false })
-      .order('event_name', { ascending: true })
-    return (data ?? []) as PortfolioEntry[]
-  } catch {
-    return []
-  }
 }
 
 function TagChip({ label }: { label: string }) {
@@ -59,13 +34,11 @@ function TagChip({ label }: { label: string }) {
 }
 
 export default async function PortfolioPage() {
-  const entries = await getEntries()
-
-  const featured = entries.filter((e) => e.featured)
-  const allYears = [...new Set(entries.map((e) => e.year))].sort((a, b) => b - a)
-  const cities   = [...new Set(entries.map((e) => e.city.split(',')[0].trim()))].length
-  const minYear  = entries.length ? Math.min(...entries.map((e) => e.year)) : new Date().getFullYear()
-  const yearsActive = `${minYear}–${new Date().getFullYear()}`
+  const [entries, featured, stats] = await Promise.all([
+    getPortfolioEntries(),
+    getFeaturedPortfolioEntries(),
+    getPortfolioStats(),
+  ])
 
   return (
     <div style={{ background: 'var(--black)', minHeight: '100vh' }}>
@@ -119,10 +92,10 @@ export default async function PortfolioPage() {
           margin: '48px 0',
         }}>
           {[
-            { label: 'Total Events',    value: String(entries.length) },
-            { label: 'Cities',          value: String(cities)         },
-            { label: 'Years Active',    value: yearsActive            },
-            { label: 'Featured Events', value: String(featured.length)},
+            { label: 'Total Events',    value: stats.total   || '—' },
+            { label: 'Cities',          value: stats.cities  || '—' },
+            { label: 'Years Active',    value: stats.yearsActive    },
+            { label: 'Featured Events', value: stats.featured || '—' },
           ].map(({ label, value }) => (
             <div key={label} style={{
               background: 'var(--off-black)',
@@ -162,13 +135,12 @@ export default async function PortfolioPage() {
               gap: '16px',
             }}>
               {featured.map((entry) => (
-                <div key={entry.id} style={{
+                <div key={entry.id} className="card-hover" style={{
                   background: 'var(--off-black)',
                   border: '1px solid var(--border)',
                   display: 'flex',
                   flexDirection: 'column',
                   overflow: 'hidden',
-                  transition: 'border-color 300ms ease',
                 }}>
                   {/* Photo or styled placeholder */}
                   {entry.photo_url ? (
@@ -245,99 +217,16 @@ export default async function PortfolioPage() {
           </section>
         )}
 
-        {/* ── Full Archive — grouped by year ─────────────────────── */}
-        <section style={{ marginBottom: '80px' }}>
-          <div className="hardware-heading">
-            <span className="section-label">Full Archive</span>
-          </div>
-
-          {allYears.map((year) => {
-            const yearEntries = entries.filter((e) => e.year === year)
-            return (
-              <div
-                key={year}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'clamp(60px, 8vw, 96px) 1fr',
-                  gap: '0 32px',
-                  borderTop: '1px solid var(--border)',
-                  paddingTop: '32px',
-                  paddingBottom: '32px',
-                  alignItems: 'start',
-                }}
-              >
-                {/* Year label */}
-                <div style={{
-                  fontFamily: 'Conthrax, sans-serif',
-                  fontSize: 'clamp(24px, 3.5vw, 40px)',
-                  color: 'rgba(250,248,243,0.12)',
-                  lineHeight: 1,
-                  paddingTop: '4px',
-                  position: 'sticky',
-                  top: '88px',
-                }}>
-                  {year}
-                </div>
-
-                {/* Events list */}
-                <div style={{ display: 'grid', gap: '0' }}>
-                  {yearEntries.map((entry, i) => (
-                    <div
-                      key={entry.id}
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr auto',
-                        alignItems: 'center',
-                        gap: '16px',
-                        padding: '13px 0',
-                        borderBottom: i < yearEntries.length - 1 ? '1px solid rgba(255,255,255,0.06)' : 'none',
-                      }}
-                    >
-                      <div>
-                        <div style={{
-                          fontSize: 'clamp(13px, 1.8vw, 15px)',
-                          color: entry.featured ? 'var(--white)' : 'rgba(250,248,243,0.82)',
-                          fontWeight: entry.featured ? 500 : 300,
-                          marginBottom: entry.tags.length ? '6px' : 0,
-                          lineHeight: 1.4,
-                        }}>
-                          {entry.event_name}
-                          {entry.featured && (
-                            <span style={{
-                              marginLeft: '8px',
-                              fontSize: '8px',
-                              letterSpacing: '0.2em',
-                              textTransform: 'uppercase',
-                              color: 'var(--violet)',
-                              verticalAlign: 'middle',
-                            }}>
-                              ★
-                            </span>
-                          )}
-                        </div>
-                        {entry.tags.length > 0 && (
-                          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                            {entry.tags.slice(0, 2).map((tag) => (
-                              <TagChip key={tag} label={tag} />
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{entry.city}</div>
-                        {entry.venue && (
-                          <div style={{ fontSize: '10px', color: 'rgba(250,248,243,0.35)', marginTop: '2px' }}>
-                            {entry.venue}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )
-          })}
-        </section>
+        {/* ── Full Archive — client component with filters ───────── */}
+        <PortfolioArchive entries={entries.map((e) => ({
+          id:         e.id,
+          event_name: e.event_name,
+          venue:      e.venue ?? null,
+          city:       e.city,
+          year:       e.year,
+          tags:       e.tags ?? [],
+          featured:   e.featured,
+        }))} />
 
         {/* ── CTA ───────────────────────────────────────────────── */}
         <section style={{
@@ -354,9 +243,12 @@ export default async function PortfolioPage() {
             Let&apos;s add your event to this list.
           </p>
           <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '24px' }}>
-            Club nights, private events, festivals — the format is yours.
+            Open to club nights, festivals, private events, and everything in between.
           </p>
-          <Link href="/book" className="btn-primary">Start a Booking →</Link>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link href="/book" className="btn-primary">Start a Booking →</Link>
+            <a href="mailto:baebookings@proton.me" className="btn-ghost">Email Us</a>
+          </div>
         </section>
 
       </div>

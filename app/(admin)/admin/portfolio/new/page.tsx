@@ -64,6 +64,11 @@ export default function NewPortfolioEntryPage() {
           </div>
 
           <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">State</span>
+            <input name="state" style={inputStyle()} placeholder="IN" />
+          </label>
+
+          <label style={{ display: 'grid', gap: '7px' }}>
             <span className="admin-section-title">Tags</span>
             <input
               name="tags"
@@ -82,10 +87,16 @@ export default function NewPortfolioEntryPage() {
             <textarea name="notes" rows={3} style={inputStyle()} />
           </label>
 
-          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
-            <input type="checkbox" name="featured" />
-            Featured (shown in highlights grid)
-          </label>
+          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+              <input type="checkbox" name="featured" />
+              Featured (shown in highlights grid)
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+              <input type="checkbox" name="status" value="draft" />
+              Save as Draft (hidden from public)
+            </label>
+          </div>
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
             <button type="submit" className="admin-btn-primary">
