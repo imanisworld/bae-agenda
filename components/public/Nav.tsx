@@ -161,6 +161,7 @@ export default function Nav() {
           backdropFilter: 'blur(20px)',
           display:    'flex',
           flexDirection: 'column',
+          overflowY:  'auto',
           padding:    '40px 32px 48px',
           gap:        '8px',
           transform:  menuOpen ? 'translateY(0)' : 'translateY(calc(-100% - 80px))',
