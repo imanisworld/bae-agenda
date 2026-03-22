@@ -84,18 +84,7 @@ export default function HeroSection({ content = {} }: Props) {
       <ScrollFader />
 
       {/* ── Top bar ──────────────────────────────────────── */}
-      <div
-        style={{
-          position: 'relative',
-          zIndex:   1,
-          display:  'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          alignItems: 'flex-start',
-          gap:      '40px',
-          /* clear the fixed nav (68px) + breathing room */
-          padding:  'calc(68px + 52px) clamp(32px, 5vw, 72px) 0',
-        }}
-      >
+      <div className="hero-topbar">
         {/* Left — eyebrow + headline */}
         <div style={{ display: 'grid', gap: '18px' }}>
           <p style={{
@@ -153,12 +142,7 @@ export default function HeroSection({ content = {} }: Props) {
 
       {/* ── Bottom — motion stage + genre band ─────────────── */}
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <div style={{
-          padding:        '0 clamp(32px, 5vw, 72px) 72px',
-          display:        'flex',
-          justifyContent: 'center',
-          paddingLeft:    'clamp(32px, 18vw, 220px)',
-        }}>
+        <div className="hero-deck-stage-wrap">
           <div
             className="hero-motion-stage"
             style={{

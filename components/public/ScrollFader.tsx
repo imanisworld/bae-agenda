@@ -69,7 +69,7 @@ export default function ScrollFader() {
         aria-label="Go to previous section"
         disabled={activeIndex === 0}
       >
-        +
+        ↑
       </button>
 
       <div className="scroll-fader-body">
@@ -106,7 +106,7 @@ export default function ScrollFader() {
         aria-label="Go to next section"
         disabled={activeIndex === SECTIONS.length - 1}
       >
-        -
+        ↓
       </button>
     </aside>
   )

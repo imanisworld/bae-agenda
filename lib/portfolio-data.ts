@@ -38,6 +38,70 @@ export const SELECTED_WORK: SelectedWorkItem[] = [
   },
 ]
 
+// ── DJ Portfolio — Gig History ──────────────────────────────────────────────
+
+export interface GigItem {
+  id:       string
+  title:    string
+  venue:    string
+  city:     string
+  date:     string      // display string, e.g. "May 8, 2025"
+  year:     string
+  tags:     string[]
+  featured: boolean
+}
+
+export const GIG_HISTORY: GigItem[] = [
+  {
+    id:       'gig-chi-chis',
+    title:    "Chi Chi's",
+    venue:    'Blind Tiger Indy',
+    city:     'Indianapolis, IN',
+    date:     'May 2025 — Ongoing',
+    year:     '2025',
+    tags:     ['Recurring Night', 'Community', 'Open Format'],
+    featured: true,
+  },
+  {
+    id:       'gig-bae-billions',
+    title:    'Bae & Billion$',
+    venue:    'Various',
+    city:     'Indianapolis, IN',
+    date:     '2024',
+    year:     '2024',
+    tags:     ['Show / Series', 'Music Culture', 'Live Sets'],
+    featured: true,
+  },
+  {
+    id:       'gig-club-plex',
+    title:    'Club Plex',
+    venue:    'Club Plex',
+    city:     'Indianapolis, IN',
+    date:     '2024 — 2025',
+    year:     '2024',
+    tags:     ['Ongoing Dates', 'Open Format', 'Nightlife'],
+    featured: false,
+  },
+]
+
+// ── Press Photos ────────────────────────────────────────────────────────────
+
+export interface PressPhoto {
+  id:  string
+  src: string
+  alt: string
+}
+
+export const PRESS_PHOTOS: PressPhoto[] = [
+  {
+    id:  'press-plex-mix',
+    src: '/photos/PlexMix19-DJBAE.JPEG',
+    alt: 'DJ B.A.E. performing at Club Plex Mix 19',
+  },
+]
+
+// ── Website Build Highlights ────────────────────────────────────────────────
+
 export const PORTFOLIO_HIGHLIGHTS = [
   'Live booking workflow from inquiry to client record',
   'Content-managed homepage copy through a custom admin editor',

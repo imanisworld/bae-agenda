@@ -1,119 +1,182 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
-import { PORTFOLIO_HIGHLIGHTS } from '@/lib/portfolio-data'
-import { getPublishedMixes } from '@/lib/db/mixes'
-import { getUpcomingEvents } from '@/lib/db/events'
-import { getContentMap } from '@/lib/db/content'
-import BuiltSection from '@/components/public/BuiltSection'
+import { GIG_HISTORY, PRESS_PHOTOS } from '@/lib/portfolio-data'
 
 export const metadata: Metadata = {
   title: 'Portfolio — DJ B.A.E.',
-  description: 'This site was designed and built from scratch — no templates, no builders. A full-stack booking platform, content system, and brand presence.',
+  description:
+    'Gig history, live events, and press shots from DJ B.A.E. — Chicago-based DJ and curator available for club nights, private events, and more.',
+  openGraph: {
+    title: 'DJ B.A.E. — Portfolio',
+    description:
+      'Nights, residencies, and events. A record of what has been built on the floor.',
+  },
 }
 
-const CONTENT_KEYS = ['about_quote', 'booking_email'] as const
+const FEATURED = GIG_HISTORY.filter((g) => g.featured)
+const ARCHIVE  = GIG_HISTORY.filter((g) => !g.featured)
 
-function statCard(label: string, value: string, sub: string) {
-  return (
-    <div className="build-console-module">
-      <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '10px' }}>
-        {label}
-      </div>
-      <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(24px, 3vw, 34px)', color: 'var(--white)', marginBottom: '8px' }}>
-        {value}
-      </div>
-      <div style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
-        {sub}
-      </div>
-    </div>
-  )
-}
-
-export default async function PortfolioPage() {
-  const [content, mixes, events] = await Promise.all([
-    getContentMap([...CONTENT_KEYS]),
-    getPublishedMixes(24),
-    getUpcomingEvents(24),
-  ])
-
-  const bookingEmail = content.booking_email ?? 'Booking available on request.'
-
+export default function PortfolioPage() {
   return (
     <div style={{ background: 'var(--black)', minHeight: '100vh', paddingTop: '68px' }}>
-      <div className="section-container" style={{ display: 'grid', gap: '36px', paddingTop: 0 }}>
+      <div className="section-container" style={{ paddingTop: 0 }}>
 
-        {/* Page header — clear purpose statement */}
-        <section>
+        {/* Page header */}
+        <section style={{ marginBottom: '48px' }}>
           <div className="hardware-heading">
             <span className="section-label">Portfolio</span>
           </div>
           <h1
             style={{
               fontFamily: 'Conthrax, sans-serif',
-              fontSize: 'clamp(34px, 5.2vw, 64px)',
+              fontSize: 'clamp(34px, 5.5vw, 72px)',
               lineHeight: 0.95,
               color: 'var(--white)',
-              margin: '0 0 24px',
+              margin: '0 0 20px',
             }}
           >
-            Built from<br />
-            <span className="hardware-title-accent">Scratch.</span>
+            Nights &amp;<br />
+            <span style={{ color: 'var(--violet)' }}>Events.</span>
           </h1>
-          <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '8px' }}>
-            This is not a template or a hosted service. The Bae Agenda is a custom-designed,
-            full-stack web platform built to handle real bookings, content management, and
-            brand presence — all in one system.
+          <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '520px', marginBottom: '20px' }}>
+            A record of what has been built on the floor — recurring nights, community series,
+            and open-format sets across Chicago and Indianapolis.
           </p>
-          <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '20px' }}>
-            If you are looking for something like this built for your brand or project,
-            that work is available.
-          </p>
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <Link href="/admin-demo" className="btn-ghost">View Admin Demo</Link>
-            {bookingEmail && (
-              <a href={`mailto:${bookingEmail}`} className="btn-ghost">Get in Touch</a>
-            )}
-          </div>
+          <Link href="/book" className="btn-primary">Book DJ B.A.E. →</Link>
         </section>
 
-        {/* Live system stats */}
-        <section
-          className="build-console-module-grid"
-          style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}
-        >
-          {statCard('Published Mixes', String(mixes.length), 'Live in the catalog. Managed through the admin.')}
-          {statCard('Upcoming Events', String(events.length), 'Public calendar entries — live data on every load.')}
-          {statCard('System Layers', '4', 'Public site, admin panel, press kit, and booking flow.')}
-          {statCard('Templates Used', '0', 'Every page, component, and layout is custom.')}
-        </section>
-
-        {/* Feature highlights */}
-        <section
-          className="build-console-mixer"
-          style={{ padding: '26px', display: 'grid', gap: '16px' }}
-        >
-          <div className="build-console-fx-header">
-            <span>What Was Built</span>
-            <div className="build-console-mini-chips">
-              <span>Full-Stack</span>
-              <span>Custom</span>
+        {/* Featured gigs — card grid */}
+        {FEATURED.length > 0 && (
+          <section style={{ marginBottom: '48px' }}>
+            <div className="hardware-heading">
+              <span className="section-label" style={{ color: 'var(--violet)' }}>Featured</span>
             </div>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-            {PORTFOLIO_HIGHLIGHTS.map((item) => (
-              <div key={item} className="build-console-module" style={{ padding: '16px' }}>
-                <div style={{ fontSize: '13px', color: 'var(--white)', lineHeight: 1.7 }}>
-                  {item}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+              {FEATURED.map((gig) => (
+                <div
+                  key={gig.id}
+                  className="build-console-module card-hover"
+                  style={{ padding: '24px', display: 'grid', gap: '12px' }}
+                >
+                  <div className="build-console-module-top">
+                    <span className="build-console-module-category">{gig.tags[0]}</span>
+                    <span className="build-console-module-index">{gig.year}</span>
+                  </div>
+                  <div style={{
+                    fontFamily: 'Conthrax, sans-serif',
+                    fontSize: 'clamp(18px, 2.5vw, 24px)',
+                    color: 'var(--white)',
+                    lineHeight: 1.1,
+                  }}>
+                    {gig.title}
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+                    {gig.venue} · {gig.city}
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
+                    {gig.date}
+                  </div>
+                  <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                    {gig.tags.slice(1).map((tag) => (
+                      <span
+                        key={tag}
+                        style={{
+                          fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase',
+                          color: 'var(--violet)', background: 'rgba(155,93,229,0.1)',
+                          border: '1px solid rgba(155,93,229,0.2)',
+                          borderRadius: '100px', padding: '3px 8px',
+                        }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Press photos */}
+        {PRESS_PHOTOS.length > 0 && (
+          <section style={{ marginBottom: '48px' }}>
+            <div className="hardware-heading">
+              <span className="section-label">Press Photos</span>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px' }}>
+              {PRESS_PHOTOS.map((photo) => (
+                <div
+                  key={photo.id}
+                  style={{
+                    position: 'relative', aspectRatio: '4/3',
+                    border: '1px solid var(--border)',
+                    overflow: 'hidden',
+                    background: 'var(--surface)',
+                  }}
+                >
+                  <Image
+                    src={photo.src}
+                    alt={photo.alt}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Archive — chronological list */}
+        {ARCHIVE.length > 0 && (
+          <section style={{ marginBottom: '48px' }}>
+            <div className="hardware-heading">
+              <span className="section-label">Archive</span>
+            </div>
+            <div style={{ display: 'grid', gap: '1px', border: '1px solid var(--border)' }}>
+              {ARCHIVE.map((gig) => (
+                <div
+                  key={gig.id}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr auto',
+                    alignItems: 'center',
+                    gap: '16px',
+                    padding: '18px 20px',
+                    background: 'var(--off-black)',
+                    borderBottom: '1px solid var(--border)',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '15px', color: 'var(--white)', marginBottom: '4px' }}>
+                      {gig.title}
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                      {gig.venue} · {gig.city}
+                    </div>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--muted)', letterSpacing: '0.08em' }}>{gig.year}</div>
+                    <div style={{ fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)', opacity: 0.6, marginTop: '2px' }}>
+                      {gig.tags[0]}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* CTA */}
+        <section style={{ textAlign: 'center', padding: '48px 0' }}>
+          <p style={{ fontSize: '14px', color: 'var(--muted)', marginBottom: '20px', lineHeight: 1.8 }}>
+            Ready to add your event to this list?
+          </p>
+          <Link href="/book" className="btn-primary">Start a Booking →</Link>
         </section>
 
       </div>
-
-      {/* Full tech stack breakdown */}
-      <BuiltSection aboutQuote={content.about_quote} />
     </div>
   )
 }
