@@ -4,7 +4,6 @@ import Link from 'next/link'
 import PrintPressKitButton from '@/components/public/PrintPressKitButton'
 import { SELECTED_WORK } from '@/lib/portfolio-data'
 import { getContentMap } from '@/lib/db/content'
-import { getPublishedMixes } from '@/lib/db/mixes'
 
 export const metadata: Metadata = {
   title: 'Press Kit — DJ B.A.E.',
@@ -33,17 +32,12 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 export default async function PressKitPage() {
-  const [content, mixes] = await Promise.all([
-    getContentMap([...CONTENT_KEYS]),
-    getPublishedMixes(6),
-  ])
+  const content = await getContentMap([...CONTENT_KEYS])
 
   const title = content.hero_title ?? 'THE BAE AGENDA'
   const subtitle = content.hero_subtitle ?? 'Private events, club nights, weddings & branded experiences.'
   const about = content.about_quote ?? 'Chicago-based DJ, curator, and experience architect.'
   const bookingEmail = content.booking_email ?? ''
-
-  const topMixes = mixes.slice(0, 2)
 
   return (
     <div className="press-kit-page" style={{ background: '#ece8df', minHeight: '100vh', color: '#111', padding: 'calc(68px + clamp(20px, 5vw, 32px)) 20px clamp(20px, 5vw, 40px)' }}>
@@ -181,60 +175,20 @@ export default async function PressKitPage() {
               </p>
             </section>
 
-            <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px', alignItems: 'start' }}>
-              <div style={{ display: 'grid', gap: '10px' }}>
-                <SectionLabel>Featured Mixes</SectionLabel>
-                <div style={{ display: 'grid', gap: '8px' }}>
-                  {topMixes.map((mix, index) => (
-                    <div
-                      key={mix.id}
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '28px 1fr',
-                        gap: '8px',
-                        alignItems: 'start',
-                        paddingBottom: '8px',
-                        borderBottom: index < topMixes.length - 1 ? '1px solid rgba(0,0,0,0.08)' : 'none',
-                      }}
-                    >
-                      <div
-                        style={{
-                          width: '28px',
-                          height: '28px',
-                          display: 'grid',
-                          placeItems: 'center',
-                          background: '#111',
-                          color: '#fffdfa',
-                          fontSize: '10px',
-                          fontWeight: 600,
-                        }}
-                      >
-                        {index + 1}
-                      </div>
-                      <div style={{ display: 'grid', gap: '3px' }}>
-                        <div style={{ fontSize: '12px', fontWeight: 600 }}>{mix.title}</div>
-                        <div style={{ fontSize: '10px', color: '#555' }}>{mix.genre ?? 'Open Format'}</div>
-                      </div>
-                    </div>
-                  ))}
+            <section style={{ display: 'grid', gap: '10px' }}>
+              <SectionLabel>Booking</SectionLabel>
+              <div style={{ background: 'rgba(17,17,17,0.04)', border: '1px solid rgba(0,0,0,0.1)', padding: '14px' }}>
+                <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#7a7a7a', marginBottom: '8px' }}>
+                  Email
                 </div>
-              </div>
-
-              <div style={{ display: 'grid', gap: '10px' }}>
-                <SectionLabel>Booking</SectionLabel>
-                <div style={{ background: 'rgba(17,17,17,0.04)', border: '1px solid rgba(0,0,0,0.1)', padding: '14px' }}>
-                  <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#7a7a7a', marginBottom: '8px' }}>
-                    Email
-                  </div>
-                  <div style={{ fontSize: '12px', lineHeight: 1.6 }}>
-                    {bookingEmail ? (
-                      <a href={`mailto:${bookingEmail}`} style={{ color: '#111', textDecoration: 'none', fontWeight: 600 }}>
-                        {bookingEmail}
-                      </a>
-                    ) : (
-                      <span>Available on request</span>
-                    )}
-                  </div>
+                <div style={{ fontSize: '12px', lineHeight: 1.6 }}>
+                  {bookingEmail ? (
+                    <a href={`mailto:${bookingEmail}`} style={{ color: '#111', textDecoration: 'none', fontWeight: 600 }}>
+                      {bookingEmail}
+                    </a>
+                  ) : (
+                    <span>Available on request</span>
+                  )}
                 </div>
               </div>
             </section>

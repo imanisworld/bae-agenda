@@ -5,7 +5,6 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { BookingStatus } from '@/types/index'
-import { slugify } from '@/lib/utils'
 
 async function requireAuthedUser() {
   const supabase = await createClient()
@@ -43,25 +42,6 @@ function parseOptionalNumber(value: FormDataEntryValue | null): number | null {
   return Number.isFinite(parsed) ? parsed : null
 }
 
-async function generateUniqueSlug(title: string): Promise<string> {
-  const admin = createAdminClient()
-  const base = slugify(title) || 'event'
-
-  for (let i = 0; i < 50; i += 1) {
-    const candidate = i === 0 ? base : `${base}-${i + 1}`
-    const { data, error } = await admin
-      .from('events')
-      .select('id')
-      .eq('slug', candidate)
-      .limit(1)
-
-    if (!error && (!data || data.length === 0)) {
-      return candidate
-    }
-  }
-
-  return `${base}-${Date.now()}`
-}
 
 export async function updateBookingStatusAction(formData: FormData) {
   await requireAuthedUser()
@@ -182,13 +162,10 @@ export async function createEventFromBookingAction(formData: FormData) {
     redirect(`/admin/events/${existingEvent.id}`)
   }
 
-  const slug = await generateUniqueSlug(source.event_name)
-
   const { data: createdEvent, error: createError } = await admin
     .from('events')
     .insert({
       title: source.event_name,
-      slug,
       event_date: source.event_date,
       venue: source.venue,
       city: source.city,
