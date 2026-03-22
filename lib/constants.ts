@@ -68,6 +68,7 @@ export const PAYMENT_TYPES   = ['deposit', 'balance', 'full', 'refund'] as const
 export const SOCIALS = [
   { label: 'Instagram', url: 'https://www.instagram.com/dj_b.a.e/',                      icon: 'IG' },
   { label: 'TikTok',    url: 'https://www.tiktok.com/@djbae1',                            icon: 'TT' },
+  { label: 'YouTube',   url: 'https://www.youtube.com/@djb.a.e',                         icon: 'YT' },
   { label: 'SoundCloud',url: 'https://soundcloud.com/deejaybae',                           icon: 'SC' },
   { label: 'Facebook',  url: 'https://www.facebook.com/480641485716491',                  icon: 'FB' },
   { label: 'dot.cards', url: 'https://dot.cards/djbae',                                   icon: 'DC' },
