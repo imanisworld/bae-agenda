@@ -81,7 +81,6 @@ const CITY_TIME_ZONE_MAP: Record<string, string> = {
   'Indianapolis, IN': 'America/Indiana/Indianapolis',
 }
 
-const DATE_OPTIONS = buildDateOptions()
 const TIME_OPTIONS = buildTimeOptions()
 const PACKAGE_OPTIONS = PACKAGES.map((pkg) =>
   `${pkg.name}${pkg.price ? ` (${formatCurrency(pkg.price)})` : ' (Custom quote)'}`
@@ -314,19 +313,17 @@ export default function BookPage() {
             </label>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>Event Date *</span>
-              <select
+              <input
+                type="date"
                 required
+                min={new Date().toISOString().split('T')[0]}
                 value={form.eventDate}
                 onChange={(e) => updateField('eventDate', e.target.value)}
-                style={inputStyle(Boolean(fieldErrors.eventDate))}
-              >
-                <option value="">Select a date</option>
-                {DATE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+                style={{
+                  ...inputStyle(Boolean(fieldErrors.eventDate)),
+                  colorScheme: 'dark',
+                }}
+              />
               {fieldErrors.eventDate && <span style={fieldErrorStyle()}>{fieldErrors.eventDate}</span>}
             </label>
           </div>
@@ -510,26 +507,6 @@ function responsiveGridStyle(): React.CSSProperties {
     gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
     gap: '14px',
   }
-}
-
-function buildDateOptions() {
-  const options: Array<{ value: string; label: string }> = []
-  const start = new Date()
-
-  for (let i = 0; i < 365; i += 1) {
-    const date = new Date(start)
-    date.setDate(start.getDate() + i)
-    const value = formatDateValue(date)
-    const label = date.toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-    })
-    options.push({ value, label })
-  }
-
-  return options
 }
 
 function buildTimeOptions() {
