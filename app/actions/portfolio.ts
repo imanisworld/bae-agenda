@@ -55,7 +55,6 @@ export async function getPortfolioEntries(): Promise<PortfolioEntry[]> {
     const { data } = await supabase
       .from('portfolio_entries')
       .select('*')
-      .eq('status', 'published')
       .order('year', { ascending: false })
       .order('event_name', { ascending: true })
     return (data ?? []) as PortfolioEntry[]
@@ -71,7 +70,6 @@ export async function getFeaturedPortfolioEntries(): Promise<PortfolioEntry[]> {
       .from('portfolio_entries')
       .select('*')
       .eq('featured', true)
-      .eq('status', 'published')
       .order('year', { ascending: false })
       .limit(6)
     return (data ?? []) as PortfolioEntry[]
@@ -85,18 +83,17 @@ export async function getPortfolioStats() {
     const supabase = await createClient()
     const { data } = await supabase
       .from('portfolio_entries')
-      .select('year, city, featured, status')
+      .select('year, city, featured')
     if (!data) return { total: 0, cities: 0, yearsActive: '—', featured: 0 }
 
-    const rows      = data as { year: number; city: string; featured: boolean; status: string }[]
-    const published = rows.filter((e) => e.status === 'published')
-    const years     = [...new Set(published.map((e) => e.year))]
-    const cities    = [...new Set(published.map((e) => e.city.split(',')[0].trim()))].length
-    const featured  = published.filter((e) => e.featured).length
-    const minYear   = years.length ? Math.min(...years) : new Date().getFullYear()
+    const rows    = data as { year: number; city: string; featured: boolean }[]
+    const years   = [...new Set(rows.map((e) => e.year))]
+    const cities  = [...new Set(rows.map((e) => e.city.split(',')[0].trim()))].length
+    const featured = rows.filter((e) => e.featured).length
+    const minYear  = years.length ? Math.min(...years) : new Date().getFullYear()
     const yearsActive = `${minYear}–${new Date().getFullYear()}`
 
-    return { total: published.length, cities, yearsActive, featured }
+    return { total: rows.length, cities, yearsActive, featured }
   } catch {
     return { total: 0, cities: 0, yearsActive: '—', featured: 0 }
   }

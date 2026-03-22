@@ -48,8 +48,8 @@ export default async function PortfolioPage() {
         minHeight: '52vh',
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'flex-end',
-        padding: 'calc(68px + 60px) clamp(24px, 5vw, 72px) 56px',
+        justifyContent: 'center',
+        padding: 'calc(68px + 48px) clamp(24px, 5vw, 72px) 48px',
         background: 'linear-gradient(180deg, var(--bg-sunken) 0%, var(--black) 100%)',
         borderBottom: '1px solid var(--border)',
       }}>

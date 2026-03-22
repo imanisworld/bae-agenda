@@ -52,9 +52,12 @@ const filterBtnActive: React.CSSProperties = {
   background: 'rgba(155,93,229,0.1)',
 }
 
+const COLLAPSED_YEARS = 3
+
 export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
-  const [city, setCity] = useState<string | null>(null)
-  const [tag,  setTag]  = useState<string | null>(null)
+  const [city,     setCity]     = useState<string | null>(null)
+  const [tag,      setTag]      = useState<string | null>(null)
+  const [expanded, setExpanded] = useState(false)
 
   const cities = useMemo(() => {
     const seen = new Set<string>()
@@ -85,6 +88,11 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
   }, [filtered])
 
   const hasFilters = city !== null || tag !== null
+
+  const visibleYears = useMemo(() => {
+    if (expanded || hasFilters) return allYears
+    return allYears.slice(0, COLLAPSED_YEARS)
+  }, [allYears, expanded, hasFilters])
 
   return (
     <section style={{ marginBottom: '80px' }}>
@@ -158,94 +166,135 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
           No events match the selected filters.
         </div>
       ) : (
-        allYears.map((year) => {
-          const yearEntries = filtered.filter((e) => e.year === year)
-          return (
-            <div
-              key={year}
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'clamp(60px, 8vw, 96px) 1fr',
-                gap: '0 32px',
-                borderTop: '1px solid var(--border)',
-                paddingTop: '32px',
-                paddingBottom: '32px',
-                alignItems: 'start',
-              }}
-            >
-              {/* Year label */}
-              <div style={{
-                fontFamily: 'Conthrax, sans-serif',
-                fontSize: 'clamp(24px, 3.5vw, 40px)',
-                color: 'rgba(250,248,243,0.12)',
-                lineHeight: 1,
-                paddingTop: '4px',
-                position: 'sticky',
-                top: '88px',
-              }}>
-                {year}
-              </div>
+        <>
+          {visibleYears.map((year) => {
+            const yearEntries = filtered.filter((e) => e.year === year)
+            return (
+              <div
+                key={year}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'clamp(60px, 8vw, 96px) 1fr',
+                  gap: '0 32px',
+                  borderTop: '1px solid var(--border)',
+                  paddingTop: '32px',
+                  paddingBottom: '32px',
+                  alignItems: 'start',
+                }}
+              >
+                {/* Year label */}
+                <div style={{
+                  fontFamily: 'Conthrax, sans-serif',
+                  fontSize: 'clamp(24px, 3.5vw, 40px)',
+                  color: 'rgba(250,248,243,0.12)',
+                  lineHeight: 1,
+                  paddingTop: '4px',
+                  position: 'sticky',
+                  top: '88px',
+                }}>
+                  {year}
+                </div>
 
-              {/* Events list */}
-              <div style={{ display: 'grid', gap: '0' }}>
-                {yearEntries.map((entry, i) => (
-                  <div
-                    key={entry.id}
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr auto',
-                      alignItems: 'center',
-                      gap: '16px',
-                      padding: '13px 0',
-                      borderBottom: i < yearEntries.length - 1
-                        ? '1px solid rgba(255,255,255,0.06)'
-                        : 'none',
-                    }}
-                  >
-                    <div>
-                      <div style={{
-                        fontSize: 'clamp(13px, 1.8vw, 15px)',
-                        color: entry.featured ? 'var(--white)' : 'rgba(250,248,243,0.82)',
-                        fontWeight: entry.featured ? 500 : 300,
-                        marginBottom: entry.tags.length ? '6px' : 0,
-                        lineHeight: 1.4,
-                      }}>
-                        {entry.event_name}
-                        {entry.featured && (
-                          <span style={{
-                            marginLeft: '8px',
-                            fontSize: '8px',
-                            letterSpacing: '0.2em',
-                            textTransform: 'uppercase',
-                            color: 'var(--violet)',
-                            verticalAlign: 'middle',
-                          }}>
-                            ★
-                          </span>
+                {/* Events list */}
+                <div style={{ display: 'grid', gap: '0' }}>
+                  {yearEntries.map((entry, i) => (
+                    <div
+                      key={entry.id}
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr auto',
+                        alignItems: 'center',
+                        gap: '16px',
+                        padding: '13px 0',
+                        borderBottom: i < yearEntries.length - 1
+                          ? '1px solid rgba(255,255,255,0.06)'
+                          : 'none',
+                      }}
+                    >
+                      <div>
+                        <div style={{
+                          fontSize: 'clamp(13px, 1.8vw, 15px)',
+                          color: entry.featured ? 'var(--white)' : 'rgba(250,248,243,0.82)',
+                          fontWeight: entry.featured ? 500 : 300,
+                          marginBottom: entry.tags.length ? '6px' : 0,
+                          lineHeight: 1.4,
+                        }}>
+                          {entry.event_name}
+                          {entry.featured && (
+                            <span style={{
+                              marginLeft: '8px',
+                              fontSize: '8px',
+                              letterSpacing: '0.2em',
+                              textTransform: 'uppercase',
+                              color: 'var(--violet)',
+                              verticalAlign: 'middle',
+                            }}>
+                              ★
+                            </span>
+                          )}
+                        </div>
+                        {entry.tags.length > 0 && (
+                          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                            {entry.tags.slice(0, 2).map((t) => (
+                              <TagChip key={t} label={t} />
+                            ))}
+                          </div>
                         )}
                       </div>
-                      {entry.tags.length > 0 && (
-                        <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                          {entry.tags.slice(0, 2).map((t) => (
-                            <TagChip key={t} label={t} />
-                          ))}
-                        </div>
-                      )}
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{entry.city}</div>
+                        {entry.venue && (
+                          <div style={{ fontSize: '10px', color: 'rgba(250,248,243,0.35)', marginTop: '2px' }}>
+                            {entry.venue}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{entry.city}</div>
-                      {entry.venue && (
-                        <div style={{ fontSize: '10px', color: 'rgba(250,248,243,0.35)', marginTop: '2px' }}>
-                          {entry.venue}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
+            )
+          })}
+
+          {/* Expand / collapse */}
+          {!hasFilters && allYears.length > COLLAPSED_YEARS && (
+            <div style={{
+              borderTop: '1px solid var(--border)',
+              paddingTop: '24px',
+              textAlign: 'center',
+            }}>
+              <button
+                type="button"
+                onClick={() => setExpanded((v) => !v)}
+                style={{
+                  fontSize: '11px',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: 'var(--muted)',
+                  background: 'transparent',
+                  border: '1px solid var(--border)',
+                  borderRadius: '100px',
+                  padding: '9px 20px',
+                  cursor: 'pointer',
+                  fontFamily: 'DM Sans, sans-serif',
+                  transition: 'color 200ms ease, border-color 200ms ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = 'var(--white)'
+                  e.currentTarget.style.borderColor = 'rgba(155,93,229,0.5)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = 'var(--muted)'
+                  e.currentTarget.style.borderColor = 'var(--border)'
+                }}
+              >
+                {expanded
+                  ? `Show less ↑`
+                  : `Show all ${filtered.length} events ↓`}
+              </button>
             </div>
-          )
-        })
+          )}
+        </>
       )}
     </section>
   )

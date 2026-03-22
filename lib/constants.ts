@@ -13,7 +13,6 @@ export const PUBLIC_NAV = [
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Built',   href: '/built'     },
   { label: 'Book',    href: '/book' },
-  { label: 'Connect', href: '/#connect' },
 ] as const
 
 export const ADMIN_NAV = [
