@@ -4,27 +4,25 @@
  * Server component — fetches site_content once and passes to sections.
  *
  * Sections:
- *   HeroSection    — full viewport, brand presence (reads hero copy)
- *   MixesSection   — 3 featured mix cards
- *   EventsSection  — upcoming dates (live Supabase data)
- *   BookingSection — packages + booking CTA (reads booking_email)
- *   BuiltSection   — tech stack / "built from scratch" (reads about_quote)
- *   ConnectSection — social links / "stay connected" (reads social URLs)
+ *   HeroSection          — full viewport, brand presence (reads hero copy)
+ *   MixesSection         — 3 featured mix cards
+ *   EventsSection        — upcoming dates (live Supabase data)
+ *   SelectedWorkSection  — real events and recurring nights
+ *   BookingSection       — packages + booking CTA (reads booking_email)
+ *   ConnectSection       — social links / "stay connected" (reads social URLs)
  */
-import HeroSection    from '@/components/public/HeroSection'
-import MixesSection   from '@/components/public/MixesSection'
-import EventsSection  from '@/components/public/EventsSection'
-import BookingSection from '@/components/public/BookingSection'
-import BuiltSection   from '@/components/public/BuiltSection'
-import ConnectSection from '@/components/public/ConnectSection'
-import { getContentMap } from '@/lib/db/content'
+import HeroSection           from '@/components/public/HeroSection'
+import MixesSection          from '@/components/public/MixesSection'
+import EventsSection         from '@/components/public/EventsSection'
+import SelectedWorkSection   from '@/components/public/SelectedWorkSection'
+import BookingSection        from '@/components/public/BookingSection'
+import ConnectSection        from '@/components/public/ConnectSection'
+import { getContentMap }     from '@/lib/db/content'
 
 // All keys needed on the homepage — fetched in a single Supabase query.
-// Add new keys here when wiring new CMS fields to homepage sections.
 const HOME_CONTENT_KEYS = [
   'hero_title',
   'hero_subtitle',
-  'about_quote',
   'booking_email',
   'instagram_url',
   'soundcloud_url',
@@ -46,11 +44,9 @@ export default async function HomePage() {
       />
       <MixesSection />
       <EventsSection />
+      <SelectedWorkSection />
       <BookingSection
         bookingEmail={content.booking_email}
-      />
-      <BuiltSection
-        aboutQuote={content.about_quote}
       />
       <ConnectSection
         socialOverrides={{

@@ -65,10 +65,10 @@ export const PAYMENT_TYPES   = ['deposit', 'balance', 'full', 'refund'] as const
 
 // ---- Socials -----------------------------------------------
 export const SOCIALS = [
-  { label: 'Instagram', url: 'https://www.instagram.com/dj_b.a.e/',                      icon: '📸' },
-  { label: 'TikTok',    url: 'https://www.tiktok.com/@djbae1',                            icon: '🎵' },
-  { label: 'YouTube',   url: 'https://www.youtube.com/channel/UCjEiMW5l_Go9vSHudx5VPEw', icon: '▶️' },
-  { label: 'SoundCloud',url: 'https://soundcloud.com/deejaybae',                           icon: '☁️' },
-  { label: 'Facebook',  url: 'https://www.facebook.com/480641485716491',                  icon: '👤' },
-  { label: 'dot.cards', url: 'https://dot.cards/djbae',                                   icon: '🔗' },
+  { label: 'Instagram', url: 'https://www.instagram.com/dj_b.a.e/',                      icon: 'IG' },
+  { label: 'TikTok',    url: 'https://www.tiktok.com/@djbae1',                            icon: 'TT' },
+  { label: 'YouTube',   url: 'https://www.youtube.com/channel/UCjEiMW5l_Go9vSHudx5VPEw', icon: 'YT' },
+  { label: 'SoundCloud',url: 'https://soundcloud.com/deejaybae',                           icon: 'SC' },
+  { label: 'Facebook',  url: 'https://www.facebook.com/480641485716491',                  icon: 'FB' },
+  { label: 'dot.cards', url: 'https://dot.cards/djbae',                                   icon: 'DC' },
 ] as const

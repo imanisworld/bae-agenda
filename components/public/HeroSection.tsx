@@ -157,13 +157,14 @@ export default function HeroSection({ content = {} }: Props) {
           padding:        '0 clamp(32px, 5vw, 72px) 72px',
           display:        'flex',
           justifyContent: 'center',
+          paddingLeft:    'clamp(32px, 18vw, 220px)',
         }}>
           <div
             className="hero-motion-stage"
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'flex-start',
               width: '100%',
               minHeight: '188px',
             }}

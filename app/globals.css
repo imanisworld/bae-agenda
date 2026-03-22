@@ -976,6 +976,75 @@ body {
 }
 .inline-link:hover { color: var(--white); }
 
+/* ── Booking console (BookingSection) ───────────────────────────── */
+.booking-console {
+  border: 1px solid rgba(255,255,255,0.10);
+  background:
+    linear-gradient(180deg, rgba(46,46,52,0.28), rgba(18,18,22,0.14)),
+    linear-gradient(135deg, rgba(19,19,22,0.98), rgba(28,28,32,0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.07),
+    0 24px 48px rgba(0,0,0,0.28);
+  padding: 32px;
+  display: grid;
+  gap: 32px;
+}
+
+.booking-console-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 32px;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .booking-console-header {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+}
+
+.booking-channels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 1px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.10);
+}
+
+.booking-channel {
+  display: flex;
+  flex-direction: column;
+  padding: 28px;
+  background: rgba(18,18,22,0.98);
+  position: relative;
+}
+
+.booking-channel-featured {
+  background: linear-gradient(180deg, rgba(155,93,229,0.10), rgba(18,18,22,0.98));
+}
+
+.booking-channel-indicator {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: rgba(255,255,255,0.12);
+}
+
+.booking-channel-featured .booking-channel-indicator {
+  background: var(--violet);
+  box-shadow: 0 0 12px rgba(155,93,229,0.5);
+}
+
+.booking-console-footer {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+
 /* ── Social card (ConnectSection) ────────────────────────────────── */
 .social-card {
   display: flex; flex-direction: column; align-items: center;
@@ -994,7 +1063,7 @@ body {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  font-size: 24px;
+  font-size: 11px;
   line-height: 1;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.3),
@@ -1036,6 +1105,12 @@ body {
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.36),
     0 0 0 1px rgba(0,0,0,0.12);
+  font-family: 'Conthrax', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(255,255,255,0.92);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
 }
 
 .social-knob-indicator {
@@ -1494,7 +1569,7 @@ body {
 
   .social-knob-cap {
     inset: 14px;
-    font-size: 21px;
+    font-size: 9px;
   }
 
   .social-knob-indicator {

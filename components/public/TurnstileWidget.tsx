@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useId, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import Script from 'next/script'
 
 declare global {
@@ -28,8 +28,10 @@ interface TurnstileWidgetProps {
 
 export default function TurnstileWidget({ siteKey, onToken }: TurnstileWidgetProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const widgetIdRef = useRef<string | null>(null)
-  const domId = useId().replace(/:/g, '')
+  const widgetIdRef  = useRef<string | null>(null)
+  // Keep callback ref in sync without triggering remounts
+  const onTokenRef   = useRef(onToken)
+  onTokenRef.current = onToken
 
   useEffect(() => {
     function renderWidget() {
@@ -38,9 +40,9 @@ export default function TurnstileWidget({ siteKey, onToken }: TurnstileWidgetPro
       widgetIdRef.current = window.turnstile.render(containerRef.current, {
         sitekey: siteKey,
         theme: 'dark',
-        callback: (token) => onToken(token),
-        'expired-callback': () => onToken(''),
-        'error-callback': () => onToken(''),
+        callback:           (token) => onTokenRef.current(token),
+        'expired-callback': ()      => onTokenRef.current(''),
+        'error-callback':   ()      => onTokenRef.current(''),
       })
     }
 
@@ -54,7 +56,7 @@ export default function TurnstileWidget({ siteKey, onToken }: TurnstileWidgetPro
       }
       widgetIdRef.current = null
     }
-  }, [onToken, siteKey])
+  }, [siteKey]) // onToken intentionally omitted — handled via ref above
 
   return (
     <>
@@ -62,7 +64,7 @@ export default function TurnstileWidget({ siteKey, onToken }: TurnstileWidgetPro
         src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
         strategy="afterInteractive"
       />
-      <div id={domId} ref={containerRef} />
+      <div ref={containerRef} />
     </>
   )
 }

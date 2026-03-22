@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
-import { SELECTED_WORK, PORTFOLIO_HIGHLIGHTS } from '@/lib/portfolio-data'
+import { PORTFOLIO_HIGHLIGHTS } from '@/lib/portfolio-data'
 import { getPublishedMixes } from '@/lib/db/mixes'
 import { getUpcomingEvents } from '@/lib/db/events'
 import { getContentMap } from '@/lib/db/content'
+import BuiltSection from '@/components/public/BuiltSection'
 
 export const metadata: Metadata = {
   title: 'Portfolio — DJ B.A.E.',
-  description: 'Selected work, system highlights, and a portfolio view of DJ B.A.E. built to showcase execution beyond the public-facing homepage.',
+  description: 'This site was designed and built from scratch — no templates, no builders. A full-stack booking platform, content system, and brand presence.',
 }
 
 const CONTENT_KEYS = ['about_quote', 'booking_email'] as const
@@ -36,165 +36,68 @@ export default async function PortfolioPage() {
     getUpcomingEvents(24),
   ])
 
-  const about = content.about_quote ?? 'Chicago-based DJ, curator, and experience architect.'
   const bookingEmail = content.booking_email ?? 'Booking available on request.'
 
   return (
     <div style={{ background: 'var(--black)', minHeight: '100vh', paddingTop: '68px' }}>
       <div className="section-container" style={{ display: 'grid', gap: '36px', paddingTop: 0 }}>
-        <section
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(300px, 100%), 1fr))',
-            gap: '28px',
-            alignItems: 'start',
-          }}
-        >
-          <div>
-            <div className="hardware-heading">
-              <span className="section-label">Portfolio</span>
-            </div>
-            <h1
-              style={{
-                fontFamily: 'Conthrax, sans-serif',
-                fontSize: 'clamp(34px, 5.2vw, 64px)',
-                lineHeight: 0.95,
-                color: 'var(--white)',
-                margin: '0 0 18px',
-                maxWidth: '7.2ch',
-              }}
-            >
-              Work,
-              <br />
-              <span className="hardware-title-accent">Systems,</span>
-              <br />
-              Process.
-            </h1>
-            <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px' }}>
-              This route exists to show the deeper work behind the public site: selected event work, booking flow thinking, content systems, and the product decisions that make the brand usable.
-            </p>
-          </div>
 
-          <div
-            className="build-console-copy"
+        {/* Page header — clear purpose statement */}
+        <section>
+          <div className="hardware-heading">
+            <span className="section-label">Portfolio</span>
+          </div>
+          <h1
             style={{
-              background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(18,18,22,0.96))',
-              padding: '18px',
-              display: 'grid',
-              gap: '16px',
-              alignSelf: 'stretch',
-              maxWidth: '560px',
-              width: '100%',
-              justifySelf: 'end',
+              fontFamily: 'Conthrax, sans-serif',
+              fontSize: 'clamp(34px, 5.2vw, 64px)',
+              lineHeight: 0.95,
+              color: 'var(--white)',
+              margin: '0 0 24px',
             }}
           >
-            <div style={{ position: 'relative', minHeight: '160px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)' }}>
-              <Image
-                src="/photos/IMG_1120.JPG.jpeg"
-                alt="DJ B.A.E. portfolio image"
-                fill
-                sizes="(max-width: 900px) 100vw, 560px"
-                style={{ objectFit: 'cover', objectPosition: 'center 22%' }}
-              />
-              <div
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  inset: 0,
-                  background: 'linear-gradient(180deg, rgba(8,8,8,0.08), rgba(8,8,8,0.22) 48%, rgba(8,8,8,0.64) 100%)',
-                }}
-              />
-            </div>
-            <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--gold)' }}>
-              Portfolio Summary
-            </div>
-            <div style={{ fontSize: '14px', color: 'var(--white)', lineHeight: 1.75 }}>
-              {about}
-            </div>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between' }}>
-              <Link href="/admin-demo" className="btn-ghost">
-                View Admin Demo
-              </Link>
-              <div style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.7 }}>
-                Contact: {bookingEmail}
-              </div>
-            </div>
+            Built from<br />
+            <span className="hardware-title-accent">Scratch.</span>
+          </h1>
+          <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '8px' }}>
+            This is not a template or a hosted service. The Bae Agenda is a custom-designed,
+            full-stack web platform built to handle real bookings, content management, and
+            brand presence — all in one system.
+          </p>
+          <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '20px' }}>
+            If you are looking for something like this built for your brand or project,
+            that work is available.
+          </p>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <Link href="/admin-demo" className="btn-ghost">View Admin Demo</Link>
+            {bookingEmail && (
+              <a href={`mailto:${bookingEmail}`} className="btn-ghost">Get in Touch</a>
+            )}
           </div>
         </section>
 
-        <section style={{ display: 'grid', gap: '18px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
-            <h2 className="section-heading" style={{ marginBottom: 0 }}>Selected <span className="hardware-title-accent">Work</span></h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(260px, 100%), 1fr))', gap: '18px' }}>
-            {SELECTED_WORK.map((item) => (
-              <article
-                key={item.id}
-                className="build-console-module card-hover"
-                style={{
-                  padding: '22px',
-                  display: 'grid',
-                  gap: '14px',
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--violet)', marginBottom: '10px' }}>
-                    {item.category}
-                  </div>
-                  <h3 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '18px', color: 'var(--white)', lineHeight: 1.25, margin: 0 }}>
-                    {item.title}
-                  </h3>
-                </div>
-                <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
-                  {item.year}
-                </div>
-                <p style={{ fontSize: '13px', color: 'var(--white)', lineHeight: 1.7, margin: 0 }}>
-                  {item.summary}
-                </p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {item.highlights.map((highlight) => (
-                    <span
-                      key={highlight}
-                      style={{
-                        fontSize: '10px',
-                        color: 'var(--muted)',
-                        border: '1px solid var(--border)',
-                        padding: '6px 9px',
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      {highlight}
-                    </span>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
+        {/* Live system stats */}
         <section
           className="build-console-module-grid"
-          style={{
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '16px',
-          }}
+          style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}
         >
-          {statCard('Published Mixes', String(mixes.length), 'Pulled from the live site catalog.')}
-          {statCard('Upcoming Events', String(events.length), 'Public-facing calendar entries currently live.')}
-          {statCard('Selected Work', String(SELECTED_WORK.length), 'Editable portfolio showcase items for presentations and reviews.')}
-          {statCard('System Layers', '4', 'Brand site, admin demo, press kit surface, and booking workflow.')}
+          {statCard('Published Mixes', String(mixes.length), 'Live in the catalog. Managed through the admin.')}
+          {statCard('Upcoming Events', String(events.length), 'Public calendar entries — live data on every load.')}
+          {statCard('System Layers', '4', 'Public site, admin panel, press kit, and booking flow.')}
+          {statCard('Templates Used', '0', 'Every page, component, and layout is custom.')}
         </section>
 
+        {/* Feature highlights */}
         <section
           className="build-console-mixer"
-          style={{
-            padding: '26px',
-            display: 'grid',
-            gap: '16px',
-          }}
+          style={{ padding: '26px', display: 'grid', gap: '16px' }}
         >
-          <div style={{ fontSize: '10px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--gold)' }}>
-            Product Highlights
+          <div className="build-console-fx-header">
+            <span>What Was Built</span>
+            <div className="build-console-mini-chips">
+              <span>Full-Stack</span>
+              <span>Custom</span>
+            </div>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
             {PORTFOLIO_HIGHLIGHTS.map((item) => (
@@ -206,7 +109,11 @@ export default async function PortfolioPage() {
             ))}
           </div>
         </section>
+
       </div>
+
+      {/* Full tech stack breakdown */}
+      <BuiltSection aboutQuote={content.about_quote} />
     </div>
   )
 }
