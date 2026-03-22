@@ -173,7 +173,7 @@ export default async function MixesSection() {
                     key={mix.id}
                     genre={mix.genre ?? 'Open Format'}
                     title={mix.title}
-                    href={SOUNDCLOUD_PROFILE_URL}
+                    href={mix.embed_url ?? SOUNDCLOUD_PROFILE_URL}
                     dataGenre={dg}
                     durationMin={durationMin}
                     year={year}

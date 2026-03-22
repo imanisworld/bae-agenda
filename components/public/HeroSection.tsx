@@ -86,14 +86,13 @@ export default function HeroSection({ content = {} }: Props) {
       {/* ── Top bar ──────────────────────────────────────── */}
       <div className="hero-topbar">
         {/* Left — eyebrow + headline */}
-        <div style={{ display: 'grid', gap: '18px' }}>
+        <div style={{ display: 'grid', gap: '10px' }}>
           <p style={{
             fontFamily:    'DM Sans, sans-serif',
             fontSize:      'clamp(9px, 2.4vw, 11px)',
             letterSpacing: 'clamp(0.12em, 1.8vw, 0.28em)',
             textTransform: 'uppercase',
             color:         'var(--eyebrow)',
-            marginBottom:  '22px',
           }}>
             Chicago · DJ · Curator · <span style={{whiteSpace:'nowrap'}}>Experience Architect</span>
           </p>
@@ -129,6 +128,7 @@ export default function HeroSection({ content = {} }: Props) {
             color:         'rgba(250,248,243,0.88)',
             letterSpacing: '0.01em',
             whiteSpace:    'nowrap',
+            marginTop:     '14px',
           }}>
             {today}
           </div>

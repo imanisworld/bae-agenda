@@ -277,7 +277,7 @@ export default function MeetPage() {
         <section
           style={{
             borderTop: '1px solid var(--border)',
-            padding: '32px 0 12px',
+            padding: '40px 0 64px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
