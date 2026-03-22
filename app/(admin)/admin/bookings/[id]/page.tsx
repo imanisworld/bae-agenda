@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import Badge from '@/components/admin/Badge'
+import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import { createClient } from '@/lib/supabase/server'
 import { updateBookingDetailsAction } from '@/app/actions/bookings'
 import type { BookingStatus } from '@/types/index'
@@ -47,6 +48,13 @@ function toDateTimeLocal(iso: string): string {
   return new Date(d.getTime() - offsetMs).toISOString().slice(0, 16)
 }
 
+function formatCurrency(value: number | null): string {
+  return (value ?? 0).toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD',
+  })
+}
+
 async function getBooking(id: string): Promise<BookingDetailRow | null> {
   const supabase = await createClient()
   const { data } = await supabase
@@ -85,6 +93,9 @@ export default async function EditBookingPage({
   const clientName = booking.clients
     ? `${booking.clients.first_name ?? ''} ${booking.clients.last_name ?? ''}`.trim()
     : ''
+  const total = booking.quote ?? 0
+  const deposit = booking.deposit_amount ?? 0
+  const balance = total - deposit
 
   return (
     <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
@@ -103,10 +114,57 @@ export default async function EditBookingPage({
         </div>
       </div>
 
-      <div style={{ marginBottom: '16px' }}>
-        <Link href={`/admin/bookings/${booking.id}/invoice`} className="admin-btn-primary">
-          Generate Invoice →
-        </Link>
+      <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ maxWidth: '520px' }}>
+            <div className="admin-section-title" style={{ marginBottom: '10px' }}>Invoice</div>
+            <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
+              Preview the client invoice, download the PDF, and keep the quote, deposit, and balance in sync with this booking.
+            </p>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <Link href={`/admin/bookings/${booking.id}/invoice`} className="admin-btn-primary">
+              Preview Invoice →
+            </Link>
+            <SendInvoiceButton
+              bookingId={booking.id}
+              clientEmail={booking.clients?.email}
+            />
+            <a href={`/api/invoice/${booking.id}`} className="admin-btn-ghost">
+              Download PDF
+            </a>
+          </div>
+        </div>
+
+        <div style={{
+          marginTop: '20px',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '12px',
+        }}>
+          {[
+            { label: 'Quote', value: formatCurrency(total) },
+            { label: 'Deposit', value: formatCurrency(deposit) },
+            { label: 'Balance Due', value: formatCurrency(balance) },
+          ].map((item) => (
+            <div
+              key={item.label}
+              style={{
+                border: '1px solid var(--border)',
+                background: 'var(--bg-sunken)',
+                padding: '14px 16px',
+              }}
+            >
+              <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
+                {item.label}
+              </div>
+              <div style={{ color: item.label === 'Balance Due' ? 'var(--violet)' : 'var(--white)', fontSize: '18px', fontFamily: 'Conthrax, sans-serif' }}>
+                {item.value}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       <form action={updateBookingDetailsAction} className="admin-section" style={{ padding: '24px' }}>

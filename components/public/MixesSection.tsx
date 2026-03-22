@@ -151,7 +151,7 @@ export default async function MixesSection() {
               </span>
             </div>
             <h2 className="section-heading" style={{ marginBottom: 0 }}>
-              Recent Sets
+              {hasLiveData ? 'Recent Sets' : 'Coming Soon'}
             </h2>
           </div>
           <Link href="/mixes" className="view-all-link" style={{ marginBottom: '10px' }}>

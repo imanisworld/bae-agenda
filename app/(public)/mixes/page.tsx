@@ -31,6 +31,7 @@ function accentForIndex(i: number): string {
 
 export default async function MixesPage() {
   const mixes = await getPublishedMixes(60)
+  const hasMixes = mixes.length > 0
 
   return (
     <div
@@ -223,13 +224,77 @@ export default async function MixesPage() {
           </article>
         </section>
 
-        {mixes.length === 0 ? (
-          <div style={{ padding: '64px 0', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
-            <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7 }}>
-              No published mixes yet.
-              <br />
-              Check back soon or listen on SoundCloud.
-            </p>
+        {!hasMixes ? (
+          <div
+            style={{
+              padding: '48px 0 64px',
+              borderTop: '1px solid var(--border)',
+              borderBottom: '1px solid var(--border)',
+            }}
+          >
+            <div
+              style={{
+                border: '1px solid var(--border)',
+                background: 'linear-gradient(180deg, rgba(155,93,229,0.09), rgba(255,255,255,0.01))',
+                padding: '32px clamp(20px, 4vw, 40px)',
+                display: 'grid',
+                gap: '20px',
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    fontFamily: 'Conthrax, sans-serif',
+                    fontSize: 'clamp(20px, 3vw, 32px)',
+                    color: 'rgba(250,248,243,0.18)',
+                    letterSpacing: '0.08em',
+                    marginBottom: '12px',
+                  }}
+                >
+                  Coming Soon
+                </div>
+                <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '680px', margin: 0 }}>
+                  Fresh sets are being queued up now. Until the published catalog goes live here, tap into SoundCloud and YouTube for the current mix stream.
+                </p>
+              </div>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))',
+                  gap: '12px',
+                }}
+              >
+                {[
+                  'New sets will land here as soon as they are published from the admin.',
+                  'Platform links stay live so listeners can still jump straight into the music.',
+                  'Booking stays one tap away for clients who want the sound, not just the stream.',
+                ].map((point) => (
+                  <div
+                    key={point}
+                    style={{
+                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'rgba(8,8,8,0.28)',
+                      padding: '16px',
+                      fontSize: '12px',
+                      color: 'var(--white)',
+                      lineHeight: 1.7,
+                    }}
+                  >
+                    {point}
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+                <a href={SOUNDCLOUD_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-primary">
+                  Follow On SoundCloud
+                </a>
+                <a href={YOUTUBE_PLAYLIST_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost">
+                  Open YouTube Playlist
+                </a>
+              </div>
+            </div>
           </div>
         ) : (
           <div

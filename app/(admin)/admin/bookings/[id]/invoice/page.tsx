@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import PageHeader from '@/components/admin/PageHeader'
+import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -225,10 +226,16 @@ export default async function InvoicePage({
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+        <SendInvoiceButton
+          bookingId={id}
+          clientEmail={client?.email}
+          className="admin-btn-primary"
+          label="Send Invoice Email"
+        />
         <a
           href={`/api/invoice/${id}`}
           download
-          className="admin-btn-primary"
+          className="admin-btn-ghost"
         >
           Download PDF
         </a>

@@ -13,6 +13,16 @@ type BookingNotificationPayload = {
   notes?: string | null
 }
 
+type InvoiceNotificationPayload = {
+  to: string
+  clientName: string
+  eventName: string
+  invoiceNumber: string
+  balanceDue: string
+  pdfBase64: string
+  pdfFilename: string
+}
+
 const OWNER_ALERT_EMAIL = process.env.BOOKING_ALERT_EMAIL ?? 'baebookings@proton.me'
 const OWNER_ALERT_PHONE = normalizeUsPhone(process.env.BOOKING_ALERT_PHONE ?? '7087522820')
 
@@ -65,6 +75,10 @@ async function sendEmail(args: {
   text: string
   html: string
   replyTo?: string
+  attachments?: Array<{
+    filename: string
+    content: string
+  }>
 }): Promise<NotificationResult> {
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.BOOKING_FROM_EMAIL
@@ -87,6 +101,7 @@ async function sendEmail(args: {
         text: args.text,
         html: args.html,
         reply_to: args.replyTo,
+        attachments: args.attachments,
       }),
     })
 
@@ -215,5 +230,43 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
     if (!result.value.ok) {
       console.error(`[booking-notification:${index}]`, result.value.reason, result.value.detail ?? '')
     }
+  })
+}
+
+export async function sendInvoiceNotification(payload: InvoiceNotificationPayload) {
+  const greetingName = payload.clientName.trim() || 'there'
+
+  return sendEmail({
+    to: payload.to,
+    subject: `Invoice from DJ B.A.E. for ${payload.eventName}`,
+    text: [
+      `Hi ${greetingName},`,
+      '',
+      `Your invoice for ${payload.eventName} is attached.`,
+      `Invoice #: ${payload.invoiceNumber}`,
+      `Balance due: ${payload.balanceDue}`,
+      '',
+      'If you have any questions, just reply to this email.',
+      '',
+      'DJ B.A.E. Bookings',
+    ].join('\n'),
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
+        <p>Hi ${greetingName},</p>
+        <p>Your invoice for <strong>${payload.eventName}</strong> is attached.</p>
+        <p>
+          <strong>Invoice #:</strong> ${payload.invoiceNumber}<br />
+          <strong>Balance due:</strong> ${payload.balanceDue}
+        </p>
+        <p>If you have any questions, just reply to this email.</p>
+        <p>DJ B.A.E. Bookings</p>
+      </div>
+    `,
+    attachments: [
+      {
+        filename: payload.pdfFilename,
+        content: payload.pdfBase64,
+      },
+    ],
   })
 }
