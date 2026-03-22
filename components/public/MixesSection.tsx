@@ -147,16 +147,18 @@ export default async function MixesSection() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
               <span style={{ width: '22px', height: '1px', background: 'var(--violet)', display: 'block', flexShrink: 0 }} />
               <span style={{ fontSize: '10px', letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                Featured Mixes
+                {hasLiveData ? 'Featured Mixes' : 'Coming Soon'}
               </span>
             </div>
             <h2 className="section-heading" style={{ marginBottom: 0 }}>
               {hasLiveData ? 'Recent Sets' : 'Coming Soon'}
             </h2>
           </div>
-          <Link href="/mixes" className="view-all-link" style={{ marginBottom: '10px' }}>
-            View All Mixes →
-          </Link>
+          {hasLiveData ? (
+            <Link href="/mixes" className="view-all-link" style={{ marginBottom: '10px' }}>
+              View All Mixes →
+            </Link>
+          ) : null}
         </div>
 
         <div aria-hidden="true" style={{ height: '1px', background: 'var(--border)', margin: '32px 0 48px' }} />
