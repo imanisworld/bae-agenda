@@ -41,8 +41,10 @@ export default function Nav() {
           position:    'fixed',
           top: 0, left: 0, right: 0,
           zIndex:      100,
-          background:  scrolled || menuOpen || forceSolidNav ? 'rgba(8,8,8,0.95)' : 'transparent',
-          backdropFilter: scrolled || menuOpen || forceSolidNav ? 'blur(14px)' : 'none',
+          background:  scrolled || menuOpen || forceSolidNav
+            ? 'rgba(8,8,8,0.95)'
+            : 'linear-gradient(180deg, rgba(8,8,10,0.82) 0%, rgba(8,8,10,0.0) 100%)',
+          backdropFilter: scrolled || menuOpen || forceSolidNav ? 'blur(14px)' : 'blur(4px)',
           borderBottom: scrolled || menuOpen || forceSolidNav ? '1px solid var(--border)' : '1px solid transparent',
           transition: `background var(--motion-medium) var(--ease-standard),
                        border-color var(--motion-medium) var(--ease-standard)`,

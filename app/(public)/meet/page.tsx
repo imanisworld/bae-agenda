@@ -195,13 +195,41 @@ export default function MeetPage() {
                   overflow: 'hidden',
                 }}
               >
+                {/* Fallback — visible if iframe fails to load */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '16px',
+                  background: 'linear-gradient(180deg, rgba(8,8,10,0.96), rgba(14,14,18,0.98))',
+                }}>
+                  <div style={{
+                    fontSize: '10px',
+                    letterSpacing: '0.28em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(250,248,243,0.38)',
+                  }}>
+                    Live Sets
+                  </div>
+                  <a
+                    href="https://www.youtube.com/channel/UCjEiMW5l_Go9vSHudx5VPEw"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-ghost"
+                  >
+                    Watch on YouTube →
+                  </a>
+                </div>
                 <iframe
                   title="DJ B.A.E. live set reel"
                   src={LIVE_SET_EMBED_SRC}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   referrerPolicy="strict-origin-when-cross-origin"
                   allowFullScreen
-                  style={{ display: 'block', width: '100%', height: '100%', minHeight: '360px', border: 0 }}
+                  style={{ display: 'block', position: 'relative', zIndex: 1, width: '100%', height: '100%', minHeight: '360px', border: 0 }}
                 />
               </div>
             </div>
