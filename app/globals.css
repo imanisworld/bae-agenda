@@ -369,7 +369,7 @@ body {
 .hero-deck-stage-wrap {
   padding: 16px clamp(32px, 5vw, 72px) 40px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   /* overflow-x clips the right edge on narrow viewports without cutting top of vinyl */
   overflow-x: clip;
   overflow-y: visible;

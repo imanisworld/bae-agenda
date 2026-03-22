@@ -148,7 +148,7 @@ export default function HeroSection({ content = {} }: Props) {
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'flex-end',
+              justifyContent: 'flex-start',
               width: '100%',
               minHeight: '188px',
             }}
