@@ -123,7 +123,7 @@ function MixCard({
 
 export default async function MixesSection() {
   const mixes       = await getFeaturedMixes(3)
-  const hasLiveData = mixes.length > 0
+  const hasLiveData = false // flip to: mixes.length > 0  when real sets are ready
 
   return (
     <section
