@@ -142,8 +142,8 @@ export default async function PortfolioPage() {
                   flexDirection: 'column',
                   overflow: 'hidden',
                 }}>
-                  {/* Photo or styled placeholder */}
-                  {entry.photo_url ? (
+                  {/* Photo only — no placeholder when missing */}
+                  {entry.photo_url && (
                     <div style={{ position: 'relative', aspectRatio: '3/2', flexShrink: 0 }}>
                       <Image
                         src={entry.photo_url}
@@ -152,24 +152,6 @@ export default async function PortfolioPage() {
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         style={{ objectFit: 'cover' }}
                       />
-                    </div>
-                  ) : (
-                    <div style={{
-                      aspectRatio: '3/2',
-                      background: 'linear-gradient(135deg, rgba(155,93,229,0.12) 0%, rgba(8,8,10,1) 70%)',
-                      display: 'flex',
-                      alignItems: 'flex-end',
-                      padding: '20px',
-                      flexShrink: 0,
-                    }}>
-                      <span style={{
-                        fontFamily: 'Conthrax, sans-serif',
-                        fontSize: 'clamp(16px, 2.5vw, 22px)',
-                        color: 'rgba(250,248,243,0.18)',
-                        lineHeight: 1.1,
-                      }}>
-                        {entry.event_name}
-                      </span>
                     </div>
                   )}
 

@@ -180,17 +180,37 @@ export default async function MixesSection() {
                   />
                 )
               })
-            : PLACEHOLDER_MIXES.map((mix) => (
-                <MixCard
-                  key={mix.id}
-                  genre={mix.genre}
-                  title={mix.title}
-                  href={mix.href}
-                  dataGenre={mix.dataGenre}
-                  durationMin={mix.durationMin}
-                  year={mix.year}
-                />
-              ))}
+            : (
+              <div style={{
+                gridColumn: '1 / -1',
+                padding: '64px 24px',
+                textAlign: 'center',
+                border: '1px solid var(--border)',
+                background: 'var(--bg-sunken)',
+              }}>
+                <div style={{
+                  fontFamily: 'Conthrax, sans-serif',
+                  fontSize: 'clamp(18px, 3vw, 28px)',
+                  color: 'rgba(250,248,243,0.18)',
+                  letterSpacing: '0.08em',
+                  marginBottom: '12px',
+                }}>
+                  Coming Soon
+                </div>
+                <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '20px' }}>
+                  New sets dropping on SoundCloud.
+                </p>
+                <a
+                  href={SOUNDCLOUD_PROFILE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-ghost"
+                  style={{ fontSize: '12px' }}
+                >
+                  Follow on SoundCloud →
+                </a>
+              </div>
+            )}
         </div>
 
       </div>
