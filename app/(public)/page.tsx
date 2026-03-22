@@ -11,13 +11,14 @@
  *   BookingSection       — packages + booking CTA (reads booking_email)
  *   ConnectSection       — social links / "stay connected" (reads social URLs)
  */
-import HeroSection           from '@/components/public/HeroSection'
-import MixesSection          from '@/components/public/MixesSection'
-import EventsSection         from '@/components/public/EventsSection'
-import SelectedWorkSection   from '@/components/public/SelectedWorkSection'
-import BookingSection        from '@/components/public/BookingSection'
-import ConnectSection        from '@/components/public/ConnectSection'
-import { getContentMap }     from '@/lib/db/content'
+import HeroSection              from '@/components/public/HeroSection'
+import MixesSection             from '@/components/public/MixesSection'
+import EventsSection            from '@/components/public/EventsSection'
+import SelectedWorkSection      from '@/components/public/SelectedWorkSection'
+import PortfolioTeaserSection   from '@/components/public/PortfolioTeaserSection'
+import BookingSection           from '@/components/public/BookingSection'
+import ConnectSection           from '@/components/public/ConnectSection'
+import { getContentMap }        from '@/lib/db/content'
 
 // All keys needed on the homepage — fetched in a single Supabase query.
 const HOME_CONTENT_KEYS = [
@@ -45,6 +46,7 @@ export default async function HomePage() {
       <MixesSection />
       <EventsSection />
       <SelectedWorkSection />
+      <PortfolioTeaserSection />
       <BookingSection
         bookingEmail={content.booking_email}
       />

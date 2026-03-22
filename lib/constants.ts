@@ -21,6 +21,7 @@ export const ADMIN_NAV = [
   { label: 'Bookings',  href: '/admin/bookings',  icon: '📋' },
   { label: 'Events',    href: '/admin/events',    icon: '📅' },
   { label: 'Mixes',     href: '/admin/mixes',     icon: '🎚️' },
+  { label: 'Portfolio', href: '/admin/portfolio', icon: '🎤' },
   { label: 'Clients',   href: '/admin/clients',   icon: '👤' },
   { label: 'Payments',  href: '/admin/payments',  icon: '💰' },
   { label: 'Content',   href: '/admin/content',   icon: '✏️' },

@@ -1,0 +1,164 @@
+import { notFound } from 'next/navigation'
+import Link from 'next/link'
+import PageHeader from '@/components/admin/PageHeader'
+import { createClient } from '@/lib/supabase/server'
+import { deletePortfolioEntryAction, updatePortfolioEntryAction } from '@/app/actions/portfolio'
+
+interface PortfolioEntry {
+  id:         string
+  event_name: string
+  venue:      string | null
+  city:       string
+  year:       number
+  date:       string | null
+  tags:       string[]
+  photo_url:  string | null
+  featured:   boolean
+  notes:      string | null
+}
+
+function inputStyle(): React.CSSProperties {
+  return {
+    width: '100%',
+    background: 'var(--off-black)',
+    border: '1px solid var(--border)',
+    color: 'var(--white)',
+    padding: '11px 13px',
+    fontSize: '13px',
+    fontFamily: 'DM Sans, sans-serif',
+  }
+}
+
+async function getEntry(id: string): Promise<PortfolioEntry | null> {
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('portfolio_entries')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle()
+  return (data as PortfolioEntry | null) ?? null
+}
+
+export default async function EditPortfolioEntryPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const { id } = await params
+  const entry = await getEntry(id)
+  if (!entry) notFound()
+
+  return (
+    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+      <PageHeader
+        title="Edit Entry"
+        subtitle="Update gig details, tags, and featured status."
+        action={{ label: 'Back To Portfolio', href: '/admin/portfolio' }}
+      />
+
+      <form
+        action={updatePortfolioEntryAction}
+        className="admin-section"
+        style={{ padding: '24px', marginBottom: '16px' }}
+      >
+        <input type="hidden" name="id" value={entry.id} />
+        <div style={{ display: 'grid', gap: '16px' }}>
+
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Event Name *</span>
+            <input name="event_name" required defaultValue={entry.event_name} style={inputStyle()} />
+          </label>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Year *</span>
+              <input
+                name="year"
+                type="number"
+                required
+                min="2000"
+                max="2100"
+                defaultValue={entry.year}
+                style={inputStyle()}
+              />
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Date</span>
+              <input
+                name="date"
+                type="date"
+                defaultValue={entry.date ?? ''}
+                style={inputStyle()}
+              />
+            </label>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Venue</span>
+              <input name="venue" defaultValue={entry.venue ?? ''} style={inputStyle()} />
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">City *</span>
+              <input name="city" required defaultValue={entry.city} style={inputStyle()} />
+            </label>
+          </div>
+
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Tags (comma-separated)</span>
+            <input
+              name="tags"
+              defaultValue={(entry.tags ?? []).join(', ')}
+              style={inputStyle()}
+            />
+          </label>
+
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Photo URL</span>
+            <input
+              name="photo_url"
+              type="url"
+              defaultValue={entry.photo_url ?? ''}
+              style={inputStyle()}
+            />
+          </label>
+
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Notes</span>
+            <textarea
+              name="notes"
+              rows={3}
+              defaultValue={entry.notes ?? ''}
+              style={inputStyle()}
+            />
+          </label>
+
+          <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+            <input type="checkbox" name="featured" defaultChecked={entry.featured} />
+            Featured (shown in highlights grid)
+          </label>
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+            <button type="submit" className="admin-btn-primary">
+              Save Changes
+            </button>
+            <Link href="/admin/portfolio" className="admin-btn-ghost">
+              Cancel
+            </Link>
+          </div>
+        </div>
+      </form>
+
+      <form action={deletePortfolioEntryAction}>
+        <input type="hidden" name="id" value={entry.id} />
+        <button
+          type="submit"
+          className="admin-btn-ghost"
+          style={{ color: '#e85d75', borderColor: 'rgba(232,93,117,0.35)' }}
+        >
+          Delete Entry
+        </button>
+      </form>
+    </div>
+  )
+}
