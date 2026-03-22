@@ -144,9 +144,6 @@ export default function MeetPage() {
               <Link href="/press-kit" className="btn-ghost">
                 Open Press Kit
               </Link>
-              <Link href="/mixes" className="btn-ghost">
-                Listen To Mixes
-              </Link>
             </div>
           </div>
         </section>
