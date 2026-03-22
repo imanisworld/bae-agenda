@@ -5,7 +5,27 @@ import PageHeader from '@/components/admin/PageHeader'
 
 export const dynamic = 'force-dynamic'
 
-async function getBooking(id: string) {
+interface BookingRow {
+  id:             string
+  event_name:     string | null
+  event_type:     string | null
+  event_date:     string | null
+  venue:          string | null
+  city:           string | null
+  package:        string | null
+  hours:          number | null
+  quote:          number | null
+  deposit_amount: number | null
+  notes:          string | null
+  clients: {
+    first_name: string | null
+    last_name:  string | null
+    email:      string | null
+    phone:      string | null
+  } | null
+}
+
+async function getBooking(id: string): Promise<BookingRow | null> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('bookings')
@@ -16,7 +36,7 @@ async function getBooking(id: string) {
     `)
     .eq('id', id)
     .maybeSingle()
-  return data
+  return (data as BookingRow | null) ?? null
 }
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
