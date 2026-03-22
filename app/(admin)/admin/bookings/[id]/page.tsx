@@ -103,6 +103,12 @@ export default async function EditBookingPage({
         </div>
       </div>
 
+      <div style={{ marginBottom: '16px' }}>
+        <Link href={`/admin/bookings/${booking.id}/invoice`} className="admin-btn-primary">
+          Generate Invoice →
+        </Link>
+      </div>
+
       <form action={updateBookingDetailsAction} className="admin-section" style={{ padding: '24px' }}>
         <input type="hidden" name="id" value={booking.id} />
         <div style={{ display: 'grid', gap: '16px' }}>
