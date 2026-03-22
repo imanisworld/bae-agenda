@@ -1,6 +1,9 @@
 /**
  * CONNECT SECTION — Server Component
- * Compact social bar shown at the bottom of every page.
+ * "Stay Connected" — social links as a patch-bay / signal-routing panel.
+ * Each social is a labeled jack output.
+ *
+ * Accepts optional CMS overrides for instagram_url, soundcloud_url, youtube_url.
  */
 import { SOCIALS } from '@/lib/constants'
 
@@ -14,6 +17,7 @@ interface Props {
   socialOverrides?: SocialOverrides
 }
 
+/** Map from SOCIALS label → CMS key */
 const CMS_OVERRIDE_MAP: Record<string, keyof SocialOverrides> = {
   Instagram:  'instagram_url',
   SoundCloud: 'soundcloud_url',
@@ -34,55 +38,54 @@ export default function ConnectSection({ socialOverrides = {} }: Props) {
       style={{
         background: 'var(--off-black)',
         borderTop: '1px solid var(--border)',
-        padding: '28px clamp(24px, 5vw, 72px)',
+        scrollMarginTop: '96px',
       }}
     >
-      <div style={{
-        maxWidth: '1280px',
-        margin: '0 auto',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '24px',
-        flexWrap: 'wrap',
-      }}>
-        <span style={{
-          fontSize: '9px',
-          letterSpacing: '0.28em',
-          textTransform: 'uppercase',
-          color: 'var(--muted)',
-          flexShrink: 0,
-        }}>
-          Connect
-        </span>
+      <div className="section-container" style={{ textAlign: 'center' }}>
 
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', flex: 1 }}>
-          {socials.map(({ label, url, icon }) => (
-            <a
-              key={label}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`DJ B.A.E. on ${label}`}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '11px',
-                color: 'var(--muted)',
-                textDecoration: 'none',
-                padding: '6px 12px',
-                border: '1px solid var(--border)',
-                borderRadius: '100px',
-                transition: 'color 200ms ease, border-color 200ms ease',
-                whiteSpace: 'nowrap',
-              }}
-              className="connect-pill"
-            >
-              <span style={{ fontSize: '13px' }}>{icon}</span>
-              {label}
-            </a>
-          ))}
+        <div className="hardware-heading" style={{ justifyContent: 'center' }}>
+          <span className="section-label">Socials</span>
         </div>
+        <h2 className="section-heading">Stay Connected</h2>
+
+        <p style={{
+          fontSize: '14px', color: 'var(--muted)', lineHeight: 1.7,
+          maxWidth: '480px', margin: '0 auto 48px',
+        }}>
+          Follow for mixes, event announcements, and behind the scenes.
+        </p>
+
+        {/* Patch-bay panel */}
+        <div className="patch-bay" style={{ maxWidth: '800px', margin: '0 auto' }}>
+          {/* Top rail */}
+          <div className="patch-bay-rail" aria-hidden="true" />
+
+          <div className="patch-bay-jacks">
+            {socials.map(({ label, url, icon }) => (
+              <a
+                key={label}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`DJ B.A.E. on ${label}`}
+                className="patch-jack"
+              >
+                {/* Jack port */}
+                <span className="patch-jack-port" aria-hidden="true">
+                  <span className="patch-jack-rim" />
+                  <span className="patch-jack-tip" />
+                </span>
+                {/* Cable stub */}
+                <span className="patch-jack-stub" aria-hidden="true" />
+                {/* Icon label */}
+                <span className="patch-jack-icon">{icon}</span>
+                {/* Platform name */}
+                <span className="patch-jack-name">{label}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
       </div>
     </section>
   )
