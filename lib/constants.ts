@@ -11,7 +11,6 @@ export const PUBLIC_NAV = [
   { label: 'Events',  href: '/#events'  },
   { label: 'Meet',    href: '/meet'     },
   { label: 'Portfolio', href: '/portfolio' },
-  { label: 'Built',   href: '/built'     },
   { label: 'Connect', href: '/#connect' },
   { label: 'Book',    href: '/book' },
 ] as const

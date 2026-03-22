@@ -67,13 +67,13 @@ export default async function BuiltPage() {
             <span style={{ color: 'var(--amber)' }}>Scratch.</span>
           </h1>
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '12px' }}>
-            This is not a template or a hosted service. The Bae Agenda is a custom-designed,
-            full-stack web platform built to handle real bookings, content management, and
-            brand presence — all in one system.
+            Designed, engineered, and deployed by <strong style={{ color: 'var(--white)' }}>DJ B.A.E.</strong> — not a template,
+            not a drag-and-drop builder. Every page, component, and flow was written by hand.
+            This is a custom full-stack platform handling real bookings, content management,
+            and brand presence in one system.
           </p>
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '20px' }}>
-            If you are looking for something like this built for your brand or project,
-            that work is available.
+            If you want something like this built for your brand or project, that work is available.
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             {bookingEmail && (
