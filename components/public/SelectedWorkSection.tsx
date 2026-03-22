@@ -47,7 +47,7 @@ export default function SelectedWorkSection() {
           <div className="build-console-topbar">
             <div className="build-console-screen">
               <div className="build-console-screen-label">Event Log</div>
-              <div className="build-console-screen-value">Selected Work / Live Events</div>
+              <div className="build-console-screen-value">Selected Work — Live Events</div>
               <div className="build-console-screen-lines">
                 {SELECTED_WORK.map(item => (
                   <span key={item.id}>

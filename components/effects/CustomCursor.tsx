@@ -92,7 +92,7 @@ export default function CustomCursor() {
         style={{
           position: 'fixed',
           left: 0, top: 0,
-          width: '7px', height: '7px',
+          width: '14px', height: '14px',
           background: 'var(--violet)',
           borderRadius: '50%',
           transform: 'translate(-50%, -50%) scale(1)',
@@ -101,7 +101,7 @@ export default function CustomCursor() {
           opacity: 0,
           willChange: 'left, top',
           transition: 'transform 200ms ease',
-          boxShadow: '0 0 8px rgba(155,93,229,0.7)',
+          boxShadow: '0 0 12px rgba(155,93,229,0.8)',
         }}
       />
       {/* Outer ring — lags behind for depth */}

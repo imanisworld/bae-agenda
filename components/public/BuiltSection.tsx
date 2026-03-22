@@ -77,7 +77,7 @@ export default function BuiltSection({ aboutQuote }: Props) {
 
             <div className="build-console-screen">
               <div className="build-console-screen-label">Signal Chain</div>
-              <div className="build-console-screen-value">Scratch Build / Live Stack</div>
+              <div className="build-console-screen-value">Scratch Build — Live Stack</div>
               <div className="build-console-screen-lines">
                 <div><strong>Framework</strong> Next.js 16</div>
                 <div><strong>Language</strong> TypeScript</div>
