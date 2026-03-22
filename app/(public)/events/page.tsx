@@ -179,6 +179,17 @@ export default async function EventsPage() {
                         {location}
                       </div>
                     )}
+                    {(event as { show_description?: boolean }).show_description && event.description && (
+                      <div style={{
+                        fontSize: '12px',
+                        color: 'var(--muted)',
+                        marginTop: '8px',
+                        lineHeight: 1.6,
+                        maxWidth: '520px',
+                      }}>
+                        {event.description}
+                      </div>
+                    )}
                   </div>
 
                   {/* Arrow */}

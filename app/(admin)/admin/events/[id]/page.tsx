@@ -13,6 +13,7 @@ interface EventRow {
   description: string | null
   public: boolean
   featured: boolean
+  show_description: boolean
 }
 
 function inputStyle(): React.CSSProperties {
@@ -38,7 +39,7 @@ async function getEvent(id: string): Promise<EventRow | null> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('events')
-    .select('id, title, event_date, venue, city, description, public, featured')
+    .select('id, title, event_date, venue, city, description, public, featured, show_description')
     .eq('id', id)
     .maybeSingle()
 
@@ -105,6 +106,10 @@ export default async function EditEventPage({
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
               <input type="checkbox" name="featured" defaultChecked={event.featured} />
               Featured On Homepage
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+              <input type="checkbox" name="show_description" defaultChecked={event.show_description} />
+              Show Description Publicly
             </label>
           </div>
 

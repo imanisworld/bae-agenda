@@ -47,6 +47,7 @@ export async function createEventAction(formData: FormData) {
     description: optionalString(formData.get('description')),
     public: formData.get('public') === 'on',
     featured: formData.get('featured') === 'on',
+    show_description: formData.get('show_description') === 'on',
   })
   if (error) {
     redirectWithError('/admin/events', error.message || 'Unable to create event.')
@@ -80,6 +81,7 @@ export async function updateEventAction(formData: FormData) {
       description: optionalString(formData.get('description')),
       public: formData.get('public') === 'on',
       featured: formData.get('featured') === 'on',
+      show_description: formData.get('show_description') === 'on',
     })
     .eq('id', id)
   if (error) {

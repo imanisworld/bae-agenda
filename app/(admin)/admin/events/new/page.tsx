@@ -60,6 +60,10 @@ export default function NewEventPage() {
               <input type="checkbox" name="featured" />
               Featured On Homepage
             </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+              <input type="checkbox" name="show_description" />
+              Show Description Publicly
+            </label>
           </div>
 
           <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
