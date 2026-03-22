@@ -66,7 +66,7 @@ export default function ConnectSection({ socialOverrides = {} }: Props) {
         </p>
 
         {/* Knob grid */}
-        <div style={{
+        <div className="connect-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
           justifyContent: 'center',

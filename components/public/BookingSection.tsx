@@ -17,9 +17,8 @@ interface Props {
 }
 
 function PackageModule({
-  name, price, hours, desc,
+  price, hours, desc,
 }: {
-  name:  string
   price: number | null
   hours: number
   desc:  string
@@ -54,6 +53,7 @@ export default function BookingSection({ bookingEmail }: Props) {
 
       <div className="section-container" style={{ position: 'relative', zIndex: 1 }}>
         <div className="hardware-heading"><span className="section-label">Booking</span></div>
+        <h2 className="section-heading" style={{ marginBottom: '28px' }}>Booking</h2>
 
         <div className="build-console">
           {/* Topbar: screen + chips + dial */}
@@ -119,7 +119,6 @@ export default function BookingSection({ bookingEmail }: Props) {
                 {PACKAGES.map(pkg => (
                   <PackageModule
                     key={pkg.name}
-                    name={pkg.name}
                     price={pkg.price}
                     hours={pkg.hours}
                     desc={pkg.desc}

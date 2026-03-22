@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { getPublishedMixes } from '@/lib/db/mixes'
 import { getUpcomingEvents } from '@/lib/db/events'
 import { getContentMap } from '@/lib/db/content'
@@ -75,7 +74,6 @@ export default async function BuiltPage() {
             that work is available.
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <Link href="/admin-demo" className="btn-ghost">View Admin Demo</Link>
             {bookingEmail && (
               <a href={`mailto:${bookingEmail}`} className="btn-ghost">Get in Touch</a>
             )}
