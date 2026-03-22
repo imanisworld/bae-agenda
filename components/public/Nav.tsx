@@ -162,6 +162,7 @@ export default function Nav() {
           display:    'flex',
           flexDirection: 'column',
           overflowY:  'auto',
+          WebkitOverflowScrolling: 'touch',
           padding:    '40px 32px 48px',
           gap:        '8px',
           transform:  menuOpen ? 'translateY(0)' : 'translateY(calc(-100% - 80px))',

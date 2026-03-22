@@ -369,8 +369,7 @@ body {
 .hero-deck-stage-wrap {
   padding: 16px clamp(32px, 5vw, 72px) 40px;
   display: flex;
-  justify-content: flex-start;
-  padding-left: clamp(32px, 5vw, 72px);
+  justify-content: flex-end;
   /* overflow-x clips the right edge on narrow viewports without cutting top of vinyl */
   overflow-x: clip;
   overflow-y: visible;
@@ -497,7 +496,7 @@ body {
 
 .hero-turntable {
   display: block;
-  width: min(330px, 62vw);
+  width: clamp(260px, 42vw, 480px);
 }
 
 .hero-turntable-panel {
@@ -573,18 +572,18 @@ body {
 }
 
 .hero-deck.is-playing .hero-turntable-record {
-  animation: hero-record-spin 2.3s linear infinite;
+  animation: hero-record-spin 2.8s linear infinite;
 }
 
 .hero-turntable-groove {
   inset: 24px;
   border-radius: 50%;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
 }
 
 .hero-turntable-groove-a { inset: 18px; }
-.hero-turntable-groove-b { inset: 42px; border-color: rgba(255,255,255,0.06); }
-.hero-turntable-groove-c { inset: 64px; border-color: rgba(166,107,255,0.18); }
+.hero-turntable-groove-b { inset: 42px; border-color: rgba(255,255,255,0.09); }
+.hero-turntable-groove-c { inset: 64px; border-color: rgba(166,107,255,0.25); }
 
 .hero-turntable-label {
   inset: 64px;
@@ -649,7 +648,7 @@ body {
   height: 14px;
   margin-left: -90px;
   transform-origin: 16px 50%;
-  transform: rotate(30deg) translateY(-1px);
+  transform: rotate(26deg) translateY(-1px);
   z-index: 3;
   transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
@@ -661,7 +660,7 @@ body {
 
 .hero-deck.is-paused .hero-turntable-arm {
   animation: none;
-  transform: rotate(30deg) translateY(-1px);
+  transform: rotate(26deg) translateY(-1px);
 }
 
 .hero-turntable-arm-bar {
@@ -849,13 +848,13 @@ body {
 
 @keyframes hero-needle-drop {
   0% {
-    transform: rotate(30deg) translateY(-1px);
+    transform: rotate(26deg) translateY(-1px);
   }
   78% {
-    transform: rotate(17deg) translateY(-1px);
+    transform: rotate(10deg) translateY(-1px);
   }
   100% {
-    transform: rotate(17deg) translateY(2px);
+    transform: rotate(10deg) translateY(2px);
   }
 }
 
