@@ -31,7 +31,10 @@ export default function TurnstileWidget({ siteKey, onToken }: TurnstileWidgetPro
   const widgetIdRef  = useRef<string | null>(null)
   // Keep callback ref in sync without triggering remounts
   const onTokenRef   = useRef(onToken)
-  onTokenRef.current = onToken
+
+  useEffect(() => {
+    onTokenRef.current = onToken
+  }, [onToken])
 
   useEffect(() => {
     function renderWidget() {
