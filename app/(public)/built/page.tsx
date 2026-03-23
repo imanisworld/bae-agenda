@@ -40,7 +40,7 @@ function statCard(label: string, value: string, sub: string) {
 const TIERS = [
   {
     name: 'Starter',
-    price: '$3,000',
+    price: '$3,000 – $7,999',
     tag: 'Brand Presence',
     items: [
       'Public-facing site only',
@@ -52,7 +52,7 @@ const TIERS = [
   },
   {
     name: 'Standard',
-    price: '$8,000',
+    price: '$8,000 – $11,999',
     tag: 'Full Platform',
     items: [
       'Everything in Starter',
@@ -64,7 +64,7 @@ const TIERS = [
   },
   {
     name: 'Custom',
-    price: 'From $12,000',
+    price: '$12,000+',
     tag: 'Scope It',
     items: [
       'Everything in Standard',
