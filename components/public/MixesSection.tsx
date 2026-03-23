@@ -13,22 +13,6 @@ const CARD_GRADIENTS: Record<DataGenre, string> = {
   afro:   'linear-gradient(135deg, #0a1a1a 0%, #050f0f 100%)',
 }
 
-// ── Placeholder data (shown when no mixes in DB) ──────────────────────────────
-
-const PLACEHOLDER_MIXES: Array<{
-  id:          string
-  genre:       string
-  title:       string
-  durationMin: number | null
-  year:        number | null
-  href:        string | null
-  dataGenre:   DataGenre
-}> = [
-  { id: '1', genre: 'Hip-Hop · Drill',      title: 'Street Archives Vol. 1', durationMin: null, year: null, href: null, dataGenre: 'hiphop' },
-  { id: '2', genre: 'R&B · Neo Soul',        title: 'After Hours',            durationMin: 72,   year: 2025, href: null, dataGenre: 'rnb'    },
-  { id: '3', genre: 'Afrobeats · Dancehall', title: 'World Tour',             durationMin: null, year: null, href: null, dataGenre: 'afro'   },
-]
-
 const SOUNDCLOUD_PROFILE_URL = 'https://soundcloud.com/deejaybae'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

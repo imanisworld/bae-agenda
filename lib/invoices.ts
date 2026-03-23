@@ -1,10 +1,13 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
+import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
 
 export interface InvoiceBookingData {
   id: string
   event_name: string | null
   event_type: string | null
   event_date: string | null
+  event_end_time: string | null
+  event_timezone: string | null
   venue: string | null
   city: string | null
   package: string | null
@@ -36,10 +39,7 @@ function formatCurrency(value: number) {
 }
 
 function formatDate(value: string | null) {
-  if (!value) return '-'
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return '-'
-  return date.toLocaleDateString('en-US', {
+  return formatEventDate(value, null, {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -163,7 +163,12 @@ export async function generateInvoicePdf(booking: InvoiceBookingData) {
   const black = rgb(0.08, 0.08, 0.08)
 
   const clientName = clientNameOf(booking)
-  const eventDate = formatDate(booking.event_date)
+  const eventDate = formatEventDate(booking.event_date, booking.event_timezone, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+  const eventTime = formatEventTimeRange(booking.event_date, booking.event_end_time, booking.event_timezone)
   const total = booking.quote ?? 0
   const deposit = booking.deposit_amount ?? 0
   const balance = balanceDueOf(booking)
@@ -251,6 +256,7 @@ export async function generateInvoicePdf(booking: InvoiceBookingData) {
   let y = PAGE.top - 188
   y = drawLabelValueRow(page, 'Event', booking.event_name ?? '-', y, fontBold, fontRegular)
   y = drawLabelValueRow(page, 'Date', eventDate, y, fontBold, fontRegular)
+  if (eventTime) y = drawLabelValueRow(page, 'Time', eventTime, y, fontBold, fontRegular)
 
   if (booking.venue) y = drawLabelValueRow(page, 'Venue', booking.venue, y, fontBold, fontRegular)
   if (booking.city) y = drawLabelValueRow(page, 'City', booking.city, y, fontBold, fontRegular)
@@ -288,6 +294,7 @@ export async function generateInvoicePdf(booking: InvoiceBookingData) {
     booking.package,
     booking.hours !== null ? `${booking.hours} hr${booking.hours !== 1 ? 's' : ''}` : null,
     eventDate !== '-' ? eventDate : null,
+    eventTime,
     [booking.venue, booking.city].filter(Boolean).join(', ') || null,
   ].filter(Boolean).join(' | ')
 

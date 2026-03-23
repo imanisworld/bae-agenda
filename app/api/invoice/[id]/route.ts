@@ -12,7 +12,7 @@ export async function GET(
   const { data } = await supabase
     .from('bookings')
     .select(`
-      id, event_name, event_type, event_date, venue, city,
+      id, event_name, event_type, event_date, event_end_time, event_timezone, venue, city,
       package, hours, quote, deposit_amount, notes,
       clients(first_name, last_name, email, phone)
     `)

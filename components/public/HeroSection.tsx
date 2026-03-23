@@ -40,13 +40,6 @@ const GENRES = [
 export default function HeroSection({ content = {} }: Props) {
   const title      = content.hero_title?.trim() || 'THE BAE AGENDA'
 
-  // Server-rendered — matches Farm Minerals date badge pattern
-  const today = new Date().toLocaleDateString('en-US', {
-    month: 'long',
-    day:   'numeric',
-    year:  'numeric',
-  })
-
   return (
     <section
       id="home"

@@ -427,7 +427,7 @@ export default function BookPage() {
           )}
           {success && (
             <p style={{ color: '#34d399', fontSize: '13px' }}>
-              Request received! We'll review your details and be in touch within 24–48 hours.
+              Request received! We&apos;ll review your details and be in touch within 24–48 hours.
             </p>
           )}
 
@@ -551,11 +551,4 @@ function formatTimeLabel(hour: number, minute: number) {
   const normalizedHour = hour % 12 || 12
   const suffix = hour >= 12 ? 'PM' : 'AM'
   return `${normalizedHour}:${String(minute).padStart(2, '0')} ${suffix}`
-}
-
-function formatDateValue(date: Date) {
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}-${month}-${day}`
 }

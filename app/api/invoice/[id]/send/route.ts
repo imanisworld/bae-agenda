@@ -24,6 +24,8 @@ export async function POST(
       event_name,
       event_type,
       event_date,
+      event_end_time,
+      event_timezone,
       venue,
       city,
       package,

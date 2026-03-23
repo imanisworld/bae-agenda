@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { toEventISO } from '@/lib/date-time'
 import type { BookingStatus } from '@/types/index'
 
 async function requireAuthedUser() {
@@ -27,11 +28,16 @@ function isBookingStatus(value: string): value is BookingStatus {
   return ['inquiry', 'confirmed', 'completed', 'cancelled'].includes(value)
 }
 
-function parseDateTimeLocal(value: FormDataEntryValue | null): string | null {
+function parseDateTimeLocal(value: FormDataEntryValue | null) {
   if (typeof value !== 'string' || value.trim().length === 0) return null
-  const d = new Date(value)
-  if (Number.isNaN(d.getTime())) return null
-  return d.toISOString()
+
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value.trim())
+  if (!match) return null
+
+  return {
+    date: `${match[1]}-${match[2]}-${match[3]}`,
+    time: `${match[4]}:${match[5]}`,
+  }
 }
 
 function parseOptionalNumber(value: FormDataEntryValue | null): number | null {
@@ -74,12 +80,22 @@ export async function updateBookingDetailsAction(formData: FormData) {
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   const eventName = optionalString(formData.get('event_name'))
-  const eventDate = parseDateTimeLocal(formData.get('event_date'))
   const eventTimeZone = optionalString(formData.get('event_timezone'))
   const statusRaw = optionalString(formData.get('status'))
+  const eventDateTime = parseDateTimeLocal(formData.get('event_date'))
+  const eventEndDateTime = parseDateTimeLocal(formData.get('event_end_time'))
 
-  if (!id || !eventName || !eventDate || !eventTimeZone || !statusRaw || !isBookingStatus(statusRaw)) {
+  if (!id || !eventName || !eventTimeZone || !statusRaw || !eventDateTime || !isBookingStatus(statusRaw)) {
     redirectWithError('/admin/bookings', 'Booking name, date, timezone, and status are required.')
+  }
+
+  const eventDate = toEventISO(eventDateTime!.date, eventTimeZone!, eventDateTime!.time)
+  const eventEndTime = eventEndDateTime
+    ? toEventISO(eventEndDateTime.date, eventTimeZone!, eventEndDateTime.time)
+    : null
+
+  if (!eventDate || (eventEndDateTime && !eventEndTime)) {
+    redirectWithError(`/admin/bookings/${id}`, 'Please use a valid event date, time, and timezone.')
   }
 
   const { error } = await admin
@@ -88,6 +104,7 @@ export async function updateBookingDetailsAction(formData: FormData) {
       event_name: eventName,
       event_type: optionalString(formData.get('event_type')),
       event_date: eventDate,
+      event_end_time: eventEndTime,
       event_timezone: eventTimeZone,
       venue: optionalString(formData.get('venue')),
       city: optionalString(formData.get('city')),

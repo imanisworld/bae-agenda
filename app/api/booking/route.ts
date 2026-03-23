@@ -3,6 +3,7 @@ import { z } from 'zod'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendBookingNotifications } from '@/lib/notifications'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { toEventISO } from '@/lib/date-time'
 
 const bookingSchema = z.object({
   firstName: z.string().trim().min(1).max(80),
@@ -60,123 +61,6 @@ function normalizeOptional(value?: string): string | null {
   if (!value) return null
   const trimmed = value.trim()
   return trimmed.length ? trimmed : null
-}
-
-function parseDateParts(dateValue: string) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateValue)
-  if (!match) return null
-
-  const year = Number(match[1])
-  const month = Number(match[2])
-  const day = Number(match[3])
-
-  if (
-    !Number.isInteger(year) ||
-    !Number.isInteger(month) ||
-    !Number.isInteger(day) ||
-    month < 1 ||
-    month > 12 ||
-    day < 1 ||
-    day > 31
-  ) {
-    return null
-  }
-
-  return { year, month, day }
-}
-
-function parseTimeParts(timeValue?: string) {
-  if (!timeValue?.trim()) return { hour: 12, minute: 0 }
-
-  const match = /^(\d{2}):(\d{2})$/.exec(timeValue.trim())
-  if (!match) return null
-
-  const hour = Number(match[1])
-  const minute = Number(match[2])
-
-  if (
-    !Number.isInteger(hour) ||
-    !Number.isInteger(minute) ||
-    hour < 0 ||
-    hour > 23 ||
-    minute < 0 ||
-    minute > 59
-  ) {
-    return null
-  }
-
-  return { hour, minute }
-}
-
-function getTimeZoneParts(date: Date, timeZone: string) {
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  })
-
-  const parts = formatter.formatToParts(date)
-  const map = Object.fromEntries(parts.map((part) => [part.type, part.value]))
-
-  return {
-    year: Number(map.year),
-    month: Number(map.month),
-    day: Number(map.day),
-    hour: Number(map.hour),
-    minute: Number(map.minute),
-  }
-}
-
-function isValidTimeZone(timeZone: string) {
-  try {
-    new Intl.DateTimeFormat('en-US', { timeZone })
-    return true
-  } catch {
-    return false
-  }
-}
-
-function toEventISO(dateValue: string, timeZone: string, timeValue?: string): string | null {
-  const dateParts = parseDateParts(dateValue)
-  const timeParts = parseTimeParts(timeValue)
-  if (!dateParts || !timeParts || !isValidTimeZone(timeZone)) return null
-
-  const desiredUtc = Date.UTC(
-    dateParts.year,
-    dateParts.month - 1,
-    dateParts.day,
-    timeParts.hour,
-    timeParts.minute
-  )
-
-  const guess = new Date(desiredUtc)
-  const zoned = getTimeZoneParts(guess, timeZone)
-  const zonedUtc = Date.UTC(
-    zoned.year,
-    zoned.month - 1,
-    zoned.day,
-    zoned.hour,
-    zoned.minute
-  )
-
-  const corrected = new Date(desiredUtc + (desiredUtc - zonedUtc))
-  const verified = getTimeZoneParts(corrected, timeZone)
-
-  if (
-    verified.year !== dateParts.year ||
-    verified.month !== dateParts.month ||
-    verified.day !== dateParts.day ||
-    verified.hour !== timeParts.hour ||
-    verified.minute !== timeParts.minute
-  ) {
-    return null
-  }
-
-  return corrected.toISOString()
 }
 
 export async function POST(request: Request) {

@@ -13,11 +13,6 @@
  * On desktop: 5 photos at 260px height.
  */
 
-interface StripSlot {
-  slot:  number
-  label: string   // hint for which photo goes here
-}
-
 const STRIP_PHOTOS = [
   { src: '/photos/PlexMix19-DJBAE.JPEG',                        alt: 'DJ B.A.E. on the decks' },
   { src: '/photos/IMG_1118.JPG.jpeg',                           alt: 'DJ B.A.E. live set' },

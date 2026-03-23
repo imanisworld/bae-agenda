@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import PageHeader from '@/components/admin/PageHeader'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,6 +12,8 @@ interface BookingRow {
   event_name:     string | null
   event_type:     string | null
   event_date:     string | null
+  event_end_time: string | null
+  event_timezone: string | null
   venue:          string | null
   city:           string | null
   package:        string | null
@@ -31,7 +34,7 @@ async function getBooking(id: string): Promise<BookingRow | null> {
   const { data } = await supabase
     .from('bookings')
     .select(`
-      id, event_name, event_type, event_date, venue, city,
+      id, event_name, event_type, event_date, event_end_time, event_timezone, venue, city,
       package, hours, quote, deposit_amount, notes,
       clients(first_name, last_name, email, phone)
     `)
@@ -76,11 +79,8 @@ export default async function InvoicePage({
     ? `${client.first_name ?? ''} ${client.last_name ?? ''}`.trim()
     : '—'
 
-  const eventDate = booking.event_date
-    ? new Date(booking.event_date).toLocaleDateString('en-US', {
-        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-      })
-    : '—'
+  const eventDate = formatEventDate(booking.event_date, booking.event_timezone)
+  const eventTime = formatEventTimeRange(booking.event_date, booking.event_end_time, booking.event_timezone)
 
   const total   = booking.quote         ?? 0
   const deposit = booking.deposit_amount ?? 0
@@ -162,6 +162,7 @@ export default async function InvoicePage({
         <div style={{ marginBottom: '24px' }}>
           <Row label="Event" value={booking.event_name} />
           <Row label="Date" value={eventDate} />
+          {eventTime && <Row label="Time" value={eventTime} />}
           {booking.venue && <Row label="Venue" value={booking.venue} />}
           {booking.city  && <Row label="City"  value={booking.city}  />}
           {booking.package && <Row label="Package" value={booking.package} />}

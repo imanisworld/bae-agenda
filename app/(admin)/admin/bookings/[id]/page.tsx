@@ -12,6 +12,7 @@ interface BookingDetailRow {
   event_name: string
   event_type: string | null
   event_date: string
+  event_end_time: string | null
   event_timezone: string
   venue: string | null
   city: string | null
@@ -64,6 +65,7 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
       event_name,
       event_type,
       event_date,
+      event_end_time,
       event_timezone,
       venue,
       city,
@@ -207,6 +209,16 @@ export default async function EditBookingPage({
               <input name="event_timezone" required defaultValue={booking.event_timezone} style={inputStyle()} />
             </label>
           </div>
+
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Event End Time</span>
+            <input
+              name="event_end_time"
+              type="datetime-local"
+              defaultValue={booking.event_end_time ? toDateTimeLocal(booking.event_end_time) : ''}
+              style={inputStyle()}
+            />
+          </label>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <label style={{ display: 'grid', gap: '7px' }}>

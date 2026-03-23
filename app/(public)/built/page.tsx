@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
 import { getContentMap } from '@/lib/db/content'
 import BuiltSection from '@/components/public/BuiltSection'
 import { PORTFOLIO_HIGHLIGHTS } from '@/lib/portfolio-data'

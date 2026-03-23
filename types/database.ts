@@ -69,6 +69,7 @@ export type Database = {
           event_date:     string
           event_timezone: string
           end_time:       string | null
+          event_end_time: string | null
           venue:          string | null
           city:           string | null
           package:        string | null  // package name (e.g. 'The Agenda')
