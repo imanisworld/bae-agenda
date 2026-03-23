@@ -67,13 +67,14 @@ export default async function BuiltPage() {
             <span style={{ color: 'var(--amber)' }}>Scratch.</span>
           </h1>
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '12px' }}>
-            Designed, engineered, and deployed by <strong style={{ color: 'var(--white)' }}>DJ B.A.E.</strong> — not a template,
-            not a drag-and-drop builder. Every page, component, and flow was written by hand.
-            This is a custom full-stack platform handling real bookings, content management,
-            and brand presence in one system.
+            Designed, engineered, and deployed by <strong style={{ color: 'var(--white)' }}>DJ B.A.E.</strong> —
+            not a template, not Wix, not Squarespace, not a drag-and-drop builder.
+            Every page, every component, every flow written from scratch in real code.
+            A custom full-stack platform with live bookings, a private admin panel, content management,
+            and a full public presence — all in one system.
           </p>
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '20px' }}>
-            If you want something like this built for your brand or project, that work is available.
+            This same work is available as a service. If you need a real site — not a builder — reach out.
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             {bookingEmail && (
@@ -131,9 +132,13 @@ export default async function BuiltPage() {
             Need something<br />
             <span style={{ color: 'var(--amber)' }}>built?</span>
           </h2>
+          <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '16px' }}>
+            This is not Wix. Not Squarespace. Not a website builder, a theme, or a subscription tool.
+            Every line of code on this site was written by hand — custom architecture, custom design, custom logic.
+          </p>
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '36px' }}>
-            The same system powering this site — bookings, content management, admin panel, public presence —
-            can be built for your brand, your business, or your project. No templates. No subscriptions. Just yours.
+            The same system powering this site — bookings, admin panel, content management, public presence —
+            can be built for your brand or business. You own it. No monthly fees to a platform. No limits on what it can do.
           </p>
 
           <div style={{
