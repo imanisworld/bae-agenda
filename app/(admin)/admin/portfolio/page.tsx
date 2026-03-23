@@ -65,7 +65,7 @@ export default async function PortfolioAdminPage({
   const featCount = all.filter((e) => e.featured).length
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '1200px' }}>
+    <div className="admin-page" style={{ maxWidth: '1200px' }}>
       <PageHeader
         title="Portfolio"
         subtitle={`${all.length} entries`}
@@ -77,7 +77,7 @@ export default async function PortfolioAdminPage({
       {/* Stats row */}
       <div style={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
         gap: '1px',
         background: 'var(--border)',
         border: '1px solid var(--border)',
@@ -148,7 +148,7 @@ export default async function PortfolioAdminPage({
           />
         ) : (
           <div className="admin-table-wrap">
-            <table className="admin-table">
+            <table className="admin-table admin-table-stack">
               <thead>
                 <tr>
                   <th>Year</th>
@@ -163,18 +163,18 @@ export default async function PortfolioAdminPage({
               <tbody>
                 {entries.map((entry) => (
                   <tr key={entry.id} style={{ opacity: entry.status === 'draft' ? 0.65 : 1 }}>
-                    <td style={{
+                    <td data-label="Year" style={{
                       fontFamily: 'Conthrax, sans-serif',
                       fontSize: '12px',
                       color: 'var(--muted)',
                     }}>
                       {entry.year}
                     </td>
-                    <td style={{ color: 'var(--white)', fontWeight: 400 }}>
+                    <td data-label="Event" style={{ color: 'var(--white)', fontWeight: 400 }}>
                       {entry.event_name}
                     </td>
-                    <td className="muted">{entry.city}</td>
-                    <td>
+                    <td data-label="City" className="muted">{entry.city}</td>
+                    <td data-label="Tags">
                       <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
                         {(entry.tags ?? []).slice(0, 2).map((tag) => (
                           <span
@@ -201,7 +201,7 @@ export default async function PortfolioAdminPage({
                         )}
                       </div>
                     </td>
-                    <td>
+                    <td data-label="Featured">
                       <form action={togglePortfolioFeaturedAction}>
                         <input type="hidden" name="id" value={entry.id} />
                         <input type="hidden" name="next_featured" value={String(!entry.featured)} />
@@ -218,7 +218,7 @@ export default async function PortfolioAdminPage({
                         </button>
                       </form>
                     </td>
-                    <td>
+                    <td data-label="Status">
                       <form action={togglePortfolioStatusAction}>
                         <input type="hidden" name="id" value={entry.id} />
                         <input
@@ -239,7 +239,7 @@ export default async function PortfolioAdminPage({
                         </button>
                       </form>
                     </td>
-                    <td>
+                    <td data-label="Actions">
                       <Link href={`/admin/portfolio/${entry.id}`} className="admin-view-all">
                         Edit →
                       </Link>

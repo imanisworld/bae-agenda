@@ -98,7 +98,7 @@ export default async function EditBookingPage({
   const balance = total - deposit
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+    <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Edit Booking"
         subtitle="Adjust booking details, notes, pricing, and status."
@@ -175,7 +175,7 @@ export default async function EditBookingPage({
             <input name="event_name" required defaultValue={booking.event_name} style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Event Type</span>
               <input name="event_type" defaultValue={booking.event_type ?? ''} style={inputStyle()} />
@@ -191,7 +191,7 @@ export default async function EditBookingPage({
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '12px' }}>
+          <div className="admin-form-grid-two-wide">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Event Date & Time *</span>
               <input
@@ -208,7 +208,7 @@ export default async function EditBookingPage({
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Venue</span>
               <input name="venue" defaultValue={booking.venue ?? ''} style={inputStyle()} />
@@ -219,7 +219,7 @@ export default async function EditBookingPage({
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Package</span>
               <input name="package" defaultValue={booking.package ?? ''} style={inputStyle()} />
@@ -230,7 +230,7 @@ export default async function EditBookingPage({
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Quote</span>
               <input name="quote" type="number" min={0} step="1" defaultValue={booking.quote ?? undefined} style={inputStyle()} />
@@ -246,7 +246,7 @@ export default async function EditBookingPage({
             <textarea name="notes" rows={6} defaultValue={booking.notes ?? ''} style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+          <div className="admin-form-actions">
             <button type="submit" className="admin-btn-primary">
               Save Changes
             </button>

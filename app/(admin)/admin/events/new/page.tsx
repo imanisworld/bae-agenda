@@ -16,7 +16,7 @@ function inputStyle(): React.CSSProperties {
 
 export default function NewEventPage() {
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+    <div className="admin-page admin-page--narrow">
       <PageHeader
         title="New Event"
         subtitle="Create an event and choose whether it is public and featured."
@@ -35,7 +35,7 @@ export default function NewEventPage() {
             <input name="event_date" type="datetime-local" required style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Venue</span>
               <input name="venue" style={inputStyle()} />
@@ -66,7 +66,7 @@ export default function NewEventPage() {
             </label>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+          <div className="admin-form-actions">
             <button type="submit" className="admin-btn-primary">
               Create Event
             </button>

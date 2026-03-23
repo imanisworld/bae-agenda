@@ -61,7 +61,7 @@ export default async function EventsPage({
   const errorMessage = getErrorMessage(resolvedSearchParams?.error)
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '1120px' }}>
+    <div className="admin-page">
       <PageHeader
         title="Events"
         subtitle={events.length ? `${events.length} total` : undefined}
@@ -82,7 +82,7 @@ export default async function EventsPage({
           />
         ) : (
           <div className="admin-table-wrap">
-            <table className="admin-table">
+            <table className="admin-table admin-table-stack">
               <thead>
                 <tr>
                   <th>Title</th>
@@ -97,16 +97,16 @@ export default async function EventsPage({
               <tbody>
                 {events.map((ev) => (
                   <tr key={ev.id}>
-                    <td style={{
+                    <td data-label="Title" style={{
                       fontWeight: 400,
                       color: isPast(ev.event_date) ? 'var(--muted)' : 'var(--white)',
                     }}>
                       {ev.title}
                     </td>
-                    <td className="muted">{fmtDate(ev.event_date)}</td>
-                    <td className="muted">{ev.venue ?? '—'}</td>
-                    <td className="muted">{ev.city  ?? '—'}</td>
-                    <td>
+                    <td data-label="Date" className="muted">{fmtDate(ev.event_date)}</td>
+                    <td data-label="Venue" className="muted">{ev.venue ?? '—'}</td>
+                    <td data-label="City" className="muted">{ev.city  ?? '—'}</td>
+                    <td data-label="Visibility">
                       <form action={toggleEventPublicAction}>
                         <input type="hidden" name="id" value={ev.id} />
                         <input type="hidden" name="next_public" value={String(!ev.public)} />
@@ -123,7 +123,7 @@ export default async function EventsPage({
                         </button>
                       </form>
                     </td>
-                    <td>
+                    <td data-label="Featured">
                       <form action={toggleEventFeaturedAction}>
                         <input type="hidden" name="id" value={ev.id} />
                         <input type="hidden" name="next_featured" value={String(!ev.featured)} />
@@ -140,7 +140,7 @@ export default async function EventsPage({
                         </button>
                       </form>
                     </td>
-                    <td>
+                    <td data-label="Actions">
                       <Link href={`/admin/events/${ev.id}`} className="admin-view-all">
                         Edit →
                       </Link>

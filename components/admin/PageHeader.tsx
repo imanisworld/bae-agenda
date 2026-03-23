@@ -15,22 +15,13 @@ interface PageHeaderProps {
 
 export default function PageHeader({ title, subtitle, action }: PageHeaderProps) {
   return (
-    <div style={{
-      display: 'flex', alignItems: 'flex-start',
-      justifyContent: 'space-between', flexWrap: 'wrap',
-      gap: '16px', marginBottom: '32px',
-    }}>
+    <div className="admin-page-header">
       <div>
-        <h1 style={{
-          fontFamily: 'Conthrax, sans-serif',
-          fontSize: '20px', fontWeight: 600,
-          letterSpacing: '0.05em', color: 'var(--white)',
-          marginBottom: subtitle ? '6px' : 0,
-        }}>
+        <h1 className="admin-page-title" style={{ marginBottom: subtitle ? '6px' : 0 }}>
           {title}
         </h1>
         {subtitle && (
-          <p style={{ fontSize: '12px', color: 'var(--muted)' }}>{subtitle}</p>
+          <p className="admin-page-subtitle">{subtitle}</p>
         )}
       </div>
 

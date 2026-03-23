@@ -59,7 +59,7 @@ export default async function MixesAdminPage({
   const errorMessage = getErrorMessage(resolvedSearchParams?.error)
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '1120px' }}>
+    <div className="admin-page">
       <PageHeader
         title="Mixes"
         subtitle={mixes.length ? `${mixes.length} total` : undefined}
@@ -81,7 +81,7 @@ export default async function MixesAdminPage({
           />
         ) : (
           <div className="admin-table-wrap">
-            <table className="admin-table">
+            <table className="admin-table admin-table-stack">
               <thead>
                 <tr>
                   <th>Title</th>
@@ -96,11 +96,11 @@ export default async function MixesAdminPage({
               <tbody>
                 {mixes.map((mix) => (
                   <tr key={mix.id}>
-                    <td style={{ fontWeight: 400 }}>{mix.title}</td>
-                    <td className="muted">{mix.genre ?? '—'}</td>
-                    <td className="muted">{formatDuration(mix.duration)}</td>
-                    <td className="muted">{mix.sort_order}</td>
-                    <td>
+                    <td data-label="Title" style={{ fontWeight: 400 }}>{mix.title}</td>
+                    <td data-label="Genre" className="muted">{mix.genre ?? '—'}</td>
+                    <td data-label="Duration" className="muted">{formatDuration(mix.duration)}</td>
+                    <td data-label="Sort" className="muted">{mix.sort_order}</td>
+                    <td data-label="Published">
                       <form action={toggleMixPublishedAction}>
                         <input type="hidden" name="id" value={mix.id} />
                         <input type="hidden" name="next_published" value={String(!mix.published_at)} />
@@ -117,7 +117,7 @@ export default async function MixesAdminPage({
                         </button>
                       </form>
                     </td>
-                    <td>
+                    <td data-label="Featured">
                       <form action={toggleMixFeaturedAction}>
                         <input type="hidden" name="id" value={mix.id} />
                         <input type="hidden" name="next_featured" value={String(!mix.is_featured)} />
@@ -134,7 +134,7 @@ export default async function MixesAdminPage({
                         </button>
                       </form>
                     </td>
-                    <td>
+                    <td data-label="Actions">
                       <Link href={`/admin/mixes/${mix.id}`} className="admin-view-all">
                         Edit →
                       </Link>

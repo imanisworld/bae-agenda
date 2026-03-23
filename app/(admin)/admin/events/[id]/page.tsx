@@ -56,7 +56,7 @@ export default async function EditEventPage({
   if (!event) notFound()
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+    <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Edit Event"
         subtitle="Update event details, visibility, and featured status."
@@ -82,7 +82,7 @@ export default async function EditEventPage({
             />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Venue</span>
               <input name="venue" defaultValue={event.venue ?? ''} style={inputStyle()} />
@@ -113,7 +113,7 @@ export default async function EditEventPage({
             </label>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+          <div className="admin-form-actions">
             <button type="submit" className="admin-btn-primary">
               Save Changes
             </button>

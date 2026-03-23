@@ -51,7 +51,7 @@ export default async function EditPortfolioEntryPage({
   if (!entry) notFound()
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+    <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Edit Entry"
         subtitle="Update gig details, tags, and featured status."
@@ -71,7 +71,7 @@ export default async function EditPortfolioEntryPage({
             <input name="event_name" required defaultValue={entry.event_name} style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Year *</span>
               <input
@@ -95,7 +95,7 @@ export default async function EditPortfolioEntryPage({
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Venue</span>
               <input name="venue" defaultValue={entry.venue ?? ''} style={inputStyle()} />
@@ -151,7 +151,7 @@ export default async function EditPortfolioEntryPage({
             </label>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+          <div className="admin-form-actions">
             <button type="submit" className="admin-btn-primary">
               Save Changes
             </button>

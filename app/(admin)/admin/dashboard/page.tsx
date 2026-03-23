@@ -208,7 +208,7 @@ export default async function DashboardPage() {
   })
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '1120px' }}>
+    <div className="admin-page">
 
       <PageHeader title="Dashboard" subtitle={today} />
 
@@ -276,7 +276,7 @@ export default async function DashboardPage() {
         </div>
 
         <div className="admin-table-wrap">
-          <table className="admin-table">
+          <table className="admin-table admin-table-stack">
             <thead>
               <tr>
                 <th>Event</th>
@@ -288,10 +288,10 @@ export default async function DashboardPage() {
             <tbody>
               {recentBookings.map((b) => (
                 <tr key={b.id}>
-                  <td style={{ fontWeight: 400 }}>{b.event_name}</td>
-                  <td className="muted">{b.client_name ?? '—'}</td>
-                  <td className="muted">{fmtDate(b.event_date, b.event_timezone)}</td>
-                  <td><Badge variant={b.status} /></td>
+                  <td data-label="Event" style={{ fontWeight: 400 }}>{b.event_name}</td>
+                  <td data-label="Client" className="muted">{b.client_name ?? '—'}</td>
+                  <td data-label="Date" className="muted">{fmtDate(b.event_date, b.event_timezone)}</td>
+                  <td data-label="Status"><Badge variant={b.status} /></td>
                 </tr>
               ))}
             </tbody>
