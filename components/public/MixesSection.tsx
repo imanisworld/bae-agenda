@@ -174,30 +174,15 @@ export default async function MixesSection() {
                 display: 'grid',
                 justifyItems: 'center',
                 gap: '18px',
-                position: 'relative',
-                overflow: 'hidden',
                 background: 'var(--bg-sunken)',
               }}>
-                {/* il_ background */}
-                <div aria-hidden="true" style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backgroundImage: 'url(/photos/il_1588xN.5427428475_1wum.avif)',
-                  backgroundSize: 'cover',
-                  backgroundPosition: 'center',
-                  filter: 'blur(1px) saturate(0.5) brightness(0.28)',
-                  transform: 'scale(1.06)',
-                  opacity: 1,
-                }} />
                 {/* Spinning CD video */}
                 <div style={{
-                  position: 'relative',
                   width: 'min(160px, 42vw)',
                   aspectRatio: '1 / 1',
                   borderRadius: '50%',
                   overflow: 'hidden',
                   boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
-                  zIndex: 1,
                 }}>
                   <video
                     src="/videos/e67f0964-8763-4658-bbba-4cc322727d68.mp4"
@@ -218,15 +203,13 @@ export default async function MixesSection() {
                   fontSize: 'clamp(18px, 3vw, 28px)',
                   color: 'rgba(250,248,243,0.5)',
                   letterSpacing: '0.08em',
-                  position: 'relative',
-                  zIndex: 1,
                 }}>
                   Coming Soon
                 </div>
-                <p style={{ fontSize: '13px', color: 'var(--muted)', margin: 0, maxWidth: '360px', textAlign: 'center', lineHeight: 1.7, position: 'relative', zIndex: 1 }}>
+                <p style={{ fontSize: '13px', color: 'var(--muted)', margin: 0, maxWidth: '360px', textAlign: 'center', lineHeight: 1.7 }}>
                   New sets dropping soon. Follow to get notified.
                 </p>
-                <div style={{ position: 'relative', zIndex: 1 }}>
+                <div>
                   <a href={SOUNDCLOUD_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ fontSize: '12px' }}>
                     Follow on SoundCloud →
                   </a>
