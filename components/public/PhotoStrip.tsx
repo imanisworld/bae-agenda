@@ -14,31 +14,23 @@
  */
 
 const STRIP_PHOTOS = [
-  { src: '/photos/PlexMix19-DJBAE.JPEG',                        alt: 'DJ B.A.E. on the decks' },
-  { src: '/photos/IMG_1118.JPG.jpeg',                           alt: 'DJ B.A.E. live set' },
-  { src: '/photos/93857B7F-E4CA-4F51-BD81-68031362370D.JPG',   alt: 'DJ B.A.E. at the event' },
-  { src: '/photos/IMG_1120.JPG.jpeg',                           alt: 'DJ B.A.E. performance' },
-  // slot 5 — add another photo here when ready
+  { src: '/photos/PlexMix19-DJBAE.JPEG', alt: 'DJ B.A.E. on the decks', credit: 'Shot by Pook' },
+  { src: '/photos/IMG_1118.JPG.jpeg', alt: 'DJ B.A.E. portrait', credit: 'Shot by G' },
+  { src: '/photos/93857B7F-E4CA-4F51-BD81-68031362370D.JPG', alt: 'DJ B.A.E. at the event', credit: 'Shot by Ki' },
+  { src: '/photos/IMG_1120.JPG.jpeg', alt: 'DJ B.A.E. smiling portrait', credit: 'Shot by G' },
+  { src: '/photos/Screenshot 2026-03-07 at 1.14.23 PM.png', alt: 'DJ B.A.E. performing outdoors at night', credit: 'Shot by Pook' },
 ]
 
 export default function PhotoStrip() {
   return (
-    <div
-      className="photo-strip"
-      aria-hidden="true"
-    >
-      {STRIP_PHOTOS.map(({ src, alt }, i) => (
+    <div className="photo-strip">
+      {STRIP_PHOTOS.map(({ src, alt, credit }, i) => (
         <div key={i} className="photo-strip-slot photo-slot">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+          <div className="photo-credit">{credit}</div>
         </div>
       ))}
-      {/* Slot 5 placeholder until 5th photo is added */}
-      <div className="photo-strip-slot photo-slot">
-        <div className="photo-placeholder">
-          <span className="photo-placeholder-label" style={{ opacity: 0.4 }}>+ add photo</span>
-        </div>
-      </div>
     </div>
   )
 }
