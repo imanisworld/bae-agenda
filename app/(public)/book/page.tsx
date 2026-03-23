@@ -15,6 +15,7 @@ type FormState = {
   eventType: string
   eventDate: string
   eventTime: string
+  eventEndTime: string
   timeZone: string
   venue: string
   city: string
@@ -44,6 +45,7 @@ const INITIAL_STATE: FormState = {
   eventType: '',
   eventDate: '',
   eventTime: '',
+  eventEndTime: '',
   timeZone: 'America/Indiana/Indianapolis',
   venue: '',
   city: '',
@@ -330,7 +332,7 @@ export default function BookPage() {
 
           <div style={responsiveGridStyle()}>
             <label style={{ display: 'grid', gap: '8px' }}>
-              <span className="section-label" style={{ marginBottom: 0 }}>Event Time</span>
+              <span className="section-label" style={{ marginBottom: 0 }}>Start Time</span>
               <input
                 list="event-time-options"
                 value={form.eventTime}
@@ -339,6 +341,19 @@ export default function BookPage() {
                 style={inputStyle()}
               />
             </label>
+            <label style={{ display: 'grid', gap: '8px' }}>
+              <span className="section-label" style={{ marginBottom: 0 }}>End Time</span>
+              <input
+                list="event-end-time-options"
+                value={form.eventEndTime}
+                onChange={(e) => updateField('eventEndTime', e.target.value)}
+                placeholder="Choose or type a time"
+                style={inputStyle()}
+              />
+            </label>
+          </div>
+
+          <div style={responsiveGridStyle()}>
             <label style={{ display: 'grid', gap: '8px' }}>
               <span className="section-label" style={{ marginBottom: 0 }}>City</span>
               <input
@@ -456,6 +471,12 @@ export default function BookPage() {
           </datalist>
 
           <datalist id="event-time-options">
+            {TIME_OPTIONS.map((option) => (
+              <option key={option.value} value={option.label} />
+            ))}
+          </datalist>
+
+          <datalist id="event-end-time-options">
             {TIME_OPTIONS.map((option) => (
               <option key={option.value} value={option.label} />
             ))}

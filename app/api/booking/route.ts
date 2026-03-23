@@ -13,6 +13,7 @@ const bookingSchema = z.object({
   eventType: z.string().trim().max(80).optional().or(z.literal('')),
   eventDate: z.string().trim().min(1),
   eventTime: z.string().trim().max(20).optional().or(z.literal('')),
+  eventEndTime: z.string().trim().max(20).optional().or(z.literal('')),
   timeZone: z.string().trim().min(1).max(80),
   venue: z.string().trim().max(160).optional().or(z.literal('')),
   city: z.string().trim().max(120).optional().or(z.literal('')),
@@ -297,6 +298,10 @@ export async function POST(request: Request) {
       clientId = createdClient.id
     }
 
+    const endTimeISO = payload.eventEndTime
+      ? toEventISO(payload.eventDate, payload.timeZone, payload.eventEndTime)
+      : null
+
     const { error: bookingError } = await supabase
       .from('bookings')
       .insert({
@@ -304,6 +309,7 @@ export async function POST(request: Request) {
         event_name: payload.eventName,
         event_type: normalizeOptional(payload.eventType),
         event_date: eventISO,
+        event_end_time: endTimeISO,
         event_timezone: payload.timeZone.trim(),
         venue: normalizeOptional(payload.venue),
         city: normalizeOptional(payload.city),
