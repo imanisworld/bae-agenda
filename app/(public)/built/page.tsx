@@ -119,7 +119,7 @@ export default async function BuiltPage() {
           className="build-console-module-grid"
           style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}
         >
-          {statCard('Build Time', '~3 Months', 'Plan for 3 months. Often done sooner.')}
+          {statCard('Build Time', '~3 Months', 'From first call to deployed, live site.')}
           {statCard('Clients Available', '2', 'Currently taking limited new projects.')}
           {statCard('System Layers', '4', 'Public site, admin panel, CMS, and booking flow.')}
           {statCard('Templates Used', '0', 'Every page, component, and layout is custom.')}
