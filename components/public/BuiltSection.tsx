@@ -1,3 +1,5 @@
+import React from 'react'
+
 /**
  * BUILT SECTION — Server Component
  * "Under The Hood" — hardware console aesthetic tech showcase.
@@ -173,13 +175,13 @@ export default function BuiltSection({ aboutQuote }: Props) {
         {/* ── Signal Chain Visual ─────────────────────────────── */}
         <div className="signal-chain-visual">
           {(['CLIENT', 'NEXT.JS', 'SUPABASE', 'VERCEL', 'LIVE'] as const).map((node, i, arr) => (
-            <>
-              <div key={node} className="signal-node">
+            <React.Fragment key={node}>
+              <div className="signal-node">
                 <div className="signal-node-dot" />
                 <span className="signal-node-label">{node}</span>
               </div>
-              {i < arr.length - 1 && <div key={`line-${i}`} className="signal-line" />}
-            </>
+              {i < arr.length - 1 && <div className="signal-line" />}
+            </React.Fragment>
           ))}
         </div>
 

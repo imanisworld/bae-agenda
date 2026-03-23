@@ -116,37 +116,6 @@ export default async function BuiltPage() {
             </div>
           </div>
 
-          <div
-            aria-hidden="true"
-            style={{
-              position: 'relative',
-              minHeight: '320px',
-              display: 'grid',
-              placeItems: 'center',
-              overflow: 'hidden',
-              border: '1px solid rgba(255,255,255,0.08)',
-              background: 'linear-gradient(180deg, rgba(255,196,107,0.08), rgba(255,255,255,0.01))',
-            }}
-          >
-            <div style={{ position: 'absolute', inset: '5% 8%', opacity: 0.22 }}>
-              <Image
-                src="/photos/images/allbackmother.jpg"
-                alt=""
-                fill
-                sizes="(max-width: 900px) 100vw, 40vw"
-                style={{ objectFit: 'cover' }}
-              />
-            </div>
-            <div style={{ position: 'relative', width: 'min(250px, 58vw)', aspectRatio: '1 / 1', filter: 'drop-shadow(0 24px 40px rgba(0,0,0,0.3))' }}>
-              <Image
-                src="/photos/images/speaker1.png"
-                alt=""
-                fill
-                sizes="250px"
-                style={{ objectFit: 'contain' }}
-              />
-            </div>
-          </div>
         </section>
 
         {/* ── Stats ────────────────────────────────────────────── */}
