@@ -204,9 +204,6 @@ export default function HeroDeck() {
               <span className="hero-turntable-marble hero-turntable-marble-c" />
               <span className="hero-turntable-label">
                 <span className="hero-turntable-label-ring" />
-                <span className="hero-turntable-label-copy hero-turntable-label-copy-top">DJ B.A.E.</span>
-                <span className="hero-turntable-label-copy hero-turntable-label-copy-bottom">THE BAE AGENDA</span>
-                <span className="hero-turntable-label-copy hero-turntable-label-copy-center">CUSTOM VINYL</span>
                 <span className="hero-turntable-label-mark hero-turntable-label-mark-a" />
                 <span className="hero-turntable-label-mark hero-turntable-label-mark-b" />
               </span>

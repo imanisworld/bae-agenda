@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import Link from 'next/link'
 import { getFeaturedMixes } from '@/lib/db/mixes'
 
@@ -136,7 +135,7 @@ export default async function MixesSection() {
         borderTop:  '1px solid var(--border)',
       }}
     >
-      <div className="section-container">
+      <div className="section-container" style={{ position: 'relative', zIndex: 2 }}>
 
         {/* Header row */}
         <div style={{
@@ -148,11 +147,11 @@ export default async function MixesSection() {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
               <span style={{ width: '22px', height: '1px', background: 'var(--violet)', display: 'block', flexShrink: 0 }} />
               <span style={{ fontSize: '10px', letterSpacing: '0.35em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                {hasLiveData ? 'Featured Mixes' : 'Coming Soon'}
+                Featured Mixes
               </span>
             </div>
             <h2 className="section-heading" style={{ marginBottom: 0 }}>
-              {hasLiveData ? 'Recent Sets' : 'Coming Soon'}
+              Recent Sets
             </h2>
           </div>
           {hasLiveData ? (
@@ -188,38 +187,62 @@ export default async function MixesSection() {
                 gridColumn: '1 / -1',
                 padding: '48px 24px',
                 border: '1px solid var(--border)',
-                background: 'var(--bg-sunken)',
                 display: 'grid',
                 justifyItems: 'center',
                 gap: '18px',
+                position: 'relative',
+                overflow: 'hidden',
+                background: 'var(--bg-sunken)',
               }}>
+                {/* il_ background */}
+                <div aria-hidden="true" style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundImage: 'url(/photos/il_1588xN.5427428475_1wum.avif)',
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  filter: 'blur(1px) saturate(0.5) brightness(0.28)',
+                  transform: 'scale(1.06)',
+                  opacity: 1,
+                }} />
+                {/* Spinning CD video */}
                 <div style={{
                   position: 'relative',
-                  width: 'min(220px, 58vw)',
+                  width: 'min(160px, 42vw)',
                   aspectRatio: '1 / 1',
-                  filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.28))',
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                  zIndex: 1,
                 }}>
-                  <Image
-                    src="/photos/images/cd.jpg"
-                    alt=""
-                    fill
-                    aria-hidden="true"
-                    sizes="220px"
-                    style={{ objectFit: 'contain' }}
+                  <video
+                    src="/videos/e67f0964-8763-4658-bbba-4cc322727d68.mp4"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: '50%',
+                    }}
                   />
                 </div>
                 <div style={{
                   fontFamily: 'Conthrax, sans-serif',
                   fontSize: 'clamp(18px, 3vw, 28px)',
-                  color: 'rgba(250,248,243,0.18)',
+                  color: 'rgba(250,248,243,0.5)',
                   letterSpacing: '0.08em',
+                  position: 'relative',
+                  zIndex: 1,
                 }}>
                   Coming Soon
                 </div>
-                <p style={{ fontSize: '13px', color: 'var(--muted)', margin: 0, maxWidth: '360px', textAlign: 'center', lineHeight: 1.7 }}>
+                <p style={{ fontSize: '13px', color: 'var(--muted)', margin: 0, maxWidth: '360px', textAlign: 'center', lineHeight: 1.7, position: 'relative', zIndex: 1 }}>
                   New sets dropping soon. Follow to get notified.
                 </p>
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
                   <a href={SOUNDCLOUD_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '12px' }}>
                     SC Follow →
                   </a>

@@ -571,7 +571,7 @@ body {
   --arm-drag-react: 0deg;
   transform: rotate(var(--record-rotation));
   background:
-    radial-gradient(circle at 50% 50%, rgba(31,24,14,0.98) 0 16%, rgba(15,13,11,1) 17% 100%);
+    radial-gradient(circle at 50% 50%, rgba(18,16,22,0.98) 0 16%, rgba(8,8,10,1) 17% 100%);
   box-shadow:
     0 0 0 14px rgba(13,13,15,0.12),
     0 34px 56px rgba(0,0,0,0.28);
@@ -591,40 +591,37 @@ body {
 
 .hero-turntable-groove-a { inset: 18px; }
 .hero-turntable-groove-b { inset: 42px; border-color: rgba(255,255,255,0.09); }
-.hero-turntable-groove-c { inset: 64px; border-color: rgba(255,196,107,0.22); }
+.hero-turntable-groove-c { inset: 64px; border-color: rgba(255,255,255,0.07); }
 
 .hero-turntable-marble {
   inset: 8px;
   border-radius: 50%;
   mix-blend-mode: screen;
-  opacity: 0.7;
+  opacity: 0.45;
 }
 
 .hero-turntable-marble-a {
   background:
     conic-gradient(
       from 10deg,
-      rgba(255,194,89,0.86) 0deg 92deg,
-      rgba(63,42,20,0.08) 92deg 150deg,
-      rgba(215,58,37,0.7) 150deg 188deg,
-      rgba(122,110,42,0.56) 188deg 252deg,
-      rgba(47,28,12,0.08) 252deg 310deg,
-      rgba(255,214,120,0.86) 310deg 360deg
+      rgba(180,180,200,0.4) 0deg 90deg,
+      rgba(20,20,30,0.05) 90deg 150deg,
+      rgba(140,140,160,0.3) 150deg 190deg,
+      rgba(60,60,80,0.2) 190deg 250deg,
+      rgba(20,20,30,0.05) 250deg 310deg,
+      rgba(180,180,200,0.4) 310deg 360deg
     );
-  filter: saturate(1.08) blur(0.2px);
+  filter: saturate(0.4) blur(0.5px);
 }
 
 .hero-turntable-marble-b {
   inset: 20px;
   background:
-    radial-gradient(circle at 26% 74%, rgba(255,239,194,0.3), transparent 28%),
-    radial-gradient(circle at 78% 34%, rgba(199,46,24,0.22), transparent 22%),
+    radial-gradient(circle at 26% 74%, rgba(155,93,229,0.12), transparent 28%),
     conic-gradient(
       from 210deg,
-      rgba(255,212,120,0.38) 0deg 72deg,
-      transparent 72deg 168deg,
-      rgba(180,38,20,0.22) 168deg 218deg,
-      transparent 218deg 360deg
+      rgba(200,200,220,0.18) 0deg 72deg,
+      transparent 72deg 360deg
     );
 }
 
@@ -640,24 +637,24 @@ body {
   inset: 64px;
   border-radius: 50%;
   background:
-    radial-gradient(circle at 34% 34%, rgba(255,255,255,0.18), transparent 18%),
-    linear-gradient(180deg, rgba(92,118,168,0.98), rgba(77,104,156,0.96));
+    radial-gradient(circle at 34% 34%, rgba(255,255,255,0.12), transparent 18%),
+    linear-gradient(180deg, rgba(30,20,50,0.98), rgba(20,14,38,0.96));
   box-shadow:
-    inset 0 0 0 2px rgba(255,229,148,0.34),
-    inset 0 0 26px rgba(0,0,0,0.18);
+    inset 0 0 0 2px rgba(155,93,229,0.3),
+    inset 0 0 26px rgba(0,0,0,0.4);
 }
 
 .hero-turntable-label-ring {
   inset: 8px;
   border-radius: 50%;
-  border: 2px solid rgba(255,221,132,0.9);
+  border: 1px solid rgba(155,93,229,0.5);
 }
 
 .hero-turntable-label-mark {
   left: 14px;
   right: 14px;
-  height: 2px;
-  background: rgba(255,225,138,0.52);
+  height: 1px;
+  background: rgba(155,93,229,0.3);
 }
 
 .hero-turntable-label-mark-a {
