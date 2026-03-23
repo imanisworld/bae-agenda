@@ -11,9 +11,9 @@ export const PUBLIC_NAV = [
   { label: 'Events',  href: '/#events'  },
   { label: 'Meet',    href: '/meet'     },
   { label: 'Portfolio', href: '/portfolio' },
+  { label: 'Book',    href: '/book'      },
   { label: 'Built',   href: '/built'     },
   { label: 'Connect', href: '/#connect' },
-  { label: 'Book',    href: '/book' },
 ] as const
 
 export const ADMIN_NAV = [
