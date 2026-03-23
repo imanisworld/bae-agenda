@@ -111,7 +111,6 @@ export default async function BuiltPage() {
             <a href={`mailto:${bookingEmail}?subject=Web Build Inquiry`} className="btn-primary">
               Start a Project →
             </a>
-            <Link href="/portfolio" className="btn-ghost">See the Work</Link>
           </div>
         </section>
 
@@ -120,7 +119,7 @@ export default async function BuiltPage() {
           className="build-console-module-grid"
           style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}
         >
-          {statCard('Build Time', '6–10 Weeks', 'From first call to deployed, live site.')}
+          {statCard('Build Time', '~3 Months', 'Plan for 3 months. Often done sooner.')}
           {statCard('Clients Available', '2', 'Currently taking limited new projects.')}
           {statCard('System Layers', '4', 'Public site, admin panel, CMS, and booking flow.')}
           {statCard('Templates Used', '0', 'Every page, component, and layout is custom.')}
@@ -264,7 +263,6 @@ export default async function BuiltPage() {
             then made available for yours.
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <Link href="/portfolio" className="btn-ghost">See the Portfolio →</Link>
             <a href={`mailto:${bookingEmail}?subject=Web Build Inquiry`} className="btn-primary">
               Start a Project →
             </a>
@@ -340,7 +338,6 @@ export default async function BuiltPage() {
             <a href={`mailto:${bookingEmail}?subject=Web Build Inquiry`} className="btn-primary">
               Start a Project →
             </a>
-            <Link href="/portfolio" className="btn-ghost">See the Work</Link>
           </div>
         </section>
       </div>
