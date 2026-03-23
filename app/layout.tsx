@@ -12,10 +12,23 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: 'DJ B.A.E. — The Bae Agenda',
+  title: {
+    default: 'DJ B.A.E. | Official Website | DJ in Indianapolis & Chicago',
+    template: '%s | DJ B.A.E.',
+  },
   description:
-    'DJ · Curator · Experience Architect. Chicago-based DJ available for private events, weddings, club nights, and more.',
-  keywords: ['DJ', 'Chicago DJ', 'DJ BAE', 'The Bae Agenda', 'event DJ', 'wedding DJ'],
+    'DJ B.A.E. — Indianapolis & Chicago DJ available for private events, weddings, club nights, festivals, and more. Book DJ BAE for your next event.',
+  keywords: [
+    'DJ BAE', 'DJ B.A.E.', 'Indianapolis DJ', 'Chicago DJ', 'The Bae Agenda',
+    'event DJ', 'wedding DJ', 'club DJ', 'festival DJ', 'DJ Indianapolis',
+    'DJ Chicago', 'book a DJ', 'private event DJ',
+  ],
+  openGraph: {
+    siteName: 'DJ B.A.E. | The Bae Agenda',
+    locale: 'en_US',
+    type: 'website',
+  },
+  metadataBase: new URL('https://thebaeagenda.com'),
 }
 
 export default function RootLayout({

@@ -5,9 +5,9 @@ import { getPortfolioEntries, getFeaturedPortfolioEntries, getPortfolioStats } f
 import PortfolioArchive from '@/components/public/PortfolioArchive'
 
 export const metadata: Metadata = {
-  title: 'Portfolio — DJ B.A.E. | The Bae Agenda',
+  title: 'Portfolio | DJ BAE Gig History — Indianapolis & Chicago',
   description:
-    'Gig history, featured events, and full archive. DJ B.A.E. — Chicago, Indianapolis, ATL. Available for club nights, festivals, private events, and more.',
+    'Full gig history, featured events, and press for DJ B.A.E. — Indianapolis & Chicago DJ. Club nights, festivals, private events, and more.',
   openGraph: {
     title: 'DJ B.A.E. — Portfolio',
     description: 'From basements to festivals. Every room, every crowd.',
@@ -209,6 +209,52 @@ export default async function PortfolioPage() {
           tags:       e.tags ?? [],
           featured:   e.featured,
         }))} />
+
+        {/* ── Press ─────────────────────────────────────────────── */}
+        <section style={{
+          borderTop: '1px solid var(--border)',
+          padding: '56px 0',
+        }}>
+          <span className="section-label" style={{ display: 'block', marginBottom: '24px' }}>
+            Press &amp; Features
+          </span>
+          <div style={{
+            display: 'flex',
+            gap: '16px',
+            flexWrap: 'wrap',
+          }}>
+            <a
+              href="https://mokbpresents.com/artist/dj-b-a-e/"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                background: 'var(--off-black)',
+                border: '1px solid var(--border)',
+                padding: '16px 20px',
+                color: 'var(--white)',
+                textDecoration: 'none',
+                fontSize: '13px',
+                transition: 'border-color 0.2s ease',
+              }}
+              className="card-hover"
+            >
+              <span style={{
+                fontFamily: 'Conthrax, sans-serif',
+                fontSize: '11px',
+                letterSpacing: '0.1em',
+                color: 'var(--violet)',
+              }}>
+                MOKB Presents
+              </span>
+              <span style={{ color: 'var(--muted)', fontSize: '12px' }}>
+                Artist Feature →
+              </span>
+            </a>
+          </div>
+        </section>
 
         {/* ── CTA ───────────────────────────────────────────────── */}
         <section style={{
