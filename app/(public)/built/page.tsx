@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { getContentMap } from '@/lib/db/content'
 import BuiltSection from '@/components/public/BuiltSection'
@@ -85,32 +86,66 @@ export default async function BuiltPage() {
       <div className="section-container" style={{ display: 'grid', gap: '56px', paddingTop: 0 }}>
 
         {/* ── Hero ─────────────────────────────────────────────── */}
-        <section>
-          <div className="hardware-heading">
-            <span className="section-label">Built</span>
+        <section style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(280px, 0.9fr)', gap: '32px', alignItems: 'center' }}>
+          <div>
+            <div className="hardware-heading">
+              <span className="section-label">Built</span>
+            </div>
+            <h1 style={{
+              fontFamily: 'Conthrax, sans-serif',
+              fontSize: 'clamp(34px, 5.2vw, 64px)',
+              lineHeight: 0.95,
+              color: 'var(--white)',
+              margin: '0 0 20px',
+            }}>
+              Built from<br />
+              <span style={{ color: 'var(--amber)' }}>Scratch.</span>
+            </h1>
+            <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '8px' }}>
+              Designed, engineered, and deployed by <strong style={{ color: 'var(--white)' }}>DJ B.A.E.</strong> —
+              not a template, not Wix, not Squarespace, not a drag-and-drop builder.
+              Every page, every component, every flow written from scratch in real code.
+            </p>
+            <p style={{ fontSize: '15px', color: 'var(--amber)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '28px', fontWeight: 500 }}>
+              This stack is available for your brand.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <a href={`mailto:${bookingEmail}?subject=Web Build Inquiry`} className="btn-primary">
+                Start a Project →
+              </a>
+            </div>
           </div>
-          <h1 style={{
-            fontFamily: 'Conthrax, sans-serif',
-            fontSize: 'clamp(34px, 5.2vw, 64px)',
-            lineHeight: 0.95,
-            color: 'var(--white)',
-            margin: '0 0 20px',
-          }}>
-            Built from<br />
-            <span style={{ color: 'var(--amber)' }}>Scratch.</span>
-          </h1>
-          <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '8px' }}>
-            Designed, engineered, and deployed by <strong style={{ color: 'var(--white)' }}>DJ B.A.E.</strong> —
-            not a template, not Wix, not Squarespace, not a drag-and-drop builder.
-            Every page, every component, every flow written from scratch in real code.
-          </p>
-          <p style={{ fontSize: '15px', color: 'var(--amber)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '28px', fontWeight: 500 }}>
-            This stack is available for your brand.
-          </p>
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <a href={`mailto:${bookingEmail}?subject=Web Build Inquiry`} className="btn-primary">
-              Start a Project →
-            </a>
+
+          <div
+            aria-hidden="true"
+            style={{
+              position: 'relative',
+              minHeight: '320px',
+              display: 'grid',
+              placeItems: 'center',
+              overflow: 'hidden',
+              border: '1px solid rgba(255,255,255,0.08)',
+              background: 'linear-gradient(180deg, rgba(255,196,107,0.08), rgba(255,255,255,0.01))',
+            }}
+          >
+            <div style={{ position: 'absolute', inset: '5% 8%', opacity: 0.22 }}>
+              <Image
+                src="/photos/images/allbackmother.jpg"
+                alt=""
+                fill
+                sizes="(max-width: 900px) 100vw, 40vw"
+                style={{ objectFit: 'cover' }}
+              />
+            </div>
+            <div style={{ position: 'relative', width: 'min(250px, 58vw)', aspectRatio: '1 / 1', filter: 'drop-shadow(0 24px 40px rgba(0,0,0,0.3))' }}>
+              <Image
+                src="/photos/images/speaker1.png"
+                alt=""
+                fill
+                sizes="250px"
+                style={{ objectFit: 'contain' }}
+              />
+            </div>
           </div>
         </section>
 

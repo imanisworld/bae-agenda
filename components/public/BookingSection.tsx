@@ -116,10 +116,6 @@ export default function BookingSection({ bookingEmail }: Props) {
               <span>Travel</span>
             </div>
 
-            <div className="build-console-dial-cluster" aria-hidden="true">
-              <span className="build-console-dial" />
-              <span className="build-console-dial-label">Booking</span>
-            </div>
           </div>
 
           {/* Grid: copy panel left, packages right */}

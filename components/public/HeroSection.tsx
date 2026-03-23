@@ -62,19 +62,19 @@ export default function HeroSection({ content = {} }: Props) {
     >
       {/* ── Background photo ─────────────────────────────── */}
       <Image
-        src="/photos/hero-bg.jpg"
+        src="/photos/images/outside.jpg"
         alt=""
         fill
         priority
         aria-hidden="true"
-        style={{ objectFit: 'cover', objectPosition: 'center 35%', opacity: 0.56 }}
+        style={{ objectFit: 'cover', objectPosition: 'center 48%', opacity: 0.6 }}
       />
 
       {/* Dark gradient overlay — keeps text readable */}
       <div aria-hidden="true" style={{
         position:   'absolute',
         inset:      0,
-        background: 'linear-gradient(to bottom, rgba(8,8,10,0.38) 0%, rgba(8,8,10,0.22) 38%, rgba(8,8,10,0.56) 78%, rgba(8,8,10,0.76) 100%)',
+        background: 'linear-gradient(to bottom, rgba(8,8,10,0.44) 0%, rgba(8,8,10,0.22) 34%, rgba(8,8,10,0.52) 72%, rgba(8,8,10,0.78) 100%)',
         zIndex:     0,
       }} />
 

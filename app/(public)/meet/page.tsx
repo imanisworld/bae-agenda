@@ -166,12 +166,6 @@ export default function MeetPage() {
               <span>Club</span>
               <span>Private</span>
               <span>Travel</span>
-              <span>Host</span>
-            </div>
-
-            <div className="build-console-dial-cluster" aria-hidden="true">
-              <span className="build-console-dial" />
-              <span className="build-console-dial-label">Room Energy</span>
             </div>
           </div>
 

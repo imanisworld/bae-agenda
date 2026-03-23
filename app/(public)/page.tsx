@@ -14,6 +14,7 @@
 import HeroSection              from '@/components/public/HeroSection'
 import MixesSection             from '@/components/public/MixesSection'
 import EventsSection            from '@/components/public/EventsSection'
+import PhotoStrip               from '@/components/public/PhotoStrip'
 import PortfolioTeaserSection   from '@/components/public/PortfolioTeaserSection'
 import BookingSection           from '@/components/public/BookingSection'
 import ConnectSection           from '@/components/public/ConnectSection'
@@ -46,6 +47,7 @@ export default async function HomePage() {
       />
       <MixesSection />
       <EventsSection />
+      <PhotoStrip />
       <PortfolioTeaserSection />
       <BookingSection
         bookingEmail={content.booking_email}

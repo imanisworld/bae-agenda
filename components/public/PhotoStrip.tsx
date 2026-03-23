@@ -18,52 +18,32 @@ interface StripSlot {
   label: string   // hint for which photo goes here
 }
 
-const STRIP_SLOTS: StripSlot[] = [
-  { slot: 1, label: 'crowd or dance floor' },
-  { slot: 2, label: 'closeup of hands on decks' },
-  { slot: 3, label: 'wide venue shot'          },
-  { slot: 4, label: 'profile / candid'         },
-  { slot: 5, label: 'lighting or atmosphere'   },
+const STRIP_PHOTOS = [
+  { src: '/photos/PlexMix19-DJBAE.JPEG',                        alt: 'DJ B.A.E. on the decks' },
+  { src: '/photos/IMG_1118.JPG.jpeg',                           alt: 'DJ B.A.E. live set' },
+  { src: '/photos/93857B7F-E4CA-4F51-BD81-68031362370D.JPG',   alt: 'DJ B.A.E. at the event' },
+  { src: '/photos/IMG_1120.JPG.jpeg',                           alt: 'DJ B.A.E. performance' },
+  // slot 5 — add another photo here when ready
 ]
 
 export default function PhotoStrip() {
   return (
     <div
       className="photo-strip"
-      aria-hidden="true"   // decorative — screen readers skip
+      aria-hidden="true"
     >
-      {STRIP_SLOTS.map(({ slot, label }) => (
-        <div
-          key={slot}
-          className="photo-strip-slot photo-slot"
-        >
-          {/*
-            ── TO ADD A REAL PHOTO ──────────────────────────────────
-            Remove the photo-placeholder div below and add:
-
-            <img
-              src={`/photos/strip-${slot}.jpg`}
-              alt={`DJ B.A.E. — ${label}`}
-            />
-
-            or with Next.js Image for optimization:
-
-            import Image from 'next/image'
-            <Image
-              src={`/photos/strip-${slot}.jpg`}
-              alt={`DJ B.A.E. — ${label}`}
-              fill
-              sizes="20vw"
-              style={{ objectFit: 'cover' }}
-            />
-            ─────────────────────────────────────────────────────────
-          */}
-          <div className="photo-placeholder">
-            <span className="photo-placeholder-label">Strip {slot}</span>
-            <span className="photo-placeholder-label" style={{ opacity: 0.55 }}>{label}</span>
-          </div>
+      {STRIP_PHOTOS.map(({ src, alt }, i) => (
+        <div key={i} className="photo-strip-slot photo-slot">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
         </div>
       ))}
+      {/* Slot 5 placeholder until 5th photo is added */}
+      <div className="photo-strip-slot photo-slot">
+        <div className="photo-placeholder">
+          <span className="photo-placeholder-label" style={{ opacity: 0.4 }}>+ add photo</span>
+        </div>
+      </div>
     </div>
   )
 }
