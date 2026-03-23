@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { balanceDueOf, generateInvoicePdf, invoiceFilename, invoiceNumberOf, type InvoiceBookingData } from '@/lib/invoices'
 import { sendInvoiceNotification } from '@/lib/notifications'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+
+// 10 invoice sends per hour per IP — generous for legitimate admin use,
+// tight enough to prevent email-spam abuse.
+const INVOICE_SEND_LIMIT  = 10
+const INVOICE_SEND_WINDOW = 60 * 60 * 1000 // 1 hour
 
 function formatCurrency(value: number) {
   return value.toLocaleString('en-US', {
@@ -11,11 +17,30 @@ function formatCurrency(value: number) {
 }
 
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params
+  // ── Auth guard ────────────────────────────────────────────────────
+  // This route generates a PDF and sends an email — require a valid
+  // admin session before doing any work.
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 })
+  }
+
+  // ── Rate limit ────────────────────────────────────────────────────
+  const clientIp = getClientIp(request.headers)
+  const rateLimit = checkRateLimit(`invoice-send:${clientIp}`, INVOICE_SEND_LIMIT, INVOICE_SEND_WINDOW)
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many invoice requests. Please wait before sending again.' },
+      { status: 429, headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) } }
+    )
+  }
+
+  // ── Fetch booking ─────────────────────────────────────────────────
+  const { id } = await params
 
   const { data } = await supabase
     .from('bookings')
