@@ -5,7 +5,7 @@
  * Middleware already guarantees the user is authenticated; this is belt-and-suspenders.
  */
 import { createClient } from '@/lib/supabase/server'
-import Sidebar from '@/components/admin/Sidebar'
+import AdminShell from '@/components/admin/AdminShell'
 
 export default async function AdminLayout({
   children,
@@ -22,28 +22,8 @@ export default async function AdminLayout({
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        minHeight: '100vh',
-        background: 'var(--black)',
-      }}
-    >
-      {/* Fixed sidebar — 240px wide */}
-      <Sidebar userEmail={user?.email} />
-
-      {/* Scrollable main content — offset by sidebar width */}
-      <main
-        style={{
-          flex: 1,
-          marginLeft: '240px',
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        {children}
-      </main>
-    </div>
+    <AdminShell userEmail={user?.email}>
+      {children}
+    </AdminShell>
   )
 }

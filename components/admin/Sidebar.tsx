@@ -5,6 +5,8 @@
  *
  * Props:
  *   userEmail — passed from the server layout after auth.getUser()
+ *   isOpen    — controls mobile slide-in state
+ *   onClose   — callback to close the sidebar on mobile
  */
 'use client'
 
@@ -15,13 +17,16 @@ import { ADMIN_NAV } from '@/lib/constants'
 
 interface SidebarProps {
   userEmail: string | undefined
+  isOpen?: boolean
+  onClose?: () => void
 }
 
-export default function Sidebar({ userEmail }: SidebarProps) {
+export default function Sidebar({ userEmail, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
 
   return (
     <aside
+      className={`admin-sidebar${isOpen ? ' admin-sidebar--open' : ''}`}
       style={{
         position: 'fixed',
         top: 0,
@@ -41,30 +46,60 @@ export default function Sidebar({ userEmail }: SidebarProps) {
         style={{
           padding: '28px 24px 24px',
           borderBottom: '1px solid var(--border)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
         }}
       >
-        <div
-          style={{
-            fontFamily: 'Conthrax, sans-serif',
-            fontSize: '13px',
-            fontWeight: 600,
-            letterSpacing: '0.2em',
-            color: 'var(--white)',
-            marginBottom: '4px',
-          }}
-        >
-          DJ <span style={{ color: 'var(--violet)' }}>B.A.E.</span>
+        <div>
+          <div
+            style={{
+              fontFamily: 'Conthrax, sans-serif',
+              fontSize: '13px',
+              fontWeight: 600,
+              letterSpacing: '0.2em',
+              color: 'var(--white)',
+              marginBottom: '4px',
+            }}
+          >
+            DJ <span style={{ color: 'var(--violet)' }}>B.A.E.</span>
+          </div>
+          <div
+            style={{
+              fontSize: '9px',
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              color: 'var(--muted)',
+            }}
+          >
+            Admin Panel
+          </div>
         </div>
-        <div
-          style={{
-            fontSize: '9px',
-            letterSpacing: '0.3em',
-            textTransform: 'uppercase',
-            color: 'var(--muted)',
-          }}
-        >
-          Admin Panel
-        </div>
+
+        {/* Close button — only visible on mobile */}
+        {onClose && (
+          <button
+            onClick={onClose}
+            aria-label="Close navigation"
+            style={{
+              display: 'none',
+              background: 'transparent',
+              border: '1px solid var(--border)',
+              color: 'var(--muted)',
+              width: '32px',
+              height: '32px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              lineHeight: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexShrink: 0,
+            }}
+            className="admin-sidebar-close"
+          >
+            ✕
+          </button>
+        )}
       </div>
 
       {/* ── Navigation ────────────────────────────────── */}
@@ -81,6 +116,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               style={{
                 display: 'flex',
                 alignItems: 'center',
