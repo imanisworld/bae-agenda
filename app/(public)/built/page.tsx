@@ -8,13 +8,13 @@ import { PORTFOLIO_HIGHLIGHTS } from '@/lib/portfolio-data'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Built — DJ B.A.E.',
+  title: 'Built | Custom Web Development by DJ B.A.E.',
   description:
-    'This site was designed and built from scratch — a full-stack booking platform, content system, and brand presence. Available to build for your brand.',
+    'This site was designed and built from scratch by DJ B.A.E. — a custom booking platform, admin dashboard, and brand presence. Available as a service for artists and brands.',
   openGraph: {
     title: 'Built from Scratch — DJ B.A.E.',
     description:
-      'No templates, no builders. A custom Next.js + Supabase platform handling bookings, CMS, and public presence. Available for freelance builds.',
+      'No templates. No builders. A custom full-stack platform with bookings, CMS, and public presence. Available for your brand.',
   },
 }
 
@@ -99,7 +99,7 @@ export default async function BuiltPage() {
           style={{ padding: '26px', display: 'grid', gap: '16px' }}
         >
           <div className="build-console-fx-header">
-            <span>What Was Built</span>
+            <span>What Was Built — For This Site</span>
             <div className="build-console-mini-chips">
               <span>Full-Stack</span>
               <span>Custom</span>
@@ -114,6 +114,79 @@ export default async function BuiltPage() {
               </div>
             ))}
           </div>
+        </section>
+
+        {/* This Is A Service */}
+        <section style={{ borderTop: '1px solid var(--border)', paddingTop: '48px' }}>
+          <span className="section-label" style={{ display: 'block', marginBottom: '8px' }}>
+            Available As A Service
+          </span>
+          <h2 style={{
+            fontFamily: 'Conthrax, sans-serif',
+            fontSize: 'clamp(22px, 3.5vw, 40px)',
+            color: 'var(--white)',
+            lineHeight: 1.1,
+            margin: '0 0 16px',
+          }}>
+            Need something<br />
+            <span style={{ color: 'var(--amber)' }}>built?</span>
+          </h2>
+          <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '36px' }}>
+            The same system powering this site — bookings, content management, admin panel, public presence —
+            can be built for your brand, your business, or your project. No templates. No subscriptions. Just yours.
+          </p>
+
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+            gap: '16px',
+            marginBottom: '36px',
+          }}>
+            {[
+              {
+                title: 'Artist & Brand Sites',
+                desc: 'Full public presence — bio, events, press, social links, and booking form. Built to rank on Google.',
+              },
+              {
+                title: 'Booking Platforms',
+                desc: 'Custom inquiry flow with client records, status tracking, invoice generation, and email notifications.',
+              },
+              {
+                title: 'Admin Dashboards',
+                desc: 'Manage content, events, bookings, and clients from a private dashboard — no third-party tools needed.',
+              },
+              {
+                title: 'Content Systems',
+                desc: 'CMS-backed copy, mixes, portfolio entries, and media — all editable from the admin without touching code.',
+              },
+            ].map(({ title, desc }) => (
+              <div key={title} className="build-console-module card-hover-amber" style={{ padding: '20px' }}>
+                <div style={{
+                  fontSize: '11px',
+                  letterSpacing: '0.16em',
+                  textTransform: 'uppercase',
+                  color: 'var(--amber)',
+                  marginBottom: '10px',
+                }}>
+                  {title}
+                </div>
+                <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7 }}>
+                  {desc}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {bookingEmail && (
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <a href={`mailto:${bookingEmail}?subject=Web Build Inquiry`} className="btn-primary">
+                Start a Conversation →
+              </a>
+              <a href={`mailto:${bookingEmail}`} className="btn-ghost">
+                {bookingEmail}
+              </a>
+            </div>
+          )}
         </section>
 
       </div>

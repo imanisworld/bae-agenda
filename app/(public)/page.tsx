@@ -7,14 +7,13 @@
  *   HeroSection          — full viewport, brand presence (reads hero copy)
  *   MixesSection         — 3 featured mix cards
  *   EventsSection        — upcoming dates (live Supabase data)
- *   SelectedWorkSection  — real events and recurring nights
+ *   PortfolioTeaserSection — featured portfolio pulled from Supabase
  *   BookingSection       — packages + booking CTA (reads booking_email)
  *   ConnectSection       — social links / "stay connected" (reads social URLs)
  */
 import HeroSection              from '@/components/public/HeroSection'
 import MixesSection             from '@/components/public/MixesSection'
 import EventsSection            from '@/components/public/EventsSection'
-import SelectedWorkSection      from '@/components/public/SelectedWorkSection'
 import PortfolioTeaserSection   from '@/components/public/PortfolioTeaserSection'
 import BookingSection           from '@/components/public/BookingSection'
 import ConnectSection           from '@/components/public/ConnectSection'
@@ -47,7 +46,6 @@ export default async function HomePage() {
       />
       <MixesSection />
       <EventsSection />
-      <SelectedWorkSection />
       <PortfolioTeaserSection />
       <BookingSection
         bookingEmail={content.booking_email}
