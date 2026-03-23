@@ -2792,7 +2792,7 @@ body.has-custom-cursor * { cursor: none !important; }
   gap: 18px;
   min-width: max-content;
   padding: 12px 0;
-  animation: genre-scroll 32s linear infinite;
+  animation: genre-scroll 55s linear infinite;
 }
 
 .genre-chip {

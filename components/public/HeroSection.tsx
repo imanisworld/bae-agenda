@@ -114,24 +114,6 @@ export default function HeroSection({ content = {} }: Props) {
             ))}
           </h1>
 
-          <div style={{
-            display:       'inline-flex',
-            alignItems:    'center',
-            justifySelf:   'start',
-            width:         'fit-content',
-            background:    'rgba(255,255,255,0.05)',
-            border:        '1px solid rgba(255,255,255,0.14)',
-            borderRadius:  '100px',
-            padding:       '7px 16px',
-            fontSize:      '11px',
-            fontFamily:    'DM Sans, sans-serif',
-            color:         'rgba(250,248,243,0.88)',
-            letterSpacing: '0.01em',
-            whiteSpace:    'nowrap',
-            marginTop:     '14px',
-          }}>
-            {today}
-          </div>
         </div>
 
         <div aria-hidden="true" />

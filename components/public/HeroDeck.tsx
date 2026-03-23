@@ -163,24 +163,6 @@ export default function HeroDeck() {
         setIsPlaying((v) => !v)
       }}
     >
-      {/* Click hint — only visible when paused */}
-      {!isPlaying && (
-        <span style={{
-          position: 'absolute',
-          bottom: '-28px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          fontSize: '9px',
-          letterSpacing: '0.22em',
-          textTransform: 'uppercase',
-          color: 'rgba(155,93,229,0.7)',
-          whiteSpace: 'nowrap',
-          fontFamily: 'Conthrax, sans-serif',
-          pointerEvents: 'none',
-        }}>
-          ↑ tap to spin
-        </span>
-      )}
       <span className="hero-turntable" aria-hidden="true">
         <span className="hero-turntable-panel">
           <span className="hero-turntable-plinth" />

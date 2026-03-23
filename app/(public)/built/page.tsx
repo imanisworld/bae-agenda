@@ -351,19 +351,19 @@ export default async function BuiltPage() {
             ].map(({ q, a }) => (
               <div key={q} style={{
                 background: 'var(--off-black)',
-                padding: '20px 24px',
+                padding: '28px 28px',
                 display: 'grid',
-                gap: '8px',
+                gap: '12px',
               }}>
                 <div style={{
                   fontFamily: 'Conthrax, sans-serif',
                   fontSize: '13px',
                   color: 'var(--white)',
-                  lineHeight: 1.4,
+                  lineHeight: 1.5,
                 }}>
                   {q}
                 </div>
-                <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7 }}>
+                <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.85 }}>
                   {a}
                 </div>
               </div>

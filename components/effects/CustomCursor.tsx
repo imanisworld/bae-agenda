@@ -85,14 +85,14 @@ export default function CustomCursor() {
 
   return (
     <>
-      {/* Inner dot — snaps to cursor position */}
+      {/* Dot — snaps to cursor position */}
       <div
         ref={dotRef}
         aria-hidden="true"
         style={{
           position: 'fixed',
           left: 0, top: 0,
-          width: '14px', height: '14px',
+          width: '10px', height: '10px',
           background: 'var(--violet)',
           borderRadius: '50%',
           transform: 'translate(-50%, -50%) scale(1)',
@@ -101,27 +101,11 @@ export default function CustomCursor() {
           opacity: 0,
           willChange: 'left, top',
           transition: 'transform 200ms ease',
-          boxShadow: '0 0 12px rgba(155,93,229,0.8)',
+          boxShadow: '0 0 10px rgba(155,93,229,0.7)',
         }}
       />
-      {/* Outer ring — lags behind for depth */}
-      <div
-        ref={ringRef}
-        aria-hidden="true"
-        style={{
-          position: 'fixed',
-          left: 0, top: 0,
-          width: '36px', height: '36px',
-          border: '1.5px solid rgba(155,93,229,0.55)',
-          borderRadius: '50%',
-          transform: 'translate(-50%, -50%) scale(1)',
-          pointerEvents: 'none',
-          zIndex: 10000,
-          opacity: 0,
-          willChange: 'left, top',
-          transition: 'border-color 200ms ease, transform 200ms ease',
-        }}
-      />
+      {/* Hidden ring ref kept to avoid breaking hover logic */}
+      <div ref={ringRef} aria-hidden="true" style={{ display: 'none' }} />
     </>
   )
 }

@@ -31,10 +31,10 @@ function TagChip({ label }: { label: string }) {
 }
 
 const filterBtnBase: React.CSSProperties = {
-  fontSize: '10px',
-  letterSpacing: '0.14em',
+  fontSize: '11px',
+  letterSpacing: '0.12em',
   textTransform: 'uppercase',
-  padding: '6px 14px',
+  padding: '9px 18px',
   borderRadius: '100px',
   border: '1px solid var(--border)',
   background: 'transparent',

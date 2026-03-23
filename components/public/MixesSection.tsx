@@ -242,12 +242,9 @@ export default async function MixesSection() {
                 <p style={{ fontSize: '13px', color: 'var(--muted)', margin: 0, maxWidth: '360px', textAlign: 'center', lineHeight: 1.7, position: 'relative', zIndex: 1 }}>
                   New sets dropping soon. Follow to get notified.
                 </p>
-                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', position: 'relative', zIndex: 1 }}>
-                  <a href={SOUNDCLOUD_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '12px' }}>
-                    SC Follow →
-                  </a>
-                  <a href="https://www.youtube.com/@djb.a.e" target="_blank" rel="noopener noreferrer" className="btn-ghost" style={{ fontSize: '12px' }}>
-                    YT Subscribe →
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <a href={SOUNDCLOUD_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ fontSize: '12px' }}>
+                    Follow on SoundCloud →
                   </a>
                 </div>
               </div>
