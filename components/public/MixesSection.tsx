@@ -199,18 +199,29 @@ export default async function MixesSection() {
                 }}>
                   Coming Soon
                 </div>
-                <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '20px' }}>
-                  New sets dropping on SoundCloud.
+                <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '24px' }}>
+                  New sets dropping soon. Follow to get notified.
                 </p>
-                <a
-                  href={SOUNDCLOUD_PROFILE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-ghost"
-                  style={{ fontSize: '12px' }}
-                >
-                  Follow on SoundCloud →
-                </a>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <a
+                    href={SOUNDCLOUD_PROFILE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-ghost"
+                    style={{ fontSize: '12px' }}
+                  >
+                    SC Follow →
+                  </a>
+                  <a
+                    href="https://www.youtube.com/@djb.a.e"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-ghost"
+                    style={{ fontSize: '12px' }}
+                  >
+                    YT Subscribe →
+                  </a>
+                </div>
               </div>
             )}
         </div>

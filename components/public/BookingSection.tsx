@@ -55,6 +55,48 @@ export default function BookingSection({ bookingEmail }: Props) {
         <div className="hardware-heading"><span className="section-label">Booking</span></div>
         <h2 className="section-heading" style={{ marginBottom: '28px' }}>Booking</h2>
 
+        {/* 3-step process */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gap: '1px',
+          background: 'var(--border)',
+          border: '1px solid var(--border)',
+          marginBottom: '28px',
+        }}>
+          {[
+            { step: '01', label: 'Inquiry',     desc: 'Submit your event details through the booking form.' },
+            { step: '02', label: 'Follow-Up',   desc: 'We review and reach back within 24–48 hours.' },
+            { step: '03', label: 'Locked In',   desc: 'Deposit secures the date. Details confirmed.' },
+          ].map(({ step, label, desc }) => (
+            <div key={step} style={{
+              background: 'var(--off-black)',
+              padding: '20px 18px',
+              display: 'grid',
+              gap: '6px',
+            }}>
+              <div style={{
+                fontSize: '9px',
+                letterSpacing: '0.28em',
+                textTransform: 'uppercase',
+                color: 'var(--violet)',
+              }}>
+                {step}
+              </div>
+              <div style={{
+                fontFamily: 'Conthrax, sans-serif',
+                fontSize: '13px',
+                color: 'var(--white)',
+              }}>
+                {label}
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+                {desc}
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="build-console">
           {/* Topbar: screen + chips + dial */}
           <div className="build-console-topbar">

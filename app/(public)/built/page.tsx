@@ -315,6 +315,58 @@ export default async function BuiltPage() {
           </div>
         </section>
 
+        {/* ── FAQ ───────────────────────────────────────────────── */}
+        <section style={{ borderTop: '1px solid var(--border)', paddingTop: '48px', marginBottom: '0' }}>
+          <span className="section-label" style={{ display: 'block', marginBottom: '24px' }}>FAQ</span>
+          <div style={{ display: 'grid', gap: '1px', background: 'var(--border)', border: '1px solid var(--border)', marginBottom: '48px' }}>
+            {[
+              {
+                q: 'What\'s the deposit?',
+                a: '50% upfront to lock the date. The remaining 50% is due at launch.',
+              },
+              {
+                q: 'Do I need to provide content?',
+                a: 'Yes — copy, images, and brand assets come from you. We build the system that presents them.',
+              },
+              {
+                q: 'Do you work remotely?',
+                a: '100% remote. No location requirement. Communication happens over email and video calls.',
+              },
+              {
+                q: 'How many revisions are included?',
+                a: 'Standard and Custom tiers include 2 rounds of revisions. Starter is 1 round.',
+              },
+              {
+                q: 'I\'m already on GoDaddy or Wix — can I keep my domain?',
+                a: 'Yes. Your domain transfers over. We handle the DNS pointing and setup.',
+              },
+              {
+                q: 'What happens after the site launches?',
+                a: 'You own the code. A monthly retainer is available if you want ongoing updates and support.',
+              },
+            ].map(({ q, a }) => (
+              <div key={q} style={{
+                background: 'var(--off-black)',
+                padding: '20px 24px',
+                display: 'grid',
+                gap: '8px',
+              }}>
+                <div style={{
+                  fontFamily: 'Conthrax, sans-serif',
+                  fontSize: '13px',
+                  color: 'var(--white)',
+                  lineHeight: 1.4,
+                }}>
+                  {q}
+                </div>
+                <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7 }}>
+                  {a}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* ── Final CTA ─────────────────────────────────────────── */}
         <section style={{
           borderTop: '1px solid var(--border)',
