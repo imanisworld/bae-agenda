@@ -36,7 +36,7 @@ export default function ConnectSection({ socialOverrides = {} }: Props) {
       id="connect"
       aria-label="Stay Connected"
       style={{
-        background: 'var(--off-black)',
+        background: 'radial-gradient(ellipse at 50% 100%, rgba(155,93,229,0.09) 0%, transparent 60%), var(--off-black)',
         borderTop: '1px solid var(--border)',
         scrollMarginTop: '96px',
       }}
@@ -69,6 +69,7 @@ export default function ConnectSection({ socialOverrides = {} }: Props) {
                 rel="noopener noreferrer"
                 aria-label={`DJ B.A.E. on ${label}`}
                 className="patch-jack"
+                data-platform={label}
               >
                 {/* Jack port */}
                 <span className="patch-jack-port" aria-hidden="true">

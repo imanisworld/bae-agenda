@@ -60,7 +60,7 @@ export default function BuiltSection({ aboutQuote }: Props) {
       id="built-by"
       aria-label="Under The Hood"
       style={{
-        background: 'var(--black)',
+        background: 'radial-gradient(ellipse at 80% 50%, rgba(155,93,229,0.06) 0%, transparent 55%), var(--black)',
         borderTop: '1px solid var(--border)',
       }}
     >
@@ -173,6 +173,101 @@ export default function BuiltSection({ aboutQuote }: Props) {
 
           </div>
 
+        </div>
+
+        {/* ── Signal Chain Visual ─────────────────────────────── */}
+        <div className="signal-chain-visual">
+          {(['CLIENT', 'NEXT.JS', 'SUPABASE', 'VERCEL', 'LIVE'] as const).map((node, i, arr) => (
+            <>
+              <div key={node} className="signal-node">
+                <div className="signal-node-dot" />
+                <span className="signal-node-label">{node}</span>
+              </div>
+              {i < arr.length - 1 && <div key={`line-${i}`} className="signal-line" />}
+            </>
+          ))}
+        </div>
+
+        {/* ── Deconstructed Speaker Diagram ──────────────────── */}
+        <div style={{
+          borderTop: '1px solid var(--border)',
+          paddingTop: '56px',
+          marginTop: '56px',
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '48px',
+          alignItems: 'center',
+        }}
+        className="speaker-anatomy-grid"
+        >
+          <div>
+            <span className="section-label" style={{ display: 'block', marginBottom: '16px' }}>Anatomy of the Build</span>
+            <h3 style={{
+              fontFamily: 'Conthrax, sans-serif',
+              fontSize: 'clamp(18px, 2.5vw, 28px)',
+              color: 'var(--white)',
+              lineHeight: 1.2,
+              margin: '0 0 16px',
+            }}>
+              Every layer<br />
+              <span style={{ color: 'var(--gold)' }}>has a job.</span>
+            </h3>
+            <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '380px' }}>
+              A speaker works because every component is purpose-built and stacked precisely.
+              This site works the same way — each layer of the stack handles exactly one thing,
+              and nothing else.
+            </p>
+            <div style={{ marginTop: '24px', display: 'grid', gap: '10px' }}>
+              {[
+                { layer: 'Frame',      tech: 'Vercel',    desc: 'Deployment & edge delivery' },
+                { layer: 'Surround',   tech: 'Tailwind',  desc: 'Visual structure & design tokens' },
+                { layer: 'Cone',       tech: 'Next.js',   desc: 'Pages, routing, Server Components' },
+                { layer: 'Voice Coil', tech: 'TypeScript', desc: 'Type-safe end to end' },
+                { layer: 'Magnet',     tech: 'Supabase',  desc: 'Data engine — auth, DB, RLS' },
+              ].map(({ layer, tech, desc }) => (
+                <div key={layer} style={{ display: 'flex', gap: '12px', alignItems: 'baseline' }}>
+                  <span style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '9px', color: 'var(--muted)', letterSpacing: '0.15em', minWidth: '72px' }}>{layer}</span>
+                  <span style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '10px', color: 'var(--violet)', minWidth: '80px' }}>{tech}</span>
+                  <span style={{ fontSize: '11px', color: 'var(--muted)', opacity: 0.7 }}>{desc}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Deconstructed device video */}
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{
+              position: 'relative',
+              width: 'min(320px, 80vw)',
+              aspectRatio: '1 / 1',
+              borderRadius: '12px',
+              overflow: 'hidden',
+              border: '1px solid rgba(155,93,229,0.2)',
+              boxShadow: '0 0 40px rgba(155,93,229,0.12)',
+            }}>
+              {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
+              <video
+                src="/videos/e67f0964-8763-4658-bbba-4cc322727d68.mp4"
+                autoPlay
+                muted
+                loop
+                playsInline
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  filter: 'brightness(0.85) contrast(1.1)',
+                }}
+              />
+              {/* Subtle violet tint overlay */}
+              <div style={{
+                position: 'absolute',
+                inset: 0,
+                background: 'linear-gradient(135deg, rgba(155,93,229,0.08) 0%, transparent 60%)',
+                pointerEvents: 'none',
+              }} />
+            </div>
+          </div>
         </div>
 
       </div>
