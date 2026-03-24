@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <div style={{ background: 'var(--black)', paddingTop: '68px' }}>
-      <div className="section-container" style={{ maxWidth: '840px', paddingTop: 0, display: 'grid', gap: '28px' }}>
+      <div className="section-container" style={{ maxWidth: '840px', paddingTop: 0, paddingBottom: '56px', display: 'grid', gap: '28px' }}>
         <section style={{ display: 'grid', gap: '16px' }}>
           <span className="section-label">Privacy</span>
           <h1

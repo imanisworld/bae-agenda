@@ -44,7 +44,7 @@ export default async function PressKitPage() {
       <div style={{ maxWidth: '1180px', margin: '0 auto', display: 'grid', gap: '24px' }}>
         <div className="print-hide" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <Link
-            href="/portfolio"
+            href="/meet"
             style={{
               display: 'inline-flex',
               alignItems: 'center',
@@ -59,7 +59,7 @@ export default async function PressKitPage() {
               textTransform: 'uppercase',
             }}
           >
-            ← Portfolio
+            ← Meet
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
             <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#666' }}>

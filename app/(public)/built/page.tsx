@@ -79,7 +79,7 @@ export default async function BuiltPage() {
 
   return (
     <div style={{ background: 'var(--black)', paddingTop: '68px' }}>
-      <div className="section-container" style={{ display: 'grid', gap: '56px', paddingTop: 0 }}>
+      <div className="section-container" style={{ display: 'grid', gap: '56px', paddingTop: 0, paddingBottom: '56px' }}>
 
         {/* ── Hero ─────────────────────────────────────────────── */}
         <section className="built-page-hero" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(280px, 0.9fr)', gap: '32px', alignItems: 'center' }}>

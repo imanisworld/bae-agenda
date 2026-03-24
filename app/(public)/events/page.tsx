@@ -17,13 +17,13 @@ export const metadata: Metadata = {
     title: 'Events | DJ B.A.E.',
     description: 'Upcoming DJ sets, club nights, and appearances by DJ B.A.E.',
     url: 'https://thebaeagenda.com/events',
-    images: [{ url: '/photos/outdoor-night-set-pook.jpg', width: 600, height: 934, alt: 'DJ B.A.E. performing outdoors at night' }],
+    images: [{ url: '/photos/outdoor-night-set-pook.png', width: 600, height: 934, alt: 'DJ B.A.E. performing outdoors at night' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Events | DJ B.A.E.',
     description: 'Upcoming DJ sets, club nights, and appearances by DJ B.A.E.',
-    images: ['/photos/outdoor-night-set-pook.jpg'],
+    images: ['/photos/outdoor-night-set-pook.png'],
   },
 }
 
@@ -46,7 +46,7 @@ export default async function EventsPage() {
       background: 'var(--black)',
       paddingTop: '68px',
     }}>
-      <div className="section-container" style={{ paddingTop: 0 }}>
+      <div className="section-container" style={{ paddingTop: 0, paddingBottom: '40px' }}>
 
         {/* Header */}
         <div style={{ marginBottom: '56px' }}>
@@ -219,7 +219,7 @@ export default async function EventsPage() {
 
         {/* Footer CTA */}
         <div style={{
-          padding: '64px 0 32px',
+          padding: '48px 0 8px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-start',

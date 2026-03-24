@@ -41,7 +41,7 @@ export default function ConnectSection({ socialOverrides = {} }: Props) {
         scrollMarginTop: '96px',
       }}
     >
-      <div className="section-container" style={{ textAlign: 'center' }}>
+      <div className="section-container" style={{ textAlign: 'center', paddingBottom: '56px' }}>
 
         <div className="hardware-heading" style={{ justifyContent: 'center' }}>
           <span className="section-label">Socials</span>

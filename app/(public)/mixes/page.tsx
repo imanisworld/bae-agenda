@@ -52,7 +52,7 @@ export default async function MixesPage() {
         paddingTop: '68px',
       }}
     >
-      <div className="section-container" style={{ paddingTop: 0 }}>
+      <div className="section-container" style={{ paddingTop: 0, paddingBottom: '40px' }}>
         <div style={{ marginBottom: '56px' }}>
           <span className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '10px' }}>
             Featured Mixes
@@ -410,7 +410,7 @@ export default async function MixesPage() {
           style={{
             borderTop: '1px solid var(--border)',
             paddingTop: '48px',
-            paddingBottom: '32px',
+            paddingBottom: '8px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'flex-start',

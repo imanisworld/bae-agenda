@@ -266,7 +266,7 @@ export default async function PortfolioPage() {
         {/* ── CTA ───────────────────────────────────────────────── */}
         <section style={{
           borderTop: '1px solid var(--border)',
-          padding: '56px 0 80px',
+          padding: '40px 0 24px',
           textAlign: 'center',
         }}>
           <p style={{

@@ -8,15 +8,27 @@
  */
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { useEffect } from 'react'
 
 export default function AdminLoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
   const [loading, setLoading]   = useState(false)
+
+  useEffect(() => {
+    const routeError = searchParams.get('error')
+    if (routeError !== 'unauthorized') return
+
+    setError('This account is not allowed to access admin. Sign in with your approved admin email.')
+
+    const supabase = createClient()
+    void supabase.auth.signOut()
+  }, [searchParams])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()

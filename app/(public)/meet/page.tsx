@@ -49,7 +49,7 @@ function sectionLabel(text: string) {
 export default function MeetPage() {
   return (
     <div style={{ background: 'var(--black)', paddingTop: '68px' }}>
-      <div className="section-container" style={{ display: 'grid', gap: '32px', paddingTop: 0 }}>
+      <div className="section-container" style={{ display: 'grid', gap: '32px', paddingTop: 0, paddingBottom: '56px' }}>
         <section
           className="meet-hero-grid"
           style={{
@@ -162,7 +162,7 @@ export default function MeetPage() {
         <section
           style={{
             borderTop: '1px solid var(--border)',
-            padding: '40px 0 64px',
+            padding: '40px 0 24px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',

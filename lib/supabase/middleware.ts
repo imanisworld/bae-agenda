@@ -66,7 +66,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl)
   }
 
-  if (isLoginRoute && user) {
+  if (isLoginRoute && user && isAllowedAdminUser(user)) {
     const dashboardUrl = request.nextUrl.clone()
     dashboardUrl.pathname = '/admin/dashboard'
     return NextResponse.redirect(dashboardUrl)

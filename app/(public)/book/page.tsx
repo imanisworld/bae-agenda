@@ -194,7 +194,7 @@ export default function BookPage() {
         paddingTop: '68px',
       }}
     >
-      <div className="section-container" style={{ maxWidth: '920px', paddingTop: 0 }}>
+      <div className="section-container" style={{ maxWidth: '920px', paddingTop: 0, paddingBottom: '48px' }}>
         <div style={{ marginBottom: '36px' }}>
           <span className="section-label">Booking Inquiry</span>
           <h1
