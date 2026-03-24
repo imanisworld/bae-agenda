@@ -3075,6 +3075,28 @@ body.has-custom-cursor * { cursor: none !important; }
   display: none;
 }
 
+.admin-mobile-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 48;
+}
+
+.admin-sidebar-close {
+  display: none;
+}
+
+.admin-sidebar.is-open {
+  transform: translateX(0) !important;
+}
+
 .admin-main {
   flex: 1;
   margin-left: 240px;
@@ -3251,9 +3273,13 @@ body.has-custom-cursor * { cursor: none !important; }
     transform: translateX(-100%) !important;
   }
 
+  .admin-sidebar-close {
+    display: block;
+  }
+
   .admin-main {
     margin-left: 0;
-    padding-top: 72px;
+    padding-top: 56px;
   }
 
   .admin-page {

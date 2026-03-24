@@ -22,26 +22,9 @@ export default async function AdminLayout({
   }
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        minHeight: '100vh',
-        background: 'var(--black)',
-      }}
-    >
-      {/* Fixed sidebar — 240px wide */}
+    <div className="admin-shell">
       <Sidebar userEmail={user?.email} />
-
-      {/* Scrollable main content — offset by sidebar width */}
-      <main
-        style={{
-          flex: 1,
-          marginLeft: '240px',
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
+      <main className="admin-main">
         {children}
       </main>
     </div>
