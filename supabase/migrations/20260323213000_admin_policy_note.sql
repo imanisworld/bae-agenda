@@ -1,0 +1,4 @@
+-- Security note:
+-- Current RLS policies still grant table-wide admin access to any authenticated user.
+-- Replace auth.role() = 'authenticated' admin policies with a real admin allowlist
+-- or role table before expanding access beyond a single trusted operator.

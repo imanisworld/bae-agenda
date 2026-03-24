@@ -4,8 +4,20 @@ import Link from 'next/link'
 import SetControlSection from '@/components/public/SetControlSection'
 
 export const metadata: Metadata = {
-  title: 'Meet DJ B.A.E. — DJ B.A.E.',
+  title: 'Meet',
   description: 'Meet DJ B.A.E. and get a closer look at the sound, setup, and energy behind the agenda.',
+  openGraph: {
+    title: 'Meet DJ B.A.E.',
+    description: 'A closer look at the sound, setup, and energy behind the agenda.',
+    url: 'https://thebaeagenda.com/meet',
+    images: [{ url: '/photos/PlexMix19-DJBAE.JPEG', width: 1637, height: 1411, alt: 'DJ B.A.E. performing live' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Meet DJ B.A.E.',
+    description: 'A closer look at the sound, setup, and energy behind the agenda.',
+    images: ['/photos/PlexMix19-DJBAE.JPEG'],
+  },
 }
 
 const techItems = [
@@ -36,7 +48,7 @@ function sectionLabel(text: string) {
 
 export default function MeetPage() {
   return (
-    <div style={{ background: 'var(--black)', minHeight: '100vh', paddingTop: '68px' }}>
+    <div style={{ background: 'var(--black)', paddingTop: '68px' }}>
       <div className="section-container" style={{ display: 'grid', gap: '32px', paddingTop: 0 }}>
         <section
           className="meet-hero-grid"
@@ -134,11 +146,11 @@ export default function MeetPage() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
               <Link href="/book" className="btn-primary">
                 Book DJ B.A.E.
               </Link>
-              <Link href="/press-kit" className="btn-ghost">
+              <Link href="/press-kit" className="inline-link">
                 Open Press Kit
               </Link>
             </div>

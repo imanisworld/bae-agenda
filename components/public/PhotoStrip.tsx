@@ -12,22 +12,28 @@
  * On mobile: 3 photos at 180px height.
  * On desktop: 5 photos at 260px height.
  */
+import Image from 'next/image'
 
 const STRIP_PHOTOS = [
   { src: '/photos/PlexMix19-DJBAE.JPEG', alt: 'DJ B.A.E. on the decks', credit: 'Shot by Pook' },
   { src: '/photos/IMG_1118.JPG.jpeg', alt: 'DJ B.A.E. portrait', credit: 'Shot by G' },
   { src: '/photos/93857B7F-E4CA-4F51-BD81-68031362370D.JPG', alt: 'DJ B.A.E. at the event', credit: 'Shot by Ki' },
   { src: '/photos/IMG_1120.JPG.jpeg', alt: 'DJ B.A.E. smiling portrait', credit: 'Shot by G' },
-  { src: '/photos/outdoor-night-set-pook.png', alt: 'DJ B.A.E. performing outdoors at night', credit: 'Shot by Pook' },
+  { src: '/photos/outdoor-night-set-pook.jpg', alt: 'DJ B.A.E. performing outdoors at night', credit: 'Shot by Pook' },
 ]
 
 export default function PhotoStrip() {
   return (
     <div className="photo-strip">
       {STRIP_PHOTOS.map(({ src, alt, credit }, i) => (
-        <div key={i} className="photo-strip-slot photo-slot">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={src} alt={alt} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+        <div key={i} className="photo-strip-slot photo-slot" style={{ position: 'relative' }}>
+          <Image
+            src={src}
+            alt={alt}
+            fill
+            sizes="(max-width: 800px) 33vw, 20vw"
+            style={{ objectFit: 'cover', display: 'block' }}
+          />
           <div className="photo-credit">{credit}</div>
         </div>
       ))}

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { balanceDueOf, generateInvoicePdf, invoiceFilename, invoiceNumberOf, type InvoiceBookingData } from '@/lib/invoices'
 import { sendInvoiceNotification } from '@/lib/notifications'
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
+import { isAllowedAdminUser } from '@/lib/admin-auth'
 
 function formatCurrency(value: number) {
   return value.toLocaleString('en-US', {
@@ -11,11 +13,50 @@ function formatCurrency(value: number) {
 }
 
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const origin = request.headers.get('origin')
+  const host = request.headers.get('host')
+  if (origin && host) {
+    const originHost = new URL(origin).host
+    if (originHost !== host) {
+      return NextResponse.json({ error: 'Invalid submission origin.' }, { status: 403 })
+    }
+  }
+
   const { id } = await params
   const supabase = await createClient()
+  const { data: auth } = await supabase.auth.getUser()
+
+  if (!auth.user || !isAllowedAdminUser(auth.user)) {
+    return NextResponse.json(
+      { error: 'Unauthorized' },
+      {
+        status: 401,
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+          'X-Robots-Tag': 'noindex, nofollow',
+        },
+      }
+    )
+  }
+
+  const clientIp = getClientIp(request.headers)
+  const rateLimit = checkRateLimit(`invoice-send:${clientIp}:${id}`, 5, 15 * 60 * 1000)
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many invoice send attempts. Please wait a few minutes and try again.' },
+      {
+        status: 429,
+        headers: {
+          'Retry-After': String(rateLimit.retryAfterSeconds),
+          'Cache-Control': 'no-store, max-age=0',
+          'X-Robots-Tag': 'noindex, nofollow',
+        },
+      }
+    )
+  }
 
   const { data } = await supabase
     .from('bookings')
@@ -70,9 +111,23 @@ export async function POST(
   if (!result.ok) {
     return NextResponse.json(
       { error: result.detail || 'Invoice email failed to send.' },
-      { status: result.reason === 'missing_config' ? 500 : 502 }
+      {
+        status: result.reason === 'missing_config' ? 500 : 502,
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+          'X-Robots-Tag': 'noindex, nofollow',
+        },
+      }
     )
   }
 
-  return NextResponse.json({ success: true })
+  return NextResponse.json(
+    { success: true },
+    {
+      headers: {
+        'Cache-Control': 'no-store, max-age=0',
+        'X-Robots-Tag': 'noindex, nofollow',
+      },
+    }
+  )
 }

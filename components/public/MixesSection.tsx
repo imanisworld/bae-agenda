@@ -182,7 +182,7 @@ export default async function MixesSection() {
 
                 <InteractiveMediaDisc
                   className="mixes-teaser-disc-button"
-                  videoSrc="/videos/e67f0964-8763-4658-bbba-4cc322727d68.mp4"
+                  imageSrc="/photos/images/logo.JPG"
                 />
 
                 <div className="mixes-teaser-copy">

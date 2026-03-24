@@ -6,7 +6,7 @@
  * Revalidates the homepage and content page after every save.
  */
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient }      from '@/lib/supabase/server'
+import { requireAdminUser }  from '@/lib/admin-auth'
 import { revalidatePath }    from 'next/cache'
 
 export interface ContentUpdate {
@@ -21,12 +21,7 @@ export async function saveContentItems(
   if (!updates.length) return { success: true }
 
   try {
-    // Require an authenticated admin session before using service-role writes
-    const userClient = await createClient()
-    const { data: auth } = await userClient.auth.getUser()
-    if (!auth.user) {
-      return { success: false, error: 'Unauthorized' }
-    }
+    await requireAdminUser()
 
     const supabase = createAdminClient()
 

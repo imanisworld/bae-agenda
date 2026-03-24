@@ -191,7 +191,6 @@ export default function BookPage() {
     <div
       style={{
         background: 'var(--off-black)',
-        minHeight: '100vh',
         paddingTop: '68px',
       }}
     >

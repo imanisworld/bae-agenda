@@ -3,6 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { getPortfolioEntries, getFeaturedPortfolioEntries, getPortfolioStats } from '@/app/actions/portfolio'
 import PortfolioArchive from '@/components/public/PortfolioArchive'
+import { getContentMap } from '@/lib/db/content'
+import { CONTENT_DEFAULTS } from '@/lib/content-schema'
 
 export const metadata: Metadata = {
   title: 'Portfolio | DJ BAE Gig History — Indianapolis & Chicago',
@@ -34,14 +36,16 @@ function TagChip({ label }: { label: string }) {
 }
 
 export default async function PortfolioPage() {
-  const [entries, featured, stats] = await Promise.all([
+  const [entries, featured, stats, content] = await Promise.all([
     getPortfolioEntries(),
     getFeaturedPortfolioEntries(),
     getPortfolioStats(),
+    getContentMap(['booking_email']),
   ])
+  const bookingEmail = content.booking_email ?? CONTENT_DEFAULTS.booking_email ?? 'bookings@thebaeagenda.com'
 
   return (
-    <div style={{ background: 'var(--black)', minHeight: '100vh' }}>
+    <div style={{ background: 'var(--black)' }}>
 
       {/* ── Hero ──────────────────────────────────────────────── */}
       <section style={{
@@ -278,7 +282,7 @@ export default async function PortfolioPage() {
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link href="/book" className="btn-primary">Start a Booking →</Link>
-            <a href="mailto:baebookings@proton.me" className="btn-ghost">Email Us</a>
+            {bookingEmail && <a href={`mailto:${bookingEmail}`} className="btn-ghost">Email Us</a>}
           </div>
         </section>
 

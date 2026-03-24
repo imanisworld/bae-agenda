@@ -7,6 +7,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import type { Database } from '@/types/database'
+import { isAllowedAdminUser } from '@/lib/admin-auth'
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -55,6 +56,13 @@ export async function updateSession(request: NextRequest) {
   if (isAdminRoute && !isLoginRoute && !user) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/admin/login'
+    return NextResponse.redirect(loginUrl)
+  }
+
+  if (isAdminRoute && !isLoginRoute && user && !isAllowedAdminUser(user)) {
+    const loginUrl = request.nextUrl.clone()
+    loginUrl.pathname = '/admin/login'
+    loginUrl.searchParams.set('error', 'unauthorized')
     return NextResponse.redirect(loginUrl)
   }
 

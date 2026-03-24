@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
+import { isAllowedAdminUser } from '@/lib/admin-auth'
+import { createRequestId, logError } from '@/lib/monitoring'
 
 const PAGE = { width: 612, height: 792, marginX: 56 }
 const muted  = rgb(0.42, 0.42, 0.48)
@@ -31,10 +33,23 @@ function labelValue(
 }
 
 export async function GET() {
+  const requestId = createRequestId()
   try {
     const supabase = await createClient()
     const { data: auth } = await supabase.auth.getUser()
-    if (!auth.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    if (!auth.user || !isAllowedAdminUser(auth.user)) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        {
+          status: 401,
+          headers: {
+            'Cache-Control': 'no-store, max-age=0',
+            'X-Robots-Tag': 'noindex, nofollow',
+            'X-Request-Id': requestId,
+          },
+        }
+      )
+    }
 
     const { data } = await supabase
       .from('site_content')
@@ -126,10 +141,14 @@ export async function GET() {
       headers: {
         'Content-Type':        'application/pdf',
         'Content-Disposition': 'attachment; filename="DJ-BAE-W9.pdf"',
+        'Cache-Control':       'no-store, max-age=0',
+        'Pragma':              'no-cache',
+        'X-Robots-Tag':        'noindex, nofollow',
+        'X-Request-Id':        requestId,
       },
     })
   } catch (err) {
-    console.error('[W9]', err)
-    return NextResponse.json({ error: 'Failed to generate W-9' }, { status: 500 })
+    logError('W9 route failed', err, { requestId, route: '/api/w9' })
+    return NextResponse.json({ error: 'Failed to generate W-9', requestId }, { status: 500, headers: { 'X-Request-Id': requestId } })
   }
 }

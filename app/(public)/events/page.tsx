@@ -11,8 +11,20 @@ import { getUpcomingEvents } from '@/lib/db/events'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Events — DJ B.A.E.',
+  title: 'Events',
   description: 'Upcoming DJ sets, club nights, and appearances by DJ B.A.E. in Chicago and beyond.',
+  openGraph: {
+    title: 'Events | DJ B.A.E.',
+    description: 'Upcoming DJ sets, club nights, and appearances by DJ B.A.E.',
+    url: 'https://thebaeagenda.com/events',
+    images: [{ url: '/photos/outdoor-night-set-pook.jpg', width: 600, height: 934, alt: 'DJ B.A.E. performing outdoors at night' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Events | DJ B.A.E.',
+    description: 'Upcoming DJ sets, club nights, and appearances by DJ B.A.E.',
+    images: ['/photos/outdoor-night-set-pook.jpg'],
+  },
 }
 
 function formatEventDate(isoDate: string) {
@@ -32,7 +44,6 @@ export default async function EventsPage() {
   return (
     <div style={{
       background: 'var(--black)',
-      minHeight: '100vh',
       paddingTop: '68px',
     }}>
       <div className="section-container" style={{ paddingTop: 0 }}>
@@ -91,7 +102,7 @@ export default async function EventsPage() {
               letterSpacing: '0.04em',
               lineHeight: 1.7,
             }}>
-              No upcoming events scheduled yet.
+              No public dates are posted yet.
               <br />
               Check back soon — or follow on{' '}
               <a

@@ -2,16 +2,10 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdminUser } from '@/lib/admin-auth'
 import { toEventISO } from '@/lib/date-time'
 import type { BookingStatus } from '@/types/index'
-
-async function requireAuthedUser() {
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getUser()
-  if (!data.user) redirect('/admin/login')
-}
 
 function redirectWithError(path: string, message: string) {
   const params = new URLSearchParams({ error: message })
@@ -50,7 +44,7 @@ function parseOptionalNumber(value: FormDataEntryValue | null): number | null {
 
 
 export async function updateBookingStatusAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
 
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
@@ -75,7 +69,7 @@ export async function updateBookingStatusAction(formData: FormData) {
 }
 
 export async function updateBookingDetailsAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
 
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
@@ -138,7 +132,7 @@ interface BookingEventSource {
 }
 
 export async function createEventFromBookingAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
 
   const admin = createAdminClient()
   const bookingId = optionalString(formData.get('booking_id'))

@@ -4,6 +4,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { sendBookingNotifications } from '@/lib/notifications'
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 import { toEventISO } from '@/lib/date-time'
+import { createRequestId, logError } from '@/lib/monitoring'
 
 const bookingSchema = z.object({
   firstName: z.string().trim().min(1).max(80),
@@ -64,6 +65,7 @@ function normalizeOptional(value?: string): string | null {
 }
 
 export async function POST(request: Request) {
+  const requestId = createRequestId()
   try {
     const origin = request.headers.get('origin')
     const host = request.headers.get('host')
@@ -221,8 +223,9 @@ export async function POST(request: Request) {
       notes: normalizeOptional(payload.notes),
     })
 
-    return NextResponse.json({ success: true }, { status: 201 })
-  } catch {
-    return NextResponse.json({ error: 'Unexpected server error.' }, { status: 500 })
+    return NextResponse.json({ success: true, requestId }, { status: 201, headers: { 'X-Request-Id': requestId } })
+  } catch (error) {
+    logError('Booking route failed', error, { requestId, route: '/api/booking' })
+    return NextResponse.json({ error: 'Unexpected server error.', requestId }, { status: 500, headers: { 'X-Request-Id': requestId } })
   }
 }

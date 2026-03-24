@@ -2,8 +2,9 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
+import { requireAdminUser } from '@/lib/admin-auth'
 
 export interface PortfolioEntry {
   id:         string
@@ -20,12 +21,6 @@ export interface PortfolioEntry {
   notes:      string | null
   created_at: string
   updated_at: string
-}
-
-async function requireAuthedUser() {
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getUser()
-  if (!data.user) redirect('/admin/login')
 }
 
 function redirectWithError(path: string, message: string) {
@@ -102,7 +97,7 @@ export async function getPortfolioStats() {
 // ── Mutating actions (authenticated) ────────────────────────────────────────
 
 export async function createPortfolioEntryAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
 
   const eventName = optionalString(formData.get('event_name'))
@@ -139,7 +134,7 @@ export async function createPortfolioEntryAction(formData: FormData) {
 }
 
 export async function updatePortfolioEntryAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
 
   const id        = optionalString(formData.get('id'))
@@ -181,7 +176,7 @@ export async function updatePortfolioEntryAction(formData: FormData) {
 }
 
 export async function deletePortfolioEntryAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/portfolio', 'Missing entry id.')
@@ -198,7 +193,7 @@ export async function deletePortfolioEntryAction(formData: FormData) {
 }
 
 export async function togglePortfolioFeaturedAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/portfolio', 'Missing entry id.')
@@ -220,7 +215,7 @@ export async function togglePortfolioFeaturedAction(formData: FormData) {
 }
 
 export async function togglePortfolioStatusAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/portfolio', 'Missing entry id.')

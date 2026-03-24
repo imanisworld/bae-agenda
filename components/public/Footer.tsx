@@ -34,6 +34,10 @@ export default function Footer() {
           © {CURRENT_YEAR} DJ B.A.E. · The Bae Agenda. All rights reserved.
         </p>
 
+        <Link href="/privacy" className="inline-link" style={{ fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+          Privacy
+        </Link>
+
       </div>
     </footer>
   )

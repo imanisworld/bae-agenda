@@ -2,14 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-
-async function requireAuthedUser() {
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getUser()
-  if (!data.user) redirect('/admin/login')
-}
+import { requireAdminUser } from '@/lib/admin-auth'
 
 function redirectWithError(path: string, message: string) {
   const params = new URLSearchParams({ error: message })
@@ -43,7 +37,7 @@ function revalidateMixPaths() {
 }
 
 export async function createMixAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
 
   const titleRaw = formData.get('title')
@@ -76,7 +70,7 @@ export async function createMixAction(formData: FormData) {
 }
 
 export async function updateMixAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
 
   const id = optionalString(formData.get('id'))
@@ -114,7 +108,7 @@ export async function updateMixAction(formData: FormData) {
 }
 
 export async function deleteMixAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/mixes', 'Missing mix id.')
@@ -129,7 +123,7 @@ export async function deleteMixAction(formData: FormData) {
 }
 
 export async function toggleMixFeaturedAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/mixes', 'Missing mix id.')
@@ -145,7 +139,7 @@ export async function toggleMixFeaturedAction(formData: FormData) {
 }
 
 export async function toggleMixPublishedAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/mixes', 'Missing mix id.')

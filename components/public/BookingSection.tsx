@@ -138,10 +138,12 @@ export default function BookingSection({ bookingEmail }: Props) {
               </p>
               <div style={{ marginTop: '24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <Link href="/book" className="btn-primary">Start Booking →</Link>
-                {email && (
-                  <a href={`mailto:${email}`} className="btn-ghost">Email Us</a>
-                )}
               </div>
+              {email && (
+                <p style={{ marginTop: '14px', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7 }}>
+                  Prefer email? <a href={`mailto:${email}`} className="inline-link">Reach out directly</a>.
+                </p>
+              )}
             </div>
 
             <div className="build-console-mixer">

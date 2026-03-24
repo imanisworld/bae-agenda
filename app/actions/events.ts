@@ -2,13 +2,8 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-async function requireAuthedUser() {
-  const supabase = await createClient()
-  const { data } = await supabase.auth.getUser()
-  if (!data.user) redirect('/admin/login')
-}
+import { requireAdminUser } from '@/lib/admin-auth'
 
 function redirectWithError(path: string, message: string) {
   const params = new URLSearchParams({ error: message })
@@ -29,7 +24,7 @@ function optionalString(value: FormDataEntryValue | null): string | null {
 }
 
 export async function createEventAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
 
   const titleRaw = formData.get('title')
@@ -60,7 +55,7 @@ export async function createEventAction(formData: FormData) {
 }
 
 export async function updateEventAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
 
   const id = optionalString(formData.get('id'))
@@ -96,7 +91,7 @@ export async function updateEventAction(formData: FormData) {
 }
 
 export async function deleteEventAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/events', 'Missing event id.')
@@ -113,7 +108,7 @@ export async function deleteEventAction(formData: FormData) {
 }
 
 export async function toggleEventPublicAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/events', 'Missing event id.')
@@ -131,7 +126,7 @@ export async function toggleEventPublicAction(formData: FormData) {
 }
 
 export async function toggleEventFeaturedAction(formData: FormData) {
-  await requireAuthedUser()
+  await requireAdminUser()
   const admin = createAdminClient()
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/events', 'Missing event id.')

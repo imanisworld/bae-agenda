@@ -4,6 +4,8 @@ import { useState } from 'react'
 
 export default function MixesTeaserForm() {
   const [email, setEmail]   = useState('')
+  const [website, setWebsite] = useState('')
+  const [startedAt] = useState(() => String(Date.now()))
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
 
   async function handleSubmit() {
@@ -15,7 +17,7 @@ export default function MixesTeaserForm() {
       const res = await fetch('/api/notify-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmed }),
+        body: JSON.stringify({ email: trimmed, website, startedAt }),
       })
       setStatus(res.ok ? 'done' : 'error')
     } catch {
@@ -41,6 +43,17 @@ export default function MixesTeaserForm() {
       className="mixes-teaser-signup"
       onSubmit={(e) => { e.preventDefault(); handleSubmit() }}
     >
+      <input
+        type="text"
+        name="website"
+        tabIndex={-1}
+        autoComplete="off"
+        value={website}
+        onChange={(e) => setWebsite(e.target.value)}
+        style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }}
+        aria-hidden="true"
+      />
+      <input type="hidden" name="startedAt" value={startedAt} />
       <label className="mixes-teaser-signup-field">
         <span className="sr-only">Email address</span>
         <input

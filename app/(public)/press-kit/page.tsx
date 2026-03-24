@@ -36,11 +36,11 @@ export default async function PressKitPage() {
 
   const title = content.hero_title ?? 'THE BAE AGENDA'
   const subtitle = content.hero_subtitle ?? 'Private events, club nights, weddings & branded experiences.'
-  const about = content.about_quote ?? 'Chicago-based DJ, curator, and experience architect.'
+  const about = content.about_quote ?? 'From the South Side of Chicago, DJ B.A.E. brings a sound shaped by genre-defying curiosity. Her artistic journey deepened during her years in Boston, where the intersection of visual art and music helped ignite her creative fire. Now based in Indianapolis, DJ B.A.E. is known for genre-fluid sets that move between hip-hop, R&B, bass, house, juke, ATL bass, Jersey and Baltimore club, jungle, baile, and underground edits with intention and cultural awareness.'
   const bookingEmail = content.booking_email ?? ''
 
   return (
-    <div className="press-kit-page" style={{ background: '#ece8df', minHeight: '100vh', color: '#111', padding: 'calc(68px + clamp(20px, 5vw, 32px)) 20px clamp(20px, 5vw, 40px)' }}>
+    <div className="press-kit-page" style={{ background: '#ece8df', color: '#111', padding: 'calc(68px + clamp(20px, 5vw, 32px)) 20px clamp(20px, 5vw, 40px)' }}>
       <div style={{ maxWidth: '1180px', margin: '0 auto', display: 'grid', gap: '24px' }}>
         <div className="print-hide" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <Link

@@ -6,6 +6,8 @@
  */
 import { createClient } from '@/lib/supabase/server'
 import Sidebar from '@/components/admin/Sidebar'
+import { isAllowedAdminUser } from '@/lib/admin-auth'
+import { redirect } from 'next/navigation'
 
 export default async function AdminLayout({
   children,
@@ -19,6 +21,10 @@ export default async function AdminLayout({
     user = data.user
   } catch {
     // Session unavailable — layout renders without user info
+  }
+
+  if (!user || !isAllowedAdminUser(user)) {
+    redirect('/admin/login?error=unauthorized')
   }
 
   return (

@@ -9,8 +9,20 @@ const YOUTUBE_EMBED_SRC = 'https://www.youtube.com/embed/2wKqMdJD3ts?list=PLItuH
 const SOUNDCLOUD_PROFILE_URL = 'https://soundcloud.com/deejaybae'
 
 export const metadata: Metadata = {
-  title: 'Mixes — DJ B.A.E.',
+  title: 'Mixes',
   description: 'Curated DJ mixes across hip-hop, R&B, Afrobeats, house, and more by DJ B.A.E.',
+  openGraph: {
+    title: 'Mixes | DJ B.A.E.',
+    description: 'Curated DJ mixes across hip-hop, R&B, Afrobeats, house, and more by DJ B.A.E.',
+    url: 'https://thebaeagenda.com/mixes',
+    images: [{ url: '/photos/images/logo.JPG', alt: 'DJ B.A.E. logo artwork' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Mixes | DJ B.A.E.',
+    description: 'Curated DJ mixes across hip-hop, R&B, Afrobeats, house, and more by DJ B.A.E.',
+    images: ['/photos/images/logo.JPG'],
+  },
 }
 
 function formatDuration(seconds: number | null): string {
@@ -37,7 +49,6 @@ export default async function MixesPage() {
     <div
       style={{
         background: 'var(--off-black)',
-        minHeight: '100vh',
         paddingTop: '68px',
       }}
     >

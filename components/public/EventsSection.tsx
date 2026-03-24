@@ -1,8 +1,6 @@
 /**
  * EVENTS SECTION — Async Server Component
- * Layout matches static site reference:
- *   Left  (1fr) — "— EVENTS" label + large heading + description
- *   Right (2fr) — event rows (gap: 2px) + placeholder + Instagram card + See All
+ * Layout matches the editorial homepage treatment without fake dates.
  */
 import Link from 'next/link'
 import { getFeaturedEvents, type Event } from '@/lib/db/events'
@@ -44,26 +42,11 @@ function EventRow({ title, event_date, venue, city, featured }: Event) {
   )
 }
 
-function PlaceholderRow() {
-  return (
-    <div className="ev-item" style={{ opacity: 0.4 }}>
-      <div>
-        <span className="ev-day">?</span>
-        <span className="ev-month">TBA</span>
-      </div>
-      <div>
-        <p className="ev-name">Your Event Could Be Here</p>
-        <p className="ev-venue">Your City</p>
-      </div>
-      <Link href="/book" className="ev-link">→</Link>
-    </div>
-  )
-}
-
 // ── Section ───────────────────────────────────────────────────────────────────
 
 export default async function EventsSection() {
   const events = await getFeaturedEvents()
+  const hasEvents = events.length > 0
 
   return (
     <section id="events" aria-label="Upcoming Events" style={{
@@ -114,42 +97,68 @@ export default async function EventsSection() {
         {/* ── Right: event rows + Instagram + SEE ALL ── */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
 
-          {/* Event rows — 2px gap between each item */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            {events.map((event) => (
-              <EventRow key={event.id} {...event} />
-            ))}
-            <PlaceholderRow />
-          </div>
-
-          {/* Instagram card */}
-          <a
-            href="https://www.instagram.com/dj_b.a.e/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="card-hover"
-            style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              border: '1px solid var(--border)', padding: '16px 20px', textDecoration: 'none',
-            }}
-          >
-            <div>
-              <div style={{ fontSize: '11px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--eyebrow)', marginBottom: '6px' }}>
-                Follow for updates
+          {hasEvents ? (
+            <>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                {events.map((event) => (
+                  <EventRow key={event.id} {...event} />
+                ))}
               </div>
-              <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '12px', fontWeight: 600, color: 'var(--white)' }}>
-                @dj_b.a.e
+
+              <div style={{ display: 'grid', gap: '10px' }}>
+                <div>
+                  <Link href="/events" className="view-all-link">
+                    See All Events →
+                  </Link>
+                </div>
+                <p style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
+                  For last-minute announcements and pop-up sets, follow{' '}
+                  <a
+                    href="https://www.instagram.com/dj_b.a.e/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-link"
+                  >
+                    @dj_b.a.e
+                  </a>
+                  .
+                </p>
+              </div>
+            </>
+          ) : (
+            <div
+              style={{
+                border: '1px solid var(--border)',
+                background: 'var(--surface)',
+                padding: '22px 20px',
+                display: 'grid',
+                gap: '16px',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '8px' }}>
+                  No Public Dates Yet
+                </div>
+                <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
+                  Public events are not posted yet. For pop-up updates, follow Instagram. For private bookings, send an inquiry.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '14px', alignItems: 'center' }}>
+                <Link href="/book" className="btn-primary">
+                  Book The Next Date
+                </Link>
+                <a
+                  href="https://www.instagram.com/dj_b.a.e/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-link"
+                >
+                  Follow on Instagram
+                </a>
               </div>
             </div>
-            <span style={{ fontSize: '20px', color: 'var(--muted)' }}>→</span>
-          </a>
-
-          {/* See All */}
-          <div>
-            <Link href="/events" className="view-all-link">
-              See All Events →
-            </Link>
-          </div>
+          )}
 
         </div>
       </div>
