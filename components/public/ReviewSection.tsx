@@ -42,7 +42,7 @@ function Stars({ n }: { n: number }) {
   )
 }
 
-export default async function ReviewSection() {
+export default async function ReviewSection({ hideForm = false }: { hideForm?: boolean }) {
   const reviews = await getApprovedReviews()
   const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
   const featuredReview = reviews[0]
@@ -98,7 +98,7 @@ export default async function ReviewSection() {
             }}>
               Real reactions from parties, venues, and live rooms.
             </p>
-            <a
+            {!hideForm && <a
               href="#leave-review"
               className="review-section-cta"
               style={{
@@ -117,7 +117,7 @@ export default async function ReviewSection() {
               }}
             >
               Leave a Review
-            </a>
+            </a>}
           </div>
 
           <div className="review-section-chips">
@@ -169,14 +169,16 @@ export default async function ReviewSection() {
                 flexWrap: 'wrap',
               }}>
                 <Stars n={featuredReview.rating} />
-                <span className="review-card-badge" style={{
-                  fontSize: '9px',
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(255,255,255,0.42)',
-                }}>
-                  Verified Review
-                </span>
+                {!featuredReview.id.startsWith('f') && featuredReview.event_type && (
+                  <span className="review-card-badge" style={{
+                    fontSize: '9px',
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(255,255,255,0.42)',
+                  }}>
+                    Reviewed
+                  </span>
+                )}
               </div>
 
               <p className="review-card-message" style={{
@@ -212,7 +214,7 @@ export default async function ReviewSection() {
               )}
             </div>
 
-            <a
+            {!hideForm && <a
               href="#leave-review"
               className="review-card-cta"
               style={{
@@ -233,10 +235,10 @@ export default async function ReviewSection() {
               }}
             >
               Leave a Review
-            </a>
+            </a>}
           </article>
 
-          <div id="leave-review" className="review-form-shell" style={{
+          {!hideForm && <div id="leave-review" className="review-form-shell" style={{
             marginTop: '10px',
             borderRadius: '20px',
             padding: '16px',
@@ -250,7 +252,7 @@ export default async function ReviewSection() {
               </p>
             </div>
             <ReviewForm compact />
-          </div>
+          </div>}
         </div>
       </div>
     </section>

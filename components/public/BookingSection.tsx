@@ -98,26 +98,6 @@ export default function BookingSection({ bookingEmail }: Props) {
         </div>
 
         <div className="build-console">
-          {/* Topbar: screen + chips + dial */}
-          <div className="build-console-topbar">
-            <div className="build-console-screen">
-              <div className="build-console-screen-label">Booking Console</div>
-              <div className="build-console-screen-value">Book with BAE</div>
-              <div className="build-console-screen-lines">
-                <span><strong>Rate</strong> $300/hour — hourly or custom packages</span>
-                <span><strong>Formats</strong> Club nights, private events, weddings, rooftops</span>
-                <span><strong>Range</strong> Open-format — hip-hop, R&amp;B, house, Afrobeats &amp; more</span>
-              </div>
-            </div>
-
-            <div className="build-console-chip-row" aria-hidden="true">
-              <span>Hourly</span>
-              <span>Custom</span>
-              <span>Travel</span>
-            </div>
-
-          </div>
-
           {/* Grid: copy panel left, packages right */}
           <div className="build-console-grid">
             <div

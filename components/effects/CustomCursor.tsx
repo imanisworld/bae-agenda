@@ -104,8 +104,24 @@ export default function CustomCursor() {
           boxShadow: '0 0 10px rgba(155,93,229,0.7)',
         }}
       />
-      {/* Hidden ring ref kept to avoid breaking hover logic */}
-      <div ref={ringRef} aria-hidden="true" style={{ display: 'none' }} />
+      {/* Ring — lags behind cursor */}
+      <div
+        ref={ringRef}
+        aria-hidden="true"
+        style={{
+          position: 'fixed',
+          left: 0, top: 0,
+          width: '34px', height: '34px',
+          border: '1.5px solid rgba(155,93,229,0.55)',
+          borderRadius: '50%',
+          transform: 'translate(-50%, -50%) scale(1)',
+          pointerEvents: 'none',
+          zIndex: 9999,
+          opacity: 0,
+          willChange: 'left, top',
+          transition: 'transform 200ms ease, border-color 200ms ease',
+        }}
+      />
     </>
   )
 }

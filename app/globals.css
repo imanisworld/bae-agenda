@@ -4500,3 +4500,57 @@ body.has-custom-cursor * { cursor: none !important; }
     justify-content: center;
   }
 }
+
+/* ─── Connect Page ───────────────────────────────────────────────────── */
+.connect-socials-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.connect-social-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  text-decoration: none;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.connect-social-card:hover {
+  border-color: rgba(155,93,229,0.45);
+  background: rgba(155,93,229,0.06);
+}
+
+.connect-social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  color: var(--white);
+}
+
+.connect-social-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--white);
+  letter-spacing: 0.01em;
+}
+
+.connect-social-handle {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 540px) {
+  .connect-socials-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
