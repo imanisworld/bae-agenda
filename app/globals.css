@@ -4502,6 +4502,29 @@ body.has-custom-cursor * { cursor: none !important; }
 }
 
 /* ─── Connect Page ───────────────────────────────────────────────────── */
+.connect-hero {
+  padding-top: 52px;
+  padding-bottom: 44px;
+}
+
+.connect-hero h1 {
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(36px, 7vw, 72px);
+  font-weight: 600;
+  line-height: 0.95;
+  margin: 12px 0 0;
+  letter-spacing: -0.01em;
+}
+
+.connect-hero-sub {
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.7;
+  max-width: 420px;
+}
+
+/* Socials grid */
 .connect-socials-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -4512,11 +4535,12 @@ body.has-custom-cursor * { cursor: none !important; }
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 16px 18px;
+  padding: 18px 20px;
   background: var(--surface);
   border: 1px solid var(--border);
   text-decoration: none;
   transition: border-color 0.18s ease, background 0.18s ease;
+  min-height: 72px;
 }
 
 .connect-social-card:hover {
@@ -4528,8 +4552,8 @@ body.has-custom-cursor * { cursor: none !important; }
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   flex-shrink: 0;
   color: var(--white);
 }
@@ -4544,13 +4568,112 @@ body.has-custom-cursor * { cursor: none !important; }
 .connect-social-handle {
   font-size: 11px;
   color: var(--muted);
-  margin-top: 2px;
+  margin-top: 3px;
   letter-spacing: 0.02em;
 }
 
-@media (max-width: 540px) {
+/* Leave a review bar */
+.connect-review-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 32px;
+  padding-bottom: 40px;
+  border-top: 1px solid var(--border);
+}
+
+.connect-review-bar-label {
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.connect-review-bar-text {
+  font-size: 14px;
+  color: var(--white);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Contact block */
+.connect-contact {
+  padding-top: 40px;
+  padding-bottom: 48px;
+}
+
+.connect-contact-label {
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+
+.connect-contact-rows {
+  display: grid;
+  gap: 14px;
+}
+
+.connect-contact-row {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.connect-contact-type {
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  min-width: 120px;
+  flex-shrink: 0;
+}
+
+.connect-contact-email {
+  font-size: 14px;
+  color: var(--white);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.connect-contact-email:hover {
+  color: var(--violet);
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
   .connect-socials-grid {
     grid-template-columns: 1fr;
+  }
+
+  .connect-social-card {
+    padding: 16px;
+    min-height: 64px;
+  }
+
+  .connect-review-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .connect-contact-type {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .connect-contact-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 390px) {
+  .connect-hero h1 {
+    font-size: 34px;
   }
 }
 
