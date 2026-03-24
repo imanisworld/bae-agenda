@@ -75,6 +75,15 @@ export default async function PortfolioTeaserSection() {
             }}>
               On The Record
             </h2>
+            <p style={{
+              marginTop: '12px',
+              maxWidth: '520px',
+              fontSize: '13px',
+              lineHeight: 1.75,
+              color: 'var(--muted)',
+            }}>
+              A quick proof strip of the rooms, audiences, and formats already in motion.
+            </p>
           </div>
           <Link href="/portfolio" className="btn-ghost" style={{ whiteSpace: 'nowrap' }}>
             Explore All Events →
@@ -95,6 +104,20 @@ export default async function PortfolioTeaserSection() {
               </p>
               <p className="portfolio-teaser-proof">100+ events played</p>
               <p className="portfolio-teaser-footnote">Real rooms. Real crowds.</p>
+              <div style={{
+                marginTop: '8px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                fontSize: '10px',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: 'rgba(250,248,243,0.52)',
+              }}>
+                <span style={{ width: '16px', height: '1px', background: 'rgba(155,93,229,0.42)', display: 'block' }} />
+                <span>Selected Proof</span>
+              </div>
             </div>
           </Link>
 

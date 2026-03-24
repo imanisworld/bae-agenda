@@ -76,7 +76,7 @@ export default async function MixesAdminPage({
         {mixes.length === 0 ? (
           <AdminEmptyState
             title="No mixes yet"
-            desc="Mixes you create here can be published to the homepage and /mixes."
+            desc="Mixes you create here can be published to the Lab page at /lab."
             action={{ label: 'Create First Mix', href: '/admin/mixes/new' }}
           />
         ) : (

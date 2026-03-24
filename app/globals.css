@@ -1949,6 +1949,26 @@ body {
 }
 
 @media (max-width: 720px) {
+  .meet-hero-copy-panel {
+    padding: 18px;
+  }
+
+  .meet-hero-status-row {
+    left: 14px;
+    top: 14px;
+    gap: 6px;
+  }
+
+  .meet-hero-photo-readout {
+    right: 14px;
+    bottom: 14px;
+    padding: 10px 12px;
+  }
+
+  .meet-hero-module-grid {
+    grid-template-columns: 1fr;
+  }
+
   .hardware-heading {
     margin-bottom: 10px;
   }
@@ -2440,6 +2460,17 @@ body.has-custom-cursor * { cursor: none !important; }
   isolation: isolate;
 }
 
+.mixes-teaser-shell.is-teaser {
+  min-height: 0;
+  padding: clamp(18px, 3vw, 30px);
+  gap: 18px;
+}
+
+.mixes-teaser-shell.is-page {
+  min-height: clamp(560px, 72vh, 760px);
+  padding: clamp(40px, 6vw, 72px);
+}
+
 .mixes-teaser-shell::before {
   content: '';
   position: absolute;
@@ -2492,6 +2523,36 @@ body.has-custom-cursor * { cursor: none !important; }
   width: min(220px, 52vw);
 }
 
+.mixes-teaser-shell.is-page .mixes-teaser-disc-button .interactive-disc-wrap {
+  width: min(260px, 48vw);
+}
+
+.mixes-teaser-shell.is-teaser .mixes-teaser-disc-button .interactive-disc-wrap {
+  width: min(148px, 34vw);
+}
+
+.mixes-teaser-shell.is-teaser .mixes-teaser-copy {
+  width: min(100%, 560px);
+  gap: 10px;
+}
+
+.mixes-teaser-shell.is-teaser .mixes-teaser-title {
+  font-size: clamp(22px, 4vw, 34px);
+}
+
+.mixes-teaser-shell.is-teaser .mixes-teaser-subtext {
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.mixes-teaser-shell.is-teaser .mixes-teaser-signup {
+  margin-top: 4px;
+}
+
+.mixes-teaser-shell.is-teaser .mixes-teaser-follow {
+  margin-top: 6px;
+}
+
 .mixes-teaser-copy {
   position: relative;
   z-index: 1;
@@ -2499,6 +2560,11 @@ body.has-custom-cursor * { cursor: none !important; }
   display: grid;
   justify-items: center;
   gap: 14px;
+}
+
+.mixes-teaser-shell.is-page .mixes-teaser-copy {
+  width: min(100%, 720px);
+  gap: 16px;
 }
 
 .mixes-teaser-kicker {
@@ -2516,11 +2582,20 @@ body.has-custom-cursor * { cursor: none !important; }
   color: var(--white);
 }
 
+.mixes-teaser-shell.is-page .mixes-teaser-title {
+  font-size: clamp(34px, 5.5vw, 58px);
+}
+
 .mixes-teaser-subtext {
   margin: 0;
   font-size: 14px;
   line-height: 1.7;
   color: var(--muted);
+}
+
+.mixes-teaser-shell.is-page .mixes-teaser-subtext {
+  font-size: 15px;
+  max-width: 640px;
 }
 
 .mixes-teaser-signup {
@@ -2679,7 +2754,7 @@ body.has-custom-cursor * { cursor: none !important; }
 .portfolio-teaser-grid {
   display: grid;
   grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);
-  gap: 18px;
+  gap: 20px;
   align-items: stretch;
 }
 
@@ -2695,6 +2770,7 @@ body.has-custom-cursor * { cursor: none !important; }
   align-content: space-between;
   justify-items: center;
   gap: 18px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
 .portfolio-teaser-logo-panel::before {
@@ -2780,6 +2856,7 @@ body.has-custom-cursor * { cursor: none !important; }
 .portfolio-teaser-event-card {
   position: relative;
   color: inherit;
+  overflow: hidden;
   transition:
     transform var(--motion-fast) var(--ease-standard),
     box-shadow var(--motion-fast) var(--ease-standard),
@@ -3055,7 +3132,33 @@ body.has-custom-cursor * { cursor: none !important; }
 
 /* ── Meet hero photo ─────────────────────────────────────────── */
 .meet-hero-photo-shell {
+  border: 1px solid rgba(255,255,255,0.12);
   background: rgba(8,8,10,0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.06),
+    0 24px 48px rgba(0,0,0,0.26);
+}
+
+.meet-hero-status-row {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  z-index: 2;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.meet-hero-status-row span {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 8px;
+  background: rgba(8,8,10,0.8);
+  border: 1px solid rgba(155,93,229,0.18);
+  color: rgba(250,248,243,0.76);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .meet-hero-photo {
@@ -3079,6 +3182,109 @@ body.has-custom-cursor * { cursor: none !important; }
   mix-blend-mode: screen;
   opacity: 0;
   animation: meet-photo-scan 2s ease-out 0.35s 1 both;
+}
+
+.meet-hero-photo-readout {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  z-index: 2;
+  max-width: min(240px, calc(100% - 36px));
+  padding: 12px 14px;
+  background: linear-gradient(180deg, rgba(8,8,10,0.88), rgba(18,18,22,0.9));
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(6px);
+}
+
+.meet-hero-photo-readout-label {
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.46);
+  margin-bottom: 6px;
+}
+
+.meet-hero-photo-readout-value {
+  font-family: 'Conthrax', sans-serif;
+  font-size: clamp(10px, 1.4vw, 13px);
+  line-height: 1.45;
+  color: var(--white);
+}
+
+.meet-hero-copy-panel {
+  display: grid;
+  align-content: center;
+  gap: 24px;
+  padding: 24px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(155,93,229,0.08), transparent 28%),
+    linear-gradient(180deg, rgba(20,20,24,0.98), rgba(10,10,14,0.98));
+}
+
+.meet-hero-copy-rail {
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+.meet-hero-copy-rail-label {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--violet);
+  margin-bottom: 8px;
+}
+
+.meet-hero-copy-rail-value {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--muted);
+  max-width: 600px;
+}
+
+.meet-hero-module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.meet-hero-module {
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(26,26,30,0.96), rgba(14,14,18,0.96));
+}
+
+.meet-hero-module-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.meet-hero-module-label,
+.meet-hero-module-index {
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.meet-hero-module-label {
+  color: var(--gold);
+}
+
+.meet-hero-module-index {
+  color: rgba(255,255,255,0.3);
+}
+
+.meet-hero-module-value {
+  font-size: 13px;
+  line-height: 1.68;
+  color: var(--white);
+}
+
+.meet-operating-range {
+  padding-top: 8px;
 }
 
 @keyframes meet-photo-settle {

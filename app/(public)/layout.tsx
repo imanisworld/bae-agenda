@@ -3,7 +3,7 @@
  * Wraps all public-facing pages with the Nav and Footer.
  * All routes under app/(public)/ inherit this layout automatically.
  *
- * Route group (public) doesn't affect the URL — /mixes, /events, /book
+ * Route group (public) doesn't affect the URL — /lab, /events, /book
  * are still at their root paths, but share this layout.
  */
 import Nav          from '@/components/public/Nav'

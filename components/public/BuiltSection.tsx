@@ -3,12 +3,13 @@ import React from 'react'
 /**
  * BUILT SECTION — Server Component
  * "Under The Hood" — hardware console aesthetic tech showcase.
- * No JS event handlers; hover via CSS class.
  *
  * Accepts optional aboutQuote from site_content CMS.
  * Falls back to CONTENT_DEFAULTS.about_quote if not set.
  */
 import { CONTENT_DEFAULTS } from '@/lib/content-schema'
+import EQKnobs from '@/components/public/EQKnobs'
+import LeverFX from '@/components/public/LeverFX'
 
 interface Props {
   aboutQuote?: string
@@ -160,15 +161,8 @@ export default function BuiltSection({ aboutQuote }: Props) {
                 ))}
               </div>
 
-              {/* EQ knob row */}
-              <div className="build-console-knob-row">
-                {(['LOW', 'MID', 'HI'] as const).map((band) => (
-                  <div key={band} className="build-console-knob-unit">
-                    <div className="build-console-knob" />
-                    <span className="build-console-dial-label">{band}</span>
-                  </div>
-                ))}
-              </div>
+              <EQKnobs />
+              <LeverFX />
             </div>
 
           </div>

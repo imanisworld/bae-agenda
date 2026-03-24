@@ -6,13 +6,13 @@
  * On success: redirect to /admin/dashboard.
  * On fail: show inline error without revealing details.
  */
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useEffect } from 'react'
 
-export default function AdminLoginPage() {
+function AdminLoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [email, setEmail]       = useState('')
@@ -268,5 +268,13 @@ export default function AdminLoginPage() {
         </p>
       </div>
     </div>
+  )
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminLoginContent />
+    </Suspense>
   )
 }

@@ -51,7 +51,7 @@ interface BookingQueryRow {
   event_date: string
   event_timezone: string
   status: BookingStatus
-  clients: { first_name: string | null; last_name: string | null } | null
+  clients: { first_name: string | null; last_name: string | null }[] | null
 }
 
 interface PaymentQueryRow {
@@ -59,7 +59,7 @@ interface PaymentQueryRow {
   amount: number
   status: PaymentStatus
   type: string
-  bookings: { event_name: string | null } | null
+  bookings: { event_name: string | null }[] | null
 }
 
 // ── Mock Data (shown when DB not connected) ───────────────────────────────────
@@ -152,24 +152,30 @@ async function getDashboardData() {
         pendingInquiries: pendingInquiries ?? 0,
         totalClients:     totalClients     ?? 0,
       },
-      recentBookings: ((bookingRows ?? []) as BookingQueryRow[]).map((b) => ({
-        id:          b.id,
-        event_name:  b.event_name,
-        event_date:  b.event_date,
-        event_timezone: b.event_timezone,
-        client_name: b.clients
-          ? `${b.clients.first_name ?? ''} ${b.clients.last_name ?? ''}`.trim() || null
-          : null,
-        status: b.status as BookingStatus,
-      })) as RecentBooking[],
+      recentBookings: ((bookingRows ?? []) as BookingQueryRow[]).map((b) => {
+        const client = b.clients?.[0] ?? null
+        return {
+          id:          b.id,
+          event_name:  b.event_name,
+          event_date:  b.event_date,
+          event_timezone: b.event_timezone,
+          client_name: client
+            ? `${client.first_name ?? ''} ${client.last_name ?? ''}`.trim() || null
+            : null,
+          status: b.status as BookingStatus,
+        }
+      }) as RecentBooking[],
       upcomingEvents:   (eventRows   ?? []) as UpcomingEvent[],
-      paymentReminders: ((paymentRows ?? []) as PaymentQueryRow[]).map((p) => ({
-        id:           p.id,
-        booking_name: p.bookings?.event_name ?? 'Unknown',
-        amount:       p.amount,
-        status:       p.status as PaymentStatus,
-        type:         p.type,
-      })) as PaymentReminder[],
+      paymentReminders: ((paymentRows ?? []) as PaymentQueryRow[]).map((p) => {
+        const booking = p.bookings?.[0] ?? null
+        return {
+          id:           p.id,
+          booking_name: booking?.event_name ?? 'Unknown',
+          amount:       p.amount,
+          status:       p.status as PaymentStatus,
+          type:         p.type,
+        }
+      }) as PaymentReminder[],
     }
   } catch {
     // DB not connected — return mock data so the dashboard feels operational

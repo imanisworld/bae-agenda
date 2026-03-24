@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import InteractiveMediaDisc from '@/components/public/InteractiveMediaDisc'
+import PitchBendStrip from '@/components/public/PitchBendStrip'
 
 interface TechItem {
   label: string
@@ -70,7 +71,7 @@ export default function SetControlSection({ techItems }: Props) {
             </span>
           </div>
 
-          <div className="set-control-visual-shell">
+          <div className="set-control-visual-shell" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px' }}>
             <div className="set-control-particle set-control-particle-a" aria-hidden="true" />
             <div className="set-control-particle set-control-particle-b" aria-hidden="true" />
             <div className="set-control-particle set-control-particle-c" aria-hidden="true" />
@@ -81,6 +82,7 @@ export default function SetControlSection({ techItems }: Props) {
               className="set-control-disc"
               imageSrc="/photos/images/logo.JPG"
             />
+            <PitchBendStrip />
           </div>
         </div>
 

@@ -34,7 +34,7 @@ interface BookingQueryRow {
   package: string | null
   status: BookingStatus
   created_at: string
-  clients: { first_name: string | null; last_name: string | null } | null
+  clients: { first_name: string | null; last_name: string | null }[] | null
 }
 
 function fmtEventDate(iso: string, timeZone: string) {
@@ -68,20 +68,23 @@ async function getBookings(): Promise<BookingRow[]> {
       .select('id, event_name, event_date, event_timezone, venue, city, package, status, created_at, clients(first_name, last_name)')
       .order('created_at', { ascending: false })
     const rows = (data ?? []) as BookingQueryRow[]
-    return rows.map((b) => ({
-      id:          b.id,
-      event_name:  b.event_name,
-      event_date:  b.event_date,
-      event_timezone: b.event_timezone,
-      venue:       b.venue,
-      city:        b.city,
-      client_name: b.clients
-        ? `${b.clients.first_name ?? ''} ${b.clients.last_name ?? ''}`.trim() || null
-        : null,
-      package:    b.package,
-      status:     b.status as BookingStatus,
-      created_at: b.created_at,
-    }))
+    return rows.map((b) => {
+      const client = b.clients?.[0] ?? null
+      return {
+        id:          b.id,
+        event_name:  b.event_name,
+        event_date:  b.event_date,
+        event_timezone: b.event_timezone,
+        venue:       b.venue,
+        city:        b.city,
+        client_name: client
+          ? `${client.first_name ?? ''} ${client.last_name ?? ''}`.trim() || null
+          : null,
+        package:    b.package,
+        status:     b.status as BookingStatus,
+        created_at: b.created_at,
+      }
+    })
   } catch {
     return []
   }

@@ -35,6 +35,35 @@ const techItems = [
   },
 ]
 
+const profileModules = [
+  {
+    label: 'Sound',
+    value: 'Open-format backbone with real range across hip-hop, R&B, house, Afrobeats, dancehall, and edits.',
+  },
+  {
+    label: 'Travel',
+    value: 'Available for local and travel bookings when the event is the right fit and the room calls for it.',
+  },
+  {
+    label: 'Read',
+    value: 'Selection shifts with the floor, not against it. The goal is pressure, pacing, and payoff.',
+  },
+] as const
+
+const operatingRange = [
+  {
+    label: 'Formats',
+    value: 'Residencies, branded nights, weddings, birthdays, rooftops, after-parties, and private events.',
+  },
+  {
+    label: 'Sound Path',
+    value: 'Controller, club booth, house mixer, or private-event rig. If there is a workable path, the set adapts.',
+  },
+  {
+    label: 'Approach',
+    value: 'Read early. Build pressure slowly. Open the room up when it is ready instead of forcing the night forward.',
+  },
+] as const
 
 function sectionLabel(text: string) {
   return (
@@ -63,11 +92,15 @@ export default function MeetPage() {
             className="meet-hero-photo-shell"
             style={{
               minHeight: 'clamp(340px, 72vw, 520px)',
-              border: '1px solid var(--border)',
               position: 'relative',
               overflow: 'hidden',
             }}
           >
+            <div className="meet-hero-status-row" aria-hidden="true">
+              <span>Live</span>
+              <span>Club / Private</span>
+              <span>Travel Ready</span>
+            </div>
             <Image
               className="meet-hero-photo"
               src="/photos/PlexMix19-DJBAE.JPEG"
@@ -96,9 +129,13 @@ export default function MeetPage() {
               }}
             />
             <div className="meet-hero-photo-scan" aria-hidden="true" />
+            <div className="meet-hero-photo-readout" aria-hidden="true">
+              <div className="meet-hero-photo-readout-label">Artist Profile</div>
+              <div className="meet-hero-photo-readout-value">Selection / Timing / Room Read</div>
+            </div>
           </div>
 
-          <div style={{ display: 'grid', alignContent: 'center', gap: '24px' }}>
+          <div className="meet-hero-copy-panel">
             <div>
               {sectionLabel('Artist Profile')}
               <h1
@@ -115,35 +152,27 @@ export default function MeetPage() {
                 <br />
                 DJ B.A.E.
               </h1>
-              <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '640px' }}>
+              <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '640px', marginBottom: '18px' }}>
                 DJ B.A.E. moves between club sets, private events, branded experiences, and community nights without flattening the personality of the room.
                 The through line is selection, pacing, and a set structure that knows when to push and when to hold back.
               </p>
+
+              <div className="meet-hero-copy-rail">
+                <div className="meet-hero-copy-rail-label">Operating Style</div>
+                <div className="meet-hero-copy-rail-value">Process-driven, but never mechanical. The setup serves the room.</div>
+              </div>
             </div>
 
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-                gap: '14px',
-              }}
-              >
-              <div style={{ border: '1px solid var(--border)', padding: '18px', background: 'var(--surface)' }}>
-                <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
-                  Sound
+            <div className="meet-hero-module-grid">
+              {profileModules.map((item, index) => (
+                <div key={item.label} className="meet-hero-module">
+                  <div className="meet-hero-module-top">
+                    <span className="meet-hero-module-label">{item.label}</span>
+                    <span className="meet-hero-module-index">0{index + 1}</span>
+                  </div>
+                  <div className="meet-hero-module-value">{item.value}</div>
                 </div>
-                <div style={{ fontSize: '14px', color: 'var(--white)', lineHeight: 1.6 }}>
-                  Open-format backbone with real range across hip-hop, R&amp;B, house, Afrobeats, dancehall, and edits.
-                </div>
-              </div>
-              <div style={{ border: '1px solid var(--border)', padding: '18px', background: 'var(--surface)' }}>
-                <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
-                  Travel
-                </div>
-                <div style={{ fontSize: '14px', color: 'var(--white)', lineHeight: 1.6 }}>
-                  Available for local and travel bookings when the event is the right fit.
-                </div>
-              </div>
+              ))}
             </div>
 
             <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -154,6 +183,54 @@ export default function MeetPage() {
                 Open Press Kit
               </Link>
             </div>
+          </div>
+        </section>
+
+        <section className="meet-operating-range">
+          <div style={{ marginBottom: '20px' }}>
+            {sectionLabel('Operating Range')}
+            <h2 style={{
+              fontFamily: 'Conthrax, sans-serif',
+              fontSize: 'clamp(22px, 3.4vw, 36px)',
+              lineHeight: 1.08,
+              color: 'var(--white)',
+              margin: 0,
+            }}>
+              Built for different rooms,
+              <br />
+              consistent in execution.
+            </h2>
+          </div>
+
+          <div className="set-control-atmosphere-grid">
+            {operatingRange.map((item) => (
+              <div
+                key={item.label}
+                className="set-control-atmosphere-card"
+                style={{
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'linear-gradient(180deg, rgba(24,24,28,0.96), rgba(12,12,16,0.96))',
+                  padding: '18px 18px 20px',
+                }}
+              >
+                <div style={{
+                  fontSize: '9px',
+                  letterSpacing: '0.22em',
+                  textTransform: 'uppercase',
+                  color: 'var(--violet)',
+                  marginBottom: '10px',
+                }}>
+                  {item.label}
+                </div>
+                <div style={{
+                  fontSize: '13px',
+                  lineHeight: 1.72,
+                  color: 'var(--muted)',
+                }}>
+                  {item.value}
+                </div>
+              </div>
+            ))}
           </div>
         </section>
 

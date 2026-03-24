@@ -27,7 +27,7 @@ interface PaymentQueryRow {
   status: PaymentStatus
   paid_at: string | null
   created_at: string
-  bookings: { event_name: string | null } | null
+  bookings: { event_name: string | null }[] | null
 }
 
 function fmtDate(iso: string | null) {
@@ -52,16 +52,19 @@ async function getPayments(): Promise<PaymentRow[]> {
       .select('id, amount, type, method, status, paid_at, created_at, bookings(event_name)')
       .order('created_at', { ascending: false })
     const rows = (data ?? []) as PaymentQueryRow[]
-    return rows.map((p) => ({
-      id:           p.id,
-      booking_name: p.bookings?.event_name ?? 'Unknown',
-      amount:       p.amount,
-      type:         p.type,
-      method:       p.method,
-      status:       p.status as PaymentStatus,
-      paid_at:      p.paid_at,
-      created_at:   p.created_at,
-    }))
+    return rows.map((p) => {
+      const booking = p.bookings?.[0] ?? null
+      return {
+        id:           p.id,
+        booking_name: booking?.event_name ?? 'Unknown',
+        amount:       p.amount,
+        type:         p.type,
+        method:       p.method,
+        status:       p.status as PaymentStatus,
+        paid_at:      p.paid_at,
+        created_at:   p.created_at,
+      }
+    })
   } catch {
     return []
   }

@@ -32,6 +32,7 @@ function parseDateTimeLocal(value: FormDataEntryValue | null): string | null {
 
 function revalidateMixPaths() {
   revalidatePath('/admin/mixes')
+  revalidatePath('/lab')
   revalidatePath('/mixes')
   revalidatePath('/')
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getContentMap } from '@/lib/db/content'
 import BuiltSection from '@/components/public/BuiltSection'
-import { PORTFOLIO_HIGHLIGHTS } from '@/lib/portfolio-data'
+import BuildPads from '@/components/public/BuildPads'
 
 export const dynamic = 'force-dynamic'
 
@@ -137,13 +137,7 @@ export default async function BuiltPage() {
               <span>Custom</span>
             </div>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
-            {PORTFOLIO_HIGHLIGHTS.map((item) => (
-              <div key={item} className="build-console-module card-hover-amber" style={{ padding: '16px' }}>
-                <div style={{ fontSize: '13px', color: 'var(--white)', lineHeight: 1.7 }}>{item}</div>
-              </div>
-            ))}
-          </div>
+          <BuildPads />
         </section>
 
         {/* ── What You Get — Pricing Tiers ─────────────────────── */}
@@ -370,7 +364,7 @@ export default async function BuiltPage() {
         {/* ── Final CTA ─────────────────────────────────────────── */}
         <section style={{
           borderTop: '1px solid var(--border)',
-          padding: '64px 0 80px',
+          padding: '64px 0 32px',
           textAlign: 'center',
         }}>
           <h2 style={{
