@@ -4511,7 +4511,7 @@ body.has-custom-cursor * { cursor: none !important; }
   font-family: Conthrax, sans-serif;
   font-size: clamp(36px, 7vw, 72px);
   font-weight: 600;
-  line-height: 0.95;
+  line-height: 1.05;
   margin: 12px 0 0;
   letter-spacing: -0.01em;
 }
@@ -4673,7 +4673,7 @@ body.has-custom-cursor * { cursor: none !important; }
 
 @media (max-width: 390px) {
   .connect-hero h1 {
-    font-size: 34px;
+    font-size: 32px;
   }
 }
 
