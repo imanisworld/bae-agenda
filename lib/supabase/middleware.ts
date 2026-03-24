@@ -38,30 +38,11 @@ export async function updateSession(request: NextRequest) {
   )
 
   // Refresh session — required for Server Component auth to stay fresh.
-  // try/catch: a network error or malformed JWT would otherwise throw here
-  // and crash every request on the site.
-  let user = null
+  // Auth redirects are disabled; admin is open for now.
   try {
-    const { data } = await supabase.auth.getUser()
-    user = data.user
+    await supabase.auth.getUser()
   } catch {
-    // Treat as unauthenticated on any error
-  }
-
-  const pathname = request.nextUrl.pathname
-  const isAdminRoute = pathname === '/admin' || pathname.startsWith('/admin/')
-  const isLoginRoute = request.nextUrl.pathname === '/admin/login'
-
-  if (isAdminRoute && !isLoginRoute && !user) {
-    const loginUrl = request.nextUrl.clone()
-    loginUrl.pathname = '/admin/login'
-    return NextResponse.redirect(loginUrl)
-  }
-
-  if (isLoginRoute && user) {
-    const dashboardUrl = request.nextUrl.clone()
-    dashboardUrl.pathname = '/admin/dashboard'
-    return NextResponse.redirect(dashboardUrl)
+    // ignore
   }
 
   return supabaseResponse
