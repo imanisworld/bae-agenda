@@ -1,21 +1,22 @@
 /**
  * ADMIN LAYOUT
  * Wraps all /admin/* routes.
- * Requires a valid Supabase session — redirects to /admin/login if not authenticated.
+ * Auth is enforced by middleware — this layout just provides the shell.
  */
 import Sidebar from '@/components/admin/Sidebar'
-import { requireAdminUser } from '@/lib/admin-auth'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const user = await requireAdminUser()
+  const supabase = await createClient()
+  const { data } = await supabase.auth.getUser()
 
   return (
     <div className="admin-shell">
-      <Sidebar userEmail={user.email} />
+      <Sidebar userEmail={data.user?.email} />
       <main className="admin-main">
         {children}
       </main>
