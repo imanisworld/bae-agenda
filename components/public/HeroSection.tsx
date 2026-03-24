@@ -8,7 +8,6 @@
  */
 import Image         from 'next/image'
 import HeroGlowLayer from '@/components/effects/HeroGlowLayer'
-import HeroDeck      from '@/components/public/HeroDeck'
 import ScrollFader   from '@/components/public/ScrollFader'
 
 interface HeroContent {
@@ -117,21 +116,6 @@ export default function HeroSection({ content = {} }: Props) {
 
       {/* ── Bottom — motion stage + genre band ─────────────── */}
       <div style={{ position: 'relative', zIndex: 1 }}>
-        <div className="hero-deck-stage-wrap">
-          <div
-            className="hero-motion-stage"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              width: '100%',
-              minHeight: '188px',
-            }}
-          >
-            <HeroDeck />
-          </div>
-        </div>
-
         {/* Genre ticker */}
         <div className="genre-band" aria-hidden="true">
           <div className="genre-track">

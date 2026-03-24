@@ -60,6 +60,7 @@ export default function BuiltSection({ aboutQuote }: Props) {
   return (
     <section
       id="built-by"
+      className="built-section-surface"
       aria-label="Under The Hood"
       style={{
         background: 'radial-gradient(ellipse at 80% 50%, rgba(155,93,229,0.06) 0%, transparent 55%), var(--black)',
@@ -72,7 +73,9 @@ export default function BuiltSection({ aboutQuote }: Props) {
           <span className="section-label" style={{ color: 'var(--violet)' }}>Under The Hood</span>
         </div>
 
-        <div className="build-console">
+        <div className="build-console built-console-hardware-bg">
+          <div className="built-console-hardware-image" aria-hidden="true" />
+          <div className="built-console-hardware-vignette" aria-hidden="true" />
 
           {/* ── Top bar: screen + chips + dial ────────────────── */}
           <div className="build-console-topbar">

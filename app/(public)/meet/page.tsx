@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
+import SetControlSection from '@/components/public/SetControlSection'
 
 export const metadata: Metadata = {
   title: 'Meet DJ B.A.E. — DJ B.A.E.',
@@ -30,8 +31,6 @@ const atmosphereNotes = [
   'Crowd resets',
   'Closing lift',
 ]
-
-const LIVE_SET_EMBED_SRC = 'https://www.youtube.com/embed/videoseries?list=UUjEiMW5l_Go9vSHudx5VPEw'
 
 function sectionLabel(text: string) {
   return (
@@ -148,150 +147,7 @@ export default function MeetPage() {
           </div>
         </section>
 
-        <section className="build-console">
-          <div className="build-console-topbar">
-            <div className="build-console-screen">
-              <div className="build-console-screen-label">Live Profile</div>
-              <div className="build-console-screen-value">Meet / Booth / Room Read</div>
-              <div className="build-console-screen-lines">
-                {techItems.map((item) => (
-                  <span key={item.label}>
-                    <strong>{item.label}</strong> {item.value}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            <div className="build-console-chip-row" aria-hidden="true">
-              <span>Club</span>
-              <span>Private</span>
-              <span>Travel</span>
-            </div>
-          </div>
-
-          <div className="build-console-grid">
-            <div
-              className="build-console-copy"
-              style={{
-                background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(18,18,22,0.96))',
-              }}
-            >
-              {sectionLabel('Energy Behind The Agenda')}
-              <div
-                style={{
-                  position: 'relative',
-                  minHeight: '360px',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  background: '#050505',
-                  overflow: 'hidden',
-                }}
-              >
-                {/* Fallback — visible if iframe fails to load */}
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '16px',
-                  background: 'linear-gradient(180deg, rgba(8,8,10,0.96), rgba(14,14,18,0.98))',
-                }}>
-                  <div style={{
-                    fontSize: '10px',
-                    letterSpacing: '0.28em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(250,248,243,0.38)',
-                  }}>
-                    Live Sets
-                  </div>
-                  <a
-                    href="https://www.youtube.com/channel/UCjEiMW5l_Go9vSHudx5VPEw"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-ghost"
-                  >
-                    Watch on YouTube →
-                  </a>
-                </div>
-                <iframe
-                  title="DJ B.A.E. live set reel"
-                  src={LIVE_SET_EMBED_SRC}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  referrerPolicy="strict-origin-when-cross-origin"
-                  allowFullScreen
-                  style={{ display: 'block', position: 'relative', zIndex: 1, width: '100%', height: '100%', minHeight: '360px', border: 0 }}
-                />
-              </div>
-            </div>
-
-            <div className="build-console-mixer">
-              <div className="build-console-fx-header">
-                <span>Set Architecture</span>
-                <div className="build-console-mini-chips">
-                  <span>Selection</span>
-                  <span>Timing</span>
-                  <span>Pressure</span>
-                </div>
-              </div>
-
-              <div className="build-console-module-grid">
-                {techItems.map((item) => (
-                  <div key={item.label} className="build-console-module">
-                    <div className="build-console-module-top">
-                      <span className="build-console-module-category">{item.label}</span>
-                    </div>
-                    <div className="build-console-module-desc" style={{ minHeight: '72px' }}>
-                      {item.value}
-                    </div>
-                    <div className="build-console-module-meter" aria-hidden="true">
-                      <span />
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div style={{ marginTop: '16px' }}>
-                <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '12px' }}>
-                  Event Atmosphere
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '10px' }}>
-                  {atmosphereNotes.map((note, index) => (
-                    <div
-                      key={note}
-                      className="build-console-pad"
-                      style={{
-                        minHeight: '92px',
-                        background: index % 2 === 0 ? 'rgba(155,93,229,0.08)' : 'rgba(242,184,75,0.07)',
-                        borderColor: 'rgba(255,255,255,0.12)',
-                        alignItems: 'end',
-                        padding: '14px',
-                        aspectRatio: 'auto',
-                        textAlign: 'left',
-                        justifyItems: 'start',
-                        lineHeight: 1.35,
-                      }}
-                    >
-                      {note}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div style={{ marginTop: '18px' }}>
-                <a
-                  href="https://www.youtube.com/@djb.a.e"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn-ghost"
-                  style={{ justifyContent: 'center' }}
-                >
-                  Watch More Live Sets
-                </a>
-              </div>
-            </div>
-          </div>
-        </section>
+        <SetControlSection techItems={techItems} atmosphereNotes={atmosphereNotes} />
 
         <section
           style={{
