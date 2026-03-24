@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import PageHeader from '@/components/admin/PageHeader'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
@@ -30,7 +30,7 @@ interface BookingRow {
 }
 
 async function getBooking(id: string): Promise<BookingRow | null> {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data } = await supabase
     .from('bookings')
     .select(`

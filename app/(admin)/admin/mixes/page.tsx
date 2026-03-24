@@ -2,7 +2,7 @@ import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import AdminNotice from '@/components/admin/AdminNotice'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { toggleMixFeaturedAction, toggleMixPublishedAction } from '@/app/actions/mixes'
 
 interface MixRow {
@@ -32,7 +32,7 @@ function formatDate(iso: string | null): string {
 
 async function getMixes(): Promise<MixRow[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
     const { data } = await supabase
       .from('mixes')
       .select('id, title, genre, duration, is_featured, sort_order, published_at')

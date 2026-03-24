@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deleteMixAction, updateMixAction } from '@/app/actions/mixes'
 
 interface MixRow {
@@ -38,7 +38,7 @@ function toDateTimeLocal(iso: string | null): string {
 }
 
 async function getMix(id: string): Promise<MixRow | null> {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data } = await supabase
     .from('mixes')
     .select('id, title, description, genre, duration, embed_url, cover_url, is_featured, sort_order, published_at')

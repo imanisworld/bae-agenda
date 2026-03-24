@@ -7,7 +7,7 @@ import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import AdminNotice     from '@/components/admin/AdminNotice'
 import { createEventFromBookingAction, updateBookingStatusAction } from '@/app/actions/bookings'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import type { BookingStatus } from '@/types/index'
 import Link from 'next/link'
 
@@ -62,7 +62,7 @@ function fmtSubmittedDate(iso: string) {
 
 async function getBookings(): Promise<BookingRow[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
     const { data } = await supabase
       .from('bookings')
       .select('id, event_name, event_date, event_timezone, venue, city, package, status, created_at, clients(first_name, last_name)')

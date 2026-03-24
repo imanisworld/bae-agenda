@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deletePortfolioEntryAction, updatePortfolioEntryAction } from '@/app/actions/portfolio'
 
 interface PortfolioEntry {
@@ -32,7 +32,7 @@ function inputStyle(): React.CSSProperties {
 }
 
 async function getEntry(id: string): Promise<PortfolioEntry | null> {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data } = await supabase
     .from('portfolio_entries')
     .select('*')

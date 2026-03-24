@@ -3,7 +3,7 @@ import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import Badge from '@/components/admin/Badge'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { updateBookingDetailsAction } from '@/app/actions/bookings'
 import type { BookingStatus } from '@/types/index'
 
@@ -57,7 +57,7 @@ function formatCurrency(value: number | null): string {
 }
 
 async function getBooking(id: string): Promise<BookingDetailRow | null> {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data } = await supabase
     .from('bookings')
     .select(`

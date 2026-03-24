@@ -5,7 +5,7 @@
 import PageHeader      from '@/components/admin/PageHeader'
 import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import type { PaymentStatus } from '@/types/index'
 
 interface PaymentRow {
@@ -46,7 +46,7 @@ function fmtCurrency(n: number) {
 
 async function getPayments(): Promise<PaymentRow[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
     const { data } = await supabase
       .from('payments')
       .select('id, amount, type, method, status, paid_at, created_at, bookings(event_name)')

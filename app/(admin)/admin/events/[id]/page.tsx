@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deleteEventAction, updateEventAction } from '@/app/actions/events'
 
 interface EventRow {
@@ -36,7 +36,7 @@ function toDateTimeLocal(iso: string): string {
 }
 
 async function getEvent(id: string): Promise<EventRow | null> {
-  const supabase = await createClient()
+  const supabase = createClient()
   const { data } = await supabase
     .from('events')
     .select('id, title, event_date, venue, city, description, public, featured, show_description')

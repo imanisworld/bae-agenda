@@ -4,7 +4,7 @@
  */
 import PageHeader      from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 
 interface ClientRow {
   id:             string
@@ -35,7 +35,7 @@ function fmtDate(iso: string) {
 
 async function getClients(): Promise<ClientRow[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
     const { data } = await supabase
       .from('clients')
       .select('id, first_name, last_name, email, phone, created_at, bookings(id)')

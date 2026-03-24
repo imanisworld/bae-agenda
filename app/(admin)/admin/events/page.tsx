@@ -9,7 +9,7 @@ import Link from 'next/link'
 import PageHeader      from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import AdminNotice     from '@/components/admin/AdminNotice'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { toggleEventFeaturedAction, toggleEventPublicAction } from '@/app/actions/events'
 
 interface EventRow {
@@ -35,7 +35,7 @@ function isPast(iso: string) {
 
 async function getEvents(): Promise<EventRow[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
     const { data } = await supabase
       .from('events')
       .select('id, title, event_date, venue, city, public, featured')

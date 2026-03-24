@@ -8,7 +8,7 @@ import Link            from 'next/link'
 import StatCard        from '@/components/admin/StatCard'
 import Badge           from '@/components/admin/Badge'
 import PageHeader      from '@/components/admin/PageHeader'
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import type { BookingStatus, PaymentStatus } from '@/types/index'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -111,7 +111,7 @@ function fmtCurrency(n: number) {
 
 async function getDashboardData() {
   try {
-    const supabase = await createClient()
+    const supabase = createClient()
     const now = new Date().toISOString()
 
     const [
