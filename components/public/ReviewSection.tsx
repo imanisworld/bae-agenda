@@ -157,7 +157,7 @@ export default async function ReviewSection({ hideForm = false }: { hideForm?: b
                 color: 'rgba(155,93,229,0.14)',
               }}
             >
-              ”
+              &ldquo;
             </div>
 
             <div className="review-card-body" style={{ display: 'grid', gap: '10px', position: 'relative', zIndex: 1 }}>
