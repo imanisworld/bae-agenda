@@ -100,10 +100,10 @@ export default async function PortfolioTeaserSection() {
               <div className="portfolio-teaser-meta">Experience</div>
               <h3 className="portfolio-teaser-title">Played Across</h3>
               <p className="portfolio-teaser-desc">
-                Indianapolis • Chicago
+                Indianapolis • Chicago • Atlanta • Boston
               </p>
               <p className="portfolio-teaser-proof">100+ events played</p>
-              <p className="portfolio-teaser-footnote">Real rooms. Real crowds.</p>
+              <p className="portfolio-teaser-footnote"> </p>
               <div style={{
                 marginTop: '8px',
                 display: 'inline-flex',
@@ -116,7 +116,7 @@ export default async function PortfolioTeaserSection() {
                 color: 'rgba(250,248,243,0.52)',
               }}>
                 <span style={{ width: '16px', height: '1px', background: 'rgba(155,93,229,0.42)', display: 'block' }} />
-                <span>Selected Proof</span>
+                <span></span>
               </div>
             </div>
           </Link>
@@ -162,7 +162,7 @@ export default async function PortfolioTeaserSection() {
                   {entry.city}
                 </div>
                 {entry.tags.length > 0 && (
-                  <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', marginTop: '2px' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px', flexWrap: 'wrap', marginTop: '2px' }}>
                     {entry.tags.slice(0, 2).map((tag) => (
                       <span
                         key={tag}

@@ -7,6 +7,7 @@
  *   Bottom    — reserved motion area above genre ticker
  */
 import Image         from 'next/image'
+import Link          from 'next/link'
 import HeroGlowLayer from '@/components/effects/HeroGlowLayer'
 import ScrollFader   from '@/components/public/ScrollFader'
 
@@ -123,6 +124,14 @@ export default function HeroSection({ content = {} }: Props) {
             })()}
           </h1>
 
+          <div style={{ marginTop: '28px', display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
+            <Link href="/book" className="btn-primary">
+              Book DJ B.A.E. →
+            </Link>
+            <Link href="/portfolio" className="btn-ghost">
+              See the Work
+            </Link>
+          </div>
         </div>
 
         <div aria-hidden="true" />

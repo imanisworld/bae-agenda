@@ -120,7 +120,10 @@ export default async function InvoicePage({
               DJ <span style={{ color: 'var(--violet)' }}>B.A.E.</span>
             </div>
             <div style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.7 }}>
+              Imani Crumble<br />
               The Bae Agenda<br />
+              8320 Berrybush Lane<br />
+              Indianapolis, IN 46345<br />
               baebookings@proton.me
             </div>
           </div>

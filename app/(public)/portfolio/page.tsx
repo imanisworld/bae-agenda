@@ -92,7 +92,7 @@ export default async function PortfolioPage() {
         {/* ── Stats ─────────────────────────────────────────────── */}
         <section style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
           gap: '1px',
           background: 'var(--border)',
           border: '1px solid var(--border)',
@@ -109,6 +109,7 @@ export default async function PortfolioPage() {
               padding: '28px 24px',
               display: 'grid',
               gap: '8px',
+              minWidth: 0,
             }}>
               <div style={{
                 fontSize: '9px',
@@ -120,9 +121,12 @@ export default async function PortfolioPage() {
               </div>
               <div style={{
                 fontFamily: 'Conthrax, sans-serif',
-                fontSize: 'clamp(22px, 3vw, 32px)',
+                fontSize: typeof value === 'string' && value.length > 6
+                  ? 'clamp(14px, 2vw, 20px)'
+                  : 'clamp(22px, 3vw, 32px)',
                 color: 'var(--white)',
-                lineHeight: 1,
+                lineHeight: 1.1,
+                wordBreak: 'break-word',
               }}>
                 {value}
               </div>

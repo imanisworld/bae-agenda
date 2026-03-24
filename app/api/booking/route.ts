@@ -23,36 +23,7 @@ const bookingSchema = z.object({
   notes: z.string().trim().max(2000).optional().or(z.literal('')),
   website: z.string().trim().max(200).optional().or(z.literal('')),
   startedAt: z.string().trim().max(30).optional().or(z.literal('')),
-  turnstileToken: z.string().trim().max(2048).optional().or(z.literal('')),
 })
-
-async function verifyTurnstileToken(token: string, ip?: string) {
-  const secret = process.env.TURNSTILE_SECRET_KEY
-  if (!secret) return { ok: true, configured: false }
-
-  if (!token.trim()) {
-    return { ok: false, configured: true }
-  }
-
-  try {
-    const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        secret,
-        response: token,
-        ...(ip ? { remoteip: ip } : {}),
-      }).toString(),
-    })
-
-    if (!response.ok) return { ok: false, configured: true }
-
-    const data = (await response.json()) as { success?: boolean }
-    return { ok: Boolean(data.success), configured: true }
-  } catch {
-    return { ok: false, configured: true }
-  }
-}
 
 const BOOKING_WINDOW_MS = 15 * 60 * 1000
 const BOOKING_LIMIT = 5
@@ -116,14 +87,6 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json(
         { error: 'Submission blocked. Please try again.' },
-        { status: 400 }
-      )
-    }
-
-    const turnstile = await verifyTurnstileToken(payload.turnstileToken ?? '', clientIp)
-    if (!turnstile.ok && turnstile.configured) {
-      return NextResponse.json(
-        { error: 'Verification failed. Please try again.' },
         { status: 400 }
       )
     }

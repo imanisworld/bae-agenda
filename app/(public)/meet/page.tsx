@@ -78,7 +78,7 @@ function sectionLabel(text: string) {
 export default function MeetPage() {
   return (
     <div style={{ background: 'var(--black)', paddingTop: '68px' }}>
-      <div className="section-container" style={{ display: 'grid', gap: '32px', paddingTop: 0, paddingBottom: '56px' }}>
+      <div className="section-container" style={{ display: 'grid', gap: '24px', paddingTop: 0, paddingBottom: '32px' }}>
         <section
           className="meet-hero-grid"
           style={{
@@ -132,6 +132,15 @@ export default function MeetPage() {
             <div className="meet-hero-photo-readout" aria-hidden="true">
               <div className="meet-hero-photo-readout-label">Artist Profile</div>
               <div className="meet-hero-photo-readout-value">Selection / Timing / Room Read</div>
+            </div>
+            {/* Mobile-only name overlay — visible when photo stacks above copy */}
+            <div className="meet-hero-mobile-name" aria-hidden="true">
+              <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: '6px', fontFamily: 'DM Sans, sans-serif' }}>
+                Artist Profile
+              </div>
+              <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(28px, 7vw, 40px)', fontWeight: 600, lineHeight: 0.95, color: 'var(--white)' }}>
+                Meet<br />DJ B.A.E.
+              </div>
             </div>
           </div>
 

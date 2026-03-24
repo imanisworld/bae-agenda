@@ -4,8 +4,6 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { EVENT_TYPES, PACKAGES } from '@/lib/constants'
 import { formatCurrency } from '@/lib/utils'
-import TurnstileWidget from '@/components/public/TurnstileWidget'
-
 type FormState = {
   firstName: string
   lastName: string
@@ -23,7 +21,6 @@ type FormState = {
   notes: string
   website: string
   startedAt: string
-  turnstileToken: string
 }
 
 type FieldKey =
@@ -32,7 +29,6 @@ type FieldKey =
   | 'eventName'
   | 'eventDate'
   | 'timeZone'
-  | 'turnstileToken'
 
 type FieldErrors = Partial<Record<FieldKey, string>>
 
@@ -53,7 +49,6 @@ const INITIAL_STATE: FormState = {
   notes: '',
   website: '',
   startedAt: '',
-  turnstileToken: '',
 }
 
 const CITY_OPTIONS = [
@@ -87,8 +82,6 @@ const TIME_OPTIONS = buildTimeOptions()
 const PACKAGE_OPTIONS = PACKAGES.map((pkg) =>
   `${pkg.name}${pkg.price ? ` (${formatCurrency(pkg.price)})` : ' (Custom quote)'}`
 )
-
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ''
 
 export default function BookPage() {
   const [form, setForm] = useState<FormState>(() => ({
@@ -132,9 +125,6 @@ export default function BookPage() {
     if (!form.eventName.trim()) nextErrors.eventName = 'Event name is required.'
     if (!form.eventDate.trim()) nextErrors.eventDate = 'Event date is required.'
     if (!form.timeZone.trim()) nextErrors.timeZone = 'Timezone is required.'
-    if (TURNSTILE_SITE_KEY && !form.turnstileToken.trim()) {
-      nextErrors.turnstileToken = 'Please complete the verification check.'
-    }
 
     if (Object.keys(nextErrors).length > 0) {
       setFieldErrors(nextErrors)
@@ -178,7 +168,6 @@ export default function BookPage() {
       setForm({
         ...INITIAL_STATE,
         startedAt: String(Date.now()),
-        turnstileToken: '',
       })
       setLoading(false)
     } catch {
@@ -214,9 +203,7 @@ export default function BookPage() {
             Share your event details below. Requests are saved directly to the admin dashboard as
             new inquiries.
           </p>
-          <p style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6, maxWidth: '620px' }}>
-            This form uses basic spam protection and abuse checks so only real inquiries make it through.
-          </p>
+
         </div>
 
         <form
@@ -430,20 +417,6 @@ export default function BookPage() {
             </p>
           )}
 
-          {TURNSTILE_SITE_KEY && (
-            <div style={{ display: 'grid', gap: '10px' }}>
-              <span className="section-label" style={{ marginBottom: 0 }}>Verification</span>
-              <TurnstileWidget
-                siteKey={TURNSTILE_SITE_KEY}
-                onToken={(token) => updateField('turnstileToken', token)}
-              />
-              <span style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
-                This helps keep spam and bot submissions out of the booking form.
-              </span>
-              {fieldErrors.turnstileToken && <span style={fieldErrorStyle()}>{fieldErrors.turnstileToken}</span>}
-            </div>
-          )}
-
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
@@ -453,7 +426,7 @@ export default function BookPage() {
             <button
               type="submit"
               className="btn-primary"
-              disabled={loading || Boolean(TURNSTILE_SITE_KEY && !form.turnstileToken)}
+              disabled={loading}
               style={{ opacity: loading ? 0.6 : 1, width: '100%', textAlign: 'center' }}
             >
               {loading ? 'Submitting...' : 'Submit Booking Request'}

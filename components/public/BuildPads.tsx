@@ -24,7 +24,7 @@ export default function BuildPads() {
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+      gridTemplateColumns: 'repeat(2, 1fr)',
       gap: '8px',
     }}>
       {PADS.map(({ id, label, sub }) => {

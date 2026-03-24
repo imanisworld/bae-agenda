@@ -189,7 +189,7 @@ export async function generateInvoicePdf(booking: InvoiceBookingData) {
     color: violet,
   })
 
-  drawTextBlock(page, 'The Bae Agenda\nbaebookings@proton.me', {
+  drawTextBlock(page, 'Imani Crumble\nThe Bae Agenda\n8320 Berrybush Lane\nIndianapolis, IN 46345\nbaebookings@proton.me', {
     x: PAGE.marginX,
     y: PAGE.top - 24,
     width: 220,

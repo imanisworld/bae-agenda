@@ -2053,9 +2053,9 @@ body {
     font-size: 9px;
   }
 
-  /* knob row stacks vertically but module-grid stays 2 columns */
+  /* knob row stays 3 columns at all sizes */
   .build-console-knob-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   /* Keep pad bank as 4 columns — square aspect-ratio would make them huge */
@@ -3356,6 +3356,21 @@ body.has-custom-cursor * { cursor: none !important; }
   font-size: clamp(10px, 1.4vw, 13px);
   line-height: 1.45;
   color: var(--white);
+}
+
+/* Mobile name overlay — hidden by default, shown when photo stacks */
+.meet-hero-mobile-name {
+  display: none;
+  position: absolute;
+  bottom: 28px;
+  left: 24px;
+  z-index: 2;
+}
+
+@media (max-width: 720px) {
+  .meet-hero-mobile-name {
+    display: block;
+  }
 }
 
 .meet-hero-copy-panel {
