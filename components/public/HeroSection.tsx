@@ -110,7 +110,7 @@ export default function HeroSection({ content = {} }: Props) {
                   <span className="hero-title-word">
                     {firstLine.map((w, i) => (
                       <span key={i} style={{ color: w === 'BAE' ? '#a66bff' : undefined }}>
-                        {i > 0 ? ' ' : ''}{w}
+                        {w}
                       </span>
                     ))}
                   </span>
