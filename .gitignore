@@ -62,6 +62,11 @@ next-env.d.ts
 !/public/photos/93857B7F-E4CA-4F51-BD81-68031362370D.JPG
 !/public/photos/65814161-310d-43a2-8ceb-705b1695c171.jpeg
 !/public/photos/il_1588xN.5427428475_1wum.avif
-/public/videos/
+!/public/photos/outdoor-night-set-pook.png
+!/public/photos/images/
+!/public/photos/images/outside.jpg
+/public/videos/*
+!/public/videos/e67f0964-8763-4658-bbba-4cc322727d68.mp4
+!/public/videos/phone video.mp4
 
 # random temp files

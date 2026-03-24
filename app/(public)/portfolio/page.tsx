@@ -55,25 +55,7 @@ export default async function PortfolioPage() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Logo video — blurred ambient background */}
-        <video
-          aria-hidden="true"
-          src="/videos/bae logo.MP4"
-          autoPlay
-          loop
-          muted
-          playsInline
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            filter: 'blur(14px) saturate(0.5) brightness(0.18)',
-            transform: 'scale(1.08)',
-            zIndex: 0,
-          }}
-        />
+        {/* Ambient background — video removed (file not available) */}
         <div style={{ maxWidth: '1280px', margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
           <div className="hardware-heading">
             <span className="section-label">Chicago · Indianapolis · ATL</span>
