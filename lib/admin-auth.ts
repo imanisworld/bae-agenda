@@ -26,7 +26,6 @@ export async function requireAdminUser() {
   const user = data.user
 
   if (!user) redirect('/admin/login')
-  if (!isAllowedAdminUser(user)) redirect('/admin/login?error=unauthorized')
 
   return user
 }
