@@ -83,10 +83,11 @@ export default function HeroSection({ content = {} }: Props) {
         <div className="hero-copy-stack" style={{ display: 'grid', gap: '10px' }}>
           <p className="hero-eyebrow" style={{
             fontFamily:    'DM Sans, sans-serif',
-            fontSize:      'clamp(9px, 2.4vw, 11px)',
-            letterSpacing: 'clamp(0.12em, 1.8vw, 0.28em)',
+            fontSize:      'clamp(11px, 2.4vw, 13px)',
+            letterSpacing: 'clamp(0.16em, 1.8vw, 0.28em)',
             textTransform: 'uppercase',
-            color:         'var(--eyebrow)',
+            color:         'var(--white)',
+            textShadow:    '0 1px 8px rgba(0,0,0,0.8)',
           }}>
             Chicago · DJ · Curator · <span style={{whiteSpace:'nowrap'}}>Experience Architect</span>
           </p>
@@ -100,12 +101,26 @@ export default function HeroSection({ content = {} }: Props) {
             color:         'var(--white)',
             margin:        0,
           }}>
-            {title.split(/\s+/).map((word, index, words) => (
-              <span key={`${word}-${index}`} className="hero-title-word" style={{ color: word === 'BAE' ? '#a66bff' : undefined }}>
-                {word}
-                {index < words.length - 1 ? <br /> : null}
-              </span>
-            ))}
+            {(() => {
+              const words = title.split(/\s+/)
+              const firstLine = words.slice(0, -1)
+              const lastWord  = words[words.length - 1]
+              return (
+                <>
+                  <span className="hero-title-word">
+                    {firstLine.map((w, i) => (
+                      <span key={i} style={{ color: w === 'BAE' ? '#a66bff' : undefined }}>
+                        {i > 0 ? ' ' : ''}{w}
+                      </span>
+                    ))}
+                  </span>
+                  {firstLine.length > 0 && <br />}
+                  <span className="hero-title-word" style={{ color: lastWord === 'BAE' ? '#a66bff' : undefined }}>
+                    {lastWord}
+                  </span>
+                </>
+              )
+            })()}
           </h1>
 
         </div>

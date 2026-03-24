@@ -350,6 +350,7 @@ body {
 .public-page-stage {
   position: relative;
   isolation: isolate;
+  overflow: hidden;
 }
 
 .public-page-stage-inner {
