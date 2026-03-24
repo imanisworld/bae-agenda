@@ -36,9 +36,8 @@ export default function ConnectPage() {
           <span className="section-label">Stay Connected</span>
         </div>
         <h1>
-          {/* THEBAEAGENDA — intentional no-space lockup */}
-          <span style={{ color: 'var(--white)' }}>THEBAE</span>
-          <span style={{ color: 'var(--violet)', letterSpacing: '0.04em' }}>AGENDA</span>
+          <span style={{ color: 'var(--white)' }}>THE BAE </span>
+          <span style={{ color: 'var(--violet)' }}>AGENDA</span>
         </h1>
         <p className="connect-hero-sub">
           Find DJ B.A.E. — follow for sets, announcements, and updates.
