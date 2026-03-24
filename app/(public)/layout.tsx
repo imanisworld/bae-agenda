@@ -9,6 +9,7 @@
 import Nav          from '@/components/public/Nav'
 import Footer       from '@/components/public/Footer'
 import CustomCursor from '@/components/effects/CustomCursor'
+import PublicPageStage from '@/components/public/PublicPageStage'
 
 export default function PublicLayout({
   children,
@@ -20,7 +21,7 @@ export default function PublicLayout({
       <CustomCursor />
       <Nav />
       <main id="main-content" tabIndex={-1}>
-        {children}
+        <PublicPageStage>{children}</PublicPageStage>
       </main>
       <Footer />
     </>

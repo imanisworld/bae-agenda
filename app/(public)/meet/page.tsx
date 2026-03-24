@@ -39,6 +39,7 @@ export default function MeetPage() {
     <div style={{ background: 'var(--black)', minHeight: '100vh', paddingTop: '68px' }}>
       <div className="section-container" style={{ display: 'grid', gap: '32px', paddingTop: 0 }}>
         <section
+          className="meet-hero-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
@@ -47,6 +48,7 @@ export default function MeetPage() {
           }}
         >
           <div
+            className="meet-hero-photo-shell"
             style={{
               minHeight: 'clamp(340px, 72vw, 520px)',
               border: '1px solid var(--border)',
@@ -55,6 +57,7 @@ export default function MeetPage() {
             }}
           >
             <Image
+              className="meet-hero-photo"
               src="/photos/PlexMix19-DJBAE.JPEG"
               alt="DJ B.A.E. performing live"
               fill
@@ -62,6 +65,7 @@ export default function MeetPage() {
               style={{ objectFit: 'cover', objectPosition: 'center 18%' }}
             />
             <div
+              className="meet-hero-photo-overlay"
               aria-hidden="true"
               style={{
                 position: 'absolute',
@@ -71,6 +75,7 @@ export default function MeetPage() {
               }}
             />
             <div
+              className="meet-hero-photo-frame"
               aria-hidden="true"
               style={{
                 position: 'absolute',
@@ -78,6 +83,7 @@ export default function MeetPage() {
                 border: '1px solid rgba(255,255,255,0.12)',
               }}
             />
+            <div className="meet-hero-photo-scan" aria-hidden="true" />
           </div>
 
           <div style={{ display: 'grid', alignContent: 'center', gap: '24px' }}>

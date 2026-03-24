@@ -16,9 +16,8 @@ export const metadata: Metadata = {
   },
 }
 
-const CONTENT_KEYS = ['about_quote', 'booking_email'] as const
-
-const CONTACT_EMAIL = 'baebookings@proton.me'
+const CONTENT_KEYS = ['about_quote'] as const
+const WEB_INQUIRY_EMAIL = 'imanicru@pm.me'
 
 function statCard(label: string, value: string, sub: string) {
   return (
@@ -77,15 +76,14 @@ const TIERS = [
 
 export default async function BuiltPage() {
   const content = await getContentMap([...CONTENT_KEYS])
-  const bookingEmail = content.booking_email ?? CONTACT_EMAIL
 
   return (
     <div style={{ background: 'var(--black)', minHeight: '100vh', paddingTop: '68px' }}>
       <div className="section-container" style={{ display: 'grid', gap: '56px', paddingTop: 0 }}>
 
         {/* ── Hero ─────────────────────────────────────────────── */}
-        <section style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(280px, 0.9fr)', gap: '32px', alignItems: 'center' }}>
-          <div>
+        <section className="built-page-hero" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.1fr) minmax(280px, 0.9fr)', gap: '32px', alignItems: 'center' }}>
+          <div className="built-page-hero-copy">
             <div className="hardware-heading">
               <span className="section-label">Built</span>
             </div>
@@ -107,8 +105,8 @@ export default async function BuiltPage() {
             <p style={{ fontSize: '15px', color: 'var(--amber)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '28px', fontWeight: 500 }}>
               This stack is available for your brand.
             </p>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-              <a href={`mailto:${bookingEmail}?subject=Web Build Inquiry`} className="btn-primary">
+            <div className="built-page-hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <a href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`} className="btn-primary">
                 Start a Project →
               </a>
             </div>
@@ -236,7 +234,7 @@ export default async function BuiltPage() {
           <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7 }}>
             Not sure which fits?{' '}
             <a
-              href={`mailto:${bookingEmail}?subject=Web Build Inquiry`}
+              href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`}
               style={{ color: 'var(--amber)', textDecoration: 'underline' }}
             >
               Send the details and we&apos;ll figure it out together.
@@ -265,7 +263,7 @@ export default async function BuiltPage() {
             then made available for yours.
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-            <a href={`mailto:${bookingEmail}?subject=Web Build Inquiry`} className="btn-primary">
+            <a href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`} className="btn-primary">
               Start a Project →
             </a>
           </div>
@@ -308,7 +306,7 @@ export default async function BuiltPage() {
           </p>
           <div>
             <a
-              href={`mailto:${bookingEmail}?subject=Retainer Inquiry`}
+              href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Retainer Inquiry`}
               className="btn-ghost"
               style={{ display: 'inline-flex' }}
             >
@@ -389,7 +387,7 @@ export default async function BuiltPage() {
             Limited availability. Currently taking 2 new projects.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href={`mailto:${bookingEmail}?subject=Web Build Inquiry`} className="btn-primary">
+            <a href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`} className="btn-primary">
               Start a Project →
             </a>
           </div>

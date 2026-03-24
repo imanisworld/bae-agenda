@@ -54,6 +54,7 @@ export default function HeroSection({ content = {} }: Props) {
     >
       {/* ── Background photo ─────────────────────────────── */}
       <Image
+        className="hero-bg-photo"
         src="/photos/images/outside.jpg"
         alt=""
         fill
@@ -68,7 +69,8 @@ export default function HeroSection({ content = {} }: Props) {
         inset:      0,
         background: 'linear-gradient(to bottom, rgba(8,8,10,0.44) 0%, rgba(8,8,10,0.22) 34%, rgba(8,8,10,0.52) 72%, rgba(8,8,10,0.78) 100%)',
         zIndex:     0,
-      }} />
+      }} className="hero-bg-overlay" />
+      <div className="hero-bg-scan" aria-hidden="true" />
 
       {/* ── Effects ──────────────────────────────────────── */}
       <div className="noise-overlay" aria-hidden="true" />
@@ -78,8 +80,8 @@ export default function HeroSection({ content = {} }: Props) {
       {/* ── Top bar ──────────────────────────────────────── */}
       <div className="hero-topbar">
         {/* Left — eyebrow + headline */}
-        <div style={{ display: 'grid', gap: '10px' }}>
-          <p style={{
+        <div className="hero-copy-stack" style={{ display: 'grid', gap: '10px' }}>
+          <p className="hero-eyebrow" style={{
             fontFamily:    'DM Sans, sans-serif',
             fontSize:      'clamp(9px, 2.4vw, 11px)',
             letterSpacing: 'clamp(0.12em, 1.8vw, 0.28em)',
@@ -89,7 +91,7 @@ export default function HeroSection({ content = {} }: Props) {
             Chicago · DJ · Curator · <span style={{whiteSpace:'nowrap'}}>Experience Architect</span>
           </p>
 
-          <h1 style={{
+          <h1 className="hero-title" style={{
             fontFamily:    'Conthrax, sans-serif',
             fontWeight:    600,
             fontSize:      'clamp(44px, 6.5vw, 100px)',
@@ -99,7 +101,7 @@ export default function HeroSection({ content = {} }: Props) {
             margin:        0,
           }}>
             {title.split(/\s+/).map((word, index, words) => (
-              <span key={`${word}-${index}`} style={{ color: word === 'BAE' ? '#a66bff' : undefined }}>
+              <span key={`${word}-${index}`} className="hero-title-word" style={{ color: word === 'BAE' ? '#a66bff' : undefined }}>
                 {word}
                 {index < words.length - 1 ? <br /> : null}
               </span>

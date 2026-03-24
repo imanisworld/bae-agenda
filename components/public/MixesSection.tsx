@@ -27,6 +27,11 @@ function genreToDataAttr(genre: string): DataGenre {
   return 'afro'
 }
 
+function normalizeMixHref(href?: string | null) {
+  if (!href) return SOUNDCLOUD_PROFILE_URL
+  return href.replace('https://soundcloud.com/djbae', SOUNDCLOUD_PROFILE_URL)
+}
+
 // ── MixCard ───────────────────────────────────────────────────────────────────
 
 function MixCard({
@@ -162,7 +167,7 @@ export default async function MixesSection() {
                     key={mix.id}
                     genre={mix.genre ?? 'Open Format'}
                     title={mix.title}
-                    href={mix.embed_url ?? SOUNDCLOUD_PROFILE_URL}
+                    href={normalizeMixHref(mix.embed_url)}
                     dataGenre={dg}
                     durationMin={durationMin}
                     year={year}
