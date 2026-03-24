@@ -1,18 +1,21 @@
 /**
  * ADMIN LAYOUT
  * Wraps all /admin/* routes.
- * Auth is disabled — re-enable when Supabase auth is properly configured.
+ * Requires a valid Supabase session — redirects to /admin/login if not authenticated.
  */
 import Sidebar from '@/components/admin/Sidebar'
+import { requireAdminUser } from '@/lib/admin-auth'
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const user = await requireAdminUser()
+
   return (
     <div className="admin-shell">
-      <Sidebar userEmail={undefined} />
+      <Sidebar userEmail={user.email} />
       <main className="admin-main">
         {children}
       </main>
