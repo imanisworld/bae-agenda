@@ -171,13 +171,32 @@ export default async function MixesSection() {
               })
             : (
               <div className="mixes-teaser-shell" style={{ gridColumn: '1 / -1' }}>
+                {/* Logo video — blurred background layer */}
+                <video
+                  aria-hidden="true"
+                  src="/videos/bae logo.MP4"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    filter: 'blur(28px) saturate(0.6) brightness(0.22)',
+                    transform: 'scale(1.08)',
+                    zIndex: 0,
+                  }}
+                />
                 <div aria-hidden="true" className="mixes-teaser-noise" />
                 <div aria-hidden="true" className="mixes-teaser-orbit mixes-teaser-orbit-a" />
                 <div aria-hidden="true" className="mixes-teaser-orbit mixes-teaser-orbit-b" />
 
                 <InteractiveMediaDisc
                   className="mixes-teaser-disc-button"
-                  videoSrc="/videos/bae logo.MP4"
+                  videoSrc="/videos/e67f0964-8763-4658-bbba-4cc322727d68.mp4"
                 />
 
                 <div className="mixes-teaser-copy">

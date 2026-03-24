@@ -52,8 +52,29 @@ export default async function PortfolioPage() {
         padding: 'calc(68px + 48px) clamp(24px, 5vw, 72px) 48px',
         background: 'linear-gradient(180deg, var(--bg-sunken) 0%, var(--black) 100%)',
         borderBottom: '1px solid var(--border)',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', width: '100%' }}>
+        {/* Logo video — blurred ambient background */}
+        <video
+          aria-hidden="true"
+          src="/videos/bae logo.MP4"
+          autoPlay
+          loop
+          muted
+          playsInline
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            filter: 'blur(32px) saturate(0.5) brightness(0.18)',
+            transform: 'scale(1.08)',
+            zIndex: 0,
+          }}
+        />
+        <div style={{ maxWidth: '1280px', margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
           <div className="hardware-heading">
             <span className="section-label">Chicago · Indianapolis · ATL</span>
           </div>
