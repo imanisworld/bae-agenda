@@ -4677,3 +4677,70 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 }
 
+/* ─── Touch: disable hover effects that stick after tap ──────────── */
+/* On devices where the primary pointer cannot hover (touch screens),
+   reset all card/thumbnail hover transforms + highlights so tapping
+   never leaves an element stuck in a highlighted state.              */
+@media (hover: none) {
+  /* Generic card helpers */
+  .card-hover:hover,
+  .card-hover-amber:hover {
+    transform: none;
+    border-color: var(--border);
+  }
+
+  /* Portfolio teaser cards */
+  .portfolio-teaser-link-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  .portfolio-teaser-event-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  .portfolio-teaser-event-card:hover::before {
+    transform: translateX(-120%); /* keep shimmer off */
+  }
+
+  /* Event list items */
+  .ev-item:hover {
+    border-color: transparent;
+    background: rgba(255,255,255,0.04);
+  }
+  .ev-item:hover .ev-link {
+    color: inherit;
+    transform: none;
+  }
+
+  /* Social / connect cards */
+  .connect-social-card:hover {
+    border-color: var(--border);
+    background: var(--surface);
+  }
+
+  /* Mix cards */
+  .mc-card:hover { transform: none; }
+  .mc-card[data-genre="hiphop"]:hover,
+  .mc-card[data-genre="rnb"]:hover,
+  .mc-card[data-genre="afro"]:hover { box-shadow: none; }
+
+  /* Format cards */
+  .format-card:hover {
+    border-color: var(--border);
+    background: var(--bg-sunken);
+  }
+
+  /* Atmosphere cards (built page) */
+  .set-control-atmosphere-card:hover { transform: none; }
+
+  /* Mixes teaser platform links */
+  .mixes-teaser-platform:hover,
+  .mixes-teaser-signup-button:hover { transform: none; }
+
+  /* Hero book card */
+  .hero-book-card:hover {
+    background: transparent;
+    transform: none;
+  }
+}
+
