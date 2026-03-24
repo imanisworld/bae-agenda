@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import { getFeaturedMixes } from '@/lib/db/mixes'
+import InteractiveMediaDisc from '@/components/public/InteractiveMediaDisc'
+import MixesTeaserForm from '@/components/public/MixesTeaserForm'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -14,6 +16,7 @@ const CARD_GRADIENTS: Record<DataGenre, string> = {
 }
 
 const SOUNDCLOUD_PROFILE_URL = 'https://soundcloud.com/deejaybae'
+const YOUTUBE_PROFILE_URL = 'https://www.youtube.com/@djb.a.e'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -167,52 +170,46 @@ export default async function MixesSection() {
                 )
               })
             : (
-              <div style={{
-                gridColumn: '1 / -1',
-                padding: '48px 24px',
-                border: '1px solid var(--border)',
-                display: 'grid',
-                justifyItems: 'center',
-                gap: '18px',
-                background: 'var(--bg-sunken)',
-              }}>
-                {/* Spinning CD video */}
-                <div style={{
-                  width: 'min(160px, 42vw)',
-                  aspectRatio: '1 / 1',
-                  borderRadius: '50%',
-                  overflow: 'hidden',
-                  boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
-                }}>
-                  <video
-                    src="/videos/e67f0964-8763-4658-bbba-4cc322727d68.mp4"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'cover',
-                      borderRadius: '50%',
-                    }}
-                  />
-                </div>
-                <div style={{
-                  fontFamily: 'Conthrax, sans-serif',
-                  fontSize: 'clamp(18px, 3vw, 28px)',
-                  color: 'rgba(250,248,243,0.5)',
-                  letterSpacing: '0.08em',
-                }}>
-                  Coming Soon
-                </div>
-                <p style={{ fontSize: '13px', color: 'var(--muted)', margin: 0, maxWidth: '360px', textAlign: 'center', lineHeight: 1.7 }}>
-                  New sets dropping soon. Follow to get notified.
-                </p>
-                <div>
-                  <a href={SOUNDCLOUD_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ fontSize: '12px' }}>
-                    Follow on SoundCloud →
-                  </a>
+              <div className="mixes-teaser-shell" style={{ gridColumn: '1 / -1' }}>
+                <div aria-hidden="true" className="mixes-teaser-noise" />
+                <div aria-hidden="true" className="mixes-teaser-orbit mixes-teaser-orbit-a" />
+                <div aria-hidden="true" className="mixes-teaser-orbit mixes-teaser-orbit-b" />
+
+                <InteractiveMediaDisc
+                  className="mixes-teaser-disc-button"
+                  videoSrc="/videos/bae logo.MP4"
+                />
+
+                <div className="mixes-teaser-copy">
+                  <div className="mixes-teaser-kicker">Mix Lab</div>
+                  <h3 className="mixes-teaser-title">Bae&apos;s in the Lab</h3>
+                  <p className="mixes-teaser-subtext">Be first to hear new sets.</p>
+
+                  <MixesTeaserForm />
+
+                  <div className="mixes-teaser-follow">
+                    <div className="mixes-teaser-follow-label">Follow Everywhere</div>
+                    <div className="mixes-teaser-follow-grid">
+                      <a
+                        href={SOUNDCLOUD_PROFILE_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mixes-teaser-platform"
+                      >
+                        <span className="mixes-teaser-platform-tag">SC</span>
+                        <span>SoundCloud</span>
+                      </a>
+                      <a
+                        href={YOUTUBE_PROFILE_URL}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mixes-teaser-platform"
+                      >
+                        <span className="mixes-teaser-platform-tag">YT</span>
+                        <span>YouTube</span>
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
