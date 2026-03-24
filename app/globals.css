@@ -2237,6 +2237,7 @@ body.has-custom-cursor * { cursor: none !important; }
   border: 0;
   background: transparent;
   cursor: pointer;
+  touch-action: none;
   -webkit-tap-highlight-color: transparent;
 }
 

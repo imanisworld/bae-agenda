@@ -187,7 +187,6 @@ export default function InteractiveMediaDisc({
           onPointerMove={onPointerMove}
           onPointerUp={finishDrag}
           onPointerCancel={finishDrag}
-          onPointerLeave={finishDrag}
         >
           <span className="interactive-disc-grooves" />
           <span className="interactive-disc-sheen" />
