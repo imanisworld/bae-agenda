@@ -3,16 +3,43 @@
  * Renamed from middleware.ts → proxy.ts in Next.js 16.
  * Runs at the edge before every matched request.
  *
- * Delegates to updateSession() which:
- *   1. Refreshes the Supabase session token on every request
- *   2. Redirects unauthenticated users away from /admin/*
- *   3. Redirects already-authenticated users away from /admin/login
+ * 1. Protects /admin/* — redirects unauthenticated users to /admin/login
+ * 2. Excludes /admin/login itself to prevent redirect loops
+ * 3. Refreshes the Supabase session token on every request
  */
-import { type NextRequest } from 'next/server'
+import { type NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 import { updateSession } from '@/lib/supabase/middleware'
 
 export async function proxy(request: NextRequest) {
-  return await updateSession(request)
+  const { pathname } = request.nextUrl
+
+  // Protect /admin/* — skip the login page to avoid infinite redirects
+  if (
+    pathname.startsWith('/admin') &&
+    !pathname.startsWith('/admin/login') &&
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          getAll() { return request.cookies.getAll() },
+          setAll() {},
+        },
+      }
+    )
+
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+  }
+
+  return updateSession(request)
 }
 
 export const config = {
