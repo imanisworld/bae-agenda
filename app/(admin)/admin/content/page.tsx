@@ -13,7 +13,7 @@ export default async function ContentPage() {
   const content = await getAllContent()
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+    <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Content Editor"
         subtitle="Edit public-facing site copy. Changes go live immediately after saving."

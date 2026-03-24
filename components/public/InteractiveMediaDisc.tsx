@@ -115,6 +115,7 @@ export default function InteractiveMediaDisc({
   }
 
   const onPointerDown = (event: PointerEvent<HTMLSpanElement>) => {
+    event.preventDefault()
     pointerIdRef.current = event.pointerId
     dragDistanceRef.current = 0
     setIsDragging(true)
@@ -126,6 +127,7 @@ export default function InteractiveMediaDisc({
 
   const onPointerMove = (event: PointerEvent<HTMLSpanElement>) => {
     if (!isDragging || pointerIdRef.current !== event.pointerId) return
+    event.preventDefault()
 
     const currentAngle = pointerAngle(event)
     const lastPointerAngle = lastPointerAngleRef.current

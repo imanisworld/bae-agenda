@@ -59,7 +59,7 @@ export default async function ClientsPage() {
   const clients = await getClients()
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '1120px' }}>
+    <div className="admin-page">
       <PageHeader
         title="Clients"
         subtitle={clients.length ? `${clients.length} total` : undefined}
@@ -77,7 +77,7 @@ export default async function ClientsPage() {
           />
         ) : (
           <div className="admin-table-wrap">
-            <table className="admin-table">
+            <table className="admin-table admin-table-stack">
               <thead>
                 <tr>
                   <th>Name</th>
@@ -90,13 +90,13 @@ export default async function ClientsPage() {
               <tbody>
                 {clients.map((c) => (
                   <tr key={c.id}>
-                    <td style={{ fontWeight: 400 }}>
+                    <td data-label="Name" style={{ fontWeight: 400 }}>
                       {c.first_name}{c.last_name ? ` ${c.last_name}` : ''}
                     </td>
-                    <td className="muted">{c.email}</td>
-                    <td className="muted">{c.phone ?? '—'}</td>
-                    <td className="muted">{c.booking_count}</td>
-                    <td className="muted">{fmtDate(c.created_at)}</td>
+                    <td data-label="Email" className="muted">{c.email}</td>
+                    <td data-label="Phone" className="muted">{c.phone ?? '—'}</td>
+                    <td data-label="Bookings" className="muted">{c.booking_count}</td>
+                    <td data-label="Added" className="muted">{fmtDate(c.created_at)}</td>
                   </tr>
                 ))}
               </tbody>

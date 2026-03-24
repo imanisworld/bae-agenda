@@ -78,14 +78,11 @@ export default async function PaymentsPage() {
   const totalPending  = pending.reduce((sum, p) => sum + p.amount, 0)
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '1120px' }}>
+    <div className="admin-page">
       <PageHeader title="Payments" />
 
       {/* Summary row */}
-      <div style={{
-        display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '16px', marginBottom: '36px',
-      }}>
+      <div className="admin-summary-grid">
         {[
           { label: 'Received',  value: fmtCurrency(totalReceived), color: '#34d399' },
           { label: 'Pending',   value: fmtCurrency(totalPending),  color: 'var(--gold)'   },
@@ -122,7 +119,7 @@ export default async function PaymentsPage() {
           />
         ) : (
           <div className="admin-table-wrap">
-            <table className="admin-table">
+            <table className="admin-table admin-table-stack">
               <thead>
                 <tr>
                   <th>Booking</th>
@@ -136,9 +133,9 @@ export default async function PaymentsPage() {
               <tbody>
                 {payments.map((p) => (
                   <tr key={p.id}>
-                    <td style={{ fontWeight: 400 }}>{p.booking_name}</td>
-                    <td className="muted" style={{ textTransform: 'capitalize' }}>{p.type}</td>
-                    <td style={{
+                    <td data-label="Booking" style={{ fontWeight: 400 }}>{p.booking_name}</td>
+                    <td data-label="Type" className="muted" style={{ textTransform: 'capitalize' }}>{p.type}</td>
+                    <td data-label="Amount" style={{
                       fontFamily: 'Conthrax, sans-serif', fontSize: '13px',
                       color: p.status === 'received' ? '#34d399'
                         : p.status === 'refunded' ? '#e85d75'
@@ -146,11 +143,11 @@ export default async function PaymentsPage() {
                     }}>
                       {fmtCurrency(p.amount)}
                     </td>
-                    <td className="muted" style={{ textTransform: 'capitalize' }}>
+                    <td data-label="Method" className="muted" style={{ textTransform: 'capitalize' }}>
                       {p.method ?? '—'}
                     </td>
-                    <td><Badge variant={p.status} /></td>
-                    <td className="muted">{fmtDate(p.paid_at)}</td>
+                    <td data-label="Status"><Badge variant={p.status} /></td>
+                    <td data-label="Paid" className="muted">{fmtDate(p.paid_at)}</td>
                   </tr>
                 ))}
               </tbody>

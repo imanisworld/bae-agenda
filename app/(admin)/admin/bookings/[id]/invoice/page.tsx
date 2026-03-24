@@ -47,7 +47,7 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div style={{
       display: 'grid',
-      gridTemplateColumns: '160px 1fr',
+      gridTemplateColumns: 'minmax(100px, 160px) 1fr',
       gap: '12px',
       padding: '10px 0',
       borderBottom: '1px solid rgba(255,255,255,0.06)',
@@ -90,7 +90,7 @@ export default async function InvoicePage({
     n.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '860px' }}>
+    <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Invoice Preview"
         subtitle={`${booking.event_name} · ${clientName}`}
@@ -226,7 +226,7 @@ export default async function InvoicePage({
       </div>
 
       {/* Actions */}
-      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+      <div className="admin-form-actions">
         <SendInvoiceButton
           bookingId={id}
           clientEmail={client?.email}

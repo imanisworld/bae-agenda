@@ -129,7 +129,7 @@ export default function SetControlSection({ techItems }: Props) {
                 fontStyle: 'italic',
               }}
             >
-              "The set doesn't start when I press play. It starts when I walk in and read the room."
+              &ldquo;The set doesn&apos;t start when I press play. It starts when I walk in and read the room.&rdquo;
             </p>
             <div
               style={{

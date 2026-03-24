@@ -51,7 +51,7 @@ export default async function EditPortfolioEntryPage({
   if (!entry) notFound()
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+    <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Edit Entry"
         subtitle="Update gig details, tags, and featured status."
@@ -64,14 +64,14 @@ export default async function EditPortfolioEntryPage({
         style={{ padding: '24px', marginBottom: '16px' }}
       >
         <input type="hidden" name="id" value={entry.id} />
-        <div style={{ display: 'grid', gap: '16px' }}>
+        <div className="admin-form-grid">
 
           <label style={{ display: 'grid', gap: '7px' }}>
             <span className="admin-section-title">Event Name *</span>
             <input name="event_name" required defaultValue={entry.event_name} style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Year *</span>
               <input
@@ -95,7 +95,7 @@ export default async function EditPortfolioEntryPage({
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Venue</span>
               <input name="venue" defaultValue={entry.venue ?? ''} style={inputStyle()} />
@@ -140,18 +140,18 @@ export default async function EditPortfolioEntryPage({
             />
           </label>
 
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+          <div className="admin-inline-options">
+            <label>
               <input type="checkbox" name="featured" defaultChecked={entry.featured} />
               Featured (shown in highlights grid)
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+            <label>
               <input type="checkbox" name="status" value="draft" defaultChecked={entry.status === 'draft'} />
               Draft (hidden from public)
             </label>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+          <div className="admin-form-actions">
             <button type="submit" className="admin-btn-primary">
               Save Changes
             </button>

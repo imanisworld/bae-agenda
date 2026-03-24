@@ -16,7 +16,7 @@ function inputStyle(): React.CSSProperties {
 
 export default function NewMixPage() {
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+    <div className="admin-page admin-page--narrow">
       <PageHeader
         title="New Mix"
         subtitle="Create a mix for the public catalog and featured sections."
@@ -24,13 +24,13 @@ export default function NewMixPage() {
       />
 
       <form action={createMixAction} className="admin-section" style={{ padding: '24px' }}>
-        <div style={{ display: 'grid', gap: '16px' }}>
+        <div className="admin-form-grid">
           <label style={{ display: 'grid', gap: '7px' }}>
             <span className="admin-section-title">Title *</span>
             <input name="title" required style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Genre</span>
               <input name="genre" style={inputStyle()} />
@@ -41,7 +41,7 @@ export default function NewMixPage() {
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Embed URL</span>
               <input name="embed_url" type="url" style={inputStyle()} />
@@ -57,7 +57,7 @@ export default function NewMixPage() {
             <textarea name="description" rows={4} style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Sort Order</span>
               <input name="sort_order" type="number" min={0} defaultValue={0} style={inputStyle()} />
@@ -68,18 +68,18 @@ export default function NewMixPage() {
             </label>
           </div>
 
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+          <div className="admin-inline-options">
+            <label>
               <input type="checkbox" name="published" defaultChecked />
               Published
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+            <label>
               <input type="checkbox" name="is_featured" />
               Featured On Homepage
             </label>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+          <div className="admin-form-actions">
             <button type="submit" className="admin-btn-primary">
               Create Mix
             </button>

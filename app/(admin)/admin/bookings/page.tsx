@@ -132,7 +132,7 @@ export default async function BookingsPage({
   const errorMessage = getErrorMessage(resolvedSearchParams?.error)
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '1120px' }}>
+    <div className="admin-page">
       <PageHeader
         title="Bookings"
         subtitle={bookings.length ? `${bookings.length} total` : undefined}
@@ -152,7 +152,7 @@ export default async function BookingsPage({
           />
         ) : (
           <div className="admin-table-wrap">
-            <table className="admin-table">
+            <table className="admin-table admin-table-stack">
               <thead>
                 <tr>
                   <th>Event</th>
@@ -167,7 +167,7 @@ export default async function BookingsPage({
               <tbody>
                 {bookings.map((b) => (
                   <tr key={b.id}>
-                    <td style={{ fontWeight: 400 }}>
+                    <td data-label="Event" style={{ fontWeight: 400 }}>
                       {b.event_name}
                       {(b.venue || b.city) && (
                         <div className="muted" style={{ marginTop: '4px' }}>
@@ -175,17 +175,17 @@ export default async function BookingsPage({
                         </div>
                       )}
                     </td>
-                    <td className="muted">{b.client_name ?? '—'}</td>
-                    <td className="muted">
+                    <td data-label="Client" className="muted">{b.client_name ?? '—'}</td>
+                    <td data-label="Event Date" className="muted">
                       {fmtEventDate(b.event_date, b.event_timezone)}
                       <div style={{ fontSize: '11px', marginTop: '4px' }}>
                         {fmtEventTime(b.event_date, b.event_timezone)} · {b.event_timezone}
                       </div>
                     </td>
-                    <td className="muted">{b.package ?? '—'}</td>
-                    <td><Badge variant={b.status} /></td>
-                    <td className="muted">{fmtSubmittedDate(b.created_at)}</td>
-                    <td>
+                    <td data-label="Package" className="muted">{b.package ?? '—'}</td>
+                    <td data-label="Status"><Badge variant={b.status} /></td>
+                    <td data-label="Submitted" className="muted">{fmtSubmittedDate(b.created_at)}</td>
+                    <td data-label="Actions">
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         {getBookingActions(b.status).map((action) => (
                           <form key={action.nextStatus} action={updateBookingStatusAction}>
@@ -200,9 +200,7 @@ export default async function BookingsPage({
                                       color: '#e85d75',
                                       borderColor: 'rgba(232,93,117,0.35)',
                                     }
-                                  : action.tone === 'primary'
-                                    ? { padding: '7px 14px' }
-                                    : undefined
+                                  : undefined
                               }
                             >
                               {action.label}

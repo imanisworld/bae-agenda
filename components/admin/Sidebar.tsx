@@ -19,9 +19,6 @@ export default function Sidebar({ userEmail }: SidebarProps) {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
-  // Close sidebar on route change
-  useEffect(() => { setOpen(false) }, [pathname])
-
   // Prevent body scroll when sidebar is open on mobile
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
@@ -114,6 +111,7 @@ export default function Sidebar({ userEmail }: SidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={() => setOpen(false)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',

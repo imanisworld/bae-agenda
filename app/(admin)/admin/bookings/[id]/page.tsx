@@ -100,7 +100,7 @@ export default async function EditBookingPage({
   const balance = total - deposit
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+    <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Edit Booking"
         subtitle="Adjust booking details, notes, pricing, and status."
@@ -108,7 +108,7 @@ export default async function EditBookingPage({
       />
 
       <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center', minWidth: 0 }}>
           <Badge variant={booking.status} />
           {clientName && <span style={{ color: 'var(--white)', fontSize: '14px' }}>{clientName}</span>}
           {booking.clients?.email && <span className="muted">{booking.clients.email}</span>}
@@ -118,14 +118,14 @@ export default async function EditBookingPage({
 
       <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          <div style={{ maxWidth: '520px' }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
             <div className="admin-section-title" style={{ marginBottom: '10px' }}>Invoice</div>
             <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
               Preview the client invoice, download the PDF, and keep the quote, deposit, and balance in sync with this booking.
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+          <div className="admin-form-actions">
             <Link href={`/admin/bookings/${booking.id}/invoice`} className="admin-btn-primary">
               Preview Invoice →
             </Link>
@@ -142,7 +142,7 @@ export default async function EditBookingPage({
         <div style={{
           marginTop: '20px',
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
           gap: '12px',
         }}>
           {[
@@ -171,13 +171,13 @@ export default async function EditBookingPage({
 
       <form action={updateBookingDetailsAction} className="admin-section" style={{ padding: '24px' }}>
         <input type="hidden" name="id" value={booking.id} />
-        <div style={{ display: 'grid', gap: '16px' }}>
+        <div className="admin-form-grid">
           <label style={{ display: 'grid', gap: '7px' }}>
             <span className="admin-section-title">Event Name *</span>
             <input name="event_name" required defaultValue={booking.event_name} style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Event Type</span>
               <input name="event_type" defaultValue={booking.event_type ?? ''} style={inputStyle()} />
@@ -193,7 +193,7 @@ export default async function EditBookingPage({
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 0.8fr', gap: '12px' }}>
+          <div className="admin-form-grid-two-wide">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Event Date & Time *</span>
               <input
@@ -220,7 +220,7 @@ export default async function EditBookingPage({
             />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Venue</span>
               <input name="venue" defaultValue={booking.venue ?? ''} style={inputStyle()} />
@@ -231,7 +231,7 @@ export default async function EditBookingPage({
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Package</span>
               <input name="package" defaultValue={booking.package ?? ''} style={inputStyle()} />
@@ -242,7 +242,7 @@ export default async function EditBookingPage({
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Quote</span>
               <input name="quote" type="number" min={0} step="1" defaultValue={booking.quote ?? undefined} style={inputStyle()} />
@@ -258,7 +258,7 @@ export default async function EditBookingPage({
             <textarea name="notes" rows={6} defaultValue={booking.notes ?? ''} style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+          <div className="admin-form-actions">
             <button type="submit" className="admin-btn-primary">
               Save Changes
             </button>

@@ -58,7 +58,7 @@ export default async function EditMixPage({
   if (!mix) notFound()
 
   return (
-    <div style={{ padding: '40px 48px', maxWidth: '900px' }}>
+    <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Edit Mix"
         subtitle="Update metadata, publishing, and featured settings."
@@ -67,13 +67,13 @@ export default async function EditMixPage({
 
       <form action={updateMixAction} className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
         <input type="hidden" name="id" value={mix.id} />
-        <div style={{ display: 'grid', gap: '16px' }}>
+        <div className="admin-form-grid">
           <label style={{ display: 'grid', gap: '7px' }}>
             <span className="admin-section-title">Title *</span>
             <input name="title" required defaultValue={mix.title} style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Genre</span>
               <input name="genre" defaultValue={mix.genre ?? ''} style={inputStyle()} />
@@ -84,7 +84,7 @@ export default async function EditMixPage({
             </label>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Embed URL</span>
               <input name="embed_url" type="url" defaultValue={mix.embed_url ?? ''} style={inputStyle()} />
@@ -100,7 +100,7 @@ export default async function EditMixPage({
             <textarea name="description" rows={4} defaultValue={mix.description ?? ''} style={inputStyle()} />
           </label>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Sort Order</span>
               <input name="sort_order" type="number" min={0} defaultValue={mix.sort_order} style={inputStyle()} />
@@ -111,18 +111,18 @@ export default async function EditMixPage({
             </label>
           </div>
 
-          <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+          <div className="admin-inline-options">
+            <label>
               <input type="checkbox" name="published" defaultChecked={Boolean(mix.published_at)} />
               Published
             </label>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: 'var(--white)' }}>
+            <label>
               <input type="checkbox" name="is_featured" defaultChecked={mix.is_featured} />
               Featured On Homepage
             </label>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px', marginTop: '4px' }}>
+          <div className="admin-form-actions">
             <button type="submit" className="admin-btn-primary">
               Save Changes
             </button>
