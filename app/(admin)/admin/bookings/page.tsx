@@ -218,6 +218,9 @@ export default async function BookingsPage({
                         <Link href={`/admin/bookings/${b.id}`} className="admin-view-all" style={{ alignSelf: 'center' }}>
                           Edit →
                         </Link>
+                        <a href={`/api/invoice/${b.id}`} download className="admin-view-all" style={{ alignSelf: 'center' }}>
+                          PDF ↓
+                        </a>
                       </div>
                     </td>
                   </tr>
