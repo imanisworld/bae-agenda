@@ -51,7 +51,7 @@ export default function Footer() {
             </span>
           </Link>
           <p style={{ margin: '6px 0 0', fontSize: '12px', color: 'var(--muted)', fontFamily: 'DM Sans, sans-serif', lineHeight: 1.55 }}>
-            Chicago&apos;s DJ, curator, and experience architect.
+            Selector. Genre Bender. Sound Architect.
           </p>
         </div>
 

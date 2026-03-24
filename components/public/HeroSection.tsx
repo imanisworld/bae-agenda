@@ -90,7 +90,7 @@ export default function HeroSection({ content = {} }: Props) {
             color:         'var(--white)',
             textShadow:    '0 1px 8px rgba(0,0,0,0.8)',
           }}>
-            Chicago · DJ · Curator · <span style={{whiteSpace:'nowrap'}}>Experience Architect</span>
+            Selector · Genre Bender · <span style={{whiteSpace:'nowrap'}}>Sound Architect</span>
           </p>
 
           <h1 className="hero-title" style={{
