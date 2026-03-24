@@ -55,7 +55,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser' }: 
                   lineHeight: 1.75,
                   color: 'var(--muted)',
                 }}>
-                  This is the holding room for old recent sets, future drops, and whatever is cooking next. The animation stays until the catalog is ready to land.
+                  The lab is where mixes, live recordings, and fresh drops start collecting. Tap in here for what is playing now and what lands next.
                 </p>
               </div>
             </div>
@@ -72,8 +72,8 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser' }: 
             marginBottom: '32px',
           }}>
             {[
-              { label: 'Status', value: 'Coming Soon' },
-              { label: 'Current Mode', value: 'Teaser Loop' },
+              { label: 'Status', value: 'In Rotation' },
+              { label: 'Current Mode', value: 'Archive + Drops' },
               { label: 'Tap In', value: 'SoundCloud + YouTube' },
             ].map((item) => (
               <div
@@ -121,18 +121,18 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser' }: 
             />
 
             <div className="mixes-teaser-copy">
-              <div className="mixes-teaser-kicker">Coming Soon</div>
+              <div className="mixes-teaser-kicker">Lab Archive</div>
               <h3 className="mixes-teaser-title">Bae&apos;s in the Lab</h3>
               <p className="mixes-teaser-subtext">
                 {isPage
-                  ? 'Old recent sets for now. New drops are cooking, the archive is warming up, and this page will open up as soon as there is more to show.'
-                  : 'Old recent sets for now. New drops are cooking.'}
+                  ? 'Recent sets and old drops are all here. Follow me now and the archive will keep growing from this point forward.'
+                  : 'Recent sets and new drops land here first.'}
               </p>
 
               <MixesTeaserForm />
 
               <div className="mixes-teaser-follow">
-                <div className="mixes-teaser-follow-label">{isPage ? 'Tap In While It Builds' : 'Tap In Now'}</div>
+                <div className="mixes-teaser-follow-label">{isPage ? 'Tap In Here' : 'Tap In Now'}</div>
                 <div className="mixes-teaser-follow-grid">
                   <a
                     href={SOUNDCLOUD_PROFILE_URL}
@@ -165,7 +165,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser' }: 
                   lineHeight: 1.7,
                   color: 'var(--muted)',
                 }}>
-                  The motion stays for now on purpose. It keeps the page alive until there’s enough real material to replace the placeholder energy with actual sets.
+                  SoundCloud and YouTube are the fastest way to catch new uploads, live edits, and whatever gets added to the rotation next.
                 </div>
               )}
 

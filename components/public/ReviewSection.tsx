@@ -45,6 +45,7 @@ function Stars({ n }: { n: number }) {
 export default async function ReviewSection() {
   const reviews = await getApprovedReviews()
   const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+  const featuredReview = reviews[0]
 
   return (
     <section
@@ -69,164 +70,186 @@ export default async function ReviewSection() {
           `,
         }}
       />
-      <div className="section-container" style={{ position: 'relative', zIndex: 1, paddingTop: '56px', paddingBottom: '48px' }}>
+      <div className="section-container review-section-shell" style={{ position: 'relative', zIndex: 1, paddingTop: '34px', paddingBottom: '32px' }}>
         <div className="hardware-heading">
           <span className="section-label">Reviews</span>
         </div>
-        <h2 className="section-heading" style={{ marginBottom: '28px' }}>Audience Feedback</h2>
-
-        <div className="build-console">
-          <div className="build-console-topbar">
-            <div className="build-console-screen">
-              <div className="build-console-screen-label">Audience Log</div>
-              <div className="build-console-screen-value">What People Say After The Set</div>
-              <div className="build-console-screen-lines">
-                <span><strong>Source</strong> Client and venue feedback submitted through the site</span>
-                <span><strong>Status</strong> New notes stay private until approved</span>
-                <span><strong>Read</strong> Real reactions from rooms, parties, and live events</span>
-              </div>
-            </div>
-
-            <div className="build-console-chip-row" aria-hidden="true">
-              <span>{reviews.length} Loaded</span>
-              <span>{averageRating.toFixed(1)} Avg</span>
-              <span>Approved</span>
-            </div>
-          </div>
-
-          <div className="build-console-grid">
-            <div
-              className="build-console-copy"
-              style={{ background: 'linear-gradient(180deg, rgba(155,93,229,0.1), rgba(18,18,22,0.96))' }}
-            >
-              <h2 style={{
+        <div className="review-section-head">
+          <div className="review-section-head-copy">
+            <h2
+              className="review-section-title"
+              style={{
                 fontFamily: 'Conthrax, sans-serif',
-                fontSize: 'clamp(22px, 4vw, 42px)',
+                fontSize: 'clamp(22px, 3.2vw, 36px)',
                 fontWeight: 600,
                 color: 'var(--white)',
-                lineHeight: 1.05,
-                marginBottom: '16px',
-              }}>
-                Reactions That<br />
-                <span style={{ color: 'var(--violet)' }}>Stay With People</span>
-              </h2>
+                lineHeight: 1,
+                margin: 0,
+              }}
+            >
+              Audience <span style={{ color: 'var(--violet)' }}>Feedback</span>
+            </h2>
+            <p className="review-section-subtitle" style={{
+              maxWidth: '520px',
+              margin: '8px 0 0',
+              fontSize: '11px',
+              color: 'var(--muted)',
+              lineHeight: 1.55,
+            }}>
+              Real reactions from parties, venues, and live rooms.
+            </p>
+            <a
+              href="#leave-review"
+              className="review-section-cta"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginTop: '12px',
+                padding: '10px 14px',
+                border: '1px solid rgba(155,93,229,0.28)',
+                background: 'rgba(155,93,229,0.08)',
+                color: 'var(--white)',
+                textDecoration: 'none',
+                fontSize: '10px',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Leave a Review
+            </a>
+          </div>
 
-              <p className="build-console-body">
-                The site moves from dates, to proof, to booking. This section is the trust bridge:
-                how the room felt, how the night landed, and why people call back.
-              </p>
+          <div className="review-section-chips">
+            <span className="build-console-mini-chips" style={{ display: 'contents' }}>
+              <span>{reviews.length} Reviews</span>
+              <span>{averageRating.toFixed(1)} Avg</span>
+            </span>
+          </div>
+        </div>
 
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                gap: '10px',
-                marginTop: '24px',
+        <div className="build-console review-section-console" style={{ padding: '12px', borderRadius: '26px' }}>
+          <article
+            key={featuredReview.id}
+            className="card-hover review-card review-card-featured"
+            style={{
+              position: 'relative',
+              overflow: 'hidden',
+              minHeight: '152px',
+              padding: '16px 18px',
+              borderRadius: '20px',
+              background: 'linear-gradient(180deg, rgba(155,93,229,0.16), rgba(24,24,28,0.98) 58%)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              display: 'grid',
+              gap: '12px',
+            }}
+          >
+            <div
+              className="review-card-quote-mark"
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                top: '-8px',
+                right: '14px',
+                fontFamily: 'Conthrax, sans-serif',
+                fontSize: '56px',
+                lineHeight: 1,
+                color: 'rgba(155,93,229,0.14)',
+              }}
+            >
+              ”
+            </div>
+
+            <div className="review-card-body" style={{ display: 'grid', gap: '10px', position: 'relative', zIndex: 1 }}>
+              <div className="review-card-top" style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '12px',
+                flexWrap: 'wrap',
               }}>
-                {[
-                  { label: 'Average', value: `${averageRating.toFixed(1)} / 5` },
-                  { label: 'Showing', value: `${reviews.length} Reviews` },
-                  { label: 'Flow', value: 'Live Energy' },
-                ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    style={{
-                      border: '1px solid rgba(255,255,255,0.08)',
-                      background: 'rgba(8,8,12,0.35)',
-                      padding: '14px 12px',
-                      display: 'grid',
-                      gap: '4px',
-                    }}
-                  >
-                    <div style={{
-                      fontSize: '9px',
-                      letterSpacing: '0.18em',
-                      textTransform: 'uppercase',
-                      color: 'var(--muted)',
-                    }}>
-                      {stat.label}
-                    </div>
-                    <div style={{
-                      fontFamily: 'Conthrax, sans-serif',
-                      fontSize: '13px',
-                      color: 'var(--white)',
-                      lineHeight: 1.3,
-                    }}>
-                      {stat.value}
-                    </div>
-                  </div>
-                ))}
+                <Stars n={featuredReview.rating} />
+                <span className="review-card-badge" style={{
+                  fontSize: '9px',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: 'rgba(255,255,255,0.42)',
+                }}>
+                  Verified Review
+                </span>
               </div>
 
-              <p style={{ marginTop: '18px', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7 }}>
-                Worked with DJ B.A.E.? Drop a note below. Approved reviews publish here and feed the same signal the rest of the page is building.
+              <p className="review-card-message" style={{
+                margin: 0,
+                maxWidth: '42ch',
+                fontSize: 'clamp(16px, 1.6vw, 21px)',
+                lineHeight: 1.42,
+                color: 'var(--white)',
+                fontStyle: 'italic',
+              }}>
+                &ldquo;{featuredReview.message}&rdquo;
               </p>
             </div>
 
-            <div className="build-console-mixer">
-              <div className="build-console-fx-header">
-                <span>Selected Reviews</span>
-                <div className="build-console-mini-chips">
-                  <span>Public</span>
-                  <span>Verified</span>
-                </div>
-              </div>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                gap: '1px',
-                background: 'var(--border)',
-                border: '1px solid var(--border)',
+            <div className="review-card-meta" style={{ position: 'relative', zIndex: 1 }}>
+              <div className="review-card-name" style={{
+                fontSize: '14px',
+                color: 'var(--white)',
+                fontWeight: 500,
+                marginBottom: '4px',
               }}>
-                {reviews.slice(0, 3).map(r => (
-                  <div
-                    key={r.id}
-                    className="card-hover"
-                    style={{
-                      background: 'var(--surface)',
-                      padding: '24px 20px',
-                      display: 'grid',
-                      gap: '12px',
-                    }}
-                  >
-                    <Stars n={r.rating} />
-                    <p style={{
-                      fontSize: '13px',
-                      color: 'var(--white)',
-                      lineHeight: 1.75,
-                      margin: 0,
-                      fontStyle: 'italic',
-                    }}>
-                      &ldquo;{r.message}&rdquo;
-                    </p>
-                    <div>
-                      <div style={{ fontSize: '12px', color: 'var(--white)', fontWeight: 500, marginBottom: '3px' }}>
-                        {r.name}
-                      </div>
-                      {r.event_type && (
-                        <div style={{ fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                          {r.event_type}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                {featuredReview.name}
               </div>
-
-              <div style={{
-                marginTop: '20px',
-                borderTop: '1px solid var(--border)',
-                paddingTop: '22px',
-              }}>
-                <div style={{ marginBottom: '18px' }}>
-                  <span className="section-label" style={{ marginBottom: '6px' }}>Leave a Review</span>
-                  <p style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
-                    Share your experience and we’ll keep the same tone and quality before anything goes live.
-                  </p>
+              {featuredReview.event_type && (
+                <div className="review-card-event" style={{
+                  fontSize: '10px',
+                  letterSpacing: '0.18em',
+                  textTransform: 'uppercase',
+                  color: 'var(--muted)',
+                }}>
+                  {featuredReview.event_type}
                 </div>
-                <ReviewForm />
-              </div>
+              )}
             </div>
+
+            <a
+              href="#leave-review"
+              className="review-card-cta"
+              style={{
+                position: 'relative',
+                zIndex: 1,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                justifySelf: 'start',
+                padding: '8px 12px',
+                border: '1px solid rgba(255,255,255,0.12)',
+                background: 'rgba(8,8,12,0.22)',
+                color: 'var(--white)',
+                textDecoration: 'none',
+                fontSize: '9px',
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+              }}
+            >
+              Leave a Review
+            </a>
+          </article>
+
+          <div id="leave-review" className="review-form-shell" style={{
+            marginTop: '10px',
+            borderRadius: '20px',
+            padding: '16px',
+            background: 'linear-gradient(180deg, rgba(24,24,28,0.98), rgba(16,16,20,0.98))',
+            border: '1px solid rgba(255,255,255,0.07)',
+          }}>
+            <div style={{ marginBottom: '12px' }}>
+              <span className="section-label" style={{ marginBottom: '6px' }}>Leave a Review</span>
+              <p style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>
+                Share your experience and it will stay private until approved.
+              </p>
+            </div>
+            <ReviewForm compact />
           </div>
         </div>
       </div>

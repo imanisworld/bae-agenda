@@ -13,7 +13,7 @@ const EVENT_TYPES = [
   'Other',
 ]
 
-export default function ReviewForm() {
+export default function ReviewForm({ compact = false }: { compact?: boolean }) {
   const [rating,    setRating]    = useState(0)
   const [hover,     setHover]     = useState(0)
   const [status,    setStatus]    = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -44,7 +44,7 @@ export default function ReviewForm() {
     return (
       <div style={{
         border:   '1px solid rgba(155,93,229,0.24)',
-        padding:  '32px 28px',
+        padding:  compact ? '24px 20px' : '32px 28px',
         textAlign: 'center',
         background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(8,8,12,0.72))',
       }}>
@@ -86,9 +86,9 @@ export default function ReviewForm() {
     background:  'rgba(8,8,12,0.92)',
     border:      '1px solid rgba(255,255,255,0.1)',
     color:       'var(--white)',
-    padding:     '12px 14px',
+    padding:     compact ? '10px 12px' : '12px 14px',
     fontFamily:  'DM Sans, sans-serif',
-    fontSize:    '14px',
+    fontSize:    compact ? '13px' : '14px',
     fontWeight:  300,
     outline:     'none',
     boxSizing:   'border-box',
@@ -105,10 +105,10 @@ export default function ReviewForm() {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'grid', gap: '20px' }}>
+    <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'grid', gap: compact ? '16px' : '20px' }}>
 
       {/* Name + Event Type row */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: compact ? '12px' : '16px' }}>
         <div style={{ display: 'grid', gap: '8px' }}>
           <label htmlFor="rv-name" style={labelStyle}>Your Name *</label>
           <input id="rv-name" name="name" type="text" required style={inputStyle} placeholder="First name or alias" />
@@ -126,9 +126,9 @@ export default function ReviewForm() {
       <div style={{
         border: '1px solid rgba(255,255,255,0.08)',
         background: 'rgba(8,8,12,0.35)',
-        padding: '16px 14px',
+        padding: compact ? '12px' : '16px 14px',
         display: 'grid',
-        gap: '12px',
+        gap: compact ? '10px' : '12px',
       }}>
         <span style={labelStyle}>Rating *</span>
         <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -143,7 +143,7 @@ export default function ReviewForm() {
                 background: 'none',
                 border:     'none',
                 cursor:     'pointer',
-                fontSize:   '28px',
+                fontSize:   compact ? '24px' : '28px',
                 padding:    '2px',
                 color:      n <= (hover || rating) ? 'var(--violet)' : 'rgba(255,255,255,0.15)',
                 transition: 'color 100ms ease',
@@ -173,7 +173,7 @@ export default function ReviewForm() {
           id="rv-message"
           name="message"
           required
-          rows={4}
+          rows={compact ? 3 : 4}
           style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.7 }}
           placeholder="Tell us about your experience…"
         />
@@ -190,7 +190,7 @@ export default function ReviewForm() {
         type="submit"
         disabled={status === 'loading'}
         style={{
-          padding:       '16px',
+          padding:       compact ? '14px 18px' : '16px',
           background:    status === 'loading' ? 'rgba(155,93,229,0.5)' : 'var(--violet)',
           color:         'var(--black)',
           border:        'none',
@@ -201,8 +201,8 @@ export default function ReviewForm() {
           fontWeight:    500,
           cursor:        status === 'loading' ? 'not-allowed' : 'pointer',
           alignSelf:     'start',
-          paddingLeft:   '32px',
-          paddingRight:  '32px',
+          paddingLeft:   compact ? '22px' : '32px',
+          paddingRight:  compact ? '22px' : '32px',
           boxShadow:     status === 'loading' ? 'none' : '0 10px 30px rgba(155,93,229,0.18)',
         }}
       >
