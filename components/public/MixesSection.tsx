@@ -185,7 +185,7 @@ export default async function MixesSection() {
                     width: '100%',
                     height: '100%',
                     objectFit: 'cover',
-                    filter: 'blur(28px) saturate(0.6) brightness(0.22)',
+                    filter: 'blur(12px) saturate(0.6) brightness(0.22)',
                     transform: 'scale(1.08)',
                     zIndex: 0,
                   }}

@@ -69,7 +69,7 @@ export default async function PortfolioPage() {
             width: '100%',
             height: '100%',
             objectFit: 'cover',
-            filter: 'blur(32px) saturate(0.5) brightness(0.18)',
+            filter: 'blur(14px) saturate(0.5) brightness(0.18)',
             transform: 'scale(1.08)',
             zIndex: 0,
           }}
