@@ -213,29 +213,6 @@ export default async function ReviewSection({ hideForm = false }: { hideForm?: b
                 </div>
               )}
             </div>
-
-            {!hideForm && <a
-              href="#leave-review"
-              className="review-card-cta"
-              style={{
-                position: 'relative',
-                zIndex: 1,
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                justifySelf: 'start',
-                padding: '8px 12px',
-                border: '1px solid rgba(255,255,255,0.12)',
-                background: 'rgba(8,8,12,0.22)',
-                color: 'var(--white)',
-                textDecoration: 'none',
-                fontSize: '9px',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Leave a Review
-            </a>}
           </article>
 
           {!hideForm && <div id="leave-review" className="review-form-shell" style={{
