@@ -11,10 +11,9 @@ interface TechItem {
 
 interface Props {
   techItems: TechItem[]
-  atmosphereNotes: string[]
 }
 
-export default function SetControlSection({ techItems, atmosphereNotes }: Props) {
+export default function SetControlSection({ techItems }: Props) {
   const sectionRef = useRef<HTMLElement | null>(null)
   const [barsVisible, setBarsVisible] = useState(false)
 
@@ -82,14 +81,6 @@ export default function SetControlSection({ techItems, atmosphereNotes }: Props)
               className="set-control-disc"
               imageSrc="/photos/images/logo.JPG"
             />
-            <a
-              href="https://www.youtube.com/@djb.a.e"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-ghost"
-            >
-              Watch on YouTube →
-            </a>
           </div>
         </div>
 
@@ -122,30 +113,34 @@ export default function SetControlSection({ techItems, atmosphereNotes }: Props)
             ))}
           </div>
 
-          <div style={{ marginTop: '14px' }}>
-            <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '12px' }}>
-              Event Atmosphere
-            </div>
-            <div className="set-control-atmosphere-grid">
-              {atmosphereNotes.map((note, index) => (
-                <div
-                  key={note}
-                  className="build-console-pad set-control-atmosphere-card"
-                  style={{
-                    minHeight: '92px',
-                    background: index % 2 === 0 ? 'rgba(155,93,229,0.08)' : 'rgba(242,184,75,0.07)',
-                    borderColor: 'rgba(255,255,255,0.12)',
-                    alignItems: 'end',
-                    padding: '14px',
-                    aspectRatio: 'auto',
-                    textAlign: 'left',
-                    justifyItems: 'start',
-                    lineHeight: 1.35,
-                  }}
-                >
-                  {note}
-                </div>
-              ))}
+          <div
+            style={{
+              marginTop: '20px',
+              borderLeft: '2px solid var(--accent, #9b5de5)',
+              paddingLeft: '20px',
+            }}
+          >
+            <p
+              style={{
+                fontSize: '15px',
+                color: 'var(--white)',
+                lineHeight: 1.8,
+                margin: 0,
+                fontStyle: 'italic',
+              }}
+            >
+              "The set doesn't start when I press play. It starts when I walk in and read the room."
+            </p>
+            <div
+              style={{
+                marginTop: '10px',
+                fontSize: '10px',
+                letterSpacing: '0.25em',
+                textTransform: 'uppercase',
+                color: 'var(--muted)',
+              }}
+            >
+              DJ B.A.E.
             </div>
           </div>
 

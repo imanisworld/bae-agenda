@@ -23,14 +23,6 @@ const techItems = [
   },
 ]
 
-const atmosphereNotes = [
-  'Warm-up control',
-  'Peak-hour pressure',
-  'Clean handoffs',
-  'Mic-ready hosting',
-  'Crowd resets',
-  'Closing lift',
-]
 
 function sectionLabel(text: string) {
   return (
@@ -147,7 +139,7 @@ export default function MeetPage() {
           </div>
         </section>
 
-        <SetControlSection techItems={techItems} atmosphereNotes={atmosphereNotes} />
+        <SetControlSection techItems={techItems} />
 
         <section
           style={{
