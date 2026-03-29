@@ -62,6 +62,9 @@ next-env.d.ts
 *.swp
 *.swo
 
+# exported credential/API key CSVs
+*.csv
+
 # personal photos — allow only the images used on the live site
 /public/photos/*
 !/public/photos/hero-bg.jpg

@@ -26,7 +26,15 @@ type FormState = {
   startedAt: string
 }
 
-type FieldKey = 'firstName' | 'email' | 'eventName' | 'eventDate' | 'timeZone'
+type FieldKey =
+  | 'firstName'
+  | 'email'
+  | 'eventName'
+  | 'eventDate'
+  | 'timeZone'
+  | 'eventTime'
+  | 'eventEndTime'
+
 type FieldErrors = Partial<Record<FieldKey, string>>
 
 const INITIAL_STATE: FormState = {
@@ -81,21 +89,60 @@ const STEP_LABELS: Record<Step, string> = {
   3: 'Details',
 }
 
+// ─── Time parsing ─────────────────────────────────────────────────────────────
+// Accepts "HH:MM" (24h) or "H:MM AM/PM" — returns total minutes from midnight, or null
+function parseFormTime(s: string): number | null {
+  const trimmed = s?.trim()
+  if (!trimmed) return null
+
+  // 24-hour format: HH:MM or H:MM
+  const h24 = /^(\d{1,2}):(\d{2})$/.exec(trimmed)
+  if (h24) {
+    const h = Number(h24[1]), m = Number(h24[2])
+    if (h >= 0 && h <= 23 && m >= 0 && m <= 59) return h * 60 + m
+    return null
+  }
+
+  // 12-hour format: H:MM AM/PM
+  const h12 = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(trimmed)
+  if (h12) {
+    let h = Number(h12[1])
+    const m = Number(h12[2])
+    const period = h12[3].toUpperCase()
+    if (m < 0 || m > 59 || h < 1 || h > 12) return null
+    if (period === 'AM' && h === 12) h = 0
+    if (period === 'PM' && h !== 12) h += 12
+    return h * 60 + m
+  }
+
+  return null
+}
+
+function normalizeTimeValue(t: string): string {
+  return TIME_OPTIONS.find((o) => o.label === t || o.value === t)?.value ?? t
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function BookPage() {
   const [step, setStep] = useState<Step>(1)
   const [form, setForm] = useState<FormState>(() => ({
     ...INITIAL_STATE,
     startedAt: String(Date.now()),
   }))
-  const [loading,     setLoading]     = useState(false)
-  const [error,       setError]       = useState('')
-  const [success,     setSuccess]     = useState(false)
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [loading,              setLoading]              = useState(false)
+  const [checkingAvailability, setCheckingAvailability] = useState(false)
+  const [error,                setError]                = useState('')
+  const [availabilityError,    setAvailabilityError]    = useState('')
+  const [success,              setSuccess]              = useState(false)
+  const [fieldErrors,          setFieldErrors]          = useState<FieldErrors>({})
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
     if (key in fieldErrors) {
       setFieldErrors((prev) => { const n = { ...prev }; delete n[key as FieldKey]; return n })
+    }
+    if (key === 'eventDate' || key === 'eventTime' || key === 'eventEndTime' || key === 'timeZone') {
+      setAvailabilityError('')
     }
   }
 
@@ -109,27 +156,110 @@ export default function BookPage() {
 
   function validateStep(s: Step): FieldErrors {
     const e: FieldErrors = {}
+
     if (s === 1) {
-      if (!form.eventDate.trim()) e.eventDate = 'Event date is required.'
-      if (!form.timeZone.trim())  e.timeZone  = 'Timezone is required.'
+      // Date required and must be in the future
+      if (!form.eventDate.trim()) {
+        e.eventDate = 'Event date is required.'
+      } else {
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        const chosen = new Date(form.eventDate + 'T00:00:00')
+        if (chosen < today) {
+          e.eventDate = 'Event date must be in the future.'
+        }
+      }
+
+      if (!form.timeZone.trim()) e.timeZone = 'Timezone is required.'
+
+      // Validate time formats if provided
+      if (form.eventTime.trim() && parseFormTime(form.eventTime) === null) {
+        e.eventTime = 'Invalid format. Use "10:00 AM" or "22:00".'
+      }
+      if (form.eventEndTime.trim() && parseFormTime(form.eventEndTime) === null) {
+        e.eventEndTime = 'Invalid format. Use "11:30 PM" or "23:30".'
+      }
+
+      // End time must be after start time
+      if (!e.eventTime && !e.eventEndTime && form.eventTime.trim() && form.eventEndTime.trim()) {
+        const startMins = parseFormTime(form.eventTime)
+        const endMins   = parseFormTime(form.eventEndTime)
+        if (startMins !== null && endMins !== null && endMins <= startMins) {
+          e.eventEndTime = 'End time must be after start time.'
+        }
+      }
     }
+
     if (s === 2) {
       if (!form.firstName.trim()) e.firstName = 'First name is required.'
       if (!form.email.trim())     e.email     = 'Email is required.'
     }
+
     if (s === 3) {
       if (!form.eventName.trim()) e.eventName = 'Event name is required.'
     }
+
     return e
   }
 
-  function handleContinue() {
+  async function handleContinue() {
     const errors = validateStep(step)
     if (Object.keys(errors).length > 0) {
       setFieldErrors(errors)
       return
     }
     setFieldErrors({})
+
+    // ── Step 1: check availability before proceeding ──
+    if (step === 1) {
+      setCheckingAvailability(true)
+      setAvailabilityError('')
+      try {
+        const res = await fetch('/api/booking/check-availability', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            eventDate:    form.eventDate,
+            eventTime:    normalizeTimeValue(form.eventTime),
+            eventEndTime: normalizeTimeValue(form.eventEndTime),
+            timeZone:     form.timeZone,
+          }),
+        })
+
+        type CheckResult = {
+          available: boolean
+          hasTime: boolean
+          conflicts: Array<{ title: string; time: string; type: string }>
+          error?: string
+        }
+        const result = await res.json() as CheckResult
+
+        if (!result.available && result.conflicts.length > 0) {
+          const names = result.conflicts
+            .map((c) => `"${c.title}" at ${c.time}`)
+            .join(', ')
+
+          if (result.hasTime) {
+            setAvailabilityError(
+              `This time is too close to an existing event: ${names}. ` +
+              `Events must be at least 30 minutes apart.`
+            )
+          } else {
+            setAvailabilityError(
+              `There are already events scheduled that day: ${names}. ` +
+              `Add a start time so we can check for conflicts.`
+            )
+          }
+          setCheckingAvailability(false)
+          return
+        }
+      } catch {
+        // Network failure — don't block the user, just proceed
+        console.warn('[book] availability check failed, proceeding anyway')
+      }
+      setCheckingAvailability(false)
+    }
+
     setStep((s) => (s < 3 ? ((s + 1) as Step) : s))
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -143,9 +273,7 @@ export default function BookPage() {
     setLoading(true)
 
     try {
-      const normalizedTime = TIME_OPTIONS.find(
-        (o) => o.label === form.eventTime || o.value === form.eventTime
-      )?.value ?? form.eventTime
+      const normalizedTime = normalizeTimeValue(form.eventTime)
 
       const res = await fetch('/api/booking', {
         method: 'POST',
@@ -331,8 +459,9 @@ export default function BookPage() {
                       value={form.eventTime}
                       onChange={(e) => set('eventTime', e.target.value)}
                       placeholder="Choose or type a time"
-                      style={inputStyle()}
+                      style={inputStyle(Boolean(fieldErrors.eventTime))}
                     />
+                    {fieldErrors.eventTime && <span style={fieldErrorStyle()}>{fieldErrors.eventTime}</span>}
                   </label>
                   <label style={{ display: 'grid', gap: '8px' }}>
                     <span className="section-label" style={{ marginBottom: 0 }}>End Time</span>
@@ -341,8 +470,9 @@ export default function BookPage() {
                       value={form.eventEndTime}
                       onChange={(e) => set('eventEndTime', e.target.value)}
                       placeholder="Choose or type a time"
-                      style={inputStyle()}
+                      style={inputStyle(Boolean(fieldErrors.eventEndTime))}
                     />
+                    {fieldErrors.eventEndTime && <span style={fieldErrorStyle()}>{fieldErrors.eventEndTime}</span>}
                   </label>
                 </div>
 
@@ -360,6 +490,23 @@ export default function BookPage() {
                   </select>
                   {fieldErrors.timeZone && <span style={fieldErrorStyle()}>{fieldErrors.timeZone}</span>}
                 </label>
+
+                {/* Availability conflict banner */}
+                {availabilityError && (
+                  <div style={{
+                    background: 'rgba(232, 93, 117, 0.1)',
+                    border: '1px solid rgba(232, 93, 117, 0.4)',
+                    padding: '12px 14px',
+                    fontSize: '13px',
+                    color: '#ff8da0',
+                    lineHeight: 1.6,
+                  }}>
+                    <strong style={{ display: 'block', marginBottom: '4px', color: '#e85d75' }}>
+                      Date / Time Conflict
+                    </strong>
+                    {availabilityError}
+                  </div>
+                )}
               </>
             )}
 
@@ -470,7 +617,18 @@ export default function BookPage() {
                   />
                 </label>
 
-                {error && <p style={{ color: '#e85d75', fontSize: '13px', margin: 0 }}>{error}</p>}
+                {error && (
+                  <div style={{
+                    background: 'rgba(232, 93, 117, 0.1)',
+                    border: '1px solid rgba(232, 93, 117, 0.4)',
+                    padding: '12px 14px',
+                    fontSize: '13px',
+                    color: '#ff8da0',
+                    lineHeight: 1.6,
+                  }}>
+                    {error}
+                  </div>
+                )}
               </>
             )}
 
@@ -488,7 +646,7 @@ export default function BookPage() {
             {step > 1 ? (
               <button
                 type="button"
-                onClick={() => { setFieldErrors({}); setStep((s) => (s - 1) as Step) }}
+                onClick={() => { setFieldErrors({}); setAvailabilityError(''); setStep((s) => (s - 1) as Step) }}
                 className="btn-ghost"
               >
                 ← Back
@@ -502,8 +660,10 @@ export default function BookPage() {
                 type="button"
                 onClick={handleContinue}
                 className="btn-primary"
+                disabled={checkingAvailability}
+                style={{ opacity: checkingAvailability ? 0.6 : 1 }}
               >
-                Continue →
+                {checkingAvailability ? 'Checking availability…' : 'Continue →'}
               </button>
             ) : (
               <button

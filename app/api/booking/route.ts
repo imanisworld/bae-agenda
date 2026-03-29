@@ -46,13 +46,14 @@ function getTwilioConfig() {
 
 function buildOwnerEmail(data: BookingData): string {
   return `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-    <h2>New Booking Request</h2>
+    <h2>🎧 New Booking Request</h2>
     <table style="width:100%;border-collapse:collapse">
       <tr><td style="padding:8px;font-weight:bold">Name</td><td style="padding:8px">${data.name}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Email</td><td style="padding:8px">${data.email}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Phone</td><td style="padding:8px">${data.phone || "—"}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Event Type</td><td style="padding:8px">${data.eventType}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Event Date</td><td style="padding:8px">${data.eventDate}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Event Time</td><td style="padding:8px">${data.eventTime || "—"}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Venue</td><td style="padding:8px">${data.venue || "—"}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Budget</td><td style="padding:8px">${data.budget || "—"}</td></tr>
       ${data.additionalInfo ? `<tr><td style="padding:8px;font-weight:bold">Notes</td><td style="padding:8px">${data.additionalInfo}</td></tr>` : ""}
@@ -63,13 +64,13 @@ function buildOwnerEmail(data: BookingData): string {
 function buildClientEmail(data: BookingData): string {
   return `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
     <h2>Thanks for reaching out, ${data.name}!</h2>
-    <p>Your booking request has been received.</p>
+    <p>Your booking request has been received. Here's a summary:</p>
     <table style="width:100%;border-collapse:collapse">
       <tr><td style="padding:8px;font-weight:bold">Event Type</td><td style="padding:8px">${data.eventType}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${data.eventDate}</td></tr>
       ${data.venue ? `<tr><td style="padding:8px;font-weight:bold">Venue</td><td style="padding:8px">${data.venue}</td></tr>` : ""}
     </table>
-    <p style="margin-top:24px">I will be in touch within 24-48 hours to confirm availability.</p>
+    <p style="margin-top:24px">I'll be in touch within 24–48 hours to confirm availability and discuss details.</p>
     <p>— Bae Agenda</p>
   </div>`;
 }
@@ -120,6 +121,8 @@ export async function POST(req: NextRequest) {
   if (!twilioConfig) console.log("[booking] twilio skipped (not configured)");
 
   const resend = new Resend(resendConfig.apiKey);
+
+  // Both emails required — thebaeagenda.com is verified in Resend
   try {
     await resend.emails.send({
       from: resendConfig.fromEmail,
@@ -127,16 +130,18 @@ export async function POST(req: NextRequest) {
       subject: `New Booking: ${data.eventType} — ${data.eventDate}`,
       html: buildOwnerEmail(data),
     });
+
     await resend.emails.send({
       from: resendConfig.fromEmail,
       to: data.email,
       subject: "Booking Request Received — Bae Agenda",
       html: buildClientEmail(data),
     });
-    console.log("[booking] email sent via Resend");
+
+    console.log("[booking] emails sent via Resend");
   } catch (err) {
     console.error("[booking] Resend error:", err);
-    return NextResponse.json({ error: "Failed to send email." }, { status: 500 });
+    return NextResponse.json({ error: "Failed to send confirmation email. Please try again." }, { status: 500 });
   }
 
   if (twilioConfig) {
@@ -150,7 +155,7 @@ export async function POST(req: NextRequest) {
 
   console.log("[booking] complete —", data.email);
   return NextResponse.json(
-    { success: true, message: "Booking request received! You will hear back within 24-48 hours." },
+    { success: true, message: "Booking request received! You'll hear back within 24–48 hours." },
     { status: 201 }
   );
 }
