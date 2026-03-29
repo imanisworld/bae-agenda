@@ -18,17 +18,17 @@ function AdminLoginContent() {
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
   const [error, setError]       = useState('')
+  const unauthorizedError = searchParams.get('error') === 'unauthorized'
+    ? 'This account is not allowed to access admin. Sign in with your approved admin email.'
+    : ''
   const [loading, setLoading]   = useState(false)
 
   useEffect(() => {
-    const routeError = searchParams.get('error')
-    if (routeError !== 'unauthorized') return
-
-    setError('This account is not allowed to access admin. Sign in with your approved admin email.')
+    if (!unauthorizedError) return
 
     const supabase = createClient()
     void supabase.auth.signOut()
-  }, [searchParams])
+  }, [unauthorizedError])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -210,7 +210,7 @@ function AdminLoginContent() {
             </div>
 
             {/* Error */}
-            {error && (
+            {(error || unauthorizedError) && (
               <p
                 role="alert"
                 style={{
@@ -219,7 +219,7 @@ function AdminLoginContent() {
                   letterSpacing: '0.04em',
                 }}
               >
-                {error}
+                {error || unauthorizedError}
               </p>
             )}
 

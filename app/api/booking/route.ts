@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { Resend } from "resend";
-import { Ratelimit } from "@upstash/ratelimit";
-import { Redis } from "@upstash/redis";
+import { checkBookingAvailability } from "@/lib/booking-availability";
+import { isValidTimeZone, toEventISO } from "@/lib/date-time";
+import { limitBookingSubmission } from "@/lib/ratelimit";
 
-const ratelimit = new Ratelimit({
-  redis: Redis.fromEnv(),
-  limiter: Ratelimit.slidingWindow(5, "10 m"),
-  analytics: true,
-});
+const ALLOWED_ORIGINS = new Set([
+  "http://localhost:3000",
+  "https://thebaeagenda.com",
+  "https://www.thebaeagenda.com",
+]);
 
 const BookingSchema = z.object({
   // Contact
@@ -22,7 +23,7 @@ const BookingSchema = z.object({
   eventDate:    z.string().min(1, "Event date is required"),
   eventTime:    z.string().optional(),
   eventEndTime: z.string().optional(),
-  timeZone:     z.string().optional(),
+  timeZone:     z.string().min(1, "Timezone is required"),
   // Location
   venue:        z.string().optional(),
   city:         z.string().optional(),
@@ -32,14 +33,69 @@ const BookingSchema = z.object({
   // Honeypot / meta
   website:      z.string().optional(),
   startedAt:    z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (!isValidTimeZone(data.timeZone)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["timeZone"],
+      message: "Invalid timezone.",
+    });
+    return;
+  }
+
+  const eventDateIso = toEventISO(data.eventDate, data.timeZone, "00:00");
+  if (!eventDateIso) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["eventDate"],
+      message: "Invalid event date.",
+    });
+  }
+
+  const hasStartTime = Boolean(data.eventTime?.trim());
+  const hasEndTime = Boolean(data.eventEndTime?.trim());
+
+  let startMs: number | null = null;
+  if (hasStartTime) {
+    const startIso = toEventISO(data.eventDate, data.timeZone, data.eventTime!.trim());
+    if (!startIso) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["eventTime"],
+        message: 'Invalid format. Use "10:00 AM" or "22:00".',
+      });
+    } else {
+      startMs = new Date(startIso).getTime();
+    }
+  }
+
+  if (hasEndTime) {
+    const endIso = toEventISO(data.eventDate, data.timeZone, data.eventEndTime!.trim());
+    if (!endIso) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["eventEndTime"],
+        message: 'Invalid format. Use "11:30 PM" or "23:30".',
+      });
+      return;
+    }
+
+    if (startMs !== null && new Date(endIso).getTime() <= startMs) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["eventEndTime"],
+        message: "End time must be after start time.",
+      });
+    }
+  }
 });
 
 type BookingData = z.infer<typeof BookingSchema>;
 
 function getResendConfig() {
   const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.BOOKING_FROM_EMAIL;
-  const alertEmail = process.env.BOOKING_ALERT_EMAIL;
+  const fromEmail = process.env.FROM_EMAIL ?? process.env.BOOKING_FROM_EMAIL;
+  const alertEmail = process.env.ALERT_EMAIL ?? process.env.BOOKING_ALERT_EMAIL;
   if (!apiKey || !fromEmail || !alertEmail) return null;
   if (!fromEmail.includes("@") || !alertEmail.includes("@")) return null;
   return { apiKey, fromEmail, alertEmail };
@@ -54,44 +110,73 @@ function getTwilioConfig() {
   return { accountSid, authToken, fromNumber, toNumber };
 }
 
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function buildOwnerEmail(data: BookingData): string {
-  const name = [data.firstName, data.lastName].filter(Boolean).join(" ");
-  const timeRange = data.eventTime
-    ? data.eventEndTime ? `${data.eventTime} – ${data.eventEndTime}` : data.eventTime
-    : "—";
+  const name = escapeHtml([data.firstName, data.lastName].filter(Boolean).join(" "));
+  const email = escapeHtml(data.email);
+  const phone = escapeHtml(data.phone || "—");
+  const eventName = escapeHtml(data.eventName);
+  const eventType = escapeHtml(data.eventType || "—");
+  const eventDate = escapeHtml(data.eventDate);
+  const timeRange = escapeHtml(
+    data.eventTime
+      ? data.eventEndTime ? `${data.eventTime} – ${data.eventEndTime}` : data.eventTime
+      : "—"
+  );
+  const timeZone = escapeHtml(data.timeZone || "—");
+  const venue = escapeHtml(data.venue || "—");
+  const city = escapeHtml(data.city || "—");
+  const packageName = escapeHtml(data.package || "—");
+  const notes = data.notes ? escapeHtml(data.notes) : null;
+
   return `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
     <h2>🎧 New Booking Request</h2>
     <table style="width:100%;border-collapse:collapse">
       <tr><td style="padding:8px;font-weight:bold">Name</td><td style="padding:8px">${name}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Email</td><td style="padding:8px">${data.email}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Phone</td><td style="padding:8px">${data.phone || "—"}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Event Name</td><td style="padding:8px">${data.eventName}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Event Type</td><td style="padding:8px">${data.eventType || "—"}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${data.eventDate}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Email</td><td style="padding:8px">${email}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Phone</td><td style="padding:8px">${phone}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Event Name</td><td style="padding:8px">${eventName}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Event Type</td><td style="padding:8px">${eventType}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${eventDate}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Time</td><td style="padding:8px">${timeRange}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Timezone</td><td style="padding:8px">${data.timeZone || "—"}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Venue</td><td style="padding:8px">${data.venue || "—"}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">City</td><td style="padding:8px">${data.city || "—"}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Package</td><td style="padding:8px">${data.package || "—"}</td></tr>
-      ${data.notes ? `<tr><td style="padding:8px;font-weight:bold">Notes</td><td style="padding:8px">${data.notes}</td></tr>` : ""}
+      <tr><td style="padding:8px;font-weight:bold">Timezone</td><td style="padding:8px">${timeZone}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Venue</td><td style="padding:8px">${venue}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">City</td><td style="padding:8px">${city}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Package</td><td style="padding:8px">${packageName}</td></tr>
+      ${notes ? `<tr><td style="padding:8px;font-weight:bold">Notes</td><td style="padding:8px">${notes}</td></tr>` : ""}
     </table>
   </div>`;
 }
 
 function buildClientEmail(data: BookingData): string {
+  const firstName = escapeHtml(data.firstName);
+  const eventName = escapeHtml(data.eventName);
+  const eventType = data.eventType ? escapeHtml(data.eventType) : null;
+  const eventDate = escapeHtml(data.eventDate);
   const timeRange = data.eventTime
-    ? data.eventEndTime ? `${data.eventTime} – ${data.eventEndTime}` : data.eventTime
+    ? escapeHtml(data.eventEndTime ? `${data.eventTime} – ${data.eventEndTime}` : data.eventTime)
     : null;
+  const venue = data.venue ? escapeHtml(data.venue) : null;
+  const city = data.city ? escapeHtml(data.city) : null;
+
   return `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-    <h2>Thanks for reaching out, ${data.firstName}!</h2>
+    <h2>Thanks for reaching out, ${firstName}!</h2>
     <p>Your booking request has been received. Here's a summary:</p>
     <table style="width:100%;border-collapse:collapse">
-      <tr><td style="padding:8px;font-weight:bold">Event</td><td style="padding:8px">${data.eventName}</td></tr>
-      ${data.eventType ? `<tr><td style="padding:8px;font-weight:bold">Type</td><td style="padding:8px">${data.eventType}</td></tr>` : ""}
-      <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${data.eventDate}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Event</td><td style="padding:8px">${eventName}</td></tr>
+      ${eventType ? `<tr><td style="padding:8px;font-weight:bold">Type</td><td style="padding:8px">${eventType}</td></tr>` : ""}
+      <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${eventDate}</td></tr>
       ${timeRange ? `<tr><td style="padding:8px;font-weight:bold">Time</td><td style="padding:8px">${timeRange}</td></tr>` : ""}
-      ${data.venue ? `<tr><td style="padding:8px;font-weight:bold">Venue</td><td style="padding:8px">${data.venue}</td></tr>` : ""}
-      ${data.city ? `<tr><td style="padding:8px;font-weight:bold">City</td><td style="padding:8px">${data.city}</td></tr>` : ""}
+      ${venue ? `<tr><td style="padding:8px;font-weight:bold">Venue</td><td style="padding:8px">${venue}</td></tr>` : ""}
+      ${city ? `<tr><td style="padding:8px;font-weight:bold">City</td><td style="padding:8px">${city}</td></tr>` : ""}
     </table>
     <p style="margin-top:24px">I'll be in touch within 24–48 hours to confirm availability and discuss details.</p>
     <p>— Bae Agenda</p>
@@ -113,13 +198,29 @@ async function sendSMS(config: NonNullable<ReturnType<typeof getTwilioConfig>>, 
 }
 
 export async function POST(req: NextRequest) {
-  console.log("[booking] request received");
+  const rateLimit = await limitBookingSubmission(req.headers);
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      {
+        error: "Too many requests.",
+        retryAfter: rateLimit.retryAfter,
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfter) },
+      }
+    );
+  }
 
-  const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
-  const { success } = await ratelimit.limit(ip);
-  if (!success) {
-    console.log("[booking] rate limit exceeded");
-    return NextResponse.json({ error: "Too many requests." }, { status: 429 });
+  const origin = req.headers.get("origin") ?? "";
+  const contentType = req.headers.get("content-type") ?? "";
+
+  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  if (!contentType.includes("application/json")) {
+    return NextResponse.json({ error: "Invalid content type" }, { status: 415 });
   }
 
   let body: unknown;
@@ -129,7 +230,6 @@ export async function POST(req: NextRequest) {
   const parsed = BookingSchema.safeParse(body);
   if (!parsed.success) {
     const flat = parsed.error.flatten();
-    console.log("[booking] validation failed", flat);
     // Return the specific field errors so the form can highlight them
     const fields = Object.keys(flat.fieldErrors);
     const firstMessage = Object.values(flat.fieldErrors).flat()[0] ?? "Please review your submission.";
@@ -139,23 +239,47 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  console.log("[booking] validation passed");
   const data = parsed.data;
 
   // Honeypot — bot filled the hidden website field
   if (data.website) {
-    console.log("[booking] honeypot triggered");
     return NextResponse.json({ success: true, message: "Request received." }, { status: 201 });
+  }
+
+  const availability = await checkBookingAvailability({
+    eventDate: data.eventDate,
+    eventTime: data.eventTime,
+    eventEndTime: data.eventEndTime,
+    timeZone: data.timeZone,
+  });
+
+  if (!availability.ok) {
+    const status = availability.error === "Invalid timezone" || availability.error === "Could not parse date" ? 400 : 500;
+    return NextResponse.json({ error: availability.error }, { status });
+  }
+
+  if (!availability.available) {
+    const fields = data.eventTime?.trim() || data.eventEndTime?.trim()
+      ? ["eventDate", "eventTime", "eventEndTime"]
+      : ["eventDate"];
+
+    return NextResponse.json(
+      {
+        error: "That date or time is no longer available. Please choose another slot.",
+        fields,
+        conflicts: availability.conflicts,
+      },
+      { status: 409 }
+    );
   }
 
   const resendConfig = getResendConfig();
   if (!resendConfig) {
-    console.error("[booking] FATAL: missing RESEND_API_KEY, BOOKING_FROM_EMAIL, or BOOKING_ALERT_EMAIL");
+    console.error("[booking] FATAL: missing RESEND_API_KEY, FROM_EMAIL/BOOKING_FROM_EMAIL, or ALERT_EMAIL/BOOKING_ALERT_EMAIL");
     return NextResponse.json({ error: "Email service not configured." }, { status: 500 });
   }
 
   const twilioConfig = getTwilioConfig();
-  if (!twilioConfig) console.log("[booking] twilio skipped (not configured)");
 
   const resend = new Resend(resendConfig.apiKey);
 
@@ -174,8 +298,6 @@ export async function POST(req: NextRequest) {
       subject: "Booking Request Received — Bae Agenda",
       html: buildClientEmail(data),
     });
-
-    console.log("[booking] emails sent via Resend");
   } catch (err) {
     console.error("[booking] Resend error:", err);
     return NextResponse.json({ error: "Failed to send confirmation email. Please try again." }, { status: 500 });
@@ -184,13 +306,11 @@ export async function POST(req: NextRequest) {
   if (twilioConfig) {
     try {
       await sendSMS(twilioConfig, data);
-      console.log("[booking] SMS sent via Twilio");
     } catch (err) {
       console.error("[booking] Twilio failed (non-fatal):", err);
     }
   }
 
-  console.log("[booking] complete —", data.email);
   return NextResponse.json(
     { success: true, message: "Booking request received! You'll hear back within 24–48 hours." },
     { status: 201 }

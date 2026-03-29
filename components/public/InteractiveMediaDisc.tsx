@@ -46,10 +46,13 @@ export default function InteractiveMediaDisc({
 }: InteractiveMediaDiscProps) {
   const [isPlaying, setIsPlaying] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
 
   const prefersReducedMotion = usePrefersReducedMotion()
 
   const discRef = useRef<HTMLSpanElement | null>(null)
+  const buttonRef = useRef<HTMLButtonElement | null>(null)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
   const pointerIdRef = useRef<number | null>(null)
   const dragDistanceRef = useRef(0)
   const suppressClickRef = useRef(false)
@@ -71,13 +74,28 @@ export default function InteractiveMediaDisc({
   }, [])
 
   useEffect(() => {
+    const node = buttonRef.current
+    if (!node) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(Boolean(entry?.isIntersecting))
+      },
+      { threshold: 0.2 }
+    )
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
     const tick = (ts: number) => {
       const lastTs = lastTsRef.current ?? ts
       const dt = Math.min(34, ts - lastTs)
       lastTsRef.current = ts
 
       if (!isDragging) {
-        const shouldAutoSpin = isPlaying && !prefersReducedMotion
+        const shouldAutoSpin = isVisible && isPlaying && !prefersReducedMotion
         const targetVelocity = shouldAutoSpin
           ? BASE_SPIN_DEG_PER_MS + resumeBoostRef.current
           : 0
@@ -103,7 +121,19 @@ export default function InteractiveMediaDisc({
     return () => {
       if (rafRef.current) window.cancelAnimationFrame(rafRef.current)
     }
-  }, [applyVisuals, isDragging, isPlaying, prefersReducedMotion])
+  }, [applyVisuals, isDragging, isPlaying, isVisible, prefersReducedMotion])
+
+  useEffect(() => {
+    const video = videoRef.current
+    if (!video) return
+
+    if (isVisible && isPlaying && !prefersReducedMotion) {
+      void video.play().catch(() => {})
+      return
+    }
+
+    video.pause()
+  }, [isPlaying, isVisible, prefersReducedMotion])
 
   const pointerAngle = (event: PointerEvent<HTMLSpanElement>) => {
     const disc = discRef.current
@@ -165,6 +195,7 @@ export default function InteractiveMediaDisc({
 
   return (
     <button
+      ref={buttonRef}
       type="button"
       className={`interactive-disc-button ${className} ${isPlaying ? 'is-playing' : 'is-paused'} ${isDragging ? 'is-dragging' : ''}`.trim()}
       aria-pressed={isPlaying}
@@ -195,11 +226,13 @@ export default function InteractiveMediaDisc({
           <span className={`interactive-disc-center ${videoSrc ? 'has-video' : ''}`}>
             {videoSrc ? (
               <video
+                ref={videoRef}
                 src={videoSrc}
                 autoPlay
                 loop
                 muted
                 playsInline
+                preload="metadata"
                 className="interactive-disc-center-video"
               />
             ) : imageSrc ? (

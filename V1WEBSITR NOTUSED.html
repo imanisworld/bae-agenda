@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DJ B.A.E. — The Bae Agenda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --off-black: #0f0f0f;
+    --surface: #141414;
+    --border: rgba(255,255,255,0.07);
+    --white: #f5f5f0;
+    --muted: rgba(245,245,240,0.45);
+    --violet: #9b5de5;
+    --violet-dim: rgba(155,93,229,0.15);
+    --violet-glow: rgba(155,93,229,0.35);
+    --gold: #c9a84c;
+    --gold-dim: rgba(201,168,76,0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--violet);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid rgba(155,93,229,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: transform 0.15s ease, width 0.3s ease, height 0.3s ease;
+    transform: translate(-12px, -12px);
+  }
+
+  /* NOISE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.4;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 28px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.95), transparent);
+  }
+
+  .nav-logo {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: var(--white);
+    text-decoration: none;
+  }
+
+  .nav-logo span { color: var(--violet); }
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-weight: 400;
+  }
+
+  .nav-links a:hover { color: var(--white); }
+
+  .nav-cta {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--violet);
+    padding: 10px 24px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+
+  .nav-cta:hover {
+    background: #b06ff0;
+    transform: translateY(-1px);
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 80% at 70% 50%, rgba(155,93,229,0.08) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 20% 80%, rgba(201,168,76,0.05) 0%, transparent 60%);
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 80%);
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+  }
+
+  .hero-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin-bottom: 40px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.2s forwards;
+  }
+
+  .hero-tag::before {
+    content: '';
+    width: 24px;
+    height: 1px;
+    background: var(--violet);
+  }
+
+  .hero-name {
+    font-family: 'Syncopate', sans-serif;
+    font-size: clamp(52px, 9vw, 110px);
+    font-weight: 700;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.4s forwards;
+  }
+
+  .hero-name .accent { color: var(--violet); }
+  .hero-name .gold { color: var(--gold); }
+
+  .hero-subtitle {
+    font-family: 'Syncopate', sans-serif;
+    font-size: clamp(12px, 1.8vw, 18px);
+    font-weight: 400;
+    letter-spacing: 0.35em;
+    color: var(--muted);
+    margin-top: 20px;
+    margin-bottom: 56px;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.6s forwards;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.8s ease 0.8s forwards;
+  }
+
+  .btn-primary {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 500;
+    color: var(--black);
+    background: var(--violet);
+    padding: 16px 36px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .btn-primary:hover::after { transform: translateX(0); }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 40px var(--violet-glow); }
+
+  .btn-secondary {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 400;
+    color: var(--muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: color 0.3s ease;
+  }
+
+  .btn-secondary::after {
+    content: '→';
+    transition: transform 0.3s ease;
+  }
+
+  .btn-secondary:hover { color: var(--white); }
+  .btn-secondary:hover::after { transform: translateX(4px); }
+
+  .hero-visual {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 45%;
+    height: 80vh;
+    opacity: 0;
+    animation: fadeIn 1.2s ease 1s forwards;
+  }
+
+  .hero-visual-inner {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--violet-dim) 0%, transparent 60%);
+    border-left: 1px solid var(--border);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .vinyl {
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: 
+      radial-gradient(circle at center, #1a1a1a 28%, #0a0a0a 29%, #1e1e1e 30%, #0a0a0a 44%, #1a1a1a 45%),
+      repeating-conic-gradient(from 0deg, #161616 0deg 2deg, #1e1e1e 2deg 4deg);
+    box-shadow: 
+      0 0 0 1px rgba(155,93,229,0.3),
+      0 0 40px rgba(155,93,229,0.25),
+      0 0 100px rgba(155,93,229,0.12),
+      0 0 200px rgba(155,93,229,0.06),
+      inset 0 0 40px rgba(0,0,0,0.9);
+    animation: spin 10s linear infinite;
+    position: relative;
+  }
+
+  .vinyl::before {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #1a1a1a 0%, #111 100%);
+    border: 1px solid rgba(155,93,229,0.2);
+  }
+
+  .vinyl::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #b06ff0 0%, var(--violet) 40%, #6b21a8 100%);
+    box-shadow: 0 0 24px var(--violet-glow), 0 0 8px rgba(155,93,229,0.8);
+    z-index: 2;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* SCROLL INDICATOR */
+  .scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    opacity: 0;
+    animation: fadeIn 1s ease 1.5s forwards;
+  }
+
+  .scroll-hint span {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .scroll-line {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(to bottom, var(--muted), transparent);
+    animation: scrollPulse 2s ease infinite;
+  }
+
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; transform: scaleY(1); }
+    50% { opacity: 1; transform: scaleY(1.2); }
+  }
+
+  /* SECTION SHARED */
+  section {
+    padding: 120px 48px;
+    position: relative;
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--violet);
+  }
+
+  .section-title {
+    font-family: 'Syncopate', sans-serif;
+    font-size: clamp(28px, 4vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin-bottom: 16px;
+  }
+
+  .section-desc {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 480px;
+  }
+
+  /* ABOUT / STATEMENT */
+  .statement {
+    background: var(--off-black);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .statement-inner {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 80px;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .statement-quote {
+    font-family: 'Syncopate', sans-serif;
+    font-size: clamp(22px, 3vw, 38px);
+    font-weight: 700;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .statement-quote .highlight {
+    color: var(--violet);
+  }
+
+  .statement-text {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.9;
+    border-left: 1px solid var(--border);
+    padding-left: 48px;
+  }
+
+  .statement-text p + p {
+    margin-top: 20px;
+  }
+
+  .stats-row {
+    display: flex;
+    gap: 60px;
+    margin-top: 48px;
+    padding-top: 48px;
+    border-top: 1px solid var(--border);
+  }
+
+  .stat-item {}
+
+  .stat-number {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--white);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .stat-number span { color: var(--violet); }
+
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* MIXES / WORK */
+  .work {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .work-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 64px;
+  }
+
+  .view-all {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s ease;
+  }
+
+  .view-all:hover { color: var(--violet); }
+
+  .mixes-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+
+  .mix-card {
+    background: var(--surface);
+    aspect-ratio: 4/3;
+    position: relative;
+    overflow: hidden;
+    cursor: none;
+    group: true;
+  }
+
+  .mix-card-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--surface) 0%, #1a1a2e 100%);
+    transition: transform 0.6s ease;
+  }
+
+  .mix-card:hover .mix-card-bg {
+    transform: scale(1.05);
+  }
+
+  .mix-card-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+  }
+
+  .mix-card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 60%);
+  }
+
+  .mix-card-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 28px;
+    transform: translateY(8px);
+    transition: transform 0.4s ease;
+  }
+
+  .mix-card:hover .mix-card-content {
+    transform: translateY(0);
+  }
+
+  .mix-genre {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--violet);
+    margin-bottom: 8px;
+  }
+
+  .mix-title {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+
+  .mix-meta {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    opacity: 0;
+    transition: opacity 0.4s ease 0.1s;
+  }
+
+  .mix-card:hover .mix-meta { opacity: 1; }
+
+  .mix-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    width: 56px; height: 56px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    backdrop-filter: blur(10px);
+    background: rgba(155,93,229,0.2);
+  }
+
+  .mix-play::after {
+    content: '▶';
+    font-size: 14px;
+    margin-left: 3px;
+  }
+
+  .mix-card:hover .mix-play {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* EVENTS */
+  .events { background: var(--off-black); }
+
+  .events-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 80px;
+  }
+
+  .events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .event-item {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    gap: 24px;
+    align-items: center;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid transparent;
+    transition: border-color 0.3s ease, background 0.3s ease;
+    cursor: none;
+  }
+
+  .event-item:hover {
+    border-color: var(--border);
+    background: rgba(155,93,229,0.05);
+  }
+
+  .event-date {
+    text-align: center;
+  }
+
+  .event-day {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--violet);
+    line-height: 1;
+    display: block;
+  }
+
+  .event-month {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .event-info {}
+
+  .event-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+  }
+
+  .event-venue {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  .event-link {
+    font-size: 18px;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.3s ease;
+    display: block;
+  }
+
+  .event-item:hover .event-link {
+    color: var(--violet);
+    transform: translateX(4px);
+  }
+
+  /* BOOKING */
+  .booking {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-group label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--white);
+    padding: 14px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.3s ease;
+    -webkit-appearance: none;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--violet);
+  }
+
+  .form-group select option { background: var(--surface); }
+
+  .form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+  }
+
+  .form-submit {
+    margin-top: 8px;
+    padding: 18px;
+    background: var(--violet);
+    color: var(--black);
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 500;
+    cursor: none;
+    transition: all 0.3s ease;
+  }
+
+  .form-submit:hover {
+    background: #b06ff0;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px var(--violet-glow);
+  }
+
+  .booking-info {}
+
+  .booking-packages {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 40px;
+  }
+
+  .package {
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid transparent;
+    transition: border-color 0.3s ease;
+    cursor: none;
+  }
+
+  .package:hover { border-color: var(--border); }
+  .package.featured { border-color: var(--violet); background: var(--violet-dim); }
+
+  .package-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .package-name {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+
+  .package-price {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--gold);
+  }
+
+  .package-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .featured-badge {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--violet);
+    background: var(--violet-dim);
+    padding: 3px 10px;
+    margin-bottom: 12px;
+    display: inline-block;
+  }
+
+  /* CONNECT / SOCIAL */
+  .connect {
+    background: var(--off-black);
+    border-top: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .connect-inner {
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .social-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: 56px;
+  }
+
+  .social-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--muted);
+    transition: color 0.3s ease, transform 0.3s ease;
+  }
+
+  .social-link:hover {
+    color: var(--violet);
+    transform: translateY(-4px);
+  }
+
+  .social-icon {
+    width: 48px; height: 48px;
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+
+  .social-link:hover .social-icon {
+    border-color: var(--violet);
+    background: var(--violet-dim);
+  }
+
+  .social-name {
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 40px 48px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-logo {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+  }
+
+  .footer-logo span { color: var(--violet); }
+
+  .footer-copy {
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* DIVIDER LINE */
+  .h-line {
+    width: 100%;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* MARQUEE */
+  .marquee-wrap {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 0;
+    background: var(--off-black);
+  }
+
+  .marquee-track {
+    display: flex;
+    gap: 0;
+    animation: marquee 20s linear infinite;
+    white-space: nowrap;
+  }
+
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 0 32px;
+    font-family: 'Syncopate', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .marquee-dot {
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    background: var(--violet);
+    flex-shrink: 0;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* MIX CARD PATTERNS */
+  .pattern-1 { background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(155,93,229,0.05) 10px, rgba(155,93,229,0.05) 11px); }
+  .pattern-2 { background: radial-gradient(circle at 30% 70%, rgba(201,168,76,0.1) 0%, transparent 50%); }
+  .pattern-3 { background: repeating-linear-gradient(-45deg, transparent, transparent 15px, rgba(155,93,229,0.04) 15px, rgba(155,93,229,0.04) 16px); }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">DJ <span>B.A.E.</span></a>
+  <ul class="nav-links">
+    <li><a href="#mixes">Mixes</a></li>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#booking">Book</a></li>
+    <li><a href="#connect">Connect</a></li>
+  </ul>
+  <a href="#booking" class="nav-cta">Book Now</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag">Chicago, IL &nbsp;·&nbsp; Est. 2016</div>
+    <h1 class="hero-name">
+      THE<br>
+      <span class="accent">BAE</span><br>
+      <span class="gold">AGENDA</span>
+    </h1>
+    <p class="hero-subtitle">DJ · Curator · Experience Architect</p>
+    <div class="hero-actions">
+      <a href="#booking" class="btn-primary">Book DJ B.A.E.</a>
+      <a href="#mixes" class="btn-secondary">Hear the mixes</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="hero-visual-inner">
+      <div class="vinyl"></div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marquee-item"><span>Hip Hop</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>R&B</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Afrobeats</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>House</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Drill</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Latin</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Trap</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Club</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Hip Hop</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>R&B</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Afrobeats</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>House</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Drill</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Latin</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Trap</span><div class="marquee-dot"></div></div>
+    <div class="marquee-item"><span>Club</span><div class="marquee-dot"></div></div>
+  </div>
+</div>
+
+<!-- STATEMENT -->
+<section class="statement">
+  <div class="statement-inner reveal">
+    <div>
+      <div class="section-label">About</div>
+      <h2 class="statement-quote">
+        The sound<br>that moves<br><span class="highlight">the room.</span>
+      </h2>
+      <div class="stats-row">
+        <div class="stat-item">
+          <span class="stat-number">23<span>K+</span></span>
+          <span class="stat-label">Tracks</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">10<span>+</span></span>
+          <span class="stat-label">Years</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number">∞</span>
+          <span class="stat-label">Vibes</span>
+        </div>
+      </div>
+    </div>
+    <div class="statement-text">
+      <p style="font-size:18px; color: var(--white); line-height: 1.7; font-style: italic;">"I play songs you didn't know you needed to hear again — or for the first time — in ways you haven't heard before."</p>
+      <p style="margin-top: 24px;">DJ B.A.E. is a Chicago-based DJ and curator known for reading the room and delivering sets that move between genres with precision and intention. From intimate private events to high-energy club nights, every set is built to be felt.</p>
+      <p>The Bae Agenda isn't just a brand — it's a philosophy. Music as experience. Sound as identity. Every event a moment worth remembering.</p>
+    </div>
+  </div>
+</section>
+
+<!-- MIXES -->
+<section id="mixes">
+  <div class="work reveal">
+    <div class="work-header">
+      <div>
+        <div class="section-label">Featured Mixes</div>
+        <h2 class="section-title">Recent Sets</h2>
+      </div>
+      <!-- INSERT: Replace # with your YouTube or SoundCloud full playlist URL -->
+      <a href="#" class="view-all">View All Mixes →</a>
+    </div>
+    <div class="mixes-grid">
+
+      <!-- MIX CARD 1: Replace href="#" with YouTube/SoundCloud link. Update genre, title, duration, year -->
+      <a href="#" target="_blank" style="text-decoration:none; display:contents;">
+      <div class="mix-card">
+        <div class="mix-card-bg" style="background: linear-gradient(135deg, #1a0a2e 0%, #0f0a1a 100%);"></div>
+        <div class="mix-card-pattern pattern-1"></div>
+        <div class="mix-card-overlay"></div>
+        <div class="mix-play"></div>
+        <div class="mix-card-content">
+          <div class="mix-genre">Hip Hop · Drill</div>
+          <div class="mix-title">STREET ARCHIVES Vol. 1</div>
+          <div class="mix-meta"><span>58 min</span><span>·</span><span>2025</span></div>
+        </div>
+      </div>
+      </a>
+
+      <!-- MIX CARD 2: Replace href="#" with YouTube/SoundCloud link. Update genre, title, duration, year -->
+      <a href="#" target="_blank" style="text-decoration:none; display:contents;">
+      <div class="mix-card">
+        <div class="mix-card-bg" style="background: linear-gradient(135deg, #1a1200 0%, #0f0e05 100%);"></div>
+        <div class="mix-card-pattern pattern-2"></div>
+        <div class="mix-card-overlay"></div>
+        <div class="mix-play"></div>
+        <div class="mix-card-content">
+          <div class="mix-genre">R&B · Neo Soul</div>
+          <div class="mix-title">AFTER HOURS</div>
+          <div class="mix-meta"><span>72 min</span><span>·</span><span>2025</span></div>
+        </div>
+      </div>
+      </a>
+
+      <!-- MIX CARD 3: Replace href="#" with YouTube/SoundCloud link. Update genre, title, duration, year -->
+      <a href="#" target="_blank" style="text-decoration:none; display:contents;">
+      <div class="mix-card">
+        <div class="mix-card-bg" style="background: linear-gradient(135deg, #0a1a1a 0%, #050f0f 100%);"></div>
+        <div class="mix-card-pattern pattern-3"></div>
+        <div class="mix-card-overlay"></div>
+        <div class="mix-play"></div>
+        <div class="mix-card-content">
+          <div class="mix-genre">Afrobeats · Dancehall</div>
+          <div class="mix-title">WORLD TOUR</div>
+          <div class="mix-meta"><span>64 min</span><span>·</span><span>2024</span></div>
+        </div>
+      </div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section id="events" class="events">
+  <div class="events-inner reveal">
+    <div>
+      <div class="section-label">Events</div>
+      <h2 class="section-title">Upcoming<br>Dates</h2>
+      <p class="section-desc" style="margin-top: 20px;">Catch DJ B.A.E. live. Follow on social for last-minute announcements and pop-up sets.</p>
+    </div>
+    <div class="events-list">
+      <div class="event-item">
+        <div class="event-date">
+          <span class="event-day">22</span>
+          <span class="event-month">Mar</span>
+        </div>
+        <div class="event-info">
+          <div class="event-name">Private Event — TBA</div>
+          <div class="event-venue">Chicago, IL</div>
+        </div>
+        <a href="#booking" class="event-link">→</a>
+      </div>
+      <div class="event-item">
+        <div class="event-date">
+          <span class="event-day">05</span>
+          <span class="event-month">Apr</span>
+        </div>
+        <div class="event-info">
+          <div class="event-name">Club Night — Details Soon</div>
+          <div class="event-venue">Chicago, IL</div>
+        </div>
+        <a href="#booking" class="event-link">→</a>
+      </div>
+      <div class="event-item">
+        <div class="event-date">
+          <span class="event-day">19</span>
+          <span class="event-month">Apr</span>
+        </div>
+        <div class="event-info">
+          <div class="event-name">Private Birthday Set</div>
+          <div class="event-venue">Chicago, IL</div>
+        </div>
+        <a href="#booking" class="event-link">→</a>
+      </div>
+      <div class="event-item" style="opacity: 0.4;">
+        <div class="event-date">
+          <span class="event-day">?</span>
+          <span class="event-month">TBA</span>
+        </div>
+        <div class="event-info">
+          <div class="event-name">Your Event Could Be Here</div>
+          <div class="event-venue">Your City</div>
+        </div>
+        <a href="#booking" class="event-link">→</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking">
+  <div class="booking reveal">
+    <div>
+      <div class="section-label">Booking</div>
+      <h2 class="section-title">Let's Build<br>Something.</h2>
+      <p class="section-desc" style="margin-top: 20px;">Ready to elevate your event? Fill out the form and DJ B.A.E. will be in touch within 48 hours.</p>
+
+      <div class="booking-packages">
+        <div class="package">
+          <div class="package-header">
+            <span class="package-name">The Intro</span>
+            <span class="package-price">From $300</span>
+          </div>
+          <p class="package-desc">2-hour set · Perfect for private events, brunches, and intimate gatherings.</p>
+        </div>
+        <div class="package featured">
+          <div class="featured-badge">Most Popular</div>
+          <div class="package-header">
+            <span class="package-name">The Agenda</span>
+            <span class="package-price">From $600</span>
+          </div>
+          <p class="package-desc">4-hour set · Full event coverage with sound coordination. Weddings, parties, corporate.</p>
+        </div>
+        <div class="package">
+          <div class="package-header">
+            <span class="package-name">Full Takeover</span>
+            <span class="package-price">Custom</span>
+          </div>
+          <p class="package-desc">6+ hours · Residencies, club nights, tours, and branded events.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="booking-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" placeholder="Jane">
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" placeholder="Smith">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" placeholder="jane@example.com">
+      </div>
+      <div class="form-group">
+        <label>Event Type</label>
+        <select>
+          <option value="" disabled selected>Select event type</option>
+          <option>Birthday / Private Party</option>
+          <option>Wedding</option>
+          <option>Corporate Event</option>
+          <option>Club / Venue Night</option>
+          <option>Brunch / Day Party</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Event Date</label>
+          <input type="date">
+        </div>
+        <div class="form-group">
+          <label>Duration</label>
+          <select>
+            <option value="" disabled selected>Hours needed</option>
+            <option>2 hours</option>
+            <option>3 hours</option>
+            <option>4 hours</option>
+            <option>5+ hours</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Tell me about your event</label>
+        <textarea placeholder="Venue, vibe, guest count, any special requests..."></textarea>
+      </div>
+      <button class="form-submit">Submit Booking Inquiry</button>
+    </div>
+  </div>
+</section>
+
+<!-- CONNECT -->
+<section id="connect" class="connect">
+  <div class="connect-inner reveal">
+    <div class="section-label" style="justify-content: center;">Socials</div>
+    <h2 class="section-title">Stay Connected</h2>
+    <p class="section-desc" style="margin: 16px auto 0; text-align: center;">Follow for mixes, event announcements, and behind the scenes.</p>
+    <div class="social-row">
+      <a href="https://www.instagram.com/dj_b.a.e/" target="_blank" class="social-link">
+        <div class="social-icon">📸</div>
+        <span class="social-name">Instagram</span>
+      </a>
+      <a href="https://www.tiktok.com/@djbae1" target="_blank" class="social-link">
+        <div class="social-icon">🎵</div>
+        <span class="social-name">TikTok</span>
+      </a>
+      <a href="https://www.youtube.com/channel/UCjEiMW5l_Go9vSHudx5VPEw" target="_blank" class="social-link">
+        <div class="social-icon">▶️</div>
+        <span class="social-name">YouTube</span>
+      </a>
+      <!-- INSERT: Replace soundcloud.com/djbae with your actual SoundCloud profile URL -->
+      <a href="https://soundcloud.com/djbae" target="_blank" class="social-link">
+        <div class="social-icon">☁️</div>
+        <span class="social-name">SoundCloud</span>
+      </a>
+      <a href="https://www.facebook.com/480641485716491" target="_blank" class="social-link">
+        <div class="social-icon">👤</div>
+        <span class="social-name">Facebook</span>
+      </a>
+      <a href="https://dot.cards/djbae" target="_blank" class="social-link">
+        <div class="social-icon">🔗</div>
+        <span class="social-name">dot.cards</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- BOOKING FORM NOTE:
+     To make this form actually send emails:
+     1. Go to formspree.io and create a free account
+     2. Create a new form — you'll get a unique endpoint URL
+     3. Replace the form tag below (add action="https://formspree.io/f/YOUR_ID" method="POST")
+     That's it. Free tier handles 50 submissions/month.
+-->
+
+<!-- BUILT BY / TECH SECTION — doubles as portfolio/skills showcase for job applications -->
+<section id="built-by" style="background: var(--black); border-top: 1px solid var(--border); padding: 80px 48px;">
+  <div style="max-width: 1200px; margin: 0 auto;" class="reveal">
+    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 80px; align-items: start;">
+      <div>
+        <div class="section-label">Under The Hood</div>
+        <h2 class="section-title" style="font-size: clamp(22px, 3vw, 36px);">Built from<br>scratch.</h2>
+        <p class="section-desc" style="margin-top: 16px;">This site was designed and developed entirely by the same person behind the music. No templates. No drag-and-drop builders.</p>
+      </div>
+      <div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;">
+
+          <div class="tech-card" style="background: var(--surface); padding: 24px; border: 1px solid transparent; transition: border-color 0.3s ease;">
+            <div style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--violet); margin-bottom: 12px;">Frontend</div>
+            <div style="font-family: 'Syncopate', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 8px;">HTML · CSS · JS</div>
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Custom animations, scroll interactions, and responsive layout. Zero frameworks.</div>
+          </div>
+
+          <div class="tech-card" style="background: var(--surface); padding: 24px; border: 1px solid transparent; transition: border-color 0.3s ease;">
+            <div style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--violet); margin-bottom: 12px;">Deployment</div>
+            <div style="font-family: 'Syncopate', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 8px;">GitHub Pages</div>
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Version controlled via Git. CI/CD deployment pipeline. Custom domain routing.</div>
+          </div>
+
+          <div class="tech-card" style="background: var(--surface); padding: 24px; border: 1px solid transparent; transition: border-color 0.3s ease;">
+            <div style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--violet); margin-bottom: 12px;">Tooling</div>
+            <div style="font-family: 'Syncopate', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 8px;">VS Code</div>
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Built locally in VS Code. Clean, semantic, production-ready code structure.</div>
+          </div>
+
+          <div class="tech-card" style="background: var(--surface); padding: 24px; border: 1px solid transparent; transition: border-color 0.3s ease;">
+            <div style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--violet); margin-bottom: 12px;">Automation</div>
+            <div style="font-family: 'Syncopate', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 8px;">Python · SQLite</div>
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Custom scripts for music library management across 23K+ tracks. Hash-based deduplication and metadata indexing.</div>
+          </div>
+
+          <div class="tech-card" style="background: var(--surface); padding: 24px; border: 1px solid transparent; transition: border-color 0.3s ease;">
+            <div style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--violet); margin-bottom: 12px;">Integrations</div>
+            <div style="font-family: 'Syncopate', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 8px;">APIs · Airtable · Stripe</div>
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">Booking flows, payment processing, and database management via third-party integrations.</div>
+          </div>
+
+          <div class="tech-card" style="background: var(--surface); padding: 24px; border: 1px solid transparent; transition: border-color 0.3s ease;">
+            <div style="font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--violet); margin-bottom: 12px;">IT Infrastructure</div>
+            <div style="font-family: 'Syncopate', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 8px;">Systems · Support</div>
+            <div style="font-size: 12px; color: var(--muted); line-height: 1.6;">10+ years in IT operations. End-to-end systems thinking applied to every project.</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tech-card:hover { border-color: var(--border) !important; }
+</style>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">DJ <span>B.A.E.</span> · The Bae Agenda</div>
+  <div class="footer-copy">© 2025 The Bae Agenda · Chicago, IL</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 4 + 'px';
+    cursor.style.top = my - 4 + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx - 16) * 0.12;
+    ry += (my - ry - 16) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Hover effects
+  document.querySelectorAll('a, button, .mix-card, .event-item, .package').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(2)';
+      ring.style.width = '48px';
+      ring.style.height = '48px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      ring.style.width = '32px';
+      ring.style.height = '32px';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
