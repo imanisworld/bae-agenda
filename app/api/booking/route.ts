@@ -1,194 +1,230 @@
-import { NextResponse } from 'next/server'
-import { z } from 'zod'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { sendBookingNotifications } from '@/lib/notifications'
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
-import { toEventISO } from '@/lib/date-time'
-import { createRequestId, logError } from '@/lib/monitoring'
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { Resend } from "resend";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
-const bookingSchema = z.object({
-  firstName: z.string().trim().min(1).max(80),
-  lastName: z.string().trim().max(80).optional().or(z.literal('')),
-  email: z.string().trim().email().max(160),
-  phone: z.string().trim().max(40).optional().or(z.literal('')),
-  eventName: z.string().trim().min(2).max(160),
-  eventType: z.string().trim().max(80).optional().or(z.literal('')),
-  eventDate: z.string().trim().min(1),
-  eventTime: z.string().trim().max(20).optional().or(z.literal('')),
-  eventEndTime: z.string().trim().max(20).optional().or(z.literal('')),
-  timeZone: z.string().trim().min(1).max(80),
-  venue: z.string().trim().max(160).optional().or(z.literal('')),
-  city: z.string().trim().max(120).optional().or(z.literal('')),
-  package: z.string().trim().max(120).optional().or(z.literal('')),
-  notes: z.string().trim().max(2000).optional().or(z.literal('')),
-  website: z.string().trim().max(200).optional().or(z.literal('')),
-  startedAt: z.string().trim().max(30).optional().or(z.literal('')),
-})
+// ─── Rate Limiting ────────────────────────────────────────────────────────────
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "10 m"),
+  analytics: true,
+});
 
-const BOOKING_WINDOW_MS = 15 * 60 * 1000
-const BOOKING_LIMIT = 5
-const MIN_SUBMIT_MS = 1500
+// ─── Validation Schema ────────────────────────────────────────────────────────
+const BookingSchema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().optional(),
+  eventType: z.string().min(1, "Event type is required"),
+  eventDate: z.string().min(1, "Event date is required"),
+  eventTime: z.string().optional(),
+  venue: z.string().optional(),
+  guestCount: z.string().optional(),
+  duration: z.string().optional(),
+  budget: z.string().optional(),
+  additionalInfo: z.string().optional(),
+});
 
-function normalizeOptional(value?: string): string | null {
-  if (!value) return null
-  const trimmed = value.trim()
-  return trimmed.length ? trimmed : null
+type BookingData = z.infer<typeof BookingSchema>;
+
+// ─── Config Validators ────────────────────────────────────────────────────────
+function getResendConfig() {
+  const apiKey = process.env.RESEND_API_KEY;
+  const fromEmail = process.env.BOOKING_FROM_EMAIL;
+  const alertEmail = process.env.BOOKING_ALERT_EMAIL;
+
+  if (!apiKey || !fromEmail || !alertEmail) {
+    return null;
+  }
+  if (!fromEmail.includes("@") || !alertEmail.includes("@")) {
+    return null;
+  }
+  return { apiKey, fromEmail, alertEmail };
 }
 
-export async function POST(request: Request) {
-  const requestId = createRequestId()
-  try {
-    const origin = request.headers.get('origin')
-    const host = request.headers.get('host')
-    if (origin && host) {
-      const originHost = new URL(origin).host
-      if (originHost !== host) {
-        return NextResponse.json({ error: 'Invalid submission origin.' }, { status: 403 })
-      }
-    }
+function getTwilioConfig() {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+  const fromNumber = process.env.TWILIO_FROM_NUMBER;
+  const toNumber = process.env.BOOKING_SMS_TO;
 
-    const clientIp = getClientIp(request.headers)
-    const rateLimit = checkRateLimit(`booking:${clientIp}`, BOOKING_LIMIT, BOOKING_WINDOW_MS)
-    if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { error: 'Too many booking requests. Please wait a few minutes and try again.' },
-        {
-          status: 429,
-          headers: { 'Retry-After': String(rateLimit.retryAfterSeconds) },
-        }
-      )
-    }
-
-    const json = (await request.json()) as unknown
-    const parsed = bookingSchema.safeParse(json)
-
-    if (!parsed.success) {
-      const fields = parsed.error.issues
-        .map((issue) => issue.path[0])
-        .filter((field): field is string => typeof field === 'string')
-
-      return NextResponse.json(
-        { error: 'Please check the highlighted form fields and try again.', fields },
-        { status: 400 }
-      )
-    }
-
-    const payload = parsed.data
-    if (payload.website?.trim()) {
-      return NextResponse.json({ success: true }, { status: 201 })
-    }
-
-    const startedAtMs = Number(payload.startedAt)
-    if (
-      payload.startedAt &&
-      Number.isFinite(startedAtMs) &&
-      startedAtMs > 0 &&
-      Date.now() - startedAtMs < MIN_SUBMIT_MS
-    ) {
-      return NextResponse.json(
-        { error: 'Submission blocked. Please try again.' },
-        { status: 400 }
-      )
-    }
-
-    const eventISO = toEventISO(payload.eventDate, payload.timeZone, payload.eventTime)
-    if (!eventISO) {
-      return NextResponse.json(
-        { error: 'Invalid event date, time, or timezone.' },
-        { status: 400 }
-      )
-    }
-
-    const supabase = createAdminClient()
-    const normalizedEmail = payload.email.toLowerCase().trim()
-
-    const { data: existingClient, error: clientLookupError } = await supabase
-      .from('clients')
-      .select('id')
-      .eq('email', normalizedEmail)
-      .maybeSingle()
-
-    if (clientLookupError) {
-      return NextResponse.json({ error: 'Could not process booking request.' }, { status: 500 })
-    }
-
-    let clientId: string
-
-    if (existingClient?.id) {
-      clientId = existingClient.id
-      const { error: updateClientError } = await supabase
-        .from('clients')
-        .update({
-          first_name: payload.firstName,
-          last_name: normalizeOptional(payload.lastName),
-          phone: normalizeOptional(payload.phone),
-        })
-        .eq('id', clientId)
-
-      if (updateClientError) {
-        return NextResponse.json({ error: 'Could not process booking request.' }, { status: 500 })
-      }
-    } else {
-      const { data: createdClient, error: createClientError } = await supabase
-        .from('clients')
-        .insert({
-          first_name: payload.firstName,
-          last_name: normalizeOptional(payload.lastName),
-          email: normalizedEmail,
-          phone: normalizeOptional(payload.phone),
-        })
-        .select('id')
-        .single()
-
-      if (createClientError || !createdClient?.id) {
-        return NextResponse.json({ error: 'Could not process booking request.' }, { status: 500 })
-      }
-
-      clientId = createdClient.id
-    }
-
-    const endTimeISO = payload.eventEndTime
-      ? toEventISO(payload.eventDate, payload.timeZone, payload.eventEndTime)
-      : null
-
-    const { error: bookingError } = await supabase
-      .from('bookings')
-      .insert({
-        client_id: clientId,
-        event_name: payload.eventName,
-        event_type: normalizeOptional(payload.eventType),
-        event_date: eventISO,
-        event_end_time: endTimeISO,
-        event_timezone: payload.timeZone.trim(),
-        venue: normalizeOptional(payload.venue),
-        city: normalizeOptional(payload.city),
-        package: normalizeOptional(payload.package),
-        status: 'inquiry',
-        notes: normalizeOptional(payload.notes),
-      })
-
-    if (bookingError) {
-      return NextResponse.json({ error: 'Could not process booking request.' }, { status: 500 })
-    }
-
-    await sendBookingNotifications({
-      firstName: payload.firstName,
-      lastName: normalizeOptional(payload.lastName),
-      email: normalizedEmail,
-      phone: normalizeOptional(payload.phone),
-      eventName: payload.eventName,
-      eventType: normalizeOptional(payload.eventType),
-      eventDate: eventISO,
-      eventTimeZone: payload.timeZone.trim(),
-      venue: normalizeOptional(payload.venue),
-      city: normalizeOptional(payload.city),
-      packageName: normalizeOptional(payload.package),
-      notes: normalizeOptional(payload.notes),
-    })
-
-    return NextResponse.json({ success: true, requestId }, { status: 201, headers: { 'X-Request-Id': requestId } })
-  } catch (error) {
-    logError('Booking route failed', error, { requestId, route: '/api/booking' })
-    return NextResponse.json({ error: 'Unexpected server error.', requestId }, { status: 500, headers: { 'X-Request-Id': requestId } })
+  if (!accountSid || !authToken || !fromNumber || !toNumber) {
+    return null; // optional — not an error
   }
+  return { accountSid, authToken, fromNumber, toNumber };
+}
+
+// ─── Email Templates ──────────────────────────────────────────────────────────
+function buildOwnerEmail(data: BookingData): string {
+  return `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #1a1a1a;">🎧 New Booking Request</h2>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><td style="padding: 8px; font-weight: bold;">Name</td><td style="padding: 8px;">${data.name}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Email</td><td style="padding: 8px;">${data.email}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Phone</td><td style="padding: 8px;">${data.phone || "—"}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Event Type</td><td style="padding: 8px;">${data.eventType}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Event Date</td><td style="padding: 8px;">${data.eventDate}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Event Time</td><td style="padding: 8px;">${data.eventTime || "—"}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Venue</td><td style="padding: 8px;">${data.venue || "—"}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Guest Count</td><td style="padding: 8px;">${data.guestCount || "—"}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Duration</td><td style="padding: 8px;">${data.duration || "—"}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Budget</td><td style="padding: 8px;">${data.budget || "—"}</td></tr>
+        ${data.additionalInfo ? `<tr><td style="padding: 8px; font-weight: bold;">Notes</td><td style="padding: 8px;">${data.additionalInfo}</td></tr>` : ""}
+      </table>
+    </div>
+  `;
+}
+
+function buildClientEmail(data: BookingData): string {
+  return `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2 style="color: #1a1a1a;">Thanks for reaching out, ${data.name}!</h2>
+      <p>Your booking request has been received. Here's a summary:</p>
+      <table style="width: 100%; border-collapse: collapse;">
+        <tr><td style="padding: 8px; font-weight: bold;">Event Type</td><td style="padding: 8px;">${data.eventType}</td></tr>
+        <tr><td style="padding: 8px; font-weight: bold;">Date</td><td style="padding: 8px;">${data.eventDate}</td></tr>
+        ${data.venue ? `<tr><td style="padding: 8px; font-weight: bold;">Venue</td><td style="padding: 8px;">${data.venue}</td></tr>` : ""}
+      </table>
+      <p style="margin-top: 24px;">I'll be in touch within 24–48 hours to confirm availability and discuss details.</p>
+      <p>— Bae Agenda</p>
+    </div>
+  `;
+}
+
+// ─── SMS Sender (optional) ────────────────────────────────────────────────────
+async function sendSMS(
+  config: NonNullable<ReturnType<typeof getTwilioConfig>>,
+  data: BookingData
+): Promise<void> {
+  const body = `New booking: ${data.name} | ${data.eventType} | ${data.eventDate} | ${data.email}`;
+
+  const response = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${config.accountSid}/Messages.json`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${config.accountSid}:${config.authToken}`).toString("base64")}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        From: config.fromNumber,
+        To: config.toNumber,
+        Body: body,
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Twilio error ${response.status}: ${err}`);
+  }
+}
+
+// ─── Main Handler ─────────────────────────────────────────────────────────────
+export async function POST(req: NextRequest) {
+  console.log("[booking] request received");
+
+  // ── Rate limiting ──
+  const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
+  const { success: rateLimitPassed } = await ratelimit.limit(ip);
+  if (!rateLimitPassed) {
+    console.log("[booking] rate limit exceeded");
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429 }
+    );
+  }
+
+  // ── Parse body ──
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    console.log("[booking] invalid JSON body");
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
+
+  // ── Validate with Zod ──
+  const parsed = BookingSchema.safeParse(body);
+  if (!parsed.success) {
+    console.log("[booking] validation failed", parsed.error.flatten());
+    return NextResponse.json(
+      { error: "Invalid booking data", details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+
+  console.log("[booking] validation passed");
+  const data = parsed.data;
+
+  // ── Check Resend config — REQUIRED ──
+  const resendConfig = getResendConfig();
+  if (!resendConfig) {
+    console.error(
+      "[booking] FATAL: Resend config missing. " +
+      "Set RESEND_API_KEY, BOOKING_FROM_EMAIL, and BOOKING_ALERT_EMAIL in Vercel env vars."
+    );
+    return NextResponse.json(
+      { error: "Email service not configured. Contact the site owner." },
+      { status: 500 }
+    );
+  }
+
+  // ── Check Twilio config — OPTIONAL ──
+  const twilioConfig = getTwilioConfig();
+  if (!twilioConfig) {
+    console.log("[booking] twilio skipped (not configured)");
+  }
+
+  // ── Send emails via Resend ──
+  const resend = new Resend(resendConfig.apiKey);
+
+  try {
+    // Notify owner
+    await resend.emails.send({
+      from: resendConfig.fromEmail,
+      to: resendConfig.alertEmail,
+      subject: `New Booking Request: ${data.eventType} — ${data.eventDate}`,
+      html: buildOwnerEmail(data),
+    });
+
+    // Confirm to client
+    await resend.emails.send({
+      from: resendConfig.fromEmail,
+      to: data.email,
+      subject: "Booking Request Received — Bae Agenda",
+      html: buildClientEmail(data),
+    });
+
+    console.log("[booking] email sent via Resend");
+  } catch (err) {
+    console.error("[booking] Resend error:", err);
+    return NextResponse.json(
+      { error: "Failed to send confirmation email. Please try again." },
+      { status: 500 }
+    );
+  }
+
+  // ── Send SMS via Twilio — optional, never blocks booking ──
+  if (twilioConfig) {
+    try {
+      await sendSMS(twilioConfig, data);
+      console.log("[booking] SMS sent via Twilio");
+    } catch (err) {
+      // Log but don't fail — SMS is non-critical
+      console.error("[booking] Twilio SMS failed (non-fatal):", err);
+    }
+  }
+
+  console.log("[booking] complete — booking confirmed for", data.email);
+
+  return NextResponse.json(
+    {
+      success: true,
+      message: "Booking request received! You'll hear back within 24–48 hours.",
+    },
+    { status: 201 }
+  );
 }
