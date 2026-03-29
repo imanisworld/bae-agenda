@@ -1,4 +1,3 @@
-<<<<<<< ours
 /**
  * ADMIN LAYOUT
  * Wraps all /admin/* routes.
@@ -8,14 +7,10 @@ import Sidebar from '@/components/admin/Sidebar'
 import { createClient } from '@/lib/supabase/server'
 
 export default async function AdminLayout({
-=======
-export default function AdminRootLayout({
->>>>>>> theirs
   children,
 }: {
   children: React.ReactNode
 }) {
-<<<<<<< ours
   const supabase = await createClient()
   const { data } = await supabase.auth.getUser()
 
@@ -27,7 +22,4 @@ export default function AdminRootLayout({
       </main>
     </div>
   )
-=======
-  return children
->>>>>>> theirs
 }
