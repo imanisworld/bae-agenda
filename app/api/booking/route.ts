@@ -11,17 +11,27 @@ const ratelimit = new Ratelimit({
 });
 
 const BookingSchema = z.object({
-  name: z.string().min(2, "Name must be at least 2 characters"),
-  email: z.string().email("Invalid email address"),
-  phone: z.string().optional(),
-  eventType: z.string().min(1, "Event type is required"),
-  eventDate: z.string().min(1, "Event date is required"),
-  eventTime: z.string().optional(),
-  venue: z.string().optional(),
-  guestCount: z.string().optional(),
-  duration: z.string().optional(),
-  budget: z.string().optional(),
-  additionalInfo: z.string().optional(),
+  // Contact
+  firstName:    z.string().min(1, "First name is required"),
+  lastName:     z.string().optional(),
+  email:        z.string().email("Invalid email address"),
+  phone:        z.string().optional(),
+  // Event
+  eventName:    z.string().min(1, "Event name is required"),
+  eventType:    z.string().optional(),
+  eventDate:    z.string().min(1, "Event date is required"),
+  eventTime:    z.string().optional(),
+  eventEndTime: z.string().optional(),
+  timeZone:     z.string().optional(),
+  // Location
+  venue:        z.string().optional(),
+  city:         z.string().optional(),
+  // Details
+  package:      z.string().optional(),
+  notes:        z.string().optional(),
+  // Honeypot / meta
+  website:      z.string().optional(),
+  startedAt:    z.string().optional(),
 });
 
 type BookingData = z.infer<typeof BookingSchema>;
@@ -45,30 +55,43 @@ function getTwilioConfig() {
 }
 
 function buildOwnerEmail(data: BookingData): string {
+  const name = [data.firstName, data.lastName].filter(Boolean).join(" ");
+  const timeRange = data.eventTime
+    ? data.eventEndTime ? `${data.eventTime} – ${data.eventEndTime}` : data.eventTime
+    : "—";
   return `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
     <h2>🎧 New Booking Request</h2>
     <table style="width:100%;border-collapse:collapse">
-      <tr><td style="padding:8px;font-weight:bold">Name</td><td style="padding:8px">${data.name}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Name</td><td style="padding:8px">${name}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Email</td><td style="padding:8px">${data.email}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Phone</td><td style="padding:8px">${data.phone || "—"}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Event Type</td><td style="padding:8px">${data.eventType}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Event Date</td><td style="padding:8px">${data.eventDate}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Event Time</td><td style="padding:8px">${data.eventTime || "—"}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Event Name</td><td style="padding:8px">${data.eventName}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Event Type</td><td style="padding:8px">${data.eventType || "—"}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${data.eventDate}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Time</td><td style="padding:8px">${timeRange}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Timezone</td><td style="padding:8px">${data.timeZone || "—"}</td></tr>
       <tr><td style="padding:8px;font-weight:bold">Venue</td><td style="padding:8px">${data.venue || "—"}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Budget</td><td style="padding:8px">${data.budget || "—"}</td></tr>
-      ${data.additionalInfo ? `<tr><td style="padding:8px;font-weight:bold">Notes</td><td style="padding:8px">${data.additionalInfo}</td></tr>` : ""}
+      <tr><td style="padding:8px;font-weight:bold">City</td><td style="padding:8px">${data.city || "—"}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Package</td><td style="padding:8px">${data.package || "—"}</td></tr>
+      ${data.notes ? `<tr><td style="padding:8px;font-weight:bold">Notes</td><td style="padding:8px">${data.notes}</td></tr>` : ""}
     </table>
   </div>`;
 }
 
 function buildClientEmail(data: BookingData): string {
+  const timeRange = data.eventTime
+    ? data.eventEndTime ? `${data.eventTime} – ${data.eventEndTime}` : data.eventTime
+    : null;
   return `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-    <h2>Thanks for reaching out, ${data.name}!</h2>
+    <h2>Thanks for reaching out, ${data.firstName}!</h2>
     <p>Your booking request has been received. Here's a summary:</p>
     <table style="width:100%;border-collapse:collapse">
-      <tr><td style="padding:8px;font-weight:bold">Event Type</td><td style="padding:8px">${data.eventType}</td></tr>
+      <tr><td style="padding:8px;font-weight:bold">Event</td><td style="padding:8px">${data.eventName}</td></tr>
+      ${data.eventType ? `<tr><td style="padding:8px;font-weight:bold">Type</td><td style="padding:8px">${data.eventType}</td></tr>` : ""}
       <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${data.eventDate}</td></tr>
+      ${timeRange ? `<tr><td style="padding:8px;font-weight:bold">Time</td><td style="padding:8px">${timeRange}</td></tr>` : ""}
       ${data.venue ? `<tr><td style="padding:8px;font-weight:bold">Venue</td><td style="padding:8px">${data.venue}</td></tr>` : ""}
+      ${data.city ? `<tr><td style="padding:8px;font-weight:bold">City</td><td style="padding:8px">${data.city}</td></tr>` : ""}
     </table>
     <p style="margin-top:24px">I'll be in touch within 24–48 hours to confirm availability and discuss details.</p>
     <p>— Bae Agenda</p>
@@ -76,7 +99,8 @@ function buildClientEmail(data: BookingData): string {
 }
 
 async function sendSMS(config: NonNullable<ReturnType<typeof getTwilioConfig>>, data: BookingData) {
-  const body = `New booking: ${data.name} | ${data.eventType} | ${data.eventDate} | ${data.email}`;
+  const name = [data.firstName, data.lastName].filter(Boolean).join(" ");
+  const body = `New booking: ${name} | ${data.eventType || data.eventName} | ${data.eventDate} | ${data.email}`;
   const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${config.accountSid}/Messages.json`, {
     method: "POST",
     headers: {
@@ -104,12 +128,25 @@ export async function POST(req: NextRequest) {
 
   const parsed = BookingSchema.safeParse(body);
   if (!parsed.success) {
-    console.log("[booking] validation failed");
-    return NextResponse.json({ error: "Invalid booking data", details: parsed.error.flatten() }, { status: 400 });
+    const flat = parsed.error.flatten();
+    console.log("[booking] validation failed", flat);
+    // Return the specific field errors so the form can highlight them
+    const fields = Object.keys(flat.fieldErrors);
+    const firstMessage = Object.values(flat.fieldErrors).flat()[0] ?? "Please review your submission.";
+    return NextResponse.json(
+      { error: firstMessage, fields },
+      { status: 400 }
+    );
   }
 
   console.log("[booking] validation passed");
   const data = parsed.data;
+
+  // Honeypot — bot filled the hidden website field
+  if (data.website) {
+    console.log("[booking] honeypot triggered");
+    return NextResponse.json({ success: true, message: "Request received." }, { status: 201 });
+  }
 
   const resendConfig = getResendConfig();
   if (!resendConfig) {
@@ -127,7 +164,7 @@ export async function POST(req: NextRequest) {
     await resend.emails.send({
       from: resendConfig.fromEmail,
       to: resendConfig.alertEmail,
-      subject: `New Booking: ${data.eventType} — ${data.eventDate}`,
+      subject: `New Booking: ${data.eventName} (${data.eventType || "General"}) — ${data.eventDate}`,
       html: buildOwnerEmail(data),
     });
 
