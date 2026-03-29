@@ -19,33 +19,35 @@
 
 # production
 /build
+/dist
 
-# misc
-.DS_Store
-node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
-.pnpm-debug.log
-*.pem
-
-# debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
+# local env / secrets
 .env*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
 .env.*.local
-dist
 
 # vercel
 .vercel
+
+# local tooling
+.supabase/
+
+# misc
+.DS_Store
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
 # typescript
 *.tsbuildinfo
@@ -55,7 +57,12 @@ next-env.d.ts
 .bun/
 ~/.bun/
 
-# personal photos — allow only the images that appear on the live site
+# optional editor junk
+.idea/
+*.swp
+*.swo
+
+# personal photos — allow only the images used on the live site
 /public/photos/*
 !/public/photos/hero-bg.jpg
 !/public/photos/PlexMix19-DJBAE.JPEG
@@ -67,26 +74,8 @@ next-env.d.ts
 !/public/photos/outdoor-night-set-pook.png
 !/public/photos/images/
 !/public/photos/images/outside.jpg
+
+# public videos — allow only the live site assets
 /public/videos/*
 !/public/videos/e67f0964-8763-4658-bbba-4cc322727d68.mp4
 !/public/videos/phone video.mp4
-
-.supabase/
-
-*.sqlite
-*.sqlite3
-
-*.key
-*.crt
-*.p12
-*.pfx
-
-.vscode/settings.json
-.idea/
-*.swp
-*.swo
-
-/uploads
-/tmp
-/temp
-# random temp files
