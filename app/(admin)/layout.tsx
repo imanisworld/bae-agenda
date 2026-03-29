@@ -1,7 +1,7 @@
 /**
  * ADMIN LAYOUT
  * Wraps all /admin/* routes.
- * Auth is enforced by middleware — this layout just provides the shell.
+ * Session shell only — auth enforcement happens deeper in /(protected).
  */
 import Sidebar from '@/components/admin/Sidebar'
 import { createClient } from '@/lib/supabase/server'

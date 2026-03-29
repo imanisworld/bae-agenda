@@ -8,7 +8,6 @@
  */
 import Nav          from '@/components/public/Nav'
 import Footer       from '@/components/public/Footer'
-import CustomCursor from '@/components/effects/CustomCursor'
 import PublicPageStage from '@/components/public/PublicPageStage'
 
 export default function PublicLayout({
@@ -24,7 +23,6 @@ export default function PublicLayout({
         flexDirection: 'column',
       }}
     >
-      <CustomCursor />
       <Nav />
       <main id="main-content" tabIndex={-1} style={{ flex: 1 }}>
         <PublicPageStage>{children}</PublicPageStage>

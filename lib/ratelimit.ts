@@ -17,6 +17,13 @@ const bookingLimiter = new Ratelimit({
   prefix: 'ratelimit:booking',
 })
 
+const reviewLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, '10 m'),
+  analytics: true,
+  prefix: 'ratelimit:review',
+})
+
 export function getClientIp(headers: Headers): string {
   const forwardedFor = headers.get('x-forwarded-for')
   if (forwardedFor) {
@@ -51,6 +58,18 @@ export async function limitNotifySignup(headers: Headers) {
 export async function limitBookingSubmission(headers: Headers) {
   const ip = getClientIp(headers)
   const result = await bookingLimiter.limit(ip)
+  const retryAfter = Math.max(Math.ceil((result.reset - Date.now()) / 1000), 1)
+
+  return {
+    ip,
+    ...result,
+    retryAfter,
+  }
+}
+
+export async function limitReviewSubmission(headers: Headers) {
+  const ip = getClientIp(headers)
+  const result = await reviewLimiter.limit(ip)
   const retryAfter = Math.max(Math.ceil((result.reset - Date.now()) / 1000), 1)
 
   return {

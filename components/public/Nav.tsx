@@ -31,6 +31,23 @@ export default function Nav() {
     return () => { document.body.style.overflow = '' }
   }, [menuOpen])
 
+  useEffect(() => {
+    setMenuOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (!menuOpen) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [menuOpen])
+
   const closeMenu = () => setMenuOpen(false)
 
   return (
@@ -106,12 +123,15 @@ export default function Nav() {
             className="nav-hamburger"
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
+            aria-controls="mobile-navigation-drawer"
             onClick={() => setMenuOpen((v) => !v)}
             style={{
               background:    'none',
-              border:        'none',
+              border:        '1px solid transparent',
               cursor:        'pointer',
               padding:       '8px',
+              minWidth:      '44px',
+              minHeight:     '44px',
               flexDirection: 'column',
               gap:           '5px',
               alignItems:    'flex-end',
@@ -148,7 +168,9 @@ export default function Nav() {
       </header>
 
       {/* ── Mobile drawer ───────────────────────────── */}
-      <div
+      <nav
+        id="mobile-navigation-drawer"
+        aria-label="Mobile navigation"
         aria-hidden={!menuOpen}
         style={{
           position:   'fixed',
@@ -162,6 +184,7 @@ export default function Nav() {
           display:    'flex',
           flexDirection: 'column',
           overflowY:  'auto',
+          overscrollBehavior: 'contain',
           WebkitOverflowScrolling: 'touch',
           padding:    '40px 32px 48px',
           gap:        '8px',
@@ -195,7 +218,7 @@ export default function Nav() {
             </Link>
           )
         )}
-      </div>
+      </nav>
     </>
   )
 }

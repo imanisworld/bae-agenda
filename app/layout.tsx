@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { DM_Sans } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
 const dmSans = DM_Sans({
@@ -16,6 +17,9 @@ export const metadata: Metadata = {
     default: 'DJ B.A.E. | Official Website | DJ in Indianapolis & Chicago',
     template: '%s | DJ B.A.E.',
   },
+  alternates: {
+    canonical: '/',
+  },
   description:
     'DJ B.A.E. — Indianapolis & Chicago DJ available for private events, weddings, club nights, festivals, and more. Book DJ BAE for your next event.',
   keywords: [
@@ -27,6 +31,9 @@ export const metadata: Metadata = {
     siteName: 'DJ B.A.E. | The Bae Agenda',
     locale: 'en_US',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
   },
   metadataBase: new URL('https://thebaeagenda.com'),
 }
@@ -51,6 +58,7 @@ export default function RootLayout({
       <body style={{ fontFamily: 'var(--font-dm-sans), DM Sans, sans-serif' }}>
         {children}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

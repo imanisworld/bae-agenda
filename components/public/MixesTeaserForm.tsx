@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { trackEvent } from '@/lib/analytics'
 
 export default function MixesTeaserForm() {
   const [email, setEmail] = useState('')
@@ -11,14 +12,22 @@ export default function MixesTeaserForm() {
     if (!trimmed || status === 'loading' || status === 'done') return
 
     setStatus('loading')
+    trackEvent('notify_signup_submit_started')
     try {
       const res = await fetch('/api/notify-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: trimmed, company: '' }),
       })
-      setStatus(res.ok ? 'done' : 'error')
+      if (res.ok) {
+        trackEvent('notify_signup_submit_succeeded')
+        setStatus('done')
+      } else {
+        trackEvent('notify_signup_submit_failed', { status: res.status })
+        setStatus('error')
+      }
     } catch {
+      trackEvent('notify_signup_submit_failed', { reason: 'network_error' })
       setStatus('error')
     }
   }

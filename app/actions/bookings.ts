@@ -5,7 +5,8 @@ import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
 import { toEventISO } from '@/lib/date-time'
-import type { BookingStatus } from '@/types/index'
+import { PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
+import type { BookingStatus, PaymentMethod, PaymentStatus, PaymentType } from '@/types/index'
 
 function redirectWithError(path: string, message: string) {
   const params = new URLSearchParams({ error: message })
@@ -42,6 +43,28 @@ function parseOptionalNumber(value: FormDataEntryValue | null): number | null {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+function isPaymentType(value: string): value is PaymentType {
+  return PAYMENT_TYPES.includes(value as PaymentType)
+}
+
+function isPaymentMethod(value: string): value is PaymentMethod {
+  return PAYMENT_METHODS.includes(value as PaymentMethod)
+}
+
+function isPaymentStatus(value: string): value is PaymentStatus {
+  return ['pending', 'received', 'refunded'].includes(value)
+}
+
+function parseOptionalDate(value: FormDataEntryValue | null): string | null {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+
+  const parsed = new Date(trimmed)
+  if (Number.isNaN(parsed.getTime())) return null
+
+  return parsed.toISOString()
+}
 
 export async function updateBookingStatusAction(formData: FormData) {
   await requireAdminUser()
@@ -198,4 +221,85 @@ export async function createEventFromBookingAction(formData: FormData) {
   revalidatePath('/events')
   revalidatePath('/')
   redirect(`/admin/events/${createdEvent.id}`)
+}
+
+export async function createBookingPaymentAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+  const bookingId = optionalString(formData.get('booking_id'))
+  const amount = parseOptionalNumber(formData.get('amount'))
+  const typeRaw = optionalString(formData.get('type'))
+  const methodRaw = optionalString(formData.get('method'))
+  const statusRaw = optionalString(formData.get('status'))
+  const paidAt = parseOptionalDate(formData.get('paid_at'))
+  const notes = optionalString(formData.get('notes'))
+
+  if (!bookingId || amount === null || amount <= 0 || !typeRaw || !statusRaw) {
+    redirectWithError('/admin/payments', 'Booking, amount, payment type, and status are required.')
+  }
+
+  if (!isPaymentType(typeRaw!) || !isPaymentStatus(statusRaw!)) {
+    redirectWithError('/admin/payments', 'Invalid payment details.')
+  }
+
+  if (methodRaw && !isPaymentMethod(methodRaw)) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Invalid payment method.')
+  }
+
+  const finalPaidAt = statusRaw === 'received'
+    ? paidAt ?? new Date().toISOString()
+    : paidAt
+
+  const { error } = await admin
+    .from('payments')
+    .insert({
+      booking_id: bookingId,
+      amount,
+      type: typeRaw,
+      method: methodRaw,
+      status: statusRaw,
+      paid_at: finalPaidAt,
+      notes,
+    })
+
+  if (error) {
+    redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to record payment.')
+  }
+
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/payments')
+  revalidatePath('/admin/dashboard')
+  redirect(`/admin/bookings/${bookingId}`)
+}
+
+export async function createBookingNoteAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+  const bookingId = optionalString(formData.get('booking_id'))
+  const clientId = optionalString(formData.get('client_id'))
+  const body = optionalString(formData.get('body'))
+
+  if (!bookingId || !body) {
+    redirectWithError('/admin/bookings', 'A note body is required.')
+  }
+
+  const { error } = await admin
+    .from('notes')
+    .insert({
+      booking_id: bookingId,
+      client_id: clientId,
+      body,
+    })
+
+  if (error) {
+    redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to save note.')
+  }
+
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/dashboard')
+  redirect(`/admin/bookings/${bookingId}`)
 }

@@ -2,6 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { submitReview } from '@/app/actions/reviews'
+import { trackEvent } from '@/lib/analytics'
 
 const EVENT_TYPES = [
   'Club Night',
@@ -18,13 +19,19 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
   const [hover,     setHover]     = useState(0)
   const [status,    setStatus]    = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
   const [errorMsg,  setErrorMsg]  = useState('')
+  const [startedAt] = useState(() => String(Date.now()))
   const formRef = useRef<HTMLFormElement>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    if (!rating) { setErrorMsg('Please select a star rating.'); return }
+    if (!rating) {
+      setErrorMsg('Please select a star rating.')
+      trackEvent('review_submit_failed', { reason: 'missing_rating' })
+      return
+    }
     setStatus('loading')
     setErrorMsg('')
+    trackEvent('review_submit_started', { rating, compact })
 
     const fd = new FormData(e.currentTarget)
     fd.set('rating', String(rating))
@@ -33,10 +40,12 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
     if (result?.error) {
       setStatus('error')
       setErrorMsg(result.error)
+      trackEvent('review_submit_failed', { reason: 'server_rejected', rating, compact })
     } else {
       setStatus('success')
       formRef.current?.reset()
       setRating(0)
+      trackEvent('review_submit_succeeded', { rating, compact })
     }
   }
 
@@ -71,7 +80,7 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
             textTransform: 'uppercase',
             color:       'var(--violet)',
             background:  'none',
-            border:      'none',
+            border:      '1px solid transparent',
             cursor:      'pointer',
           }}
         >
@@ -84,13 +93,12 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
   const inputStyle: React.CSSProperties = {
     width:       '100%',
     background:  'rgba(8,8,12,0.92)',
-    border:      '1px solid rgba(255,255,255,0.1)',
+    border:      '1px solid rgba(255,255,255,0.16)',
     color:       'var(--white)',
     padding:     compact ? '10px 12px' : '12px 14px',
     fontFamily:  'DM Sans, sans-serif',
     fontSize:    compact ? '13px' : '14px',
     fontWeight:  300,
-    outline:     'none',
     boxSizing:   'border-box',
     boxShadow:   'inset 0 1px 0 rgba(255,255,255,0.03)',
   }
@@ -106,6 +114,8 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
 
   return (
     <form ref={formRef} onSubmit={handleSubmit} style={{ display: 'grid', gap: compact ? '16px' : '20px' }}>
+      <input type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: 'absolute', opacity: 0, pointerEvents: 'none' }} />
+      <input type="hidden" name="startedAt" value={startedAt} />
 
       {/* Name + Event Type row */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: compact ? '12px' : '16px' }}>

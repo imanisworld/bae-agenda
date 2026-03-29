@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
-import { Resend } from "resend";
 import { checkBookingAvailability } from "@/lib/booking-availability";
 import { isValidTimeZone, toEventISO } from "@/lib/date-time";
 import { limitBookingSubmission } from "@/lib/ratelimit";
+import { sendBookingNotifications } from "@/lib/notifications";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 const ALLOWED_ORIGINS = new Set([
   "http://localhost:3000",
@@ -92,109 +93,9 @@ const BookingSchema = z.object({
 
 type BookingData = z.infer<typeof BookingSchema>;
 
-function getResendConfig() {
-  const apiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.FROM_EMAIL ?? process.env.BOOKING_FROM_EMAIL;
-  const alertEmail = process.env.ALERT_EMAIL ?? process.env.BOOKING_ALERT_EMAIL;
-  if (!apiKey || !fromEmail || !alertEmail) return null;
-  if (!fromEmail.includes("@") || !alertEmail.includes("@")) return null;
-  return { apiKey, fromEmail, alertEmail };
-}
-
-function getTwilioConfig() {
-  const accountSid = process.env.TWILIO_ACCOUNT_SID;
-  const authToken = process.env.TWILIO_AUTH_TOKEN;
-  const fromNumber = process.env.TWILIO_FROM_NUMBER;
-  const toNumber = process.env.BOOKING_SMS_TO;
-  if (!accountSid || !authToken || !fromNumber || !toNumber) return null;
-  return { accountSid, authToken, fromNumber, toNumber };
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function buildOwnerEmail(data: BookingData): string {
-  const name = escapeHtml([data.firstName, data.lastName].filter(Boolean).join(" "));
-  const email = escapeHtml(data.email);
-  const phone = escapeHtml(data.phone || "—");
-  const eventName = escapeHtml(data.eventName);
-  const eventType = escapeHtml(data.eventType || "—");
-  const eventDate = escapeHtml(data.eventDate);
-  const timeRange = escapeHtml(
-    data.eventTime
-      ? data.eventEndTime ? `${data.eventTime} – ${data.eventEndTime}` : data.eventTime
-      : "—"
-  );
-  const timeZone = escapeHtml(data.timeZone || "—");
-  const venue = escapeHtml(data.venue || "—");
-  const city = escapeHtml(data.city || "—");
-  const packageName = escapeHtml(data.package || "—");
-  const notes = data.notes ? escapeHtml(data.notes) : null;
-
-  return `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-    <h2>🎧 New Booking Request</h2>
-    <table style="width:100%;border-collapse:collapse">
-      <tr><td style="padding:8px;font-weight:bold">Name</td><td style="padding:8px">${name}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Email</td><td style="padding:8px">${email}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Phone</td><td style="padding:8px">${phone}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Event Name</td><td style="padding:8px">${eventName}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Event Type</td><td style="padding:8px">${eventType}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${eventDate}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Time</td><td style="padding:8px">${timeRange}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Timezone</td><td style="padding:8px">${timeZone}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Venue</td><td style="padding:8px">${venue}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">City</td><td style="padding:8px">${city}</td></tr>
-      <tr><td style="padding:8px;font-weight:bold">Package</td><td style="padding:8px">${packageName}</td></tr>
-      ${notes ? `<tr><td style="padding:8px;font-weight:bold">Notes</td><td style="padding:8px">${notes}</td></tr>` : ""}
-    </table>
-  </div>`;
-}
-
-function buildClientEmail(data: BookingData): string {
-  const firstName = escapeHtml(data.firstName);
-  const eventName = escapeHtml(data.eventName);
-  const eventType = data.eventType ? escapeHtml(data.eventType) : null;
-  const eventDate = escapeHtml(data.eventDate);
-  const timeRange = data.eventTime
-    ? escapeHtml(data.eventEndTime ? `${data.eventTime} – ${data.eventEndTime}` : data.eventTime)
-    : null;
-  const venue = data.venue ? escapeHtml(data.venue) : null;
-  const city = data.city ? escapeHtml(data.city) : null;
-
-  return `<div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-    <h2>Thanks for reaching out, ${firstName}!</h2>
-    <p>Your booking request has been received. Here's a summary:</p>
-    <table style="width:100%;border-collapse:collapse">
-      <tr><td style="padding:8px;font-weight:bold">Event</td><td style="padding:8px">${eventName}</td></tr>
-      ${eventType ? `<tr><td style="padding:8px;font-weight:bold">Type</td><td style="padding:8px">${eventType}</td></tr>` : ""}
-      <tr><td style="padding:8px;font-weight:bold">Date</td><td style="padding:8px">${eventDate}</td></tr>
-      ${timeRange ? `<tr><td style="padding:8px;font-weight:bold">Time</td><td style="padding:8px">${timeRange}</td></tr>` : ""}
-      ${venue ? `<tr><td style="padding:8px;font-weight:bold">Venue</td><td style="padding:8px">${venue}</td></tr>` : ""}
-      ${city ? `<tr><td style="padding:8px;font-weight:bold">City</td><td style="padding:8px">${city}</td></tr>` : ""}
-    </table>
-    <p style="margin-top:24px">I'll be in touch within 24–48 hours to confirm availability and discuss details.</p>
-    <p>— Bae Agenda</p>
-  </div>`;
-}
-
-async function sendSMS(config: NonNullable<ReturnType<typeof getTwilioConfig>>, data: BookingData) {
-  const name = [data.firstName, data.lastName].filter(Boolean).join(" ");
-  const body = `New booking: ${name} | ${data.eventType || data.eventName} | ${data.eventDate} | ${data.email}`;
-  const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${config.accountSid}/Messages.json`, {
-    method: "POST",
-    headers: {
-      Authorization: "Basic " + Buffer.from(`${config.accountSid}:${config.authToken}`).toString("base64"),
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({ From: config.fromNumber, To: config.toNumber, Body: body }),
-  });
-  if (!res.ok) throw new Error(`Twilio ${res.status}`);
+function optionalString(value?: string) {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
 }
 
 export async function POST(req: NextRequest) {
@@ -273,42 +174,75 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const resendConfig = getResendConfig();
-  if (!resendConfig) {
-    console.error("[booking] FATAL: missing RESEND_API_KEY, FROM_EMAIL/BOOKING_FROM_EMAIL, or ALERT_EMAIL/BOOKING_ALERT_EMAIL");
-    return NextResponse.json({ error: "Email service not configured." }, { status: 500 });
+  const eventDateIso = toEventISO(data.eventDate, data.timeZone, data.eventTime?.trim() || "00:00");
+  if (!eventDateIso) {
+    return NextResponse.json({ error: "Invalid event date." }, { status: 400 });
   }
 
-  const twilioConfig = getTwilioConfig();
-
-  const resend = new Resend(resendConfig.apiKey);
-
-  // Both emails required — thebaeagenda.com is verified in Resend
   try {
-    await resend.emails.send({
-      from: resendConfig.fromEmail,
-      to: resendConfig.alertEmail,
-      subject: `New Booking: ${data.eventName} (${data.eventType || "General"}) — ${data.eventDate}`,
-      html: buildOwnerEmail(data),
-    });
+    const admin = createAdminClient();
 
-    await resend.emails.send({
-      from: resendConfig.fromEmail,
-      to: data.email,
-      subject: "Booking Request Received — Bae Agenda",
-      html: buildClientEmail(data),
-    });
-  } catch (err) {
-    console.error("[booking] Resend error:", err);
-    return NextResponse.json({ error: "Failed to send confirmation email. Please try again." }, { status: 500 });
-  }
+    const clientPayload = {
+      first_name: data.firstName.trim(),
+      last_name: optionalString(data.lastName),
+      email: data.email.trim().toLowerCase(),
+      phone: optionalString(data.phone),
+      notes: optionalString(data.notes),
+    };
 
-  if (twilioConfig) {
-    try {
-      await sendSMS(twilioConfig, data);
-    } catch (err) {
-      console.error("[booking] Twilio failed (non-fatal):", err);
+    const { data: client, error: clientError } = await admin
+      .from("clients")
+      .upsert(clientPayload, { onConflict: "email" })
+      .select("id")
+      .single();
+
+    if (clientError || !client?.id) {
+      console.error("[booking] client upsert error:", clientError);
+      return NextResponse.json({ error: "Unable to save your contact details. Please try again." }, { status: 500 });
     }
+
+    const eventEndTime = data.eventEndTime?.trim()
+      ? toEventISO(data.eventDate, data.timeZone, data.eventEndTime.trim())
+      : null;
+
+    const { error: bookingError } = await admin
+      .from("bookings")
+      .insert({
+        client_id: client.id,
+        event_name: data.eventName.trim(),
+        event_type: optionalString(data.eventType),
+        event_date: eventDateIso,
+        event_timezone: data.timeZone.trim(),
+        event_end_time: eventEndTime,
+        venue: optionalString(data.venue),
+        city: optionalString(data.city),
+        package: optionalString(data.package),
+        notes: optionalString(data.notes),
+        status: "inquiry",
+      });
+
+    if (bookingError) {
+      console.error("[booking] booking insert error:", bookingError);
+      return NextResponse.json({ error: "Unable to save your booking request. Please try again." }, { status: 500 });
+    }
+
+    await sendBookingNotifications({
+      firstName: clientPayload.first_name,
+      lastName: clientPayload.last_name,
+      email: clientPayload.email,
+      phone: clientPayload.phone,
+      eventName: data.eventName.trim(),
+      eventType: optionalString(data.eventType),
+      eventDate: eventDateIso,
+      eventTimeZone: data.timeZone.trim(),
+      venue: optionalString(data.venue),
+      city: optionalString(data.city),
+      packageName: optionalString(data.package),
+      notes: optionalString(data.notes),
+    });
+  } catch (error) {
+    console.error("[booking] unexpected save error:", error);
+    return NextResponse.json({ error: "Unable to process your booking request. Please try again." }, { status: 500 });
   }
 
   return NextResponse.json(

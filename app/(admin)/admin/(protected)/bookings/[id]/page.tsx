@@ -4,7 +4,8 @@ import PageHeader from '@/components/admin/PageHeader'
 import Badge from '@/components/admin/Badge'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { updateBookingDetailsAction } from '@/app/actions/bookings'
+import { createBookingNoteAction, createBookingPaymentAction, updateBookingDetailsAction } from '@/app/actions/bookings'
+import { PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingStatus } from '@/types/index'
 
 interface BookingDetailRow {
@@ -23,11 +24,27 @@ interface BookingDetailRow {
   status: BookingStatus
   notes: string | null
   clients: {
+    id: string
     first_name: string | null
     last_name: string | null
     email: string | null
     phone: string | null
   } | null
+  payments: Array<{
+    id: string
+    amount: number
+    type: string
+    method: string | null
+    status: 'pending' | 'received' | 'refunded'
+    paid_at: string | null
+    created_at: string
+    notes: string | null
+  }> | null
+  booking_notes: Array<{
+    id: string
+    body: string
+    created_at: string
+  }> | null
 }
 
 function inputStyle(): React.CSSProperties {
@@ -56,6 +73,28 @@ function formatCurrency(value: number | null): string {
   })
 }
 
+function formatDateTime(iso: string) {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return '—'
+
+  return date.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}
+
+function toDateInputValue(iso: string | null) {
+  if (!iso) return ''
+
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return ''
+
+  return date.toISOString().slice(0, 10)
+}
+
 async function getBooking(id: string): Promise<BookingDetailRow | null> {
   const supabase = createClient()
   const { data } = await supabase
@@ -75,7 +114,9 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
       deposit_amount,
       status,
       notes,
-      clients(first_name, last_name, email, phone)
+      clients(id, first_name, last_name, email, phone),
+      payments(id, amount, type, method, status, paid_at, created_at, notes),
+      booking_notes:notes!booking_id(id, body, created_at)
     `)
     .eq('id', id)
     .maybeSingle()
@@ -98,6 +139,10 @@ export default async function EditBookingPage({
   const total = booking.quote ?? 0
   const deposit = booking.deposit_amount ?? 0
   const balance = total - deposit
+  const payments = booking.payments ?? []
+  const receivedPayments = payments.filter((payment) => payment.status === 'received')
+  const receivedTotal = receivedPayments.reduce((sum, payment) => sum + payment.amount, 0)
+  const internalNotes = booking.booking_notes ?? []
 
   return (
     <div className="admin-page admin-page--narrow">
@@ -167,6 +212,173 @@ export default async function EditBookingPage({
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className="admin-section-title" style={{ marginBottom: '10px' }}>Payment Log</div>
+            <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
+              Record deposits, balances, refunds, and mark whether funds are pending or received.
+            </p>
+          </div>
+
+          <div style={{ minWidth: '180px' }}>
+            <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
+              Received So Far
+            </div>
+            <div style={{ color: '#34d399', fontSize: '22px', fontFamily: 'Conthrax, sans-serif' }}>
+              {formatCurrency(receivedTotal)}
+            </div>
+          </div>
+        </div>
+
+        {payments.length === 0 ? (
+          <p style={{ color: 'var(--muted)', fontSize: '13px', margin: '20px 0 0' }}>
+            No payments logged for this booking yet.
+          </p>
+        ) : (
+          <div style={{ marginTop: '20px', display: 'grid', gap: '10px' }}>
+            {payments.map((payment) => (
+              <div
+                key={payment.id}
+                style={{
+                  border: '1px solid var(--border)',
+                  background: 'var(--bg-sunken)',
+                  padding: '14px 16px',
+                  display: 'grid',
+                  gap: '8px',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <span style={{ color: 'var(--white)', fontFamily: 'Conthrax, sans-serif', fontSize: '13px' }}>
+                      {formatCurrency(payment.amount)}
+                    </span>
+                    <span className="muted" style={{ textTransform: 'capitalize' }}>
+                      {payment.type}
+                      {payment.method ? ` · ${payment.method}` : ''}
+                    </span>
+                  </div>
+                  <Badge variant={payment.status} />
+                </div>
+                <div className="muted" style={{ fontSize: '12px' }}>
+                  {payment.paid_at ? `Paid ${formatDateTime(payment.paid_at)}` : `Logged ${formatDateTime(payment.created_at)}`}
+                </div>
+                {payment.notes && (
+                  <div style={{ color: 'var(--white)', fontSize: '13px', lineHeight: 1.6 }}>
+                    {payment.notes}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <form action={createBookingPaymentAction} style={{ marginTop: '20px', display: 'grid', gap: '14px' }}>
+          <input type="hidden" name="booking_id" value={booking.id} />
+          <div className="admin-form-grid-two">
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Amount *</span>
+              <input name="amount" type="number" min={0} step="1" required style={inputStyle()} />
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Type *</span>
+              <select name="type" defaultValue="deposit" style={inputStyle()}>
+                {PAYMENT_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type.charAt(0).toUpperCase() + type.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          <div className="admin-form-grid-two-wide">
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Method</span>
+              <select name="method" defaultValue="" style={inputStyle()}>
+                <option value="">Select method</option>
+                {PAYMENT_METHODS.map((method) => (
+                  <option key={method} value={method}>
+                    {method.toUpperCase() === 'ACH' ? 'ACH' : method.charAt(0).toUpperCase() + method.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Status *</span>
+              <select name="status" defaultValue="received" style={inputStyle()}>
+                <option value="received">Received</option>
+                <option value="pending">Pending</option>
+                <option value="refunded">Refunded</option>
+              </select>
+            </label>
+          </div>
+
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Paid Date</span>
+            <input name="paid_at" type="date" defaultValue={toDateInputValue(new Date().toISOString())} style={inputStyle()} />
+          </label>
+
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Payment Note</span>
+            <textarea name="notes" rows={3} style={inputStyle()} placeholder="Optional receipt or transfer details" />
+          </label>
+
+          <div className="admin-form-actions">
+            <button type="submit" className="admin-btn-primary">
+              Record Payment
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
+        <div className="admin-section-title" style={{ marginBottom: '10px' }}>Internal Notes</div>
+        <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
+          Save internal follow-up notes here without changing the client-facing booking summary.
+        </p>
+
+        {internalNotes.length === 0 ? (
+          <p style={{ color: 'var(--muted)', fontSize: '13px', margin: '20px 0 0' }}>
+            No internal notes yet.
+          </p>
+        ) : (
+          <div style={{ marginTop: '20px', display: 'grid', gap: '10px' }}>
+            {internalNotes.map((note) => (
+              <div
+                key={note.id}
+                style={{
+                  border: '1px solid var(--border)',
+                  background: 'var(--bg-sunken)',
+                  padding: '14px 16px',
+                }}
+              >
+                <div className="muted" style={{ fontSize: '11px', marginBottom: '8px' }}>
+                  {formatDateTime(note.created_at)}
+                </div>
+                <div style={{ color: 'var(--white)', fontSize: '13px', lineHeight: 1.7 }}>
+                  {note.body}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <form action={createBookingNoteAction} style={{ marginTop: '20px', display: 'grid', gap: '14px' }}>
+          <input type="hidden" name="booking_id" value={booking.id} />
+          <input type="hidden" name="client_id" value={booking.clients?.id ?? ''} />
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Add Internal Note</span>
+            <textarea name="body" rows={4} required style={inputStyle()} placeholder="Called client, awaiting deposit, confirmed setup details..." />
+          </label>
+          <div className="admin-form-actions">
+            <button type="submit" className="admin-btn-primary">
+              Save Note
+            </button>
+          </div>
+        </form>
       </div>
 
       <form action={updateBookingDetailsAction} className="admin-section" style={{ padding: '24px' }}>

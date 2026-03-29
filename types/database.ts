@@ -47,7 +47,7 @@ export type Database = {
           id:         string
           first_name: string
           last_name:  string | null
-          email:      string | null  // nullable — not all gig contacts have email on record
+          email:      string
           phone:      string | null
           notes:      string | null
           created_at: string
