@@ -3,9 +3,7 @@
 import { useState } from 'react'
 
 export default function MixesTeaserForm() {
-  const [email, setEmail]   = useState('')
-  const [website, setWebsite] = useState('')
-  const [startedAt] = useState(() => String(Date.now()))
+  const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle')
 
   async function handleSubmit() {
@@ -17,7 +15,7 @@ export default function MixesTeaserForm() {
       const res = await fetch('/api/notify-signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: trimmed, website, startedAt }),
+        body: JSON.stringify({ email: trimmed, company: '' }),
       })
       setStatus(res.ok ? 'done' : 'error')
     } catch {
@@ -33,7 +31,7 @@ export default function MixesTeaserForm() {
         letterSpacing: '0.06em',
         padding: '14px 0',
       }}>
-        You&apos;re on the list. We&apos;ll hit you when new sets drop.
+        You&apos;re in 🎧
       </p>
     )
   }
@@ -45,15 +43,12 @@ export default function MixesTeaserForm() {
     >
       <input
         type="text"
-        name="website"
+        name="company"
         tabIndex={-1}
         autoComplete="off"
-        value={website}
-        onChange={(e) => setWebsite(e.target.value)}
-        style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }}
+        className="hidden"
         aria-hidden="true"
       />
-      <input type="hidden" name="startedAt" value={startedAt} />
       <label className="mixes-teaser-signup-field">
         <span className="sr-only">Email address</span>
         <input
