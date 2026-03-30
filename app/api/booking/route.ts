@@ -109,8 +109,6 @@ const BookingSchema = z.object({
   }
 });
 
-type BookingData = z.infer<typeof BookingSchema>;
-
 function optionalString(value?: string) {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;

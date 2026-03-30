@@ -32,10 +32,6 @@ export default function Nav() {
   }, [menuOpen])
 
   useEffect(() => {
-    setMenuOpen(false)
-  }, [pathname])
-
-  useEffect(() => {
     if (!menuOpen) return
 
     const onKeyDown = (event: KeyboardEvent) => {

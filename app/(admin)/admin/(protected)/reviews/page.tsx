@@ -3,12 +3,12 @@ import PageHeader from '@/components/admin/PageHeader'
 import { approveReview, rejectReview } from '@/app/actions/reviews'
 
 interface Review {
-  id:         string
-  name:       string
+  id: string
+  name: string
   event_type: string | null
-  rating:     number
-  message:    string
-  approved:   boolean
+  rating: number
+  message: string
+  approved: boolean
   created_at: string
 }
 
@@ -23,14 +23,17 @@ async function getReviews() {
       .from('reviews')
       .select('id, name, event_type, rating, message, approved, created_at')
       .order('created_at', { ascending: false })
+
     return (data ?? []) as Review[]
-  } catch { return [] }
+  } catch {
+    return []
+  }
 }
 
 export default async function ReviewsPage() {
   const reviews = await getReviews()
-  const pending  = reviews.filter(r => !r.approved)
-  const approved = reviews.filter(r =>  r.approved)
+  const pending = reviews.filter((review) => !review.approved)
+  const approved = reviews.filter((review) => review.approved)
 
   const fmtDate = (iso: string) =>
     new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
@@ -39,10 +42,10 @@ export default async function ReviewsPage() {
     return (
       <div style={{
         background: 'var(--surface)',
-        border:     `1px solid ${isPending ? 'rgba(155,93,229,0.3)' : 'var(--border)'}`,
-        padding:    '20px',
-        display:    'grid',
-        gap:        '10px',
+        border: `1px solid ${isPending ? 'rgba(155,93,229,0.3)' : 'var(--border)'}`,
+        padding: '20px',
+        display: 'grid',
+        gap: '10px',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
           <div>
@@ -65,29 +68,29 @@ export default async function ReviewsPage() {
           <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
             <form action={approveReview.bind(null, r.id)}>
               <button type="submit" style={{
-                padding:       '8px 18px',
-                background:    'var(--violet)',
-                color:         'var(--black)',
-                border:        'none',
-                fontSize:      '11px',
+                padding: '8px 18px',
+                background: 'var(--violet)',
+                color: 'var(--black)',
+                border: 'none',
+                fontSize: '11px',
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                fontWeight:    500,
-                cursor:        'pointer',
+                fontWeight: 500,
+                cursor: 'pointer',
               }}>
                 Approve
               </button>
             </form>
             <form action={rejectReview.bind(null, r.id)}>
               <button type="submit" style={{
-                padding:       '8px 18px',
-                background:    'none',
-                color:         '#e85d75',
-                border:        '1px solid rgba(232,93,117,0.4)',
-                fontSize:      '11px',
+                padding: '8px 18px',
+                background: 'none',
+                color: '#e85d75',
+                border: '1px solid rgba(232,93,117,0.4)',
+                fontSize: '11px',
                 letterSpacing: '0.18em',
                 textTransform: 'uppercase',
-                cursor:        'pointer',
+                cursor: 'pointer',
               }}>
                 Delete
               </button>
@@ -102,14 +105,13 @@ export default async function ReviewsPage() {
     <div className="admin-page">
       <PageHeader title="Reviews" subtitle={`${pending.length} pending · ${approved.length} published`} />
 
-      {/* Pending */}
       {pending.length > 0 && (
         <div className="admin-section">
           <div className="admin-section-header">
             <span className="admin-section-title">Pending Approval</span>
           </div>
           <div style={{ display: 'grid', gap: '12px', padding: '20px' }}>
-            {pending.map(r => <ReviewCard key={r.id} r={r} isPending={true} />)}
+            {pending.map((review) => <ReviewCard key={review.id} r={review} isPending={true} />)}
           </div>
         </div>
       )}
@@ -120,14 +122,13 @@ export default async function ReviewsPage() {
         </div>
       )}
 
-      {/* Approved */}
       {approved.length > 0 && (
         <div className="admin-section">
           <div className="admin-section-header">
             <span className="admin-section-title">Published</span>
           </div>
           <div style={{ display: 'grid', gap: '12px', padding: '20px' }}>
-            {approved.map(r => <ReviewCard key={r.id} r={r} isPending={false} />)}
+            {approved.map((review) => <ReviewCard key={review.id} r={review} isPending={false} />)}
           </div>
         </div>
       )}

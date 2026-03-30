@@ -2,9 +2,11 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import Badge from '@/components/admin/Badge'
+import AdminNotice from '@/components/admin/AdminNotice'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { createBookingNoteAction, createBookingPaymentAction, updateBookingDetailsAction } from '@/app/actions/bookings'
+import { createBookingNoteAction, createBookingPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, sendBookingBalanceReminderAction, sendBookingDepositReminderAction, sendBookingEventReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
 import { PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingStatus } from '@/types/index'
 
@@ -124,14 +126,25 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
   return (data as BookingDetailRow | null) ?? null
 }
 
+function getMessage(param: string | string[] | undefined) {
+  if (!param) return null
+  return Array.isArray(param) ? param[0] ?? null : param
+}
+
 export default async function EditBookingPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>
+  searchParams?: Promise<{ error?: string | string[]; success?: string | string[] }>
 }) {
   const { id } = await params
+  const resolvedSearchParams = searchParams ? await searchParams : undefined
   const booking = await getBooking(id)
   if (!booking) notFound()
+
+  const errorMessage = getMessage(resolvedSearchParams?.error)
+  const successMessage = getMessage(resolvedSearchParams?.success)
 
   const clientName = booking.clients
     ? `${booking.clients.first_name ?? ''} ${booking.clients.last_name ?? ''}`.trim()
@@ -140,9 +153,11 @@ export default async function EditBookingPage({
   const deposit = booking.deposit_amount ?? 0
   const balance = total - deposit
   const payments = booking.payments ?? []
-  const receivedPayments = payments.filter((payment) => payment.status === 'received')
-  const receivedTotal = receivedPayments.reduce((sum, payment) => sum + payment.amount, 0)
+  const receivedTotal = getReceivedPaymentTotal(payments)
+  const outstandingDeposit = getOutstandingDeposit(booking.deposit_amount, payments)
+  const outstandingBalance = getOutstandingBalance(booking.quote, payments)
   const internalNotes = booking.booking_notes ?? []
+  const emailActivity = internalNotes.filter((note) => /\bemail\b/i.test(note.body)).slice(0, 4)
 
   return (
     <div className="admin-page admin-page--narrow">
@@ -152,12 +167,174 @@ export default async function EditBookingPage({
         action={{ label: 'Back To Bookings', href: '/admin/bookings' }}
       />
 
+      {errorMessage && <AdminNotice message={errorMessage} />}
+      {successMessage && (
+        <div
+          style={{
+            background: 'rgba(34, 197, 94, 0.08)',
+            border: '1px solid rgba(34, 197, 94, 0.24)',
+            color: '#bbf7d0',
+            padding: '14px 16px',
+            marginBottom: '24px',
+            fontSize: '12px',
+            lineHeight: 1.6,
+          }}
+        >
+          {successMessage}
+        </div>
+      )}
+
       <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center', minWidth: 0 }}>
           <Badge variant={booking.status} />
           {clientName && <span style={{ color: 'var(--white)', fontSize: '14px' }}>{clientName}</span>}
           {booking.clients?.email && <span className="muted">{booking.clients.email}</span>}
           {booking.clients?.phone && <span className="muted">{booking.clients.phone}</span>}
+        </div>
+      </div>
+
+      <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className="admin-section-title" style={{ marginBottom: '10px' }}>Client Emails</div>
+            <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
+              Resend the original inquiry receipt or the confirmed-booking email without changing the current booking details.
+            </p>
+          </div>
+
+          <div className="admin-form-actions">
+            <form action={resendBookingInquiryReceiptAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email}
+                style={!booking.clients?.email ? { opacity: 0.55, cursor: 'not-allowed' } : undefined}
+                title={!booking.clients?.email ? 'Add a client email before sending.' : undefined}
+              >
+                Resend Inquiry Receipt
+              </button>
+            </form>
+            <form action={resendBookingConfirmationAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || (booking.status !== 'confirmed' && booking.status !== 'completed')}
+                style={
+                  !booking.clients?.email || (booking.status !== 'confirmed' && booking.status !== 'completed')
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : booking.status !== 'confirmed' && booking.status !== 'completed'
+                      ? 'Confirm the booking first before resending the confirmation email.'
+                      : undefined
+                }
+              >
+                Resend Confirmation Email
+              </button>
+            </form>
+            <form action={sendBookingDepositReminderAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || outstandingDeposit <= 0}
+                style={
+                  !booking.clients?.email || outstandingDeposit <= 0
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : outstandingDeposit <= 0
+                      ? 'No deposit reminder is needed because the current deposit amount is already covered.'
+                      : undefined
+                }
+              >
+                Send Deposit Reminder
+              </button>
+            </form>
+            <form action={sendBookingBalanceReminderAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || outstandingBalance <= 0}
+                style={
+                  !booking.clients?.email || outstandingBalance <= 0
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : outstandingBalance <= 0
+                      ? 'No balance reminder is needed because the current balance is already covered.'
+                      : undefined
+                }
+              >
+                Send Balance Reminder
+              </button>
+            </form>
+            <form action={sendBookingEventReminderAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || (booking.status !== 'confirmed' && booking.status !== 'completed')}
+                style={
+                  !booking.clients?.email || (booking.status !== 'confirmed' && booking.status !== 'completed')
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : booking.status !== 'confirmed' && booking.status !== 'completed'
+                      ? 'Confirm the booking first before sending an event reminder.'
+                      : undefined
+                }
+              >
+                Send Event Reminder
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div style={{ marginTop: '20px' }}>
+          <div className="admin-section-title" style={{ marginBottom: '10px' }}>Recent Email Activity</div>
+          {emailActivity.length === 0 ? (
+            <p style={{ color: 'var(--muted)', fontSize: '13px', margin: 0 }}>
+              No email activity logged for this booking yet.
+            </p>
+          ) : (
+            <div style={{ display: 'grid', gap: '10px' }}>
+              {emailActivity.map((note) => (
+                <div
+                  key={note.id}
+                  style={{
+                    border: '1px solid var(--border)',
+                    background: 'var(--bg-sunken)',
+                    padding: '14px 16px',
+                    display: 'grid',
+                    gap: '6px',
+                  }}
+                >
+                  <div className="muted" style={{ fontSize: '11px' }}>
+                    {formatDateTime(note.created_at)}
+                  </div>
+                  <div style={{ color: 'var(--white)', fontSize: '13px', lineHeight: 1.6 }}>
+                    {note.body}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

@@ -107,6 +107,30 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['payments']['Insert']>
       }
 
+      // ── invoices ────────────────────────────────────────────────
+      invoices: {
+        Row: {
+          id: string
+          booking_id: string
+          status: 'draft' | 'sent' | 'paid' | 'void'
+          invoice_number: string
+          pdf_filename: string
+          event_name: string | null
+          client_name: string | null
+          client_email: string | null
+          total_amount: number
+          deposit_amount: number
+          balance_due: number
+          sent_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['invoices']['Row'],
+          'id' | 'created_at' | 'updated_at'
+        > & { id?: string }
+        Update: Partial<Database['public']['Tables']['invoices']['Insert']>
+      }
+
       // ── mixes ───────────────────────────────────────────────────
       mixes: {
         Row: {

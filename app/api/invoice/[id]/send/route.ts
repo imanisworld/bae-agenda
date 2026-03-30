@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { balanceDueOf, generateInvoicePdf, invoiceFilename, invoiceNumberOf, type InvoiceBookingData } from '@/lib/invoices'
 import { sendInvoiceNotification } from '@/lib/notifications'
-import { checkRateLimit, getClientIp } from '@/lib/rate-limit'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
+import { limitInvoiceSend } from '@/lib/ratelimit'
 
 function formatCurrency(value: number) {
   return value.toLocaleString('en-US', {
@@ -42,15 +43,14 @@ export async function POST(
     )
   }
 
-  const clientIp = getClientIp(request.headers)
-  const rateLimit = checkRateLimit(`invoice-send:${clientIp}:${id}`, 5, 15 * 60 * 1000)
-  if (!rateLimit.allowed) {
+  const rateLimit = await limitInvoiceSend(request.headers, id)
+  if (!rateLimit.success) {
     return NextResponse.json(
       { error: 'Too many invoice send attempts. Please wait a few minutes and try again.' },
       {
         status: 429,
         headers: {
-          'Retry-After': String(rateLimit.retryAfterSeconds),
+          'Retry-After': String(rateLimit.retryAfter),
           'Cache-Control': 'no-store, max-age=0',
           'X-Robots-Tag': 'noindex, nofollow',
         },
@@ -119,6 +119,16 @@ export async function POST(
         },
       }
     )
+  }
+
+  try {
+    const admin = createAdminClient()
+    await admin.from('notes').insert({
+      booking_id: booking.id,
+      body: `Invoice email sent to ${clientEmail}.`,
+    })
+  } catch (error) {
+    console.error('[invoice-send] note insert failed:', error)
   }
 
   return NextResponse.json(

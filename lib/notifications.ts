@@ -13,12 +13,72 @@ type BookingNotificationPayload = {
   notes?: string | null
 }
 
+type BookingConfirmedNotificationPayload = {
+  firstName: string
+  lastName?: string | null
+  email: string
+  eventName: string
+  eventDate: string
+  eventTimeZone: string
+  venue?: string | null
+  city?: string | null
+}
+
+type BookingInquiryReceiptPayload = {
+  firstName: string
+  lastName?: string | null
+  email: string
+  eventName: string
+  eventDate: string
+  eventTimeZone: string
+}
+
+type BookingDepositReminderPayload = {
+  firstName: string
+  lastName?: string | null
+  email: string
+  eventName: string
+  eventDate: string
+  eventTimeZone: string
+  depositDue: string
+}
+
+type BookingBalanceReminderPayload = {
+  firstName: string
+  lastName?: string | null
+  email: string
+  eventName: string
+  eventDate: string
+  eventTimeZone: string
+  balanceDue: string
+}
+
+type BookingEventReminderPayload = {
+  firstName: string
+  lastName?: string | null
+  email: string
+  eventName: string
+  eventDate: string
+  eventTimeZone: string
+  venue?: string | null
+  city?: string | null
+}
+
 type InvoiceNotificationPayload = {
   to: string
   clientName: string
   eventName: string
   invoiceNumber: string
   balanceDue: string
+  pdfBase64: string
+  pdfFilename: string
+}
+
+type W9NotificationPayload = {
+  to: string
+  clientName: string
+  eventName: string
+  paymentAmount: string
   pdfBase64: string
   pdfFilename: string
 }
@@ -180,106 +240,6 @@ function buildOwnerBookingEmailHtml(payload: BookingNotificationPayload, eventDa
   `
 }
 
-function buildClientBookingEmailHtml(payload: BookingNotificationPayload, eventDateTime: string) {
-  const safeFirstName = escapeHtml(payload.firstName)
-  const safeEventName = escapeHtml(payload.eventName)
-
-  return `
-    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-    <html dir="ltr" lang="en">
-      <head>
-        <meta content="width=device-width" name="viewport" />
-        <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-        <meta content="IE=edge" http-equiv="X-UA-Compatible" />
-        <meta name="x-apple-disable-message-reformatting" />
-        <meta content="telephone=no,address=no,email=no,date=no,url=no" name="format-detection" />
-        <title>The Bae Agenda</title>
-      </head>
-      <body style="margin:0;padding:0;background-color:#0b0b10;">
-        <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center" style="background-color:#0b0b10;margin:0;padding:24px 0;width:100%;">
-          <tbody>
-            <tr>
-              <td align="center">
-                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,’Segoe UI’,Roboto,Helvetica,Arial,sans-serif;color:#f5f5f7;">
-                  <tbody>
-                    <tr>
-                      <td style="padding:0 20px 16px 20px;" align="center">
-                        <div style="display:inline-block;font-size:24px;font-weight:800;letter-spacing:0.5px;color:#ffffff;">
-                          The Bae Agenda
-                        </div>
-                        <div style="margin-top:8px;font-size:13px;line-height:20px;color:#a1a1aa;">
-                          Culture. Events. Community.
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="padding:0 20px;">
-                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#14141c;border:1px solid #27272f;border-radius:18px;">
-                          <tbody>
-                            <tr>
-                              <td style="padding:32px 28px 24px 28px;">
-                                <div style="font-size:22px;font-weight:700;line-height:30px;color:#ffffff;margin:0 0 16px 0;">
-                                  We got your request
-                                </div>
-                                <p style="margin:0 0 14px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
-                                  Thanks for reaching out to <strong>The Bae Agenda</strong>, ${safeFirstName}.
-                                </p>
-                                <p style="margin:0 0 18px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
-                                  We’ve received your booking request and will review it shortly. If it’s a fit, we’ll follow up with next steps.
-                                </p>
-                                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 20px 0;background-color:#101017;border:1px solid #27272f;border-radius:14px;">
-                                  <tbody>
-                                    <tr>
-                                      <td style="padding:18px 18px 8px 18px;">
-                                        <div style="font-size:13px;color:#a1a1aa;margin-bottom:6px;">Event</div>
-                                        <div style="font-size:16px;color:#ffffff;font-weight:600;">${safeEventName}</div>
-                                      </td>
-                                    </tr>
-                                    <tr>
-                                      <td style="padding:8px 18px 18px 18px;">
-                                        <div style="font-size:13px;color:#a1a1aa;margin-bottom:6px;">Date</div>
-                                        <div style="font-size:16px;color:#ffffff;">${escapeHtml(eventDateTime)}</div>
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 12px 0;">
-                                  <tbody>
-                                    <tr>
-                                      <td align="center" style="border-radius:999px;background-color:#7c3aed;">
-                                        <a href="https://thebaeagenda.com" target="_blank" style="display:inline-block;padding:12px 20px;font-size:14px;font-weight:700;line-height:14px;color:#ffffff;text-decoration:none;">
-                                          Visit The Bae Agenda
-                                        </a>
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                                <p style="margin:16px 0 0 0;font-size:14px;line-height:24px;color:#a1a1aa;">
-                                  This is an automated confirmation email.
-                                </p>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style="padding:18px 20px 0 20px;text-align:center;font-size:12px;line-height:20px;color:#71717a;">
-                        © 2026 The Bae Agenda<br />
-                        thebaeagenda.com
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </body>
-    </html>
-  `
-}
-
 async function sendEmail(args: {
   to: string
   subject: string
@@ -383,28 +343,13 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
       text: `A new booking inquiry was submitted.\n\n${ownerSummary}`,
       html: buildOwnerBookingEmailHtml(payload, eventDateTime),
     }),
-    sendEmail({
-      to: payload.email,
-      subject: `We received your booking inquiry for ${payload.eventName}`,
-      text: [
-        `Hi ${payload.firstName},`,
-        '',
-        'Thanks for reaching out to The Bae Agenda.',
-        '',
-        'We received your booking request and will review it shortly.',
-        '',
-        `Event: ${payload.eventName}`,
-        `Date: ${eventDateTime}`,
-        '',
-        'If your submission is a fit, we will follow up with next steps.',
-        '',
-        'Visit The Bae Agenda: https://thebaeagenda.com',
-        '',
-        'This is an automated confirmation email.',
-        '',
-        'The Bae Agenda',
-      ].join('\n'),
-      html: buildClientBookingEmailHtml(payload, eventDateTime),
+    sendBookingInquiryReceipt({
+      firstName: payload.firstName,
+      lastName: payload.lastName,
+      email: payload.email,
+      eventName: payload.eventName,
+      eventDate: payload.eventDate,
+      eventTimeZone: payload.eventTimeZone,
     }),
   ]
 
@@ -428,6 +373,192 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
     if (!result.value.ok) {
       console.error(`[booking-notification:${index}]`, result.value.reason, result.value.detail ?? '')
     }
+  })
+}
+
+export async function sendBookingInquiryReceipt(payload: BookingInquiryReceiptPayload) {
+  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
+  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+
+  return sendEmail({
+    to: payload.email,
+    subject: `We received your booking inquiry for ${payload.eventName}`,
+    text: [
+      `Hi ${guestName},`,
+      '',
+      'Thanks for reaching out. Your booking inquiry came through successfully.',
+      '',
+      `Event: ${payload.eventName}`,
+      `Date: ${eventDateTime}`,
+      `Time Zone: ${payload.eventTimeZone}`,
+      '',
+      'We will follow up soon.',
+      '',
+      'DJ B.A.E. Bookings',
+    ].join('\n'),
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
+        <p>Hi ${guestName},</p>
+        <p>Thanks for reaching out. Your booking inquiry came through successfully.</p>
+        <p>
+          <strong>Event:</strong> ${payload.eventName}<br />
+          <strong>Date:</strong> ${eventDateTime}<br />
+          <strong>Time Zone:</strong> ${payload.eventTimeZone}
+        </p>
+        <p>We will follow up soon.</p>
+        <p>DJ B.A.E. Bookings</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendBookingConfirmedNotification(payload: BookingConfirmedNotificationPayload) {
+  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
+  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+  const location = [payload.venue, payload.city].filter(Boolean).join(', ')
+
+  return sendEmail({
+    to: payload.email,
+    subject: `Your booking is confirmed for ${payload.eventName}`,
+    text: [
+      `Hi ${guestName},`,
+      '',
+      `Your booking for ${payload.eventName} is officially confirmed.`,
+      '',
+      `Event: ${payload.eventName}`,
+      `Date: ${eventDateTime}`,
+      `Time Zone: ${payload.eventTimeZone}`,
+      ...(location ? [`Location: ${location}`] : []),
+      '',
+      'We are locked in and will follow up with any remaining details if needed.',
+      '',
+      'DJ B.A.E. Bookings',
+    ].join('\n'),
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
+        <p>Hi ${guestName},</p>
+        <p>Your booking for <strong>${payload.eventName}</strong> is officially confirmed.</p>
+        <p>
+          <strong>Event:</strong> ${payload.eventName}<br />
+          <strong>Date:</strong> ${eventDateTime}<br />
+          <strong>Time Zone:</strong> ${payload.eventTimeZone}
+          ${location ? `<br /><strong>Location:</strong> ${location}` : ''}
+        </p>
+        <p>We are locked in and will follow up with any remaining details if needed.</p>
+        <p>DJ B.A.E. Bookings</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendBookingDepositReminder(payload: BookingDepositReminderPayload) {
+  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
+  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+
+  return sendEmail({
+    to: payload.email,
+    subject: `Deposit reminder for ${payload.eventName}`,
+    text: [
+      `Hi ${guestName},`,
+      '',
+      `This is a quick reminder that the deposit for ${payload.eventName} is still outstanding.`,
+      '',
+      `Event: ${payload.eventName}`,
+      `Date: ${eventDateTime}`,
+      `Deposit due: ${payload.depositDue}`,
+      '',
+      'If you have any questions, just reply to this email.',
+      '',
+      'DJ B.A.E. Bookings',
+    ].join('\n'),
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
+        <p>Hi ${guestName},</p>
+        <p>This is a quick reminder that the deposit for <strong>${payload.eventName}</strong> is still outstanding.</p>
+        <p>
+          <strong>Event:</strong> ${payload.eventName}<br />
+          <strong>Date:</strong> ${eventDateTime}<br />
+          <strong>Deposit due:</strong> ${payload.depositDue}
+        </p>
+        <p>If you have any questions, just reply to this email.</p>
+        <p>DJ B.A.E. Bookings</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendBookingBalanceReminder(payload: BookingBalanceReminderPayload) {
+  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
+  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+
+  return sendEmail({
+    to: payload.email,
+    subject: `Balance reminder for ${payload.eventName}`,
+    text: [
+      `Hi ${guestName},`,
+      '',
+      `This is a quick reminder that the remaining balance for ${payload.eventName} is still outstanding.`,
+      '',
+      `Event: ${payload.eventName}`,
+      `Date: ${eventDateTime}`,
+      `Balance due: ${payload.balanceDue}`,
+      '',
+      'If you have any questions, just reply to this email.',
+      '',
+      'DJ B.A.E. Bookings',
+    ].join('\n'),
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
+        <p>Hi ${guestName},</p>
+        <p>This is a quick reminder that the remaining balance for <strong>${payload.eventName}</strong> is still outstanding.</p>
+        <p>
+          <strong>Event:</strong> ${payload.eventName}<br />
+          <strong>Date:</strong> ${eventDateTime}<br />
+          <strong>Balance due:</strong> ${payload.balanceDue}
+        </p>
+        <p>If you have any questions, just reply to this email.</p>
+        <p>DJ B.A.E. Bookings</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendBookingEventReminder(payload: BookingEventReminderPayload) {
+  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
+  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+  const location = [payload.venue, payload.city].filter(Boolean).join(', ')
+
+  return sendEmail({
+    to: payload.email,
+    subject: `Event reminder for ${payload.eventName}`,
+    text: [
+      `Hi ${guestName},`,
+      '',
+      `This is a quick reminder for your upcoming event: ${payload.eventName}.`,
+      '',
+      `Event: ${payload.eventName}`,
+      `Date: ${eventDateTime}`,
+      `Time Zone: ${payload.eventTimeZone}`,
+      ...(location ? [`Location: ${location}`] : []),
+      '',
+      'If any details have changed, just reply to this email.',
+      '',
+      'DJ B.A.E. Bookings',
+    ].join('\n'),
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
+        <p>Hi ${guestName},</p>
+        <p>This is a quick reminder for your upcoming event: <strong>${payload.eventName}</strong>.</p>
+        <p>
+          <strong>Event:</strong> ${payload.eventName}<br />
+          <strong>Date:</strong> ${eventDateTime}<br />
+          <strong>Time Zone:</strong> ${payload.eventTimeZone}
+          ${location ? `<br /><strong>Location:</strong> ${location}` : ''}
+        </p>
+        <p>If any details have changed, just reply to this email.</p>
+        <p>DJ B.A.E. Bookings</p>
+      </div>
+    `,
   })
 }
 
@@ -533,6 +664,40 @@ export async function sendInvoiceNotification(payload: InvoiceNotificationPayloa
           </table>
         </body>
       </html>
+    `,
+    attachments: [
+      {
+        filename: payload.pdfFilename,
+        content: payload.pdfBase64,
+      },
+    ],
+  })
+}
+
+export async function sendW9Notification(payload: W9NotificationPayload) {
+  const greetingName = payload.clientName.trim() || 'there'
+
+  return sendEmail({
+    to: payload.to,
+    subject: `W-9 from DJ B.A.E. for ${payload.eventName}`,
+    text: [
+      `Hi ${greetingName},`,
+      '',
+      `Attached is DJ B.A.E.'s W-9 for ${payload.eventName}.`,
+      `Payment recorded: ${payload.paymentAmount}`,
+      '',
+      'If you need anything else for payment processing, just reply to this email.',
+      '',
+      'DJ B.A.E. Bookings',
+    ].join('\n'),
+    html: `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
+        <p>Hi ${greetingName},</p>
+        <p>Attached is DJ B.A.E.'s <strong>W-9</strong> for <strong>${payload.eventName}</strong>.</p>
+        <p><strong>Payment recorded:</strong> ${payload.paymentAmount}</p>
+        <p>If you need anything else for payment processing, just reply to this email.</p>
+        <p>DJ B.A.E. Bookings</p>
+      </div>
     `,
     attachments: [
       {

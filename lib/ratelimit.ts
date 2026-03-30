@@ -24,6 +24,29 @@ const reviewLimiter = new Ratelimit({
   prefix: 'ratelimit:review',
 })
 
+const invoiceSendLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(5, '15 m'),
+  analytics: true,
+  prefix: 'ratelimit:invoice-send',
+})
+
+function createRetryAfter(reset: number) {
+  return Math.max(Math.ceil((reset - Date.now()) / 1000), 1)
+}
+
+async function limitByKey(
+  key: string,
+  limiter: Ratelimit
+) {
+  const result = await limiter.limit(key)
+
+  return {
+    ...result,
+    retryAfter: createRetryAfter(result.reset),
+  }
+}
+
 export function getClientIp(headers: Headers): string {
   const forwardedFor = headers.get('x-forwarded-for')
   if (forwardedFor) {
@@ -45,36 +68,40 @@ export function getClientIp(headers: Headers): string {
 
 export async function limitNotifySignup(headers: Headers) {
   const ip = getClientIp(headers)
-  const result = await notifySignupLimiter.limit(ip)
-  const retryAfter = Math.max(Math.ceil((result.reset - Date.now()) / 1000), 1)
+  const result = await limitByKey(ip, notifySignupLimiter)
 
   return {
     ip,
     ...result,
-    retryAfter,
   }
 }
 
 export async function limitBookingSubmission(headers: Headers) {
   const ip = getClientIp(headers)
-  const result = await bookingLimiter.limit(ip)
-  const retryAfter = Math.max(Math.ceil((result.reset - Date.now()) / 1000), 1)
+  const result = await limitByKey(ip, bookingLimiter)
 
   return {
     ip,
     ...result,
-    retryAfter,
   }
 }
 
 export async function limitReviewSubmission(headers: Headers) {
   const ip = getClientIp(headers)
-  const result = await reviewLimiter.limit(ip)
-  const retryAfter = Math.max(Math.ceil((result.reset - Date.now()) / 1000), 1)
+  const result = await limitByKey(ip, reviewLimiter)
 
   return {
     ip,
     ...result,
-    retryAfter,
+  }
+}
+
+export async function limitInvoiceSend(headers: Headers, invoiceId: string) {
+  const ip = getClientIp(headers)
+  const result = await limitByKey(`${ip}:${invoiceId}`, invoiceSendLimiter)
+
+  return {
+    ip,
+    ...result,
   }
 }

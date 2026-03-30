@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 /**
  * PITCH BEND STRIP
@@ -14,24 +14,25 @@ export default function PitchBendStrip() {
   const [display, setDisplay] = useState(0) // for rendering
   const isDraggingRef = useRef(false)
 
-  // Spring back to 0 on release
-  const springTick = useCallback(() => {
-    if (isDraggingRef.current) return
-    const v = valueRef.current
-    if (Math.abs(v) < 0.004) {
-      valueRef.current = 0
-      setDisplay(0)
-      return
-    }
-    valueRef.current = v * 0.82
-    setDisplay(valueRef.current)
-    rafRef.current = requestAnimationFrame(springTick)
-  }, [])
+  const startSpring = () => {
+    const springTick = () => {
+      if (isDraggingRef.current) return
 
-  const startSpring = useCallback(() => {
+      const v = valueRef.current
+      if (Math.abs(v) < 0.004) {
+        valueRef.current = 0
+        setDisplay(0)
+        return
+      }
+
+      valueRef.current = v * 0.82
+      setDisplay(valueRef.current)
+      rafRef.current = requestAnimationFrame(springTick)
+    }
+
     if (rafRef.current) cancelAnimationFrame(rafRef.current)
     rafRef.current = requestAnimationFrame(springTick)
-  }, [springTick])
+  }
 
   useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }, [])
 
