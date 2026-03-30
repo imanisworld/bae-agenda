@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Privacy',
+  alternates: {
+    canonical: '/privacy',
+  },
   description: 'Privacy and cookie information for thebaeagenda.com.',
 }
 

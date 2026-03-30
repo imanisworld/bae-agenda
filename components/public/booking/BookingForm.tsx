@@ -38,6 +38,12 @@ type FieldKey =
 
 type FieldErrors = Partial<Record<FieldKey, string>>
 
+type BookingSubmitPayload = {
+  error?: string
+  fields?: string[]
+  retryAfter?: number
+}
+
 const INITIAL_STATE: FormState = {
   firstName: '',
   lastName: '',
@@ -306,7 +312,7 @@ export default function BookingForm() {
         }),
       })
 
-      const payload = (await res.json()) as { error?: string; fields?: string[] }
+      const payload = (await res.json()) as BookingSubmitPayload
 
       if (!res.ok) {
         if (payload.fields?.length) {
@@ -321,7 +327,11 @@ export default function BookingForm() {
           reason: payload.error ?? 'request_failed',
           fieldCount: payload.fields?.length ?? 0,
         })
-        setError(payload.error ?? 'Could not submit booking request.')
+        if (res.status === 429 && payload.retryAfter) {
+          setError(`Too many requests. Please wait ${formatRetryAfter(payload.retryAfter)} and try again.`)
+        } else {
+          setError(payload.error ?? 'Could not submit booking request.')
+        }
         setLoading(false)
         return
       }
@@ -831,4 +841,13 @@ function buildTimeOptions() {
 function formatTimeLabel(hour: number, minute: number) {
   const h = hour % 12 || 12
   return `${h}:${String(minute).padStart(2, '0')} ${hour >= 12 ? 'PM' : 'AM'}`
+}
+
+function formatRetryAfter(seconds: number) {
+  if (seconds < 60) {
+    return `${seconds} second${seconds === 1 ? '' : 's'}`
+  }
+
+  const minutes = Math.ceil(seconds / 60)
+  return `${minutes} minute${minutes === 1 ? '' : 's'}`
 }

@@ -9,6 +9,9 @@ import ReviewDrawer from '@/components/public/ReviewDrawer'
 
 export const metadata: Metadata = {
   title: 'Connect',
+  alternates: {
+    canonical: '/connect',
+  },
   description: 'Follow DJ B.A.E. for sets, announcements, and updates.',
   openGraph: {
     title: 'Connect · DJ B.A.E.',

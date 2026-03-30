@@ -7,6 +7,9 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Built | Custom Web Development for Artists & Brands — DJ B.A.E.',
+  alternates: {
+    canonical: '/built',
+  },
   description:
     'Custom full-stack websites for DJs, artists, promoters, and creative businesses. Real code — not Wix, not Squarespace. Booking platforms, admin dashboards, and brand presence built from scratch.',
   openGraph: {

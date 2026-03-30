@@ -7,10 +7,24 @@ import { sendBookingNotifications } from "@/lib/notifications";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const ALLOWED_ORIGINS = new Set([
-  "http://localhost:3000",
   "https://thebaeagenda.com",
   "https://www.thebaeagenda.com",
 ]);
+
+function isAllowedOrigin(origin: string) {
+  if (!origin) return true;
+
+  if (ALLOWED_ORIGINS.has(origin)) {
+    return true;
+  }
+
+  try {
+    const url = new URL(origin);
+    return ["localhost", "127.0.0.1"].includes(url.hostname);
+  } catch {
+    return false;
+  }
+}
 
 const BookingSchema = z.object({
   // Contact
@@ -116,7 +130,7 @@ export async function POST(req: NextRequest) {
   const origin = req.headers.get("origin") ?? "";
   const contentType = req.headers.get("content-type") ?? "";
 
-  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+  if (!isAllowedOrigin(origin)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

@@ -5,6 +5,9 @@ import SetControlSection from '@/components/public/SetControlSection'
 
 export const metadata: Metadata = {
   title: 'Meet',
+  alternates: {
+    canonical: '/meet',
+  },
   description: 'Meet DJ B.A.E. and get a closer look at the sound, setup, and energy behind the agenda.',
   openGraph: {
     title: 'Meet DJ B.A.E.',
