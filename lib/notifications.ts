@@ -200,7 +200,7 @@ function buildClientBookingEmailHtml(payload: BookingNotificationPayload, eventD
           <tbody>
             <tr>
               <td align="center">
-                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#f5f5f7;">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,’Segoe UI’,Roboto,Helvetica,Arial,sans-serif;color:#f5f5f7;">
                   <tbody>
                     <tr>
                       <td style="padding:0 20px 16px 20px;" align="center">
@@ -224,17 +224,26 @@ function buildClientBookingEmailHtml(payload: BookingNotificationPayload, eventD
                                 <p style="margin:0 0 14px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
                                   Thanks for reaching out to <strong>The Bae Agenda</strong>, ${safeFirstName}.
                                 </p>
-                                <p style="margin:0 0 14px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
-                                  We’ve received your booking request and will review it shortly.
+                                <p style="margin:0 0 18px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
+                                  We’ve received your booking request and will review it shortly. If it’s a fit, we’ll follow up with next steps.
                                 </p>
-                                <p style="margin:0 0 14px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
-                                  <strong>Event:</strong> ${safeEventName}<br />
-                                  <strong>Date:</strong> ${escapeHtml(eventDateTime)}
-                                </p>
-                                <p style="margin:0 0 24px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
-                                  If your submission is a fit, we’ll follow up with next steps.
-                                </p>
-                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 8px 0;">
+                                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 20px 0;background-color:#101017;border:1px solid #27272f;border-radius:14px;">
+                                  <tbody>
+                                    <tr>
+                                      <td style="padding:18px 18px 8px 18px;">
+                                        <div style="font-size:13px;color:#a1a1aa;margin-bottom:6px;">Event</div>
+                                        <div style="font-size:16px;color:#ffffff;font-weight:600;">${safeEventName}</div>
+                                      </td>
+                                    </tr>
+                                    <tr>
+                                      <td style="padding:8px 18px 18px 18px;">
+                                        <div style="font-size:13px;color:#a1a1aa;margin-bottom:6px;">Date</div>
+                                        <div style="font-size:16px;color:#ffffff;">${escapeHtml(eventDateTime)}</div>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 12px 0;">
                                   <tbody>
                                     <tr>
                                       <td align="center" style="border-radius:999px;background-color:#7c3aed;">
@@ -245,9 +254,9 @@ function buildClientBookingEmailHtml(payload: BookingNotificationPayload, eventD
                                     </tr>
                                   </tbody>
                                 </table>
-                                <div style="margin-top:18px;font-size:13px;line-height:22px;color:#a1a1aa;">
+                                <p style="margin:16px 0 0 0;font-size:14px;line-height:24px;color:#a1a1aa;">
                                   This is an automated confirmation email.
-                                </div>
+                                </p>
                               </td>
                             </tr>
                           </tbody>
@@ -440,16 +449,90 @@ export async function sendInvoiceNotification(payload: InvoiceNotificationPayloa
       'DJ B.A.E. Bookings',
     ].join('\n'),
     html: `
-      <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
-        <p>Hi ${greetingName},</p>
-        <p>Your invoice for <strong>${payload.eventName}</strong> is attached.</p>
-        <p>
-          <strong>Invoice #:</strong> ${payload.invoiceNumber}<br />
-          <strong>Balance due:</strong> ${payload.balanceDue}
-        </p>
-        <p>If you have any questions, just reply to this email.</p>
-        <p>DJ B.A.E. Bookings</p>
-      </div>
+      <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+      <html dir="ltr" lang="en">
+        <head>
+          <meta content="width=device-width" name="viewport" />
+          <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+          <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+          <meta name="x-apple-disable-message-reformatting" />
+          <meta content="telephone=no,address=no,email=no,date=no,url=no" name="format-detection" />
+          <title>The Bae Agenda</title>
+        </head>
+        <body style="margin:0;padding:0;background-color:#0b0b10;">
+          <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center" style="background-color:#0b0b10;margin:0;padding:24px 0;width:100%;">
+            <tbody>
+              <tr>
+                <td align="center">
+                  <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#f5f5f7;">
+                    <tbody>
+                      <tr>
+                        <td style="padding:0 20px 16px 20px;" align="center">
+                          <div style="display:inline-block;font-size:24px;font-weight:800;letter-spacing:0.5px;color:#ffffff;">
+                            The Bae Agenda
+                          </div>
+                          <div style="margin-top:8px;font-size:13px;line-height:20px;color:#a1a1aa;">
+                            Culture. Events. Community.
+                          </div>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:0 20px;">
+                          <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#14141c;border:1px solid #27272f;border-radius:18px;">
+                            <tbody>
+                              <tr>
+                                <td style="padding:32px 28px 24px 28px;">
+                                  <div style="font-size:22px;font-weight:700;line-height:30px;color:#ffffff;margin:0 0 16px 0;">
+                                    Your invoice is ready
+                                  </div>
+                                  <p style="margin:0 0 18px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
+                                    Hi ${escapeHtml(greetingName)}, your invoice for <strong>${escapeHtml(payload.eventName)}</strong> is attached to this email.
+                                  </p>
+                                  <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 20px 0;background-color:#101017;border:1px solid #27272f;border-radius:14px;">
+                                    <tbody>
+                                      <tr>
+                                        <td style="padding:18px 18px 8px 18px;">
+                                          <div style="font-size:13px;color:#a1a1aa;margin-bottom:6px;">Event</div>
+                                          <div style="font-size:16px;color:#ffffff;font-weight:600;">${escapeHtml(payload.eventName)}</div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding:8px 18px;">
+                                          <div style="font-size:13px;color:#a1a1aa;margin-bottom:6px;">Invoice #</div>
+                                          <div style="font-size:16px;color:#ffffff;">${escapeHtml(payload.invoiceNumber)}</div>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding:8px 18px 18px 18px;">
+                                          <div style="font-size:13px;color:#a1a1aa;margin-bottom:6px;">Balance Due</div>
+                                          <div style="font-size:16px;color:#ffffff;font-weight:600;">${escapeHtml(payload.balanceDue)}</div>
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  <p style="margin:16px 0 0 0;font-size:14px;line-height:24px;color:#a1a1aa;">
+                                    If you have any questions, just reply to this email.
+                                  </p>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding:18px 20px 0 20px;text-align:center;font-size:12px;line-height:20px;color:#71717a;">
+                          © 2026 The Bae Agenda<br />
+                          thebaeagenda.com
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </body>
+      </html>
     `,
     attachments: [
       {
