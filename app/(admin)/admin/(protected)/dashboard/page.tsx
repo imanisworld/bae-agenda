@@ -8,6 +8,7 @@ import Link            from 'next/link'
 import StatCard        from '@/components/admin/StatCard'
 import Badge           from '@/components/admin/Badge'
 import PageHeader      from '@/components/admin/PageHeader'
+import { getBookingPaymentStatus, type BookingPaymentStatus } from '@/lib/booking-payment-status'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import type { BookingStatus, PaymentStatus } from '@/types/index'
 
@@ -20,6 +21,7 @@ interface RecentBooking {
   event_timezone: string
   client_name: string | null
   status:      BookingStatus
+  payment_status: BookingPaymentStatus
 }
 
 interface UpcomingEvent {
@@ -51,7 +53,9 @@ interface BookingQueryRow {
   event_date: string
   event_timezone: string
   status: BookingStatus
+  quote: number | null
   clients: { first_name: string | null; last_name: string | null }[] | null
+  payments: { amount: number; status: 'pending' | 'received' | 'refunded' }[] | null
 }
 
 interface PaymentQueryRow {
@@ -131,7 +135,7 @@ async function getDashboardData() {
         .eq('status', 'inquiry'),
       supabase.from('clients').select('*', { count: 'exact', head: true }),
       supabase.from('bookings')
-        .select('id, event_name, event_date, event_timezone, status, clients(first_name, last_name)')
+        .select('id, event_name, event_date, event_timezone, status, quote, clients(first_name, last_name), payments(amount, status)')
         .order('created_at', { ascending: false }).limit(5),
       supabase.from('events')
         .select('id, title, event_date, venue, featured')
@@ -163,6 +167,7 @@ async function getDashboardData() {
             ? `${client.first_name ?? ''} ${client.last_name ?? ''}`.trim() || null
             : null,
           status: b.status as BookingStatus,
+          payment_status: getBookingPaymentStatus(b.quote, b.payments),
         }
       }) as RecentBooking[],
       upcomingEvents:   (eventRows   ?? []) as UpcomingEvent[],
@@ -289,6 +294,7 @@ export default async function DashboardPage() {
                 <th>Client</th>
                 <th>Date</th>
                 <th>Status</th>
+                <th>Payment</th>
               </tr>
             </thead>
             <tbody>
@@ -298,6 +304,7 @@ export default async function DashboardPage() {
                   <td data-label="Client" className="muted">{b.client_name ?? '—'}</td>
                   <td data-label="Date" className="muted">{fmtDate(b.event_date, b.event_timezone)}</td>
                   <td data-label="Status"><Badge variant={b.status} /></td>
+                  <td data-label="Payment"><Badge variant={b.payment_status} /></td>
                 </tr>
               ))}
             </tbody>

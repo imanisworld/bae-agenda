@@ -5,6 +5,7 @@ import Badge from '@/components/admin/Badge'
 import AdminNotice from '@/components/admin/AdminNotice'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
+import { getBookingPaymentStatus } from '@/lib/booking-payment-status'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { createBookingNoteAction, createBookingPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, sendBookingBalanceReminderAction, sendBookingDepositReminderAction, sendBookingEventReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
 import { PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
@@ -156,6 +157,7 @@ export default async function EditBookingPage({
   const receivedTotal = getReceivedPaymentTotal(payments)
   const outstandingDeposit = getOutstandingDeposit(booking.deposit_amount, payments)
   const outstandingBalance = getOutstandingBalance(booking.quote, payments)
+  const paymentStatus = getBookingPaymentStatus(booking.quote, payments)
   const internalNotes = booking.booking_notes ?? []
   const emailActivity = internalNotes.filter((note) => /\bemail\b/i.test(note.body)).slice(0, 4)
 
@@ -187,6 +189,7 @@ export default async function EditBookingPage({
       <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center', minWidth: 0 }}>
           <Badge variant={booking.status} />
+          <Badge variant={paymentStatus} />
           {clientName && <span style={{ color: 'var(--white)', fontSize: '14px' }}>{clientName}</span>}
           {booking.clients?.email && <span className="muted">{booking.clients.email}</span>}
           {booking.clients?.phone && <span className="muted">{booking.clients.phone}</span>}
@@ -371,6 +374,7 @@ export default async function EditBookingPage({
             { label: 'Quote', value: formatCurrency(total) },
             { label: 'Deposit', value: formatCurrency(deposit) },
             { label: 'Balance Due', value: formatCurrency(balance) },
+            { label: 'Payment Status', value: paymentStatus.toUpperCase() },
           ].map((item) => (
             <div
               key={item.label}
@@ -383,9 +387,13 @@ export default async function EditBookingPage({
               <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
                 {item.label}
               </div>
-              <div style={{ color: item.label === 'Balance Due' ? 'var(--violet)' : 'var(--white)', fontSize: '18px', fontFamily: 'Conthrax, sans-serif' }}>
-                {item.value}
-              </div>
+              {item.label === 'Payment Status' ? (
+                <Badge variant={paymentStatus} />
+              ) : (
+                <div style={{ color: item.label === 'Balance Due' ? 'var(--violet)' : 'var(--white)', fontSize: '18px', fontFamily: 'Conthrax, sans-serif' }}>
+                  {item.value}
+                </div>
+              )}
             </div>
           ))}
         </div>

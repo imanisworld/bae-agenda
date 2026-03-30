@@ -7,6 +7,7 @@ import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import AdminNotice     from '@/components/admin/AdminNotice'
 import { createEventFromBookingAction, updateBookingStatusAction } from '@/app/actions/bookings'
+import { getBookingPaymentStatus, type BookingPaymentStatus } from '@/lib/booking-payment-status'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import type { BookingStatus } from '@/types/index'
 import Link from 'next/link'
@@ -21,6 +22,7 @@ interface BookingRow {
   client_name: string | null
   package:     string | null
   status:      BookingStatus
+  payment_status: BookingPaymentStatus
   created_at:  string
 }
 
@@ -32,9 +34,11 @@ interface BookingQueryRow {
   venue: string | null
   city: string | null
   package: string | null
+  quote: number | null
   status: BookingStatus
   created_at: string
   clients: { first_name: string | null; last_name: string | null }[] | null
+  payments: { amount: number; status: 'pending' | 'received' | 'refunded' }[] | null
 }
 
 function fmtEventDate(iso: string, timeZone: string) {
@@ -65,7 +69,7 @@ async function getBookings(): Promise<BookingRow[]> {
     const supabase = createClient()
     const { data } = await supabase
       .from('bookings')
-      .select('id, event_name, event_date, event_timezone, venue, city, package, status, created_at, clients(first_name, last_name)')
+      .select('id, event_name, event_date, event_timezone, venue, city, package, quote, status, created_at, clients(first_name, last_name), payments(amount, status)')
       .order('created_at', { ascending: false })
     const rows = (data ?? []) as BookingQueryRow[]
     return rows.map((b) => {
@@ -82,6 +86,7 @@ async function getBookings(): Promise<BookingRow[]> {
           : null,
         package:    b.package,
         status:     b.status as BookingStatus,
+        payment_status: getBookingPaymentStatus(b.quote, b.payments),
         created_at: b.created_at,
       }
     })
@@ -163,6 +168,7 @@ export default async function BookingsPage({
                   <th>Event Date</th>
                   <th>Package</th>
                   <th>Status</th>
+                  <th>Payment</th>
                   <th>Submitted</th>
                   <th>Actions</th>
                 </tr>
@@ -187,6 +193,7 @@ export default async function BookingsPage({
                     </td>
                     <td data-label="Package" className="muted">{b.package ?? '—'}</td>
                     <td data-label="Status"><Badge variant={b.status} /></td>
+                    <td data-label="Payment"><Badge variant={b.payment_status} /></td>
                     <td data-label="Submitted" className="muted">{fmtSubmittedDate(b.created_at)}</td>
                     <td data-label="Actions">
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>

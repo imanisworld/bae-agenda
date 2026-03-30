@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
+import { getBookingPaymentStatus } from '@/lib/booking-payment-status'
 import {
   getBalanceReminderPayloadFromBooking,
   getConfirmationPayloadFromBooking,
@@ -304,6 +305,41 @@ async function getBookingW9Recipient(admin: ReturnType<typeof createAdminClient>
       email: string | null
     }> | null
   }
+}
+
+async function syncInvoicePaymentState(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
+  const { data: booking, error: bookingError } = await admin
+    .from('bookings')
+    .select('quote, payments(amount, status)')
+    .eq('id', bookingId)
+    .maybeSingle()
+
+  if (bookingError || !booking) {
+    console.error('[invoice-payment-sync] unable to load booking payments:', bookingError)
+    return { paymentStatus: 'unpaid' as const, updatedInvoice: false }
+  }
+
+  const paymentStatus = getBookingPaymentStatus(
+    booking.quote as number | null,
+    (booking.payments as Array<{ amount: number; status: 'pending' | 'received' | 'refunded' }> | null) ?? null
+  )
+
+  const nextInvoiceStatus = paymentStatus === 'paid' ? 'paid' : 'draft'
+  const payload = nextInvoiceStatus === 'paid'
+    ? { status: nextInvoiceStatus, sent_at: new Date().toISOString() }
+    : { status: nextInvoiceStatus, sent_at: null }
+
+  const { error: invoiceError } = await admin
+    .from('invoices')
+    .update(payload)
+    .eq('booking_id', bookingId)
+
+  if (invoiceError) {
+    console.error('[invoice-payment-sync] unable to sync invoice state:', invoiceError)
+    return { paymentStatus, updatedInvoice: false }
+  }
+
+  return { paymentStatus, updatedInvoice: true }
 }
 async function getConfirmationPayloadIfNeeded(admin: ReturnType<typeof createAdminClient>, bookingId: string, nextStatus: BookingStatus) {
   if (nextStatus !== 'confirmed') return null
@@ -815,10 +851,20 @@ export async function createBookingPaymentAction(formData: FormData) {
     }
   }
 
+  const invoicePaymentState = await syncInvoicePaymentState(admin, bookingId)
+  if (invoicePaymentState.paymentStatus === 'paid') {
+    await appendBookingTimelineNote(
+      admin,
+      bookingId,
+      'Booking balance is now fully paid.'
+    )
+  }
+
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/payments')
   revalidatePath('/admin/dashboard')
+  revalidatePath(`/admin/bookings/${bookingId}/invoice`)
   redirect(`/admin/bookings/${bookingId}`)
 }
 
