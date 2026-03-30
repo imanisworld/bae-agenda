@@ -3711,6 +3711,7 @@ body.has-custom-cursor * { cursor: none !important; }
 .admin-main {
   flex: 1;
   margin-left: 240px;
+  min-width: 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -3719,6 +3720,7 @@ body.has-custom-cursor * { cursor: none !important; }
 .admin-page {
   width: 100%;
   max-width: 1120px;
+  min-width: 0;
   padding: 40px 48px;
 }
 
@@ -3898,6 +3900,83 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 }
 
+@media (max-width: 1280px) {
+  .admin-page {
+    padding: 32px 24px 36px;
+  }
+
+  .admin-table-stack {
+    display: block;
+  }
+
+  .admin-table-stack thead {
+    display: none;
+  }
+
+  .admin-table-stack tbody,
+  .admin-table-stack tr {
+    display: block;
+  }
+
+  .admin-table-stack tr {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .admin-table-stack tbody tr:last-child {
+    border-bottom: none;
+  }
+
+  .admin-table-stack td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    width: 100%;
+    padding: 8px 0;
+    border-bottom: none;
+    text-align: right;
+  }
+
+  .admin-table-stack td::before {
+    content: attr(data-label);
+    color: var(--muted);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-align: left;
+    flex: 0 0 88px;
+  }
+
+  .admin-table-stack td > * {
+    margin-left: auto;
+    min-width: 0;
+  }
+
+  .admin-table-stack td[data-label='Actions'] > div,
+  .admin-table-stack td[data-label='Actions'] > form,
+  .admin-table-stack td[data-label='Actions'] > a {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .admin-table-stack td[data-label='Actions'] {
+    display: block;
+    text-align: left;
+  }
+
+  .admin-table-stack td[data-label='Actions']::before {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .admin-table-stack td[data-label='Actions'] .admin-btn-primary,
+  .admin-table-stack td[data-label='Actions'] .admin-btn-ghost,
+  .admin-table-stack td[data-label='Actions'] .admin-view-all {
+    width: 100%;
+  }
+}
+
 @media (max-width: 720px) {
   .admin-page {
     padding: 24px 16px 28px;
@@ -3950,75 +4029,6 @@ body.has-custom-cursor * { cursor: none !important; }
     grid-template-columns: 1fr;
   }
 
-  .admin-table-stack {
-    display: block;
-  }
-
-  .admin-table-stack thead {
-    display: none;
-  }
-
-  .admin-table-stack tbody,
-  .admin-table-stack tr {
-    display: block;
-  }
-
-  .admin-table-stack tr {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .admin-table-stack tbody tr:last-child {
-    border-bottom: none;
-  }
-
-  .admin-table-stack td {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    width: 100%;
-    padding: 8px 0;
-    border-bottom: none;
-    text-align: right;
-  }
-
-  .admin-table-stack td::before {
-    content: attr(data-label);
-    color: var(--muted);
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    text-align: left;
-    flex: 0 0 88px;
-  }
-
-  .admin-table-stack td > * {
-    margin-left: auto;
-  }
-
-  .admin-table-stack td[data-label='Actions'] > div,
-  .admin-table-stack td[data-label='Actions'] > form,
-  .admin-table-stack td[data-label='Actions'] > a {
-    width: 100%;
-    margin-left: 0;
-  }
-
-  .admin-table-stack td[data-label='Actions'] {
-    display: block;
-    text-align: left;
-  }
-
-  .admin-table-stack td[data-label='Actions']::before {
-    display: block;
-    margin-bottom: 10px;
-  }
-
-  .admin-table-stack td[data-label='Actions'] .admin-btn-primary,
-  .admin-table-stack td[data-label='Actions'] .admin-btn-ghost,
-  .admin-table-stack td[data-label='Actions'] .admin-view-all {
-    width: 100%;
-  }
 }
 
 /* ================================================================
