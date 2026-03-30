@@ -38,6 +38,12 @@ type FieldKey =
 
 type FieldErrors = Partial<Record<FieldKey, string>>
 
+type BookingSubmitPayload = {
+  error?: string
+  fields?: string[]
+  retryAfter?: number
+}
+
 const INITIAL_STATE: FormState = {
   firstName: '',
   lastName: '',
@@ -252,8 +258,8 @@ export default function BookingForm() {
           })
           setAvailabilityError(
             result.hasTime
-              ? `This time is too close to an existing event: ${names}. Events must be at least 30 minutes apart.`
-              : `There are already events scheduled that day: ${names}. Add a start time so we can check for conflicts.`
+              ? `That time is no longer available. Please choose another time. Current conflicts: ${names}.`
+              : `There are already events scheduled that day: ${names}. Add a start time so we can check availability more accurately.`
           )
           setCheckingAvailability(false)
           return
@@ -306,7 +312,7 @@ export default function BookingForm() {
         }),
       })
 
-      const payload = (await res.json()) as { error?: string; fields?: string[] }
+      const payload = (await res.json()) as BookingSubmitPayload
 
       if (!res.ok) {
         if (payload.fields?.length) {
@@ -321,7 +327,11 @@ export default function BookingForm() {
           reason: payload.error ?? 'request_failed',
           fieldCount: payload.fields?.length ?? 0,
         })
-        setError(payload.error ?? 'Could not submit booking request.')
+        if (res.status === 429 && payload.retryAfter) {
+          setError(`Too many requests. Please wait ${formatRetryAfter(payload.retryAfter)} and try again.`)
+        } else {
+          setError(payload.error ?? 'Could not submit booking request.')
+        }
         setLoading(false)
         return
       }
@@ -459,12 +469,6 @@ export default function BookingForm() {
           </div>
         </form>
 
-        <datalist id="event-time-options">
-          {TIME_OPTIONS.map((option) => <option key={option.value} value={option.label} />)}
-        </datalist>
-        <datalist id="event-end-time-options">
-          {TIME_OPTIONS.map((option) => <option key={option.value} value={option.label} />)}
-        </datalist>
         <datalist id="city-options">
           {CITY_OPTIONS.map((city) => <option key={city} value={city} />)}
         </datalist>
@@ -592,24 +596,30 @@ function EventStep({
       <div style={twoColGrid()}>
         <label style={{ display: 'grid', gap: '8px' }}>
           <span className="section-label" style={{ marginBottom: 0 }}>Start Time</span>
-          <input
-            list="event-time-options"
+          <select
             value={form.eventTime}
             onChange={(e) => set('eventTime', e.target.value)}
-            placeholder="Choose or type a time"
             style={inputStyle(Boolean(fieldErrors.eventTime))}
-          />
+          >
+            <option value="">Select a start time</option>
+            {TIME_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
           {fieldErrors.eventTime && <span style={fieldErrorStyle()}>{fieldErrors.eventTime}</span>}
         </label>
         <label style={{ display: 'grid', gap: '8px' }}>
           <span className="section-label" style={{ marginBottom: 0 }}>End Time</span>
-          <input
-            list="event-end-time-options"
+          <select
             value={form.eventEndTime}
             onChange={(e) => set('eventEndTime', e.target.value)}
-            placeholder="Choose or type a time"
             style={inputStyle(Boolean(fieldErrors.eventEndTime))}
-          />
+          >
+            <option value="">Select an end time</option>
+            {TIME_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
           {fieldErrors.eventEndTime && <span style={fieldErrorStyle()}>{fieldErrors.eventEndTime}</span>}
         </label>
       </div>
@@ -831,4 +841,13 @@ function buildTimeOptions() {
 function formatTimeLabel(hour: number, minute: number) {
   const h = hour % 12 || 12
   return `${h}:${String(minute).padStart(2, '0')} ${hour >= 12 ? 'PM' : 'AM'}`
+}
+
+function formatRetryAfter(seconds: number) {
+  if (seconds < 60) {
+    return `${seconds} second${seconds === 1 ? '' : 's'}`
+  }
+
+  const minutes = Math.ceil(seconds / 60)
+  return `${minutes} minute${minutes === 1 ? '' : 's'}`
 }

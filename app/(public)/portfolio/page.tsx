@@ -8,6 +8,9 @@ import { CONTENT_DEFAULTS } from '@/lib/content-schema'
 
 export const metadata: Metadata = {
   title: 'Portfolio | DJ BAE Gig History — Indianapolis & Chicago',
+  alternates: {
+    canonical: '/portfolio',
+  },
   description:
     'Full gig history, featured events, and press for DJ B.A.E. — Indianapolis & Chicago DJ. Club nights, festivals, private events, and more.',
   openGraph: {

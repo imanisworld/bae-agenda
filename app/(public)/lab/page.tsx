@@ -3,6 +3,9 @@ import MixesSection from '@/components/public/MixesSection'
 
 export const metadata: Metadata = {
   title: 'Lab',
+  alternates: {
+    canonical: '/lab',
+  },
   description: 'Bae’s in the Lab. A live archive for mixes, recent sets, and new drops from DJ B.A.E.',
   openGraph: {
     title: 'Lab | DJ B.A.E.',

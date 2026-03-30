@@ -7,6 +7,9 @@ import { getContentMap } from '@/lib/db/content'
 
 export const metadata: Metadata = {
   title: 'Press Kit — DJ B.A.E.',
+  alternates: {
+    canonical: '/press-kit',
+  },
   description: 'Printable press kit generated from the current site content and showcase data.',
 }
 

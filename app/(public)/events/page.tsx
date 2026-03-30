@@ -12,6 +12,9 @@ export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Events',
+  alternates: {
+    canonical: '/events',
+  },
   description: 'Upcoming DJ sets, club nights, and appearances by DJ B.A.E. in Chicago and beyond.',
   openGraph: {
     title: 'Events | DJ B.A.E.',

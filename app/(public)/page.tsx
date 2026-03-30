@@ -28,6 +28,9 @@ const HOME_OG_IMAGE = '/photos/images/outside.jpg'
 
 export const metadata: Metadata = {
   title: 'Official Website',
+  alternates: {
+    canonical: '/',
+  },
   description: 'Official DJ B.A.E. site for booking, live dates, artist info, and Bae’s in the Lab based in Indianapolis with roots in Chicago.',
   openGraph: {
     title: 'DJ B.A.E. | The Bae Agenda',

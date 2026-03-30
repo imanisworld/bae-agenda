@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Book',
+  alternates: {
+    canonical: '/book',
+  },
   description: 'Send a booking inquiry for DJ B.A.E. for private events, nightlife, branded events, and custom curations.',
   openGraph: {
     title: 'Book DJ B.A.E.',
