@@ -4,7 +4,18 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
-import { getOutstandingBalance, getOutstandingDeposit } from '@/lib/booking-finance'
+import {
+  getBalanceReminderPayloadFromBooking,
+  getConfirmationPayloadFromBooking,
+  getDepositReminderPayloadFromBooking,
+  getEventReminderPayloadFromBooking,
+  getInquiryReceiptPayloadFromBooking,
+  type BookingBalanceReminderSource,
+  type BookingConfirmationSource,
+  type BookingDepositReminderSource,
+  type BookingEventReminderSource,
+  type BookingInquiryReceiptSource,
+} from '@/lib/booking-email-payloads'
 import { toEventISO } from '@/lib/date-time'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
 import { sendBookingBalanceReminder, sendBookingConfirmedNotification, sendBookingDepositReminder, sendBookingEventReminder, sendBookingInquiryReceipt, sendW9Notification } from '@/lib/notifications'
@@ -93,82 +104,6 @@ async function appendBookingTimelineNote(
   if (error) {
     console.error('[booking-note] unable to save timeline note:', error.message)
   }
-}
-
-interface BookingConfirmationSource {
-  id: string
-  status: BookingStatus
-  event_name: string | null
-  event_date: string
-  event_timezone: string | null
-  venue: string | null
-  city: string | null
-  clients: Array<{
-    first_name: string | null
-    last_name: string | null
-    email: string | null
-  }> | null
-}
-
-interface BookingInquiryReceiptSource {
-  id: string
-  event_name: string | null
-  event_date: string
-  event_timezone: string | null
-  clients: Array<{
-    first_name: string | null
-    last_name: string | null
-    email: string | null
-  }> | null
-}
-
-interface BookingDepositReminderSource {
-  id: string
-  event_name: string | null
-  event_date: string
-  event_timezone: string | null
-  deposit_amount: number | null
-  clients: Array<{
-    first_name: string | null
-    last_name: string | null
-    email: string | null
-  }> | null
-  payments: Array<{
-    amount: number
-    status: PaymentStatus
-  }> | null
-}
-
-interface BookingBalanceReminderSource {
-  id: string
-  event_name: string | null
-  event_date: string
-  event_timezone: string | null
-  quote: number | null
-  clients: Array<{
-    first_name: string | null
-    last_name: string | null
-    email: string | null
-  }> | null
-  payments: Array<{
-    amount: number
-    status: PaymentStatus
-  }> | null
-}
-
-interface BookingEventReminderSource {
-  id: string
-  status: BookingStatus
-  event_name: string | null
-  event_date: string
-  event_timezone: string | null
-  venue: string | null
-  city: string | null
-  clients: Array<{
-    first_name: string | null
-    last_name: string | null
-    email: string | null
-  }> | null
 }
 
 async function getBookingConfirmationSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
@@ -370,120 +305,6 @@ async function getBookingW9Recipient(admin: ReturnType<typeof createAdminClient>
     }> | null
   }
 }
-
-function getConfirmationPayloadFromBooking(booking: BookingConfirmationSource | null) {
-  if (!booking) return null
-
-  const client = booking.clients?.[0] ?? null
-  const clientEmail = client?.email?.trim()
-  const eventTimeZone = booking.event_timezone?.trim()
-
-  if (!clientEmail || !booking.event_name || !eventTimeZone) {
-    return null
-  }
-
-    return {
-    firstName: client?.first_name?.trim() || 'there',
-    lastName: client?.last_name?.trim() || null,
-    email: clientEmail,
-    eventName: booking.event_name,
-    eventDate: booking.event_date,
-    eventTimeZone,
-    venue: booking.venue,
-    city: booking.city,
-  }
-}
-
-function getInquiryReceiptPayloadFromBooking(booking: BookingInquiryReceiptSource | null) {
-  if (!booking) return null
-
-  const client = booking.clients?.[0] ?? null
-  const clientEmail = client?.email?.trim()
-  const eventTimeZone = booking.event_timezone?.trim()
-
-  if (!clientEmail || !booking.event_name || !eventTimeZone) {
-    return null
-  }
-
-  return {
-    firstName: client?.first_name?.trim() || 'there',
-    lastName: client?.last_name?.trim() || null,
-    email: clientEmail,
-    eventName: booking.event_name,
-    eventDate: booking.event_date,
-    eventTimeZone,
-  }
-}
-
-function getDepositReminderPayloadFromBooking(booking: BookingDepositReminderSource | null) {
-  if (!booking) return null
-
-  const client = booking.clients?.[0] ?? null
-  const clientEmail = client?.email?.trim()
-  const eventTimeZone = booking.event_timezone?.trim()
-  const depositRemaining = getOutstandingDeposit(booking.deposit_amount, booking.payments)
-
-  if (!clientEmail || !booking.event_name || !eventTimeZone || depositRemaining <= 0) {
-    return null
-  }
-
-  return {
-    firstName: client?.first_name?.trim() || 'there',
-    lastName: client?.last_name?.trim() || null,
-    email: clientEmail,
-    eventName: booking.event_name,
-    eventDate: booking.event_date,
-    eventTimeZone,
-    depositDue: formatCurrency(depositRemaining),
-  }
-}
-
-function getBalanceReminderPayloadFromBooking(booking: BookingBalanceReminderSource | null) {
-  if (!booking) return null
-
-  const client = booking.clients?.[0] ?? null
-  const clientEmail = client?.email?.trim()
-  const eventTimeZone = booking.event_timezone?.trim()
-  const balanceRemaining = getOutstandingBalance(booking.quote, booking.payments)
-
-  if (!clientEmail || !booking.event_name || !eventTimeZone || balanceRemaining <= 0) {
-    return null
-  }
-
-  return {
-    firstName: client?.first_name?.trim() || 'there',
-    lastName: client?.last_name?.trim() || null,
-    email: clientEmail,
-    eventName: booking.event_name,
-    eventDate: booking.event_date,
-    eventTimeZone,
-    balanceDue: formatCurrency(balanceRemaining),
-  }
-}
-
-function getEventReminderPayloadFromBooking(booking: BookingEventReminderSource | null) {
-  if (!booking) return null
-
-  const client = booking.clients?.[0] ?? null
-  const clientEmail = client?.email?.trim()
-  const eventTimeZone = booking.event_timezone?.trim()
-
-  if (!clientEmail || !booking.event_name || !eventTimeZone) {
-    return null
-  }
-
-  return {
-    firstName: client?.first_name?.trim() || 'there',
-    lastName: client?.last_name?.trim() || null,
-    email: clientEmail,
-    eventName: booking.event_name,
-    eventDate: booking.event_date,
-    eventTimeZone,
-    venue: booking.venue,
-    city: booking.city,
-  }
-}
-
 async function getConfirmationPayloadIfNeeded(admin: ReturnType<typeof createAdminClient>, bookingId: string, nextStatus: BookingStatus) {
   if (nextStatus !== 'confirmed') return null
 
