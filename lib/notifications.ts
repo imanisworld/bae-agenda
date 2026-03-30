@@ -78,6 +78,199 @@ function escapeHtml(value: string) {
     .replace(/'/g, '&#39;')
 }
 
+function renderField(label: string, value: string) {
+  return `
+    <tr>
+      <td style="padding:8px 18px;">
+        <div style="font-size:13px;color:#a1a1aa;margin-bottom:6px;">
+          ${escapeHtml(label)}
+        </div>
+        <div style="font-size:16px;color:#ffffff;">
+          ${escapeHtml(value)}
+        </div>
+      </td>
+    </tr>
+  `
+}
+
+function buildOwnerBookingEmailHtml(payload: BookingNotificationPayload, eventDateTime: string) {
+  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ') || payload.firstName
+  const fields = [
+    ['Guest', guestName],
+    ['Email', payload.email],
+    ['Phone', payload.phone || 'Not provided'],
+    ['Event', payload.eventName],
+    ['Type', payload.eventType || 'Not provided'],
+    ['Date', eventDateTime],
+    ['Time Zone', payload.eventTimeZone],
+    ['Venue', payload.venue || 'Not provided'],
+    ['City', payload.city || 'Not provided'],
+    ['Package', payload.packageName || 'Not provided'],
+    ['Notes', payload.notes || 'Not provided'],
+  ] as const
+
+  return `
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html dir="ltr" lang="en">
+      <head>
+        <meta content="width=device-width" name="viewport" />
+        <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+        <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+        <meta name="x-apple-disable-message-reformatting" />
+        <meta content="telephone=no,address=no,email=no,date=no,url=no" name="format-detection" />
+        <title>The Bae Agenda</title>
+      </head>
+      <body style="margin:0;padding:0;background-color:#0b0b10;">
+        <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center" style="background-color:#0b0b10;margin:0;padding:24px 0;width:100%;">
+          <tbody>
+            <tr>
+              <td align="center">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:640px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#f5f5f7;">
+                  <tbody>
+                    <tr>
+                      <td style="padding:0 20px 16px 20px;" align="center">
+                        <div style="display:inline-block;font-size:24px;font-weight:800;letter-spacing:0.5px;color:#ffffff;">
+                          The Bae Agenda
+                        </div>
+                        <div style="margin-top:8px;font-size:13px;line-height:20px;color:#a1a1aa;">
+                          New booking inquiry
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:0 20px;">
+                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#14141c;border:1px solid #27272f;border-radius:18px;">
+                          <tbody>
+                            <tr>
+                              <td style="padding:32px 28px 24px 28px;">
+                                <div style="font-size:22px;font-weight:700;line-height:30px;color:#ffffff;margin:0 0 16px 0;">
+                                  New inquiry received
+                                </div>
+                                <p style="margin:0 0 18px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
+                                  A new booking inquiry was submitted through the site. Reply directly to continue the conversation with the client.
+                                </p>
+                                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 20px 0;background-color:#101017;border:1px solid #27272f;border-radius:14px;">
+                                  <tbody>
+                                    ${fields.map(([label, value]) => renderField(label, value)).join('')}
+                                  </tbody>
+                                </table>
+                                <p style="margin:16px 0 0 0;font-size:13px;line-height:22px;color:#a1a1aa;">
+                                  This alert was generated automatically by the booking form.
+                                </p>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:18px 20px 0 20px;text-align:center;font-size:12px;line-height:20px;color:#71717a;">
+                        © 2026 The Bae Agenda<br />
+                        thebaeagenda.com
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `
+}
+
+function buildClientBookingEmailHtml(payload: BookingNotificationPayload, eventDateTime: string) {
+  const safeFirstName = escapeHtml(payload.firstName)
+  const safeEventName = escapeHtml(payload.eventName)
+
+  return `
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+    <html dir="ltr" lang="en">
+      <head>
+        <meta content="width=device-width" name="viewport" />
+        <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+        <meta content="IE=edge" http-equiv="X-UA-Compatible" />
+        <meta name="x-apple-disable-message-reformatting" />
+        <meta content="telephone=no,address=no,email=no,date=no,url=no" name="format-detection" />
+        <title>The Bae Agenda</title>
+      </head>
+      <body style="margin:0;padding:0;background-color:#0b0b10;">
+        <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center" style="background-color:#0b0b10;margin:0;padding:24px 0;width:100%;">
+          <tbody>
+            <tr>
+              <td align="center">
+                <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#f5f5f7;">
+                  <tbody>
+                    <tr>
+                      <td style="padding:0 20px 16px 20px;" align="center">
+                        <div style="display:inline-block;font-size:24px;font-weight:800;letter-spacing:0.5px;color:#ffffff;">
+                          The Bae Agenda
+                        </div>
+                        <div style="margin-top:8px;font-size:13px;line-height:20px;color:#a1a1aa;">
+                          Culture. Events. Community.
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:0 20px;">
+                        <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#14141c;border:1px solid #27272f;border-radius:18px;">
+                          <tbody>
+                            <tr>
+                              <td style="padding:32px 28px 24px 28px;">
+                                <div style="font-size:22px;font-weight:700;line-height:30px;color:#ffffff;margin:0 0 16px 0;">
+                                  We got your request
+                                </div>
+                                <p style="margin:0 0 14px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
+                                  Thanks for reaching out to <strong>The Bae Agenda</strong>, ${safeFirstName}.
+                                </p>
+                                <p style="margin:0 0 14px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
+                                  We’ve received your booking request and will review it shortly.
+                                </p>
+                                <p style="margin:0 0 14px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
+                                  <strong>Event:</strong> ${safeEventName}<br />
+                                  <strong>Date:</strong> ${escapeHtml(eventDateTime)}
+                                </p>
+                                <p style="margin:0 0 24px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
+                                  If your submission is a fit, we’ll follow up with next steps.
+                                </p>
+                                <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 8px 0;">
+                                  <tbody>
+                                    <tr>
+                                      <td align="center" style="border-radius:999px;background-color:#7c3aed;">
+                                        <a href="https://thebaeagenda.com" target="_blank" style="display:inline-block;padding:12px 20px;font-size:14px;font-weight:700;line-height:14px;color:#ffffff;text-decoration:none;">
+                                          Visit The Bae Agenda
+                                        </a>
+                                      </td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                                <div style="margin-top:18px;font-size:13px;line-height:22px;color:#a1a1aa;">
+                                  This is an automated confirmation email.
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding:18px 20px 0 20px;text-align:center;font-size:12px;line-height:20px;color:#71717a;">
+                        © 2026 The Bae Agenda<br />
+                        thebaeagenda.com
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </body>
+    </html>
+  `
+}
+
 async function sendEmail(args: {
   to: string
   subject: string
@@ -172,8 +365,6 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
   const ownerSummary = buildBookingSummaryLines(payload).join('\n')
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ')
-  const safeFirstName = escapeHtml(payload.firstName)
-  const safeEventName = escapeHtml(payload.eventName)
 
   const tasks: Array<Promise<NotificationResult>> = [
     sendEmail({
@@ -181,13 +372,7 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
       subject: `New booking inquiry: ${payload.eventName}`,
       replyTo: payload.email,
       text: `A new booking inquiry was submitted.\n\n${ownerSummary}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
-          <h2 style="margin: 0 0 16px;">New booking inquiry</h2>
-          <p style="margin: 0 0 16px;">A new inquiry was submitted through the site.</p>
-          <pre style="white-space: pre-wrap; font-family: Arial, sans-serif; background: #f6f4ef; padding: 16px; border: 1px solid #ddd;">${ownerSummary}</pre>
-        </div>
-      `,
+      html: buildOwnerBookingEmailHtml(payload, eventDateTime),
     }),
     sendEmail({
       to: payload.email,
@@ -210,91 +395,7 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
         '',
         'The Bae Agenda',
       ].join('\n'),
-      html: `
-        <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-        <html dir="ltr" lang="en">
-          <head>
-            <meta content="width=device-width" name="viewport" />
-            <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
-            <meta content="IE=edge" http-equiv="X-UA-Compatible" />
-            <meta name="x-apple-disable-message-reformatting" />
-            <meta content="telephone=no,address=no,email=no,date=no,url=no" name="format-detection" />
-            <title>The Bae Agenda</title>
-          </head>
-          <body style="margin:0;padding:0;background-color:#0b0b10;">
-            <table border="0" width="100%" cellpadding="0" cellspacing="0" role="presentation" align="center" style="background-color:#0b0b10;margin:0;padding:24px 0;width:100%;">
-              <tbody>
-                <tr>
-                  <td align="center">
-                    <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="max-width:600px;margin:0 auto;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#f5f5f7;">
-                      <tbody>
-                        <tr>
-                          <td style="padding:0 20px 16px 20px;" align="center">
-                            <div style="display:inline-block;font-size:24px;font-weight:800;letter-spacing:0.5px;color:#ffffff;">
-                              The Bae Agenda
-                            </div>
-                            <div style="margin-top:8px;font-size:13px;line-height:20px;color:#a1a1aa;">
-                              Culture. Events. Community.
-                            </div>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding:0 20px;">
-                            <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="background-color:#14141c;border:1px solid #27272f;border-radius:18px;">
-                              <tbody>
-                                <tr>
-                                  <td style="padding:32px 28px 24px 28px;">
-                                    <div style="font-size:22px;font-weight:700;line-height:30px;color:#ffffff;margin:0 0 16px 0;">
-                                      We got your request
-                                    </div>
-                                    <p style="margin:0 0 14px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
-                                      Thanks for reaching out to <strong>The Bae Agenda</strong>, ${safeFirstName}.
-                                    </p>
-                                    <p style="margin:0 0 14px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
-                                      We’ve received your booking request and will review it shortly.
-                                    </p>
-                                    <p style="margin:0 0 14px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
-                                      <strong>Event:</strong> ${safeEventName}<br />
-                                      <strong>Date:</strong> ${escapeHtml(eventDateTime)}
-                                    </p>
-                                    <p style="margin:0 0 24px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
-                                      If your submission is a fit, we’ll follow up with next steps.
-                                    </p>
-                                    <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 8px 0;">
-                                      <tbody>
-                                        <tr>
-                                          <td align="center" style="border-radius:999px;background-color:#7c3aed;">
-                                            <a href="https://thebaeagenda.com" target="_blank" style="display:inline-block;padding:12px 20px;font-size:14px;font-weight:700;line-height:14px;color:#ffffff;text-decoration:none;">
-                                              Visit The Bae Agenda
-                                            </a>
-                                          </td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                    <div style="margin-top:18px;font-size:13px;line-height:22px;color:#a1a1aa;">
-                                      This is an automated confirmation email.
-                                    </div>
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding:18px 20px 0 20px;text-align:center;font-size:12px;line-height:20px;color:#71717a;">
-                            © 2026 The Bae Agenda<br />
-                            thebaeagenda.com
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </body>
-        </html>
-      `,
+      html: buildClientBookingEmailHtml(payload, eventDateTime),
     }),
   ]
 
