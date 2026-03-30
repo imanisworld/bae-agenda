@@ -12,7 +12,7 @@ const ALLOWED_ORIGINS = new Set([
   'https://www.thebaeagenda.com',
 ])
 
-function isAllowedOrigin(origin: string) {
+function isAllowedOrigin(origin: string, requestHost: string) {
   if (!origin) return true
 
   if (ALLOWED_ORIGINS.has(origin)) {
@@ -21,7 +21,11 @@ function isAllowedOrigin(origin: string) {
 
   try {
     const url = new URL(origin)
-    return ['localhost', '127.0.0.1'].includes(url.hostname)
+    if (['localhost', '127.0.0.1'].includes(url.hostname)) {
+      return true
+    }
+
+    return Boolean(requestHost) && url.host === requestHost
   } catch {
     return false
   }
@@ -44,9 +48,10 @@ export async function POST(request: Request) {
   }
 
   const origin = request.headers.get('origin') ?? ''
+  const requestHost = request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? ''
   const contentType = request.headers.get('content-type') ?? ''
 
-  if (!isAllowedOrigin(origin)) {
+  if (!isAllowedOrigin(origin, requestHost)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
