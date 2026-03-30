@@ -250,7 +250,7 @@ async function getBookingInvoiceDraftSource(admin: ReturnType<typeof createAdmin
     return null
   }
 
-  return data as InvoiceDraftSource
+  return data as unknown as InvoiceDraftSource
 }
 
 async function ensureInvoiceDraft(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
@@ -786,34 +786,40 @@ export async function createBookingPaymentAction(formData: FormData) {
     redirectWithError(`/admin/bookings/${bookingId}`, 'Invalid payment method.')
   }
 
-  const finalPaidAt = statusRaw === 'received'
+  const finalBookingId = bookingId as string
+  const finalAmount = amount as number
+  const finalType = typeRaw as PaymentType
+  const finalStatus = statusRaw as PaymentStatus
+  const finalMethod = methodRaw as PaymentMethod | null
+
+  const finalPaidAt = finalStatus === 'received'
     ? paidAt ?? new Date().toISOString()
     : paidAt
 
   const { error } = await admin
     .from('payments')
     .insert({
-      booking_id: bookingId,
-      amount,
-      type: typeRaw,
-      method: methodRaw,
-      status: statusRaw,
+      booking_id: finalBookingId,
+      amount: finalAmount,
+      type: finalType,
+      method: finalMethod,
+      status: finalStatus,
       paid_at: finalPaidAt,
       notes,
-    })
+  })
 
   if (error) {
-    redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to record payment.')
+    redirectWithError(`/admin/bookings/${finalBookingId}`, error.message || 'Unable to record payment.')
   }
 
-  if (shouldAutoSendW9ForPayment(amount, statusRaw)) {
-    const booking = await getBookingW9Recipient(admin, bookingId)
+  if (shouldAutoSendW9ForPayment(finalAmount, finalStatus)) {
+    const booking = await getBookingW9Recipient(admin, finalBookingId)
     const client = booking?.clients?.[0] ?? null
     const clientEmail = client?.email?.trim()
     const eventName = booking?.event_name?.trim()
 
     if (booking && clientEmail && eventName) {
-      const paymentAmount = formatCurrency(amount)
+      const paymentAmount = formatCurrency(finalAmount)
 
       try {
         const pdf = await generateW9Pdf()
@@ -829,14 +835,14 @@ export async function createBookingPaymentAction(formData: FormData) {
         if (result.ok) {
           await appendBookingTimelineNote(
             admin,
-            bookingId,
+            finalBookingId,
             `W-9 email sent to ${clientEmail} after recording a ${paymentAmount} payment.`
           )
         } else {
           console.error('[booking-w9] email failed:', result.reason, result.detail ?? '')
           await appendBookingTimelineNote(
             admin,
-            bookingId,
+            finalBookingId,
             'W-9 email could not be sent automatically after payment logging.'
           )
         }
@@ -844,28 +850,28 @@ export async function createBookingPaymentAction(formData: FormData) {
         console.error('[booking-w9] unexpected error:', w9Error)
         await appendBookingTimelineNote(
           admin,
-          bookingId,
+          finalBookingId,
           'W-9 email could not be generated automatically after payment logging.'
         )
       }
     }
   }
 
-  const invoicePaymentState = await syncInvoicePaymentState(admin, bookingId)
+  const invoicePaymentState = await syncInvoicePaymentState(admin, finalBookingId)
   if (invoicePaymentState.paymentStatus === 'paid') {
     await appendBookingTimelineNote(
       admin,
-      bookingId,
+      finalBookingId,
       'Booking balance is now fully paid.'
     )
   }
 
-  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath(`/admin/bookings/${finalBookingId}`)
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/payments')
   revalidatePath('/admin/dashboard')
-  revalidatePath(`/admin/bookings/${bookingId}/invoice`)
-  redirect(`/admin/bookings/${bookingId}`)
+  revalidatePath(`/admin/bookings/${finalBookingId}/invoice`)
+  redirect(`/admin/bookings/${finalBookingId}`)
 }
 
 export async function createBookingNoteAction(formData: FormData) {

@@ -17,6 +17,19 @@ function parseDateTimeLocal(value: FormDataEntryValue | null): string | null {
   return d.toISOString()
 }
 
+function parseEventDateTime(formData: FormData): string | null {
+  const combinedValue = parseDateTimeLocal(formData.get('event_date'))
+  if (combinedValue) return combinedValue
+
+  const eventDateRaw = formData.get('event_date')
+  const eventTimeRaw = formData.get('event_time')
+  const eventDate = typeof eventDateRaw === 'string' ? eventDateRaw.trim() : ''
+  const eventTime = typeof eventTimeRaw === 'string' ? eventTimeRaw.trim() : ''
+
+  if (!eventDate || !eventTime) return null
+  return parseDateTimeLocal(`${eventDate}T${eventTime}`)
+}
+
 function optionalString(value: FormDataEntryValue | null): string | null {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -29,7 +42,7 @@ export async function createEventAction(formData: FormData) {
 
   const titleRaw = formData.get('title')
   const title = typeof titleRaw === 'string' ? titleRaw.trim() : ''
-  const eventDate = parseDateTimeLocal(formData.get('event_date'))
+  const eventDate = parseEventDateTime(formData)
   if (!title || !eventDate) {
     redirectWithError('/admin/events', 'Title and date are required to create an event.')
   }
@@ -61,7 +74,7 @@ export async function updateEventAction(formData: FormData) {
   const id = optionalString(formData.get('id'))
   const titleRaw = formData.get('title')
   const title = typeof titleRaw === 'string' ? titleRaw.trim() : ''
-  const eventDate = parseDateTimeLocal(formData.get('event_date'))
+  const eventDate = parseEventDateTime(formData)
   if (!id || !title || !eventDate) {
     redirectWithError('/admin/events', 'Title and date are required to update an event.')
   }

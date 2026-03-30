@@ -1,35 +1,65 @@
 import { Ratelimit } from '@upstash/ratelimit'
 import { Redis } from '@upstash/redis'
 
-const redis = Redis.fromEnv()
+type LimitResult = {
+  success: boolean
+  limit: number
+  remaining: number
+  reset: number
+  retryAfter: number
+  disabled?: boolean
+}
 
-const notifySignupLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(5, '10 m'),
-  analytics: true,
-  prefix: 'ratelimit:notify-signup',
-})
+let redis: Redis | null | undefined
+let warnedMissingRedis = false
 
-const bookingLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(5, '10 m'),
-  analytics: true,
-  prefix: 'ratelimit:booking',
-})
+const limiterCache = {
+  notifySignup: null as Ratelimit | null,
+  booking: null as Ratelimit | null,
+  review: null as Ratelimit | null,
+  invoiceSend: null as Ratelimit | null,
+}
 
-const reviewLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(5, '10 m'),
-  analytics: true,
-  prefix: 'ratelimit:review',
-})
+function getRedisClient() {
+  if (redis !== undefined) return redis
 
-const invoiceSendLimiter = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(5, '15 m'),
-  analytics: true,
-  prefix: 'ratelimit:invoice-send',
-})
+  const url = process.env.UPSTASH_REDIS_REST_URL?.trim()
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN?.trim()
+
+  if (!url || !token) {
+    if (!warnedMissingRedis) {
+      console.warn('[ratelimit] Upstash env missing; rate limiting is disabled.')
+      warnedMissingRedis = true
+    }
+    redis = null
+    return redis
+  }
+
+  redis = new Redis({ url, token })
+  return redis
+}
+
+function createLimiter(
+  cacheKey: keyof typeof limiterCache,
+  requests: number,
+  window: `${number} ${'s' | 'm' | 'h' | 'd'}`,
+  prefix: string
+) {
+  if (limiterCache[cacheKey]) return limiterCache[cacheKey]
+
+  const client = getRedisClient()
+  if (!client) return null
+
+  const limiter = new Ratelimit({
+    redis: client,
+    limiter: Ratelimit.slidingWindow(requests, window),
+    analytics: true,
+    prefix,
+  })
+
+  limiterCache[cacheKey] = limiter
+  return limiter
+}
 
 function createRetryAfter(reset: number) {
   return Math.max(Math.ceil((reset - Date.now()) / 1000), 1)
@@ -37,8 +67,19 @@ function createRetryAfter(reset: number) {
 
 async function limitByKey(
   key: string,
-  limiter: Ratelimit
-) {
+  limiter: Ratelimit | null
+): Promise<LimitResult> {
+  if (!limiter) {
+    return {
+      success: true,
+      limit: Number.POSITIVE_INFINITY,
+      remaining: Number.POSITIVE_INFINITY,
+      reset: Date.now(),
+      retryAfter: 0,
+      disabled: true,
+    }
+  }
+
   const result = await limiter.limit(key)
 
   return {
@@ -68,7 +109,10 @@ export function getClientIp(headers: Headers): string {
 
 export async function limitNotifySignup(headers: Headers) {
   const ip = getClientIp(headers)
-  const result = await limitByKey(ip, notifySignupLimiter)
+  const result = await limitByKey(
+    ip,
+    createLimiter('notifySignup', 5, '10 m', 'ratelimit:notify-signup')
+  )
 
   return {
     ip,
@@ -78,7 +122,10 @@ export async function limitNotifySignup(headers: Headers) {
 
 export async function limitBookingSubmission(headers: Headers) {
   const ip = getClientIp(headers)
-  const result = await limitByKey(ip, bookingLimiter)
+  const result = await limitByKey(
+    ip,
+    createLimiter('booking', 5, '10 m', 'ratelimit:booking')
+  )
 
   return {
     ip,
@@ -88,7 +135,10 @@ export async function limitBookingSubmission(headers: Headers) {
 
 export async function limitReviewSubmission(headers: Headers) {
   const ip = getClientIp(headers)
-  const result = await limitByKey(ip, reviewLimiter)
+  const result = await limitByKey(
+    ip,
+    createLimiter('review', 5, '10 m', 'ratelimit:review')
+  )
 
   return {
     ip,
@@ -98,7 +148,10 @@ export async function limitReviewSubmission(headers: Headers) {
 
 export async function limitInvoiceSend(headers: Headers, invoiceId: string) {
   const ip = getClientIp(headers)
-  const result = await limitByKey(`${ip}:${invoiceId}`, invoiceSendLimiter)
+  const result = await limitByKey(
+    `${ip}:${invoiceId}`,
+    createLimiter('invoiceSend', 5, '15 m', 'ratelimit:invoice-send')
+  )
 
   return {
     ip,

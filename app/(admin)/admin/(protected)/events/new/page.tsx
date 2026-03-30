@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import { createEventAction } from '@/app/actions/events'
+import { EVENT_CITY_OPTIONS, EVENT_TIME_OPTIONS } from '@/lib/event-form-options'
 
 function inputStyle(): React.CSSProperties {
   return {
@@ -30,19 +31,41 @@ export default function NewEventPage() {
             <input name="title" required style={inputStyle()} />
           </label>
 
-          <label style={{ display: 'grid', gap: '7px' }}>
-            <span className="admin-section-title">Date & Time *</span>
-            <input name="event_date" type="datetime-local" required style={inputStyle()} />
-          </label>
+          <div className="admin-form-grid-two">
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Event Date *</span>
+              <input name="event_date" type="date" required style={inputStyle()} />
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Start Time *</span>
+              <select name="event_time" required defaultValue="" style={inputStyle()}>
+                <option value="" disabled>Select a start time</option>
+                {EVENT_TIME_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+          </div>
 
           <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Venue</span>
-              <input name="venue" style={inputStyle()} />
+              <span className="admin-section-title">Venue / Address</span>
+              <input
+                name="venue"
+                placeholder="Venue name or street address"
+                autoComplete="street-address"
+                style={inputStyle()}
+              />
             </label>
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">City</span>
-              <input name="city" style={inputStyle()} />
+              <input
+                name="city"
+                list="event-city-options"
+                placeholder="Choose or type any city"
+                autoComplete="address-level2"
+                style={inputStyle()}
+              />
             </label>
           </div>
 
@@ -75,6 +98,10 @@ export default function NewEventPage() {
             </Link>
           </div>
         </div>
+
+        <datalist id="event-city-options">
+          {EVENT_CITY_OPTIONS.map((city) => <option key={city} value={city} />)}
+        </datalist>
       </form>
     </div>
   )

@@ -7,6 +7,15 @@ export function isValidTimeZone(timeZone: string) {
   }
 }
 
+export function getLocalDateString(date: Date, timeZone: string) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date)
+}
+
 function parseDateParts(dateValue: string) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateValue)
   if (!match) return null
@@ -155,4 +164,32 @@ export function formatEventTimeRange(
 
   if (start && end) return `${start} - ${end}`
   return start ?? end ?? null
+}
+
+export function isCalendarDaysOut(
+  eventDate: string,
+  timeZone: string,
+  daysOut: number,
+  now = new Date()
+) {
+  const event = new Date(eventDate)
+  if (Number.isNaN(event.getTime())) return false
+
+  const target = new Date(now)
+  target.setDate(target.getDate() + daysOut)
+
+  return getLocalDateString(event, timeZone) === getLocalDateString(target, timeZone)
+}
+
+export function isHoursAwayWithinRange(
+  eventDate: string,
+  minimumHoursInclusive: number,
+  maximumHoursExclusive: number,
+  now = new Date()
+) {
+  const event = new Date(eventDate)
+  if (Number.isNaN(event.getTime())) return false
+
+  const hoursUntil = (event.getTime() - now.getTime()) / (1000 * 60 * 60)
+  return hoursUntil >= minimumHoursInclusive && hoursUntil < maximumHoursExclusive
 }

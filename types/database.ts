@@ -76,6 +76,8 @@ export type Database = {
           hours:          number | null
           quote:          number | null  // quoted price in USD
           deposit_amount: number | null
+          last_balance_reminder_sent_at: string | null
+          last_event_reminder_sent_at: string | null
           status:         'inquiry' | 'confirmed' | 'completed' | 'cancelled'
           notes:          string | null
           created_at:     string

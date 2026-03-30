@@ -3,6 +3,7 @@ import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deleteEventAction, updateEventAction } from '@/app/actions/events'
+import { EVENT_CITY_OPTIONS, EVENT_TIME_OPTIONS } from '@/lib/event-form-options'
 
 interface EventRow {
   id: string
@@ -33,6 +34,14 @@ function toDateTimeLocal(iso: string): string {
   if (Number.isNaN(d.getTime())) return ''
   const offsetMs = d.getTimezoneOffset() * 60_000
   return new Date(d.getTime() - offsetMs).toISOString().slice(0, 16)
+}
+
+function toDateInputValue(iso: string): string {
+  return toDateTimeLocal(iso).slice(0, 10)
+}
+
+function toTimeInputValue(iso: string): string {
+  return toDateTimeLocal(iso).slice(11, 16)
 }
 
 async function getEvent(id: string): Promise<EventRow | null> {
@@ -71,25 +80,53 @@ export default async function EditEventPage({
             <input name="title" required defaultValue={event.title} style={inputStyle()} />
           </label>
 
-          <label style={{ display: 'grid', gap: '7px' }}>
-            <span className="admin-section-title">Date & Time *</span>
-            <input
-              name="event_date"
-              type="datetime-local"
-              required
-              defaultValue={toDateTimeLocal(event.event_date)}
-              style={inputStyle()}
-            />
-          </label>
+          <div className="admin-form-grid-two">
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Event Date *</span>
+              <input
+                name="event_date"
+                type="date"
+                required
+                defaultValue={toDateInputValue(event.event_date)}
+                style={inputStyle()}
+              />
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Start Time *</span>
+              <select
+                name="event_time"
+                required
+                defaultValue={toTimeInputValue(event.event_date)}
+                style={inputStyle()}
+              >
+                {EVENT_TIME_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>{option.label}</option>
+                ))}
+              </select>
+            </label>
+          </div>
 
           <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Venue</span>
-              <input name="venue" defaultValue={event.venue ?? ''} style={inputStyle()} />
+              <span className="admin-section-title">Venue / Address</span>
+              <input
+                name="venue"
+                defaultValue={event.venue ?? ''}
+                placeholder="Venue name or street address"
+                autoComplete="street-address"
+                style={inputStyle()}
+              />
             </label>
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">City</span>
-              <input name="city" defaultValue={event.city ?? ''} style={inputStyle()} />
+              <input
+                name="city"
+                list="event-city-options"
+                defaultValue={event.city ?? ''}
+                placeholder="Choose or type any city"
+                autoComplete="address-level2"
+                style={inputStyle()}
+              />
             </label>
           </div>
 
@@ -122,6 +159,10 @@ export default async function EditEventPage({
             </Link>
           </div>
         </div>
+
+        <datalist id="event-city-options">
+          {EVENT_CITY_OPTIONS.map((city) => <option key={city} value={city} />)}
+        </datalist>
       </form>
 
       <form action={deleteEventAction}>

@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import { formatEventTimeRange, isValidTimeZone, toEventISO } from './date-time'
+import {
+  formatEventTimeRange,
+  getLocalDateString,
+  isCalendarDaysOut,
+  isHoursAwayWithinRange,
+  isValidTimeZone,
+  toEventISO,
+} from './date-time'
 
 describe('date-time helpers', () => {
   it('accepts valid time zones and rejects invalid ones', () => {
@@ -27,5 +34,47 @@ describe('date-time helpers', () => {
         'America/Indiana/Indianapolis'
       )
     ).toBe('6:30 PM - 8:00 PM')
+  })
+
+  it('formats a local calendar date string in a target time zone', () => {
+    expect(
+      getLocalDateString(
+        new Date('2026-07-04T22:30:00.000Z'),
+        'America/Indiana/Indianapolis'
+      )
+    ).toBe('2026-07-04')
+  })
+
+  it('matches a booking that is exactly seven local calendar days away', () => {
+    expect(
+      isCalendarDaysOut(
+        '2026-07-11T22:30:00.000Z',
+        'America/Indiana/Indianapolis',
+        7,
+        new Date('2026-07-04T13:00:00.000Z')
+      )
+    ).toBe(true)
+  })
+
+  it('matches bookings inside a 48-hour reminder window', () => {
+    expect(
+      isHoursAwayWithinRange(
+        '2026-07-04T22:30:00.000Z',
+        47,
+        49,
+        new Date('2026-07-02T23:00:00.000Z')
+      )
+    ).toBe(true)
+  })
+
+  it('rejects bookings outside the 48-hour reminder window', () => {
+    expect(
+      isHoursAwayWithinRange(
+        '2026-07-04T22:30:00.000Z',
+        47,
+        49,
+        new Date('2026-07-03T23:00:00.000Z')
+      )
+    ).toBe(false)
   })
 })

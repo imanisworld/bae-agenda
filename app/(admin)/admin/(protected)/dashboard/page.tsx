@@ -76,11 +76,11 @@ const MOCK_STATS: DashboardStats = {
 }
 
 const MOCK_BOOKINGS: RecentBooking[] = [
-  { id: 'm1', event_name: 'Birthday Celebration',    event_date: '2026-03-22', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Marcus Webb',    status: 'inquiry'   },
-  { id: 'm2', event_name: 'House Music Brunch',      event_date: '2026-03-15', event_timezone: 'America/Chicago', client_name: 'Nadia Thomas',   status: 'confirmed' },
-  { id: 'm3', event_name: 'Corporate After-Party',   event_date: '2026-04-05', event_timezone: 'America/Chicago', client_name: 'Priya Sharma',   status: 'confirmed' },
-  { id: 'm4', event_name: 'Club Night at Spybar',    event_date: '2026-04-12', event_timezone: 'America/Chicago', client_name: 'Jordan Lee',     status: 'inquiry'   },
-  { id: 'm5', event_name: 'Wedding Reception',       event_date: '2026-02-28', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Destiny Brown',  status: 'completed' },
+  { id: 'm1', event_name: 'Birthday Celebration',    event_date: '2026-03-22', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Marcus Webb',    status: 'inquiry',   payment_status: 'unpaid' },
+  { id: 'm2', event_name: 'House Music Brunch',      event_date: '2026-03-15', event_timezone: 'America/Chicago',                client_name: 'Nadia Thomas',   status: 'confirmed', payment_status: 'partial' },
+  { id: 'm3', event_name: 'Corporate After-Party',   event_date: '2026-04-05', event_timezone: 'America/Chicago',                client_name: 'Priya Sharma',   status: 'confirmed', payment_status: 'unpaid' },
+  { id: 'm4', event_name: 'Club Night at Spybar',    event_date: '2026-04-12', event_timezone: 'America/Chicago',                client_name: 'Jordan Lee',     status: 'inquiry',   payment_status: 'unpaid' },
+  { id: 'm5', event_name: 'Wedding Reception',       event_date: '2026-02-28', event_timezone: 'America/Indiana/Indianapolis',  client_name: 'Destiny Brown',  status: 'completed', payment_status: 'paid' },
 ]
 
 const MOCK_EVENTS: UpcomingEvent[] = [
