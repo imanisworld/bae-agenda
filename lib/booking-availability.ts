@@ -17,6 +17,10 @@ export type BookingConflict = {
   type: "event" | "booking";
 };
 
+type BlockedDatesResult =
+  | { ok: true; dates: string[] }
+  | { ok: false; error: string };
+
 type AvailabilityResult =
   | { ok: true; available: boolean; conflicts: BookingConflict[]; hasTime: boolean }
   | { ok: false; error: string };
@@ -37,6 +41,56 @@ function formatLocalTime(date: Date, timeZone: string): string {
     minute: "2-digit",
     hour12: true,
   }).format(date);
+}
+
+export async function getBlockedBookingDates(timeZone: string): Promise<BlockedDatesResult> {
+  if (!isValidTimeZone(timeZone)) {
+    return { ok: false, error: "Invalid timezone" };
+  }
+
+  try {
+    const supabase = createAdminClient();
+    const now = new Date().toISOString();
+
+    const [{ data: events, error: eventsErr }, { data: bookings, error: bookingsErr }] = await Promise.all([
+      supabase
+        .from("events")
+        .select("event_date")
+        .gte("event_date", now),
+      supabase
+        .from("bookings")
+        .select("event_date")
+        .in("status", ["inquiry", "confirmed"])
+        .gte("event_date", now),
+    ]);
+
+    if (eventsErr) {
+      console.error("[booking-availability] blocked dates events query error:", eventsErr.message);
+    }
+
+    if (bookingsErr) {
+      console.error("[booking-availability] blocked dates bookings query error:", bookingsErr.message);
+    }
+
+    const blocked = new Set<string>();
+
+    for (const item of events ?? []) {
+      const date = new Date(item.event_date as string);
+      if (Number.isNaN(date.getTime())) continue;
+      blocked.add(getLocalDateStr(date, timeZone));
+    }
+
+    for (const item of bookings ?? []) {
+      const date = new Date(item.event_date as string);
+      if (Number.isNaN(date.getTime())) continue;
+      blocked.add(getLocalDateStr(date, timeZone));
+    }
+
+    return { ok: true, dates: Array.from(blocked).sort() };
+  } catch (error) {
+    console.error("[booking-availability] blocked dates unexpected error:", error);
+    return { ok: false, error: "Could not load blocked dates" };
+  }
 }
 
 export async function checkBookingAvailability(input: BookingAvailabilityInput): Promise<AvailabilityResult> {

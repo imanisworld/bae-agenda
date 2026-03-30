@@ -1,7 +1,21 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
+import {
+  addDays,
+  addMonths,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isBefore,
+  isSameDay,
+  isSameMonth,
+  parseISO,
+  startOfMonth,
+  startOfToday,
+  startOfWeek,
+} from 'date-fns'
 import { EVENT_TYPES, PACKAGES } from '@/lib/constants'
 import { trackEvent } from '@/lib/analytics'
 import { formatCurrency } from '@/lib/utils'
@@ -42,6 +56,8 @@ type BookingSubmitPayload = {
   error?: string
   fields?: string[]
   retryAfter?: number
+  fieldErrors?: Partial<Record<FieldKey, string>>
+  conflicts?: Array<{ title: string; time: string; type: string }>
 }
 
 const INITIAL_STATE: FormState = {
@@ -96,6 +112,8 @@ const STEP_LABELS: Record<Step, string> = {
   3: 'Details',
 }
 
+const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
+
 function parseFormTime(s: string): number | null {
   const trimmed = sanitizeTimeInput(s)
   if (!trimmed) return null
@@ -144,10 +162,21 @@ export default function BookingForm() {
   }))
   const [loading, setLoading] = useState(false)
   const [checkingAvailability, setCheckingAvailability] = useState(false)
+  const [loadingBlockedDates, setLoadingBlockedDates] = useState(true)
   const [error, setError] = useState('')
   const [availabilityError, setAvailabilityError] = useState('')
+  const [blockedDatesError, setBlockedDatesError] = useState('')
   const [success, setSuccess] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [blockedDates, setBlockedDates] = useState<string[]>([])
+  const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()))
+
+  const blockedDateSet = useMemo(() => new Set(blockedDates), [blockedDates])
+  const normalizedStartTime = normalizeTimeValue(form.eventTime)
+  const endTimeOptions = useMemo(
+    () => getEndTimeOptions(normalizedStartTime),
+    [normalizedStartTime]
+  )
 
   function set<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -171,6 +200,62 @@ export default function BookingForm() {
     }))
   }
 
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadBlockedDates() {
+      setLoadingBlockedDates(true)
+      setBlockedDatesError('')
+
+      try {
+        const res = await fetch(`/api/booking/blocked-dates?timeZone=${encodeURIComponent(form.timeZone)}`)
+        const payload = await res.json() as { dates?: string[]; error?: string }
+
+        if (!res.ok) {
+          throw new Error(payload.error ?? 'Could not load blocked dates.')
+        }
+
+        if (cancelled) return
+        setBlockedDates(payload.dates ?? [])
+      } catch (err) {
+        if (cancelled) return
+        setBlockedDates([])
+        setBlockedDatesError(err instanceof Error ? err.message : 'Could not load blocked dates.')
+      } finally {
+        if (!cancelled) setLoadingBlockedDates(false)
+      }
+    }
+
+    void loadBlockedDates()
+
+    return () => {
+      cancelled = true
+    }
+  }, [form.timeZone])
+
+  useEffect(() => {
+    if (!form.eventDate) return
+
+    if (blockedDateSet.has(form.eventDate)) {
+      set('eventDate', '')
+      setFieldErrors((prev) => ({
+        ...prev,
+        eventDate: 'That date is already unavailable. Please choose another date.',
+      }))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockedDateSet, form.eventDate])
+
+  useEffect(() => {
+    if (!form.eventEndTime) return
+
+    const normalizedEnd = normalizeTimeValue(form.eventEndTime)
+    if (!endTimeOptions.some((option) => option.value === normalizedEnd)) {
+      set('eventEndTime', '')
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [endTimeOptions, form.eventEndTime])
+
   function validateStep(currentStep: Step): FieldErrors {
     const errors: FieldErrors = {}
 
@@ -186,6 +271,8 @@ export default function BookingForm() {
         const chosen = new Date(form.eventDate + 'T00:00:00')
         if (chosen < today) {
           errors.eventDate = 'Event date must be in the future.'
+        } else if (blockedDateSet.has(form.eventDate)) {
+          errors.eventDate = 'That date is already unavailable. Please choose another date.'
         }
       }
 
@@ -315,12 +402,24 @@ export default function BookingForm() {
       const payload = (await res.json()) as BookingSubmitPayload
 
       if (!res.ok) {
-        if (payload.fields?.length) {
+        if (payload.fieldErrors && Object.keys(payload.fieldErrors).length > 0) {
+          setFieldErrors(payload.fieldErrors)
+        } else if (payload.fields?.length) {
           const serverErrors: FieldErrors = {}
           payload.fields.forEach((field) => {
-            if (field in form) serverErrors[field as FieldKey] = 'Please review this field.'
+            if (field in form) serverErrors[field as FieldKey] = payload.error ?? 'Please review this field.'
           })
           setFieldErrors(serverErrors)
+        }
+
+        if (payload.conflicts?.length) {
+          const names = payload.conflicts.map((conflict) => `"${conflict.title}" at ${conflict.time}`).join(', ')
+          setAvailabilityError(
+            form.eventTime || form.eventEndTime
+              ? `This time is too close to an existing event: ${names}. Events must be at least 30 minutes apart.`
+              : `That date is already tied to another event: ${names}. Please choose another date.`
+          )
+          setStep(1)
         }
 
         trackEvent('booking_submit_failed', {
@@ -397,8 +496,13 @@ export default function BookingForm() {
             {step === 1 && (
               <EventStep
                 availabilityError={availabilityError}
+                blockedDates={blockedDateSet}
+                blockedDatesError={blockedDatesError}
+                calendarMonth={calendarMonth}
                 fieldErrors={fieldErrors}
                 form={form}
+                loadingBlockedDates={loadingBlockedDates}
+                setCalendarMonth={setCalendarMonth}
                 set={set}
               />
             )}
@@ -542,15 +646,32 @@ function BookingProgress({ step }: { step: Step }) {
 
 function EventStep({
   availabilityError,
+  blockedDates,
+  blockedDatesError,
+  calendarMonth,
   fieldErrors,
   form,
+  loadingBlockedDates,
+  setCalendarMonth,
   set,
 }: {
   availabilityError: string
+  blockedDates: Set<string>
+  blockedDatesError: string
+  calendarMonth: Date
   fieldErrors: FieldErrors
   form: FormState
+  loadingBlockedDates: boolean
+  setCalendarMonth: (value: Date) => void
   set: <K extends keyof FormState>(key: K, value: FormState[K]) => void
 }) {
+  const today = startOfToday()
+  const selectedDate = form.eventDate ? parseISO(`${form.eventDate}T00:00:00`) : null
+  const visibleMonth = selectedDate && isSameMonth(selectedDate, calendarMonth)
+    ? calendarMonth
+    : startOfMonth(calendarMonth)
+  const calendarDays = buildCalendarDays(visibleMonth)
+
   return (
     <>
       <div style={{ display: 'grid', gap: '8px' }}>
@@ -580,24 +701,85 @@ function EventStep({
         </div>
       </div>
 
-      <label style={{ display: 'grid', gap: '8px' }}>
+      <div style={{ display: 'grid', gap: '8px' }}>
         <span className="section-label" style={{ marginBottom: 0 }}>Event Date *</span>
-        <input
-          type="date"
-          required
-          min={new Date().toISOString().split('T')[0]}
-          value={form.eventDate}
-          onChange={(e) => set('eventDate', e.target.value)}
-          style={{ ...inputStyle(Boolean(fieldErrors.eventDate)), colorScheme: 'dark' }}
-        />
+        <div style={calendarShellStyle(Boolean(fieldErrors.eventDate))}>
+          <div style={calendarHeaderStyle()}>
+            <div>
+              <div style={{ fontSize: '12px', color: 'var(--muted)', marginBottom: '4px' }}>Selected Date</div>
+              <div style={{ color: 'var(--white)', fontSize: '15px' }}>
+                {selectedDate ? format(selectedDate, 'EEEE, MMMM d, yyyy') : 'Choose an available date'}
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => setCalendarMonth(addMonths(visibleMonth, -1))}
+                className="btn-ghost"
+                disabled={isBefore(endOfMonth(addMonths(visibleMonth, -1)), today)}
+                style={{ minWidth: 'unset', padding: '8px 12px' }}
+              >
+                Prev
+              </button>
+              <button
+                type="button"
+                onClick={() => setCalendarMonth(addMonths(visibleMonth, 1))}
+                className="btn-ghost"
+                style={{ minWidth: 'unset', padding: '8px 12px' }}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+
+          <div style={{ fontSize: '13px', color: 'var(--white)', marginBottom: '12px' }}>
+            {format(visibleMonth, 'MMMM yyyy')}
+          </div>
+
+          <div style={calendarGridStyle()}>
+            {WEEKDAY_LABELS.map((day) => (
+              <div key={day} style={calendarWeekdayStyle()}>{day}</div>
+            ))}
+            {calendarDays.map((day) => {
+              const dateValue = format(day, 'yyyy-MM-dd')
+              const isPast = isBefore(day, today)
+              const isBlocked = blockedDates.has(dateValue)
+              const isSelected = selectedDate ? isSameDay(day, selectedDate) : false
+              const disabled = isPast || isBlocked
+
+              return (
+                <button
+                  key={dateValue}
+                  type="button"
+                  onClick={() => set('eventDate', dateValue)}
+                  disabled={disabled}
+                  aria-pressed={isSelected}
+                  style={calendarDayStyle({
+                    isCurrentMonth: isSameMonth(day, visibleMonth),
+                    isDisabled: disabled,
+                    isSelected,
+                    isBlocked,
+                  })}
+                >
+                  <span>{format(day, 'd')}</span>
+                </button>
+              )
+            })}
+          </div>
+        </div>
+        <span style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+          Past dates and dates already used in bookings or admin events are unavailable.
+        </span>
+        {loadingBlockedDates && <span style={{ fontSize: '12px', color: 'var(--muted)' }}>Loading unavailable dates…</span>}
+        {blockedDatesError && <span style={fieldErrorStyle()}>{blockedDatesError}</span>}
         {fieldErrors.eventDate && <span style={fieldErrorStyle()}>{fieldErrors.eventDate}</span>}
-      </label>
+      </div>
 
       <div style={twoColGrid()}>
         <label style={{ display: 'grid', gap: '8px' }}>
           <span className="section-label" style={{ marginBottom: 0 }}>Start Time</span>
           <select
-            value={form.eventTime}
+            value={normalizeTimeValue(form.eventTime)}
             onChange={(e) => set('eventTime', e.target.value)}
             style={inputStyle(Boolean(fieldErrors.eventTime))}
           >
@@ -611,12 +793,12 @@ function EventStep({
         <label style={{ display: 'grid', gap: '8px' }}>
           <span className="section-label" style={{ marginBottom: 0 }}>End Time</span>
           <select
-            value={form.eventEndTime}
+            value={normalizeTimeValue(form.eventEndTime)}
             onChange={(e) => set('eventEndTime', e.target.value)}
             style={inputStyle(Boolean(fieldErrors.eventEndTime))}
           >
             <option value="">Select an end time</option>
-            {TIME_OPTIONS.map((option) => (
+            {getEndTimeOptions(normalizeTimeValue(form.eventTime)).map((option) => (
               <option key={option.value} value={option.value}>{option.label}</option>
             ))}
           </select>
@@ -850,4 +1032,96 @@ function formatRetryAfter(seconds: number) {
 
   const minutes = Math.ceil(seconds / 60)
   return `${minutes} minute${minutes === 1 ? '' : 's'}`
+}
+
+function getEndTimeOptions(startValue: string) {
+  const startMinutes = parseFormTime(startValue)
+  if (startMinutes === null) return TIME_OPTIONS
+  return TIME_OPTIONS.filter((option) => {
+    const optionMinutes = parseFormTime(option.value)
+    return optionMinutes !== null && optionMinutes > startMinutes
+  })
+}
+
+function buildCalendarDays(month: Date) {
+  const start = startOfWeek(startOfMonth(month))
+  const end = endOfWeek(endOfMonth(month))
+  const days: Date[] = []
+
+  for (let day = start; !isBefore(end, day); day = addDays(day, 1)) {
+    days.push(day)
+  }
+
+  return days
+}
+
+function calendarShellStyle(hasError: boolean): React.CSSProperties {
+  return {
+    background: 'var(--off-black)',
+    border: `1px solid ${hasError ? '#e85d75' : 'var(--border)'}`,
+    padding: '14px',
+    display: 'grid',
+    gap: '12px',
+  }
+}
+
+function calendarHeaderStyle(): React.CSSProperties {
+  return {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    flexWrap: 'wrap',
+  }
+}
+
+function calendarGridStyle(): React.CSSProperties {
+  return {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(7, minmax(0, 1fr))',
+    gap: '8px',
+  }
+}
+
+function calendarWeekdayStyle(): React.CSSProperties {
+  return {
+    fontSize: '11px',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
+    color: 'var(--muted)',
+    textAlign: 'center',
+    paddingBottom: '4px',
+  }
+}
+
+function calendarDayStyle({
+  isBlocked,
+  isCurrentMonth,
+  isDisabled,
+  isSelected,
+}: {
+  isBlocked: boolean
+  isCurrentMonth: boolean
+  isDisabled: boolean
+  isSelected: boolean
+}): React.CSSProperties {
+  return {
+    minHeight: '42px',
+    border: `1px solid ${
+      isSelected ? 'var(--violet)' : isBlocked ? 'rgba(232, 93, 117, 0.4)' : 'var(--border)'
+    }`,
+    background: isSelected
+      ? 'rgba(155,93,229,0.18)'
+      : isBlocked
+        ? 'rgba(232, 93, 117, 0.08)'
+        : 'var(--surface)',
+    color: isDisabled
+      ? (isBlocked ? '#ff8da0' : 'var(--muted)')
+      : (isCurrentMonth ? 'var(--white)' : 'rgba(255,255,255,0.4)'),
+    cursor: isDisabled ? 'not-allowed' : 'pointer',
+    opacity: isCurrentMonth ? 1 : 0.6,
+    fontFamily: 'DM Sans, sans-serif',
+    fontSize: '14px',
+    transition: 'all 150ms ease',
+  }
 }

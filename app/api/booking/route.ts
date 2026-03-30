@@ -114,6 +114,15 @@ function optionalString(value?: string) {
   return trimmed ? trimmed : null;
 }
 
+function flattenFieldErrors(fieldErrors: Record<string, string[] | undefined>) {
+  return Object.fromEntries(
+    Object.entries(fieldErrors).flatMap(([field, messages]) => {
+      const message = messages?.[0];
+      return message ? [[field, message]] : [];
+    })
+  );
+}
+
 export async function POST(req: NextRequest) {
   const rateLimit = await limitBookingSubmission(req.headers);
   if (!rateLimit.success) {
@@ -148,11 +157,11 @@ export async function POST(req: NextRequest) {
   const parsed = BookingSchema.safeParse(body);
   if (!parsed.success) {
     const flat = parsed.error.flatten();
-    // Return the specific field errors so the form can highlight them
     const fields = Object.keys(flat.fieldErrors);
     const firstMessage = Object.values(flat.fieldErrors).flat()[0] ?? "Please review your submission.";
+    const fieldErrors = flattenFieldErrors(flat.fieldErrors);
     return NextResponse.json(
-      { error: firstMessage, fields },
+      { error: firstMessage, fields, fieldErrors },
       { status: 400 }
     );
   }
@@ -180,11 +189,21 @@ export async function POST(req: NextRequest) {
     const fields = data.eventTime?.trim() || data.eventEndTime?.trim()
       ? ["eventDate", "eventTime", "eventEndTime"]
       : ["eventDate"];
+    const fieldErrors = data.eventTime?.trim() || data.eventEndTime?.trim()
+      ? {
+          eventDate: "That date or time is no longer available.",
+          eventTime: "Choose a different time with at least a 30-minute gap.",
+          eventEndTime: "Review the event window and choose another slot.",
+        }
+      : {
+          eventDate: "This date is already booked. Please choose another date.",
+        };
 
     return NextResponse.json(
       {
         error: "That date or time is no longer available. Please choose another slot.",
         fields,
+        fieldErrors,
         conflicts: availability.conflicts,
       },
       { status: 409 }
