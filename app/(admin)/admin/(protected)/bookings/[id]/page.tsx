@@ -30,6 +30,10 @@ interface BookingDetailRow {
   status: BookingStatus
   lifecycle_status: BookingLifecycleStatus | null
   payment_status: BookingWorkflowPaymentStatus | null
+  inquiry_receipt_sent_at: string | null
+  confirmation_email_sent_at: string | null
+  last_balance_reminder_sent_at: string | null
+  post_event_follow_up_sent_at: string | null
   payment_method: string | null
   notes: string | null
   clients: {
@@ -134,6 +138,10 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
       status,
       lifecycle_status,
       payment_status,
+      inquiry_receipt_sent_at,
+      confirmation_email_sent_at,
+      last_balance_reminder_sent_at,
+      post_event_follow_up_sent_at,
       payment_method,
       notes,
       clients(id, first_name, last_name, email, phone),
@@ -204,6 +212,12 @@ export default async function EditBookingPage({
     return new Date(right.created_at).getTime() - new Date(left.created_at).getTime()
   })
   const emailActivity = internalNotes.filter((note) => /\bemail\b/i.test(note.body)).slice(0, 4)
+  const emailStatusCards = [
+    { label: 'Inquiry Receipt', sentAt: booking.inquiry_receipt_sent_at },
+    { label: 'Confirmation', sentAt: booking.confirmation_email_sent_at },
+    { label: 'Final Payment', sentAt: booking.last_balance_reminder_sent_at },
+    { label: 'Post-Event', sentAt: booking.post_event_follow_up_sent_at },
+  ]
 
   return (
     <div className="admin-page admin-page--narrow">
@@ -746,6 +760,35 @@ export default async function EditBookingPage({
               </button>
             </form>
           </div>
+        </div>
+
+        <div
+          style={{
+            marginTop: '20px',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: '12px',
+          }}
+        >
+          {emailStatusCards.map((item) => (
+            <div
+              key={item.label}
+              style={{
+                border: '1px solid var(--border)',
+                background: 'var(--bg-sunken)',
+                padding: '14px 16px',
+                display: 'grid',
+                gap: '8px',
+              }}
+            >
+              <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                {item.label}
+              </div>
+              <div style={{ color: item.sentAt ? 'var(--white)' : 'var(--muted)', fontSize: '13px', lineHeight: 1.6 }}>
+                {item.sentAt ? `Last sent ${formatDateTime(item.sentAt)}` : 'Not sent yet'}
+              </div>
+            </div>
+          ))}
         </div>
 
         <div style={{ marginTop: '20px' }}>
