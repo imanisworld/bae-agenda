@@ -28,7 +28,10 @@ interface PaymentQueryRow {
   status: PaymentStatus
   paid_at: string | null
   created_at: string
-  bookings: { event_name: string | null }[] | null
+  bookings:
+    | { event_name: string | null }
+    | { event_name: string | null }[]
+    | null
 }
 
 function fmtDate(iso: string | null) {
@@ -45,6 +48,17 @@ function fmtCurrency(n: number) {
   }).format(n)
 }
 
+function getBookingName(
+  bookingRelation: PaymentQueryRow['bookings'],
+) {
+  const booking = Array.isArray(bookingRelation)
+    ? bookingRelation[0] ?? null
+    : bookingRelation
+
+  const name = booking?.event_name?.trim()
+  return name && name.length > 0 ? name : 'Unknown'
+}
+
 async function getPayments(): Promise<PaymentRow[]> {
   try {
     const supabase = createClient()
@@ -54,10 +68,9 @@ async function getPayments(): Promise<PaymentRow[]> {
       .order('created_at', { ascending: false })
     const rows = (data ?? []) as PaymentQueryRow[]
     return rows.map((p) => {
-      const booking = p.bookings?.[0] ?? null
       return {
         id:           p.id,
-        booking_name: booking?.event_name ?? 'Unknown',
+        booking_name: getBookingName(p.bookings),
         amount:       p.amount,
         type:         p.type,
         method:       p.method,

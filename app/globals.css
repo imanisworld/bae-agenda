@@ -3954,7 +3954,7 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 960px) {
   .admin-page {
     padding: 32px 24px 36px;
   }
