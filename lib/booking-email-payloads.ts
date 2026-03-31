@@ -23,7 +23,12 @@ export interface BookingConfirmationSource {
   event_timezone: string | null
   venue: string | null
   city: string | null
+  deposit_amount: number | null
   clients: BookingClient[] | null
+  payments: Array<{
+    amount: number
+    status: PaymentStatus
+  }> | null
 }
 
 export interface BookingInquiryReceiptSource {
@@ -77,6 +82,7 @@ export function getConfirmationPayloadFromBooking(booking: BookingConfirmationSo
   const client = booking.clients?.[0] ?? null
   const clientEmail = client?.email?.trim()
   const eventTimeZone = booking.event_timezone?.trim()
+  const depositRemaining = getOutstandingDeposit(booking.deposit_amount, booking.payments)
 
   if (!clientEmail || !booking.event_name || !eventTimeZone) {
     return null
@@ -91,6 +97,8 @@ export function getConfirmationPayloadFromBooking(booking: BookingConfirmationSo
     eventTimeZone,
     venue: booking.venue,
     city: booking.city,
+    depositDue: depositRemaining > 0 ? formatCurrency(depositRemaining) : null,
+    payUrl: depositRemaining > 0 ? `${getAppBaseUrl()}/pay/${booking.id}` : null,
   }
 }
 

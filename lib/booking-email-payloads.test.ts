@@ -26,7 +26,9 @@ describe('booking email payload helpers', () => {
       event_timezone: eventTimeZone,
       venue: 'Canal Bistro',
       city: 'Indianapolis, IN',
+      deposit_amount: 300,
       clients: baseClient,
+      payments: [{ amount: 100, status: 'received' }],
     }
 
     expect(getConfirmationPayloadFromBooking(booking)).toEqual({
@@ -38,6 +40,8 @@ describe('booking email payload helpers', () => {
       eventTimeZone,
       venue: 'Canal Bistro',
       city: 'Indianapolis, IN',
+      depositDue: '$200.00',
+      payUrl: 'http://localhost:3000/pay/booking-1',
     })
   })
 
@@ -50,10 +54,32 @@ describe('booking email payload helpers', () => {
       event_timezone: eventTimeZone,
       venue: null,
       city: null,
+      deposit_amount: null,
       clients: [{ first_name: 'Imani', last_name: 'Crumble', email: null }],
+      payments: null,
     }
 
     expect(getConfirmationPayloadFromBooking(booking)).toBeNull()
+  })
+
+  it('omits the payment link when no deposit is currently due', () => {
+    const booking: BookingConfirmationSource = {
+      id: 'booking-2b',
+      status: 'confirmed',
+      event_name: 'Sunset Set',
+      event_date: eventDate,
+      event_timezone: eventTimeZone,
+      venue: 'White River',
+      city: 'Indianapolis, IN',
+      deposit_amount: 300,
+      clients: baseClient,
+      payments: [{ amount: 300, status: 'received' }],
+    }
+
+    expect(getConfirmationPayloadFromBooking(booking)).toMatchObject({
+      depositDue: null,
+      payUrl: null,
+    })
   })
 
   it('builds the inquiry receipt payload with a fallback first name', () => {

@@ -22,6 +22,8 @@ type BookingConfirmedNotificationPayload = {
   eventTimeZone: string
   venue?: string | null
   city?: string | null
+  depositDue?: string | null
+  payUrl?: string | null
 }
 
 type BookingInquiryReceiptPayload = {
@@ -493,6 +495,7 @@ export async function sendBookingConfirmedNotification(payload: BookingConfirmed
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
   const location = [payload.venue, payload.city].filter(Boolean).join(', ')
+  const hasDepositLink = Boolean(payload.depositDue && payload.payUrl)
 
   return sendEmail({
     to: payload.email,
@@ -506,22 +509,40 @@ export async function sendBookingConfirmedNotification(payload: BookingConfirmed
       `Date: ${eventDateTime}`,
       `Time Zone: ${payload.eventTimeZone}`,
       ...(location ? [`Location: ${location}`] : []),
+      ...(hasDepositLink
+        ? [
+            `Deposit due: ${payload.depositDue}`,
+            `Payment link: ${payload.payUrl}`,
+          ]
+        : []),
       '',
-      'We are locked in and will follow up with any remaining details if needed.',
+      hasDepositLink
+        ? 'Use the payment link above to pay your deposit through Stripe Checkout, or reply if you need Zelle or Cash App instructions.'
+        : 'We are locked in and will follow up with any remaining details if needed.',
       '',
       'DJ B.A.E. Bookings',
     ].join('\n'),
     html: buildClientBookingEmailHtml({
       eyebrow: 'Booking confirmed',
       heading: 'Your booking is confirmed',
-      intro: `Hi ${escapeHtml(guestName)}, your booking for <strong>${escapeHtml(payload.eventName)}</strong> is officially confirmed.`,
+      intro: hasDepositLink
+        ? `Hi ${escapeHtml(guestName)}, your booking for <strong>${escapeHtml(payload.eventName)}</strong> is officially confirmed. Your deposit is still due, and your payment link is included below.`
+        : `Hi ${escapeHtml(guestName)}, your booking for <strong>${escapeHtml(payload.eventName)}</strong> is officially confirmed.`,
       fields: [
         ['Event', payload.eventName],
         ['Date', eventDateTime],
         ['Time Zone', payload.eventTimeZone],
         ...(location ? [['Location', location] as const] : []),
+        ...(hasDepositLink
+          ? [
+              ['Deposit due', payload.depositDue as string] as const,
+              ['Payment link', payload.payUrl as string] as const,
+            ]
+          : []),
       ],
-      closing: 'We are locked in and will follow up with any remaining details if needed.',
+      closing: hasDepositLink
+        ? 'Use the payment link above for Stripe Checkout, or reply if you need Zelle or Cash App instructions.'
+        : 'We are locked in and will follow up with any remaining details if needed.',
     }),
   })
 }

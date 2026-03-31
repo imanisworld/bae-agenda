@@ -119,6 +119,8 @@ async function getBookingConfirmationSource(admin: ReturnType<typeof createAdmin
       event_timezone,
       venue,
       city,
+      deposit_amount,
+      payments(amount, status),
       clients(first_name, last_name, email)
     `)
     .eq('id', bookingId)
