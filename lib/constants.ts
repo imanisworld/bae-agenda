@@ -63,7 +63,7 @@ export const EVENT_TYPES = [
 ] as const
 
 // ---- Payment -----------------------------------------------
-export const PAYMENT_METHODS = ['cash', 'venmo', 'zelle', 'stripe', 'check', 'ach', 'other'] as const
+export const PAYMENT_METHODS = ['cash', 'venmo', 'zelle', 'cash_app', 'stripe', 'check', 'ach', 'other'] as const
 export const PAYMENT_TYPES   = ['deposit', 'balance', 'full', 'refund'] as const
 
 // ---- Socials -----------------------------------------------

@@ -219,6 +219,29 @@ Done when:
 
 ---
 
+## Phase 10 — Deposit Payment System
+Purpose:
+Let clients pay deposits cleanly, while keeping manual payment options and admin confirmation in sync.
+
+Tasks:
+- confirm booking pricing uses the real `quote` column, not a guessed `price` field
+- add Stripe Checkout for deposit payments
+- support manual Zelle / Cash App instructions and tracking
+- create public `/pay/[booking-id]` page
+- add booking deposit-status fields for payment state and confirmation source
+- register Stripe webhook at `https://thebaeagenda.com/api/stripe/webhook`
+- mark Stripe payments confirmed from webhook events
+- support admin manual-confirm flow for off-platform payments
+- surface deposit status clearly in admin booking review
+
+Done when:
+- a client can open a public payment page and pay a deposit with Stripe Checkout
+- staff can record and manually confirm Zelle / Cash App deposits
+- webhook-confirmed payments update booking deposit state automatically
+- admin has a reliable fallback when payment happens outside Stripe
+
+---
+
 ## Phase 10 — Launch Readiness
 Purpose:
 Prepare for real domain cutover.

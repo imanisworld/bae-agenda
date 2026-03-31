@@ -4,7 +4,7 @@
  * Server component — reads session so we can pass user info to the sidebar.
  */
 import { createClient } from '@/lib/supabase/server'
-import Sidebar from '@/components/admin/Sidebar'
+import AdminShell from '@/components/admin/AdminShell'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
 import { redirect } from 'next/navigation'
 
@@ -27,9 +27,8 @@ export default async function AdminProtectedLayout({
   }
 
   return (
-    <div className="admin-shell">
-      <Sidebar userEmail={user?.email} />
-      <main className="admin-main">{children}</main>
-    </div>
+    <AdminShell userEmail={user?.email}>
+      {children}
+    </AdminShell>
   )
 }

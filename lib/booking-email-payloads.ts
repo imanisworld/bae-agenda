@@ -1,4 +1,5 @@
 import { getOutstandingBalance, getOutstandingDeposit } from '@/lib/booking-finance'
+import { getAppBaseUrl } from '@/lib/stripe'
 import type { BookingStatus, PaymentStatus } from '@/types/index'
 
 function formatCurrency(value: number): string {
@@ -134,6 +135,7 @@ export function getDepositReminderPayloadFromBooking(booking: BookingDepositRemi
     eventDate: booking.event_date,
     eventTimeZone,
     depositDue: formatCurrency(depositRemaining),
+    payUrl: `${getAppBaseUrl()}/pay/${booking.id}`,
   }
 }
 

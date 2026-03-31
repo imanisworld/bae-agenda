@@ -7,6 +7,7 @@ import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import AdminNotice     from '@/components/admin/AdminNotice'
 import { createEventFromBookingAction, updateBookingStatusAction } from '@/app/actions/bookings'
+import { getDepositStatus } from '@/lib/booking-deposit'
 import { getBookingPaymentStatus, type BookingPaymentStatus } from '@/lib/booking-payment-status'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import type { BookingStatus } from '@/types/index'
@@ -23,6 +24,7 @@ interface BookingRow {
   package:     string | null
   status:      BookingStatus
   payment_status: BookingPaymentStatus
+  deposit_status: 'unpaid' | 'pending' | 'paid'
   created_at:  string
 }
 
@@ -35,6 +37,7 @@ interface BookingQueryRow {
   city: string | null
   package: string | null
   quote: number | null
+  deposit_amount: number | null
   status: BookingStatus
   created_at: string
   clients: { first_name: string | null; last_name: string | null }[] | null
@@ -69,7 +72,7 @@ async function getBookings(): Promise<BookingRow[]> {
     const supabase = createClient()
     const { data } = await supabase
       .from('bookings')
-      .select('id, event_name, event_date, event_timezone, venue, city, package, quote, status, created_at, clients(first_name, last_name), payments(amount, status)')
+      .select('id, event_name, event_date, event_timezone, venue, city, package, quote, deposit_amount, status, created_at, clients(first_name, last_name), payments(amount, type, status)')
       .order('created_at', { ascending: false })
     const rows = (data ?? []) as BookingQueryRow[]
     return rows.map((b) => {
@@ -87,6 +90,7 @@ async function getBookings(): Promise<BookingRow[]> {
         package:    b.package,
         status:     b.status as BookingStatus,
         payment_status: getBookingPaymentStatus(b.quote, b.payments),
+        deposit_status: getDepositStatus(b.deposit_amount, b.payments as Array<{ amount: number; type: string; status: 'pending' | 'received' | 'refunded' }> | null),
         created_at: b.created_at,
       }
     })
@@ -169,6 +173,7 @@ export default async function BookingsPage({
                   <th>Package</th>
                   <th>Status</th>
                   <th>Payment</th>
+                  <th>Deposit</th>
                   <th>Submitted</th>
                   <th>Actions</th>
                 </tr>
@@ -194,6 +199,9 @@ export default async function BookingsPage({
                     <td data-label="Package" className="muted">{b.package ?? '—'}</td>
                     <td data-label="Status"><Badge variant={b.status} /></td>
                     <td data-label="Payment"><Badge variant={b.payment_status} /></td>
+                    <td data-label="Deposit">
+                      <Badge variant={b.deposit_status === 'paid' ? 'paid' : b.deposit_status === 'pending' ? 'pending' : 'unpaid'} label={`Deposit ${b.deposit_status}`} />
+                    </td>
                     <td data-label="Submitted" className="muted">{fmtSubmittedDate(b.created_at)}</td>
                     <td data-label="Actions">
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>

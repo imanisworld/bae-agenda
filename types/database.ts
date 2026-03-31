@@ -76,6 +76,10 @@ export type Database = {
           hours:          number | null
           quote:          number | null  // quoted price in USD
           deposit_amount: number | null
+          deposit_status: 'unpaid' | 'pending' | 'paid'
+          deposit_paid_at: string | null
+          deposit_confirmed_via: 'stripe' | 'manual' | null
+          deposit_checkout_session_id: string | null
           last_balance_reminder_sent_at: string | null
           last_event_reminder_sent_at: string | null
           status:         'inquiry' | 'confirmed' | 'completed' | 'cancelled'
@@ -96,9 +100,10 @@ export type Database = {
           booking_id: string             // FK → bookings.id (required)
           amount:     number
           type:       'deposit' | 'balance' | 'full' | 'refund'
-          method:     'cash' | 'venmo' | 'zelle' | 'stripe' | 'check' | 'ach' | 'other' | null
+          method:     'cash' | 'venmo' | 'zelle' | 'cash_app' | 'stripe' | 'check' | 'ach' | 'other' | null
           status:     'pending' | 'received' | 'refunded'
           paid_at:    string | null      // when payment was received
+          external_reference: string | null
           notes:      string | null
           created_at: string
           updated_at: string

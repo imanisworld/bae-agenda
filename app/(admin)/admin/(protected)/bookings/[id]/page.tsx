@@ -4,10 +4,12 @@ import PageHeader from '@/components/admin/PageHeader'
 import Badge from '@/components/admin/Badge'
 import AdminNotice from '@/components/admin/AdminNotice'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt, getDepositStatus } from '@/lib/booking-deposit'
 import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { getBookingPaymentStatus } from '@/lib/booking-payment-status'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { createBookingNoteAction, createBookingPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, sendBookingBalanceReminderAction, sendBookingDepositReminderAction, sendBookingEventReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
+import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingStatus } from '@/types/index'
 
@@ -157,6 +159,9 @@ export default async function EditBookingPage({
   const receivedTotal = getReceivedPaymentTotal(payments)
   const outstandingDeposit = getOutstandingDeposit(booking.deposit_amount, payments)
   const outstandingBalance = getOutstandingBalance(booking.quote, payments)
+  const depositStatus = getDepositStatus(booking.deposit_amount, payments)
+  const depositPaidAt = getDepositPaidAt(booking.deposit_amount, payments)
+  const depositConfirmedVia = getDepositConfirmedVia(booking.deposit_amount, payments)
   const paymentStatus = getBookingPaymentStatus(booking.quote, payments)
   const internalNotes = booking.booking_notes ?? []
   const emailActivity = internalNotes.filter((note) => /\bemail\b/i.test(note.body)).slice(0, 4)
@@ -370,12 +375,13 @@ export default async function EditBookingPage({
           gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
           gap: '12px',
         }}>
-          {[
-            { label: 'Quote', value: formatCurrency(total) },
-            { label: 'Deposit', value: formatCurrency(deposit) },
-            { label: 'Balance Due', value: formatCurrency(balance) },
-            { label: 'Payment Status', value: paymentStatus.toUpperCase() },
-          ].map((item) => (
+            {[
+              { label: 'Quote', value: formatCurrency(total) },
+              { label: 'Deposit', value: formatCurrency(deposit) },
+              { label: 'Balance Due', value: formatCurrency(balance) },
+              { label: 'Payment Status', value: paymentStatus.toUpperCase() },
+              { label: 'Deposit Status', value: depositStatus.toUpperCase() },
+            ].map((item) => (
             <div
               key={item.label}
               style={{
@@ -389,6 +395,11 @@ export default async function EditBookingPage({
               </div>
               {item.label === 'Payment Status' ? (
                 <Badge variant={paymentStatus} />
+              ) : item.label === 'Deposit Status' ? (
+                <Badge
+                  variant={depositStatus === 'paid' ? 'paid' : depositStatus === 'pending' ? 'pending' : 'unpaid'}
+                  label={`Deposit ${depositStatus}`}
+                />
               ) : (
                 <div style={{ color: item.label === 'Balance Due' ? 'var(--violet)' : 'var(--white)', fontSize: '18px', fontFamily: 'Conthrax, sans-serif' }}>
                   {item.value}
@@ -418,6 +429,58 @@ export default async function EditBookingPage({
           </div>
         </div>
 
+        <div style={{ marginTop: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '12px' }}>
+          <div style={{ border: '1px solid var(--border)', background: 'var(--bg-sunken)', padding: '16px', display: 'grid', gap: '10px' }}>
+            <div className="admin-section-title">Public Deposit Link</div>
+            <div className="muted" style={{ fontSize: '12px', lineHeight: 1.7 }}>
+              Share this page with the client when the deposit is ready to collect.
+            </div>
+            <Link href={`/pay/${booking.id}`} className="admin-btn-ghost">
+              Open Payment Page
+            </Link>
+          </div>
+
+          <form action={confirmManualDepositAction} style={{ border: '1px solid var(--border)', background: 'var(--bg-sunken)', padding: '16px', display: 'grid', gap: '12px' }}>
+            <input type="hidden" name="booking_id" value={booking.id} />
+            <div className="admin-section-title">Manual Deposit Confirm</div>
+            <div className="admin-form-grid-two">
+              <label style={{ display: 'grid', gap: '7px' }}>
+                <span className="muted" style={{ fontSize: '12px' }}>Method</span>
+                <select name="method" defaultValue="zelle" style={inputStyle()}>
+                  <option value="zelle">Zelle</option>
+                  <option value="cash_app">Cash App</option>
+                </select>
+              </label>
+              <div style={{ display: 'grid', gap: '7px' }}>
+                <span className="muted" style={{ fontSize: '12px' }}>Current Deposit</span>
+                <div style={{ color: 'var(--white)', fontFamily: 'Conthrax, sans-serif', fontSize: '16px' }}>
+                  {outstandingDeposit > 0 ? formatCurrency(outstandingDeposit) : 'Covered'}
+                </div>
+              </div>
+            </div>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="muted" style={{ fontSize: '12px' }}>Note</span>
+              <textarea name="notes" rows={2} style={inputStyle()} placeholder="Receipt screenshot received, transfer confirmed..." />
+            </label>
+            <div className="admin-form-actions">
+              <button
+                type="submit"
+                className="admin-btn-primary"
+                disabled={outstandingDeposit <= 0}
+                style={outstandingDeposit <= 0 ? { opacity: 0.55, cursor: 'not-allowed' } : undefined}
+              >
+                Confirm Manual Deposit
+              </button>
+            </div>
+            {(depositPaidAt || depositConfirmedVia) && (
+              <div className="muted" style={{ fontSize: '12px', lineHeight: 1.7 }}>
+                {depositPaidAt ? `Last deposit update: ${formatDateTime(depositPaidAt)}.` : ''}
+                {depositConfirmedVia ? ` Confirmed via ${depositConfirmedVia}.` : ''}
+              </div>
+            )}
+          </form>
+        </div>
+
         {payments.length === 0 ? (
           <p style={{ color: 'var(--muted)', fontSize: '13px', margin: '20px 0 0' }}>
             No payments logged for this booking yet.
@@ -442,7 +505,7 @@ export default async function EditBookingPage({
                     </span>
                     <span className="muted" style={{ textTransform: 'capitalize' }}>
                       {payment.type}
-                      {payment.method ? ` · ${payment.method}` : ''}
+                      {payment.method ? ` · ${formatPaymentMethodLabel(payment.method)}` : ''}
                     </span>
                   </div>
                   <Badge variant={payment.status} />
@@ -486,7 +549,7 @@ export default async function EditBookingPage({
                 <option value="">Select method</option>
                 {PAYMENT_METHODS.map((method) => (
                   <option key={method} value={method}>
-                    {method.toUpperCase() === 'ACH' ? 'ACH' : method.charAt(0).toUpperCase() + method.slice(1)}
+                    {formatPaymentMethodLabel(method)}
                   </option>
                 ))}
               </select>

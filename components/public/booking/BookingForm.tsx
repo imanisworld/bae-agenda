@@ -113,6 +113,7 @@ const STEP_LABELS: Record<Step, string> = {
 }
 
 const WEEKDAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function parseFormTime(s: string): number | null {
   const trimmed = sanitizeTimeInput(s)
@@ -152,6 +153,12 @@ function sanitizeTimeInput(value: string) {
     .trim()
     .replace(/\s+/g, ' ')
     .toUpperCase() ?? ''
+}
+
+function stepForField(field: string): Step {
+  if (field === 'firstName' || field === 'email') return 2
+  if (field === 'eventName') return 3
+  return 1
 }
 
 export default function BookingForm() {
@@ -297,6 +304,7 @@ export default function BookingForm() {
     if (currentStep === 2) {
       if (!form.firstName.trim()) errors.firstName = 'First name is required.'
       if (!form.email.trim()) errors.email = 'Email is required.'
+      else if (!EMAIL_PATTERN.test(form.email.trim())) errors.email = 'Enter a valid email address.'
     }
 
     if (currentStep === 3 && !form.eventName.trim()) {
@@ -315,6 +323,11 @@ export default function BookingForm() {
     setFieldErrors({})
 
     if (step === 1) {
+      if (loadingBlockedDates) {
+        setBlockedDatesError('Please wait while we load unavailable dates.')
+        return
+      }
+
       setCheckingAvailability(true)
       setAvailabilityError('')
       try {
@@ -333,9 +346,16 @@ export default function BookingForm() {
           available: boolean
           hasTime: boolean
           conflicts: Array<{ title: string; time: string; type: string }>
+          error?: string
         }
 
         const result = await res.json() as CheckResult
+
+        if (!res.ok) {
+          setAvailabilityError(result.error ?? 'We could not verify availability right now. Please try again.')
+          setCheckingAvailability(false)
+          return
+        }
 
         if (!result.available && result.conflicts.length > 0) {
           const names = result.conflicts.map((conflict) => `"${conflict.title}" at ${conflict.time}`).join(', ')
@@ -402,14 +422,24 @@ export default function BookingForm() {
       const payload = (await res.json()) as BookingSubmitPayload
 
       if (!res.ok) {
+        let nextStep: Step | null = null
+
         if (payload.fieldErrors && Object.keys(payload.fieldErrors).length > 0) {
           setFieldErrors(payload.fieldErrors)
+          nextStep = Object.keys(payload.fieldErrors).reduce<Step>(
+            (current, field) => Math.min(current, stepForField(field)) as Step,
+            3
+          )
         } else if (payload.fields?.length) {
           const serverErrors: FieldErrors = {}
           payload.fields.forEach((field) => {
             if (field in form) serverErrors[field as FieldKey] = payload.error ?? 'Please review this field.'
           })
           setFieldErrors(serverErrors)
+          nextStep = payload.fields.reduce<Step>(
+            (current, field) => Math.min(current, stepForField(field)) as Step,
+            3
+          )
         }
 
         if (payload.conflicts?.length) {
@@ -419,8 +449,10 @@ export default function BookingForm() {
               ? `This time is too close to an existing event: ${names}. Events must be at least 30 minutes apart.`
               : `That date is already tied to another event: ${names}. Please choose another date.`
           )
-          setStep(1)
+          nextStep = 1
         }
+
+        if (nextStep) setStep(nextStep)
 
         trackEvent('booking_submit_failed', {
           reason: payload.error ?? 'request_failed',

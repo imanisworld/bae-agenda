@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
 import { getBookingPaymentStatus } from '@/lib/booking-payment-status'
+import { syncBookingDepositState } from '@/lib/booking-deposit-sync'
 import {
   getBalanceReminderPayloadFromBooking,
   getConfirmationPayloadFromBooking,
@@ -676,6 +677,8 @@ export async function updateBookingDetailsAction(formData: FormData) {
     )
   }
 
+  await syncBookingDepositState(admin, bookingId)
+
   revalidatePath('/admin/bookings')
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath(`/admin/bookings/${bookingId}/invoice`)
@@ -858,6 +861,7 @@ export async function createBookingPaymentAction(formData: FormData) {
   }
 
   const invoicePaymentState = await syncInvoicePaymentState(admin, finalBookingId)
+  await syncBookingDepositState(admin, finalBookingId)
   if (invoicePaymentState.paymentStatus === 'paid') {
     await appendBookingTimelineNote(
       admin,

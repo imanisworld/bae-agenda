@@ -58,6 +58,8 @@ Main groups:
   `ADMIN_EMAILS`
 - Booking emails:
   `RESEND_API_KEY`, `BOOKING_FROM_EMAIL`, `BOOKING_ALERT_EMAIL`, `BOOKING_ALERT_PHONE`
+- Stripe:
+  `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_APP_URL`
 - Mix notify signup:
   `FROM_EMAIL`, `ALERT_EMAIL`
 - Twilio:
@@ -116,6 +118,8 @@ npm run build
 
 - This app is set up for Vercel-style deployment
 - Production env vars must be added before booking, auth, invoice, or notification flows will work
+- Stripe deposit flow also requires the Stripe env vars above plus a webhook endpoint pointed at
+  `https://thebaeagenda.com/api/stripe/webhook`
 - Twilio is optional unless SMS alerts are required
 - Upstash is required for the shared rate-limit paths
 

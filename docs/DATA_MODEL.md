@@ -51,18 +51,23 @@ Represents a DJ service request or confirmed job.
 Fields:
 - id
 - client_id
-- event_id (optional)
+- event_name
 - event_type
 - event_date
-- location
+- end_time
+- venue
+- city
+- package
+- hours
 - status
-- quoted_amount
+- quote
+- deposit_amount
 - notes
 - created_at
+- updated_at
 
 Status values:
 - inquiry
-- quoted
 - confirmed
 - completed
 - cancelled
@@ -76,19 +81,22 @@ Represents payments tied to bookings.
 Fields:
 - id
 - booking_id
-- payment_type
+- type
+- method
 - amount
 - status
 - paid_at
 - notes
 - created_at
+- updated_at
 
 Payment types:
 - deposit
-- final
-- other
+- balance
+- full
+- refund
 
 Payment status:
-- unpaid
-- paid
-- partial
+- pending
+- received
+- refunded

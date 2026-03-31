@@ -8,6 +8,7 @@ import Link            from 'next/link'
 import StatCard        from '@/components/admin/StatCard'
 import Badge           from '@/components/admin/Badge'
 import PageHeader      from '@/components/admin/PageHeader'
+import { getDepositStatus } from '@/lib/booking-deposit'
 import { getBookingPaymentStatus, type BookingPaymentStatus } from '@/lib/booking-payment-status'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import type { BookingStatus, PaymentStatus } from '@/types/index'
@@ -22,6 +23,7 @@ interface RecentBooking {
   client_name: string | null
   status:      BookingStatus
   payment_status: BookingPaymentStatus
+  deposit_status: 'unpaid' | 'pending' | 'paid'
 }
 
 interface UpcomingEvent {
@@ -54,8 +56,9 @@ interface BookingQueryRow {
   event_timezone: string
   status: BookingStatus
   quote: number | null
+  deposit_amount: number | null
   clients: { first_name: string | null; last_name: string | null }[] | null
-  payments: { amount: number; status: 'pending' | 'received' | 'refunded' }[] | null
+  payments: { amount: number; type: string; status: 'pending' | 'received' | 'refunded' }[] | null
 }
 
 interface PaymentQueryRow {
@@ -76,11 +79,11 @@ const MOCK_STATS: DashboardStats = {
 }
 
 const MOCK_BOOKINGS: RecentBooking[] = [
-  { id: 'm1', event_name: 'Birthday Celebration',    event_date: '2026-03-22', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Marcus Webb',    status: 'inquiry',   payment_status: 'unpaid' },
-  { id: 'm2', event_name: 'House Music Brunch',      event_date: '2026-03-15', event_timezone: 'America/Chicago',                client_name: 'Nadia Thomas',   status: 'confirmed', payment_status: 'partial' },
-  { id: 'm3', event_name: 'Corporate After-Party',   event_date: '2026-04-05', event_timezone: 'America/Chicago',                client_name: 'Priya Sharma',   status: 'confirmed', payment_status: 'unpaid' },
-  { id: 'm4', event_name: 'Club Night at Spybar',    event_date: '2026-04-12', event_timezone: 'America/Chicago',                client_name: 'Jordan Lee',     status: 'inquiry',   payment_status: 'unpaid' },
-  { id: 'm5', event_name: 'Wedding Reception',       event_date: '2026-02-28', event_timezone: 'America/Indiana/Indianapolis',  client_name: 'Destiny Brown',  status: 'completed', payment_status: 'paid' },
+  { id: 'm1', event_name: 'Birthday Celebration',    event_date: '2026-03-22', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Marcus Webb',    status: 'inquiry',   payment_status: 'unpaid',  deposit_status: 'unpaid' },
+  { id: 'm2', event_name: 'House Music Brunch',      event_date: '2026-03-15', event_timezone: 'America/Chicago',               client_name: 'Nadia Thomas',   status: 'confirmed', payment_status: 'partial', deposit_status: 'pending' },
+  { id: 'm3', event_name: 'Corporate After-Party',   event_date: '2026-04-05', event_timezone: 'America/Chicago',               client_name: 'Priya Sharma',   status: 'confirmed', payment_status: 'unpaid',  deposit_status: 'unpaid' },
+  { id: 'm4', event_name: 'Club Night at Spybar',    event_date: '2026-04-12', event_timezone: 'America/Chicago',               client_name: 'Jordan Lee',     status: 'inquiry',   payment_status: 'unpaid',  deposit_status: 'unpaid' },
+  { id: 'm5', event_name: 'Wedding Reception',       event_date: '2026-02-28', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Destiny Brown',  status: 'completed', payment_status: 'paid',    deposit_status: 'paid' },
 ]
 
 const MOCK_EVENTS: UpcomingEvent[] = [
@@ -135,7 +138,7 @@ async function getDashboardData() {
         .eq('status', 'inquiry'),
       supabase.from('clients').select('*', { count: 'exact', head: true }),
       supabase.from('bookings')
-        .select('id, event_name, event_date, event_timezone, status, quote, clients(first_name, last_name), payments(amount, status)')
+        .select('id, event_name, event_date, event_timezone, status, quote, deposit_amount, clients(first_name, last_name), payments(amount, type, status)')
         .order('created_at', { ascending: false }).limit(5),
       supabase.from('events')
         .select('id, title, event_date, venue, featured')
@@ -168,6 +171,7 @@ async function getDashboardData() {
             : null,
           status: b.status as BookingStatus,
           payment_status: getBookingPaymentStatus(b.quote, b.payments),
+          deposit_status: getDepositStatus(b.deposit_amount, b.payments),
         }
       }) as RecentBooking[],
       upcomingEvents:   (eventRows   ?? []) as UpcomingEvent[],
@@ -295,6 +299,7 @@ export default async function DashboardPage() {
                 <th>Date</th>
                 <th>Status</th>
                 <th>Payment</th>
+                <th>Deposit</th>
               </tr>
             </thead>
             <tbody>
@@ -305,6 +310,9 @@ export default async function DashboardPage() {
                   <td data-label="Date" className="muted">{fmtDate(b.event_date, b.event_timezone)}</td>
                   <td data-label="Status"><Badge variant={b.status} /></td>
                   <td data-label="Payment"><Badge variant={b.payment_status} /></td>
+                  <td data-label="Deposit">
+                    <Badge variant={b.deposit_status === 'paid' ? 'paid' : b.deposit_status === 'pending' ? 'pending' : 'unpaid'} label={`Deposit ${b.deposit_status}`} />
+                  </td>
                 </tr>
               ))}
             </tbody>

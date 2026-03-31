@@ -5,6 +5,7 @@
 import PageHeader      from '@/components/admin/PageHeader'
 import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
+import { formatPaymentMethodLabel } from '@/lib/booking-deposit'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import type { PaymentStatus } from '@/types/index'
 
@@ -147,7 +148,7 @@ export default async function PaymentsPage() {
                       {fmtCurrency(p.amount)}
                     </td>
                     <td data-label="Method" className="muted" style={{ textTransform: 'capitalize' }}>
-                      {p.method ?? '—'}
+                      {formatPaymentMethodLabel(p.method)}
                     </td>
                     <td data-label="Status"><Badge variant={p.status} /></td>
                     <td data-label="Paid" className="muted">{fmtDate(p.paid_at)}</td>
