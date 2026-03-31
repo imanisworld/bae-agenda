@@ -1,4 +1,4 @@
-import { getOutstandingBalance, getOutstandingDeposit } from '@/lib/booking-finance'
+import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { getAppBaseUrl } from '@/lib/stripe'
 import type { BookingStatus, PaymentStatus } from '@/types/index'
 
@@ -70,6 +70,50 @@ export interface BookingBalanceReminderSource {
 }
 
 export interface BookingEventReminderSource {
+  id: string
+  status: BookingStatus
+  event_name: string | null
+  event_date: string
+  event_timezone: string | null
+  venue: string | null
+  city: string | null
+  clients: BookingClient[] | null
+}
+
+export interface BookingDepositReceivedSource {
+  id: string
+  status: BookingStatus
+  event_name: string | null
+  event_date: string
+  event_timezone: string | null
+  quote: number | null
+  deposit_amount: number | null
+  venue: string | null
+  city: string | null
+  clients: BookingClient[] | null
+  payments: Array<{
+    amount: number
+    status: PaymentStatus
+  }> | null
+}
+
+export interface BookingFullyPaidSource {
+  id: string
+  status: BookingStatus
+  event_name: string | null
+  event_date: string
+  event_timezone: string | null
+  quote: number | null
+  venue: string | null
+  city: string | null
+  clients: BookingClient[] | null
+  payments: Array<{
+    amount: number
+    status: PaymentStatus
+  }> | null
+}
+
+export interface BookingPostEventFollowUpSource {
   id: string
   status: BookingStatus
   event_name: string | null
@@ -200,5 +244,82 @@ export function getEventReminderPayloadFromBooking(booking: BookingEventReminder
     eventTimeZone,
     venue: booking.venue,
     city: booking.city,
+  }
+}
+
+export function getDepositReceivedPayloadFromBooking(booking: BookingDepositReceivedSource | null) {
+  if (!booking) return null
+
+  const client = booking.clients?.[0] ?? null
+  const clientEmail = client?.email?.trim()
+  const eventTimeZone = booking.event_timezone?.trim()
+  const depositAmount = booking.deposit_amount ?? 0
+  const depositRemaining = getOutstandingDeposit(booking.deposit_amount, booking.payments)
+  const balanceRemaining = getOutstandingBalance(booking.quote, booking.payments)
+
+  if (!clientEmail || !booking.event_name || !eventTimeZone || depositAmount <= 0 || depositRemaining > 0) {
+    return null
+  }
+
+  return {
+    firstName: client?.first_name?.trim() || 'there',
+    lastName: client?.last_name?.trim() || null,
+    email: clientEmail,
+    eventName: booking.event_name,
+    eventDate: booking.event_date,
+    eventTimeZone,
+    totalAmount: formatCurrency(booking.quote ?? 0),
+    depositAmount: formatCurrency(depositAmount),
+    remainingAmount: formatCurrency(balanceRemaining),
+    venue: booking.venue,
+    city: booking.city,
+  }
+}
+
+export function getFullyPaidPayloadFromBooking(booking: BookingFullyPaidSource | null) {
+  if (!booking) return null
+
+  const client = booking.clients?.[0] ?? null
+  const clientEmail = client?.email?.trim()
+  const eventTimeZone = booking.event_timezone?.trim()
+  const balanceRemaining = getOutstandingBalance(booking.quote, booking.payments)
+  const receivedTotal = getReceivedPaymentTotal(booking.payments)
+
+  if (!clientEmail || !booking.event_name || !eventTimeZone || (booking.quote ?? 0) <= 0 || balanceRemaining > 0 || receivedTotal <= 0) {
+    return null
+  }
+
+  return {
+    firstName: client?.first_name?.trim() || 'there',
+    lastName: client?.last_name?.trim() || null,
+    email: clientEmail,
+    eventName: booking.event_name,
+    eventDate: booking.event_date,
+    eventTimeZone,
+    totalPaid: formatCurrency(receivedTotal),
+    venue: booking.venue,
+    city: booking.city,
+  }
+}
+
+export function getPostEventFollowUpPayloadFromBooking(booking: BookingPostEventFollowUpSource | null) {
+  if (!booking) return null
+
+  const client = booking.clients?.[0] ?? null
+  const clientEmail = client?.email?.trim()
+  const eventTimeZone = booking.event_timezone?.trim()
+
+  if (!clientEmail || !booking.event_name || !eventTimeZone || booking.status !== 'completed') {
+    return null
+  }
+
+  return {
+    firstName: client?.first_name?.trim() || 'there',
+    lastName: client?.last_name?.trim() || null,
+    email: clientEmail,
+    eventName: booking.event_name,
+    eventDate: booking.event_date,
+    eventTimeZone,
+    location: [booking.venue, booking.city].filter(Boolean).join(', ') || null,
   }
 }

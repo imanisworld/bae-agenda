@@ -75,6 +75,42 @@ type BookingEventReminderPayload = {
   city?: string | null
 }
 
+type BookingDepositReceivedPayload = {
+  firstName: string
+  lastName?: string | null
+  email: string
+  eventName: string
+  eventDate: string
+  eventTimeZone: string
+  totalAmount?: string | null
+  depositAmount?: string | null
+  remainingAmount?: string | null
+  venue?: string | null
+  city?: string | null
+}
+
+type BookingFullyPaidPayload = {
+  firstName: string
+  lastName?: string | null
+  email: string
+  eventName: string
+  eventDate: string
+  eventTimeZone: string
+  totalPaid?: string | null
+  venue?: string | null
+  city?: string | null
+}
+
+type BookingPostEventFollowUpPayload = {
+  firstName: string
+  lastName?: string | null
+  email: string
+  eventName: string
+  eventDate: string
+  eventTimeZone: string
+  location?: string | null
+}
+
 type InvoiceNotificationPayload = {
   to: string
   clientName: string
@@ -662,6 +698,113 @@ export async function sendBookingEventReminder(payload: BookingEventReminderPayl
         ...(location ? [['Location', location] as const] : []),
       ],
       closing: 'If any details have changed, just reply to this email.',
+    }),
+  })
+}
+
+export async function sendBookingDepositReceivedNotification(payload: BookingDepositReceivedPayload) {
+  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
+  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+  const location = [payload.venue, payload.city].filter(Boolean).join(', ')
+
+  return sendEmail({
+    to: payload.email,
+    subject: "Deposit Received - You're Booked",
+    text: [
+      `Hey ${guestName},`,
+      '',
+      `Your deposit for ${payload.eventName} on ${eventDateTime} came through, and your date is officially locked in.`,
+      '',
+      `Event: ${payload.eventName}`,
+      `Date: ${eventDateTime}`,
+      `Deposit received: ${payload.depositAmount ?? 'Paid'}`,
+      `Remaining balance: ${payload.remainingAmount ?? 'TBD'}`,
+      ...(location ? [`Location: ${location}`] : []),
+      '',
+      'If any event details change between now and then, just reply here and keep me posted.',
+      '',
+      '- DJ B.A.E.',
+    ].join('\n'),
+    html: buildClientBookingEmailHtml({
+      eyebrow: 'Deposit received',
+      heading: "Deposit Received - You're Booked",
+      intro: `Hey ${escapeHtml(guestName)}, your deposit for <strong>${escapeHtml(payload.eventName)}</strong> on <strong>${escapeHtml(eventDateTime)}</strong> came through, and your date is officially locked in.`,
+      fields: [
+        ['Event', payload.eventName],
+        ['Event Date', eventDateTime],
+        ['Deposit Received', payload.depositAmount ?? 'Paid'],
+        ['Remaining Balance', payload.remainingAmount ?? 'TBD'],
+        ...(location ? [['Location', location] as const] : []),
+      ] as const,
+      closing: 'If any event details change between now and then, just reply here and keep me posted.',
+    }),
+  })
+}
+
+export async function sendBookingFullyPaidNotification(payload: BookingFullyPaidPayload) {
+  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
+  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+  const location = [payload.venue, payload.city].filter(Boolean).join(', ')
+
+  return sendEmail({
+    to: payload.email,
+    subject: `Fully Paid - Ready for ${eventDateTime}`,
+    text: [
+      `Hey ${guestName},`,
+      '',
+      `You're officially fully paid for ${payload.eventName} on ${eventDateTime}.`,
+      '',
+      `Event: ${payload.eventName}`,
+      `Date: ${eventDateTime}`,
+      `Total paid: ${payload.totalPaid ?? 'Paid in full'}`,
+      ...(location ? [`Location: ${location}`] : []),
+      '',
+      'We are all set on the payment side. If any timing or logistics shift before the event, just reply here.',
+      '',
+      '- DJ B.A.E.',
+    ].join('\n'),
+    html: buildClientBookingEmailHtml({
+      eyebrow: 'Fully paid',
+      heading: 'Fully Paid - Ready To Go',
+      intro: `Hey ${escapeHtml(guestName)}, you're officially fully paid for <strong>${escapeHtml(payload.eventName)}</strong> on <strong>${escapeHtml(eventDateTime)}</strong>.`,
+      fields: [
+        ['Event', payload.eventName],
+        ['Event Date', eventDateTime],
+        ['Total Paid', payload.totalPaid ?? 'Paid in full'],
+        ...(location ? [['Location', location] as const] : []),
+      ] as const,
+      closing: 'We are all set on the payment side. If any timing or logistics shift before the event, just reply here.',
+    }),
+  })
+}
+
+export async function sendBookingPostEventFollowUp(payload: BookingPostEventFollowUpPayload) {
+  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
+  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+
+  return sendEmail({
+    to: payload.email,
+    subject: 'Appreciate You - DJ B.A.E.',
+    text: [
+      `Hey ${guestName},`,
+      '',
+      `Appreciate you for having me for ${payload.eventName} on ${eventDateTime}.`,
+      '',
+      'Thank you for trusting me with the vibe. If you have any photos, videos, or feedback you want to share, just reply here.',
+      'And if you are planning anything else later on, I would love to work together again.',
+      '',
+      '- DJ B.A.E.',
+    ].join('\n'),
+    html: buildClientBookingEmailHtml({
+      eyebrow: 'Thank you',
+      heading: 'Appreciate You',
+      intro: `Hey ${escapeHtml(guestName)}, appreciate you for having me for <strong>${escapeHtml(payload.eventName)}</strong> on <strong>${escapeHtml(eventDateTime)}</strong>.`,
+      fields: [
+        ['Event', payload.eventName],
+        ['Event Date', eventDateTime],
+        ...(payload.location ? [['Location', payload.location] as const] : []),
+      ] as const,
+      closing: 'Thank you for trusting me with the vibe. If you have any photos, videos, or feedback you want to share, just reply here.',
     }),
   })
 }

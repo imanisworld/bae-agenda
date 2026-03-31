@@ -2,14 +2,20 @@ import { describe, expect, it } from 'vitest'
 import {
   getBalanceReminderPayloadFromBooking,
   getConfirmationPayloadFromBooking,
+  getDepositReceivedPayloadFromBooking,
   getDepositReminderPayloadFromBooking,
   getEventReminderPayloadFromBooking,
+  getFullyPaidPayloadFromBooking,
   getInquiryReceiptPayloadFromBooking,
+  getPostEventFollowUpPayloadFromBooking,
   type BookingBalanceReminderSource,
   type BookingConfirmationSource,
+  type BookingDepositReceivedSource,
   type BookingDepositReminderSource,
   type BookingEventReminderSource,
+  type BookingFullyPaidSource,
   type BookingInquiryReceiptSource,
+  type BookingPostEventFollowUpSource,
 } from './booking-email-payloads'
 
 const baseClient = [{ first_name: 'Imani', last_name: 'Crumble', email: 'client@example.com' }]
@@ -208,5 +214,135 @@ describe('booking email payload helpers', () => {
     }
 
     expect(getEventReminderPayloadFromBooking(booking)).toBeNull()
+  })
+
+  it('builds the deposit received payload once the deposit is covered', () => {
+    const booking: BookingDepositReceivedSource = {
+      id: 'booking-10',
+      status: 'confirmed',
+      event_name: 'Rooftop Day Party',
+      event_date: eventDate,
+      event_timezone: eventTimeZone,
+      quote: 1500,
+      deposit_amount: 500,
+      venue: 'Skyline Loft',
+      city: 'Chicago, IL',
+      clients: baseClient,
+      payments: [{ amount: 500, status: 'received' }],
+    }
+
+    expect(getDepositReceivedPayloadFromBooking(booking)).toEqual({
+      firstName: 'Imani',
+      lastName: 'Crumble',
+      email: 'client@example.com',
+      eventName: 'Rooftop Day Party',
+      eventDate,
+      eventTimeZone,
+      totalAmount: '$1,500.00',
+      depositAmount: '$500.00',
+      remainingAmount: '$1,000.00',
+      venue: 'Skyline Loft',
+      city: 'Chicago, IL',
+    })
+  })
+
+  it('suppresses the deposit received payload until the deposit is actually paid', () => {
+    const booking: BookingDepositReceivedSource = {
+      id: 'booking-11',
+      status: 'confirmed',
+      event_name: 'Rooftop Day Party',
+      event_date: eventDate,
+      event_timezone: eventTimeZone,
+      quote: 1500,
+      deposit_amount: 500,
+      venue: 'Skyline Loft',
+      city: 'Chicago, IL',
+      clients: baseClient,
+      payments: [{ amount: 200, status: 'received' }],
+    }
+
+    expect(getDepositReceivedPayloadFromBooking(booking)).toBeNull()
+  })
+
+  it('builds the fully paid payload once the quote is covered', () => {
+    const booking: BookingFullyPaidSource = {
+      id: 'booking-12',
+      status: 'confirmed',
+      event_name: 'Wedding Reception',
+      event_date: eventDate,
+      event_timezone: eventTimeZone,
+      quote: 1200,
+      venue: 'Canal Bistro',
+      city: 'Indianapolis, IN',
+      clients: baseClient,
+      payments: [{ amount: 1200, status: 'received' }],
+    }
+
+    expect(getFullyPaidPayloadFromBooking(booking)).toEqual({
+      firstName: 'Imani',
+      lastName: 'Crumble',
+      email: 'client@example.com',
+      eventName: 'Wedding Reception',
+      eventDate,
+      eventTimeZone,
+      totalPaid: '$1,200.00',
+      venue: 'Canal Bistro',
+      city: 'Indianapolis, IN',
+    })
+  })
+
+  it('suppresses the fully paid payload when a balance is still due', () => {
+    const booking: BookingFullyPaidSource = {
+      id: 'booking-13',
+      status: 'confirmed',
+      event_name: 'Wedding Reception',
+      event_date: eventDate,
+      event_timezone: eventTimeZone,
+      quote: 1200,
+      venue: 'Canal Bistro',
+      city: 'Indianapolis, IN',
+      clients: baseClient,
+      payments: [{ amount: 900, status: 'received' }],
+    }
+
+    expect(getFullyPaidPayloadFromBooking(booking)).toBeNull()
+  })
+
+  it('builds the post-event follow-up payload for completed bookings', () => {
+    const booking: BookingPostEventFollowUpSource = {
+      id: 'booking-14',
+      status: 'completed',
+      event_name: 'Brunch Set',
+      event_date: eventDate,
+      event_timezone: eventTimeZone,
+      venue: 'Gallery Cafe',
+      city: 'Indianapolis, IN',
+      clients: baseClient,
+    }
+
+    expect(getPostEventFollowUpPayloadFromBooking(booking)).toEqual({
+      firstName: 'Imani',
+      lastName: 'Crumble',
+      email: 'client@example.com',
+      eventName: 'Brunch Set',
+      eventDate,
+      eventTimeZone,
+      location: 'Gallery Cafe, Indianapolis, IN',
+    })
+  })
+
+  it('suppresses the post-event follow-up payload until the booking is completed', () => {
+    const booking: BookingPostEventFollowUpSource = {
+      id: 'booking-15',
+      status: 'confirmed',
+      event_name: 'Brunch Set',
+      event_date: eventDate,
+      event_timezone: eventTimeZone,
+      venue: 'Gallery Cafe',
+      city: 'Indianapolis, IN',
+      clients: baseClient,
+    }
+
+    expect(getPostEventFollowUpPayloadFromBooking(booking)).toBeNull()
   })
 })

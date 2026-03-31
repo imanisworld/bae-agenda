@@ -9,7 +9,7 @@ import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } fr
 import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { createBookingNoteAction, createBookingPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, sendBookingBalanceReminderAction, sendBookingDepositReminderAction, sendBookingEventReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
+import { createBookingNoteAction, createBookingPaymentAction, resendBookingConfirmationAction, resendBookingDepositReceivedAction, resendBookingFullyPaidAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingDepositReminderAction, sendBookingEventReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingLifecycleStatus, BookingStatus, BookingWorkflowPaymentStatus } from '@/types/index'
@@ -447,6 +447,72 @@ export default async function EditBookingPage({
                 }
               >
                 Send Event Reminder
+              </button>
+            </form>
+            <form action={resendBookingDepositReceivedAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || outstandingDeposit > 0}
+                style={
+                  !booking.clients?.email || outstandingDeposit > 0
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : outstandingDeposit > 0
+                      ? 'Wait until the deposit is fully covered before sending this email.'
+                      : undefined
+                }
+              >
+                Send Deposit Received
+              </button>
+            </form>
+            <form action={resendBookingFullyPaidAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || outstandingBalance > 0}
+                style={
+                  !booking.clients?.email || outstandingBalance > 0
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : outstandingBalance > 0
+                      ? 'Wait until the balance is fully covered before sending this email.'
+                      : undefined
+                }
+              >
+                Send Fully Paid
+              </button>
+            </form>
+            <form action={resendBookingPostEventFollowUpAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || lifecycleStatus !== 'completed'}
+                style={
+                  !booking.clients?.email || lifecycleStatus !== 'completed'
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : lifecycleStatus !== 'completed'
+                      ? 'Mark the booking completed before sending the post-event follow-up.'
+                      : undefined
+                }
+              >
+                Send Post-Event Follow-Up
               </button>
             </form>
           </div>

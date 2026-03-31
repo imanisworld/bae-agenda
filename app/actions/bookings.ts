@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
+import { sendBookingDepositReceivedEmail, sendBookingFullyPaidEmail, sendBookingPostEventFollowUpEmail } from '@/lib/booking-email-workflows'
 import { getBookingPaymentStatus } from '@/lib/booking-payment-status'
 import { syncBookingDepositState } from '@/lib/booking-deposit-sync'
 import {
@@ -18,12 +19,16 @@ import {
   getConfirmationPayloadFromBooking,
   getDepositReminderPayloadFromBooking,
   getEventReminderPayloadFromBooking,
+  getFullyPaidPayloadFromBooking,
   getInquiryReceiptPayloadFromBooking,
+  getPostEventFollowUpPayloadFromBooking,
   type BookingBalanceReminderSource,
   type BookingConfirmationSource,
   type BookingDepositReminderSource,
   type BookingEventReminderSource,
+  type BookingFullyPaidSource,
   type BookingInquiryReceiptSource,
+  type BookingPostEventFollowUpSource,
 } from '@/lib/booking-email-payloads'
 import { toEventISO } from '@/lib/date-time'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
@@ -242,6 +247,56 @@ async function getBookingEventReminderSource(admin: ReturnType<typeof createAdmi
   }
 
   return data as BookingEventReminderSource
+}
+
+async function getBookingFullyPaidSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
+  const { data, error } = await admin
+    .from('bookings')
+    .select(`
+      id,
+      status,
+      event_name,
+      event_date,
+      event_timezone,
+      quote,
+      venue,
+      city,
+      clients(first_name, last_name, email),
+      payments(amount, status)
+    `)
+    .eq('id', bookingId)
+    .maybeSingle()
+
+  if (error || !data) {
+    console.error('[booking-fully-paid] unable to load booking:', error)
+    return null
+  }
+
+  return data as BookingFullyPaidSource
+}
+
+async function getBookingPostEventFollowUpSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
+  const { data, error } = await admin
+    .from('bookings')
+    .select(`
+      id,
+      status,
+      event_name,
+      event_date,
+      event_timezone,
+      venue,
+      city,
+      clients(first_name, last_name, email)
+    `)
+    .eq('id', bookingId)
+    .maybeSingle()
+
+  if (error || !data) {
+    console.error('[booking-follow-up] unable to load booking:', error)
+    return null
+  }
+
+  return data as BookingPostEventFollowUpSource
 }
 
 async function getBookingInvoiceDraftSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
@@ -618,6 +673,92 @@ export async function sendBookingEventReminderAction(formData: FormData) {
   redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Event reminder email sent to ${eventPayload.email}.`)}`)
 }
 
+export async function resendBookingDepositReceivedAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+  const bookingIdRaw = optionalString(formData.get('booking_id'))
+
+  if (!bookingIdRaw) {
+    redirectWithError('/admin/bookings', 'Missing booking id for deposit received email.')
+  }
+
+  const bookingId = bookingIdRaw as string
+  const result = await sendBookingDepositReceivedEmail(admin, bookingId, { force: true, mode: 'resend' })
+  if (result.status === 'failed') {
+    redirectWithError(`/admin/bookings/${bookingId}`, result.detail)
+  }
+  if (result.status === 'sent') {
+    redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Deposit received email sent to ${result.email}.`)}`)
+  }
+
+  redirectWithError(`/admin/bookings/${bookingId}`, 'This booking does not currently qualify for a deposit received email.')
+}
+
+export async function resendBookingFullyPaidAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+  const bookingIdRaw = optionalString(formData.get('booking_id'))
+
+  if (!bookingIdRaw) {
+    redirectWithError('/admin/bookings', 'Missing booking id for fully paid email.')
+  }
+
+  const bookingId = bookingIdRaw as string
+  const booking = await getBookingFullyPaidSource(admin, bookingId)
+  if (!booking) {
+    redirectWithError('/admin/bookings', 'Could not find that booking.')
+  }
+
+  const payload = getFullyPaidPayloadFromBooking(booking as BookingFullyPaidSource)
+  if (!payload) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'This booking is not fully paid yet.')
+  }
+
+  const result = await sendBookingFullyPaidEmail(admin, bookingId, { force: true, mode: 'resend' })
+  if (result.status === 'failed') {
+    redirectWithError(`/admin/bookings/${bookingId}`, result.detail)
+  }
+  if (result.status === 'sent') {
+    redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Fully paid email sent to ${result.email}.`)}`)
+  }
+
+  redirectWithError(`/admin/bookings/${bookingId}`, 'This booking is not ready for a fully paid email yet.')
+}
+
+export async function resendBookingPostEventFollowUpAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+  const bookingIdRaw = optionalString(formData.get('booking_id'))
+
+  if (!bookingIdRaw) {
+    redirectWithError('/admin/bookings', 'Missing booking id for post-event follow-up email.')
+  }
+
+  const bookingId = bookingIdRaw as string
+  const booking = await getBookingPostEventFollowUpSource(admin, bookingId)
+  if (!booking) {
+    redirectWithError('/admin/bookings', 'Could not find that booking.')
+  }
+
+  const payload = getPostEventFollowUpPayloadFromBooking(booking as BookingPostEventFollowUpSource)
+  if (!payload) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Only completed bookings can send the post-event follow-up email.')
+  }
+
+  const result = await sendBookingPostEventFollowUpEmail(admin, bookingId, { force: true, mode: 'resend' })
+  if (result.status === 'failed') {
+    redirectWithError(`/admin/bookings/${bookingId}`, result.detail)
+  }
+  if (result.status === 'sent') {
+    redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Post-event follow-up email sent to ${result.email}.`)}`)
+  }
+
+  redirectWithError(`/admin/bookings/${bookingId}`, 'This booking is not ready for the post-event follow-up email yet.')
+}
+
 export async function updateBookingStatusAction(formData: FormData) {
   await requireAdminUser()
 
@@ -666,6 +807,13 @@ export async function updateBookingStatusAction(formData: FormData) {
       bookingId,
       'Invoice draft created automatically when the booking was confirmed.'
     )
+  }
+
+  if (lifecycleStatus === 'completed') {
+    const followUpResult = await sendBookingPostEventFollowUpEmail(admin, bookingId)
+    if (followUpResult.status === 'failed') {
+      console.error('[booking-follow-up] email failed:', followUpResult.detail)
+    }
   }
 
   revalidatePath('/admin/bookings')
@@ -764,6 +912,13 @@ export async function updateBookingDetailsAction(formData: FormData) {
 
   await syncBookingDepositState(admin, bookingId)
   await syncBookingWorkflowState(admin, bookingId)
+
+  if (lifecycleStatus === 'completed') {
+    const followUpResult = await sendBookingPostEventFollowUpEmail(admin, bookingId)
+    if (followUpResult.status === 'failed') {
+      console.error('[booking-follow-up] email failed:', followUpResult.detail)
+    }
+  }
 
   revalidatePath('/admin/bookings')
   revalidatePath(`/admin/bookings/${bookingId}`)
@@ -948,7 +1103,21 @@ export async function createBookingPaymentAction(formData: FormData) {
 
   const invoicePaymentState = await syncInvoicePaymentState(admin, finalBookingId)
   await syncBookingDepositState(admin, finalBookingId)
-  await syncBookingWorkflowState(admin, finalBookingId)
+  const workflowState = await syncBookingWorkflowState(admin, finalBookingId)
+  const depositEmailResult = await sendBookingDepositReceivedEmail(admin, finalBookingId)
+  if (depositEmailResult.status === 'failed') {
+    console.error('[booking-payment] deposit received email failed:', depositEmailResult.detail)
+  }
+  const fullyPaidEmailResult = await sendBookingFullyPaidEmail(admin, finalBookingId)
+  if (fullyPaidEmailResult.status === 'failed') {
+    console.error('[booking-payment] fully paid email failed:', fullyPaidEmailResult.detail)
+  }
+  if (workflowState?.lifecycleStatus === 'completed') {
+    const followUpResult = await sendBookingPostEventFollowUpEmail(admin, finalBookingId)
+    if (followUpResult.status === 'failed') {
+      console.error('[booking-payment] post-event follow-up email failed:', followUpResult.detail)
+    }
+  }
   if (invoicePaymentState.paymentStatus === 'paid') {
     await appendBookingTimelineNote(
       admin,

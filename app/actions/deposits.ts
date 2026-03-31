@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getOutstandingDeposit } from '@/lib/booking-finance'
+import { sendBookingDepositReceivedEmail } from '@/lib/booking-email-workflows'
 import { syncBookingDepositState } from '@/lib/booking-deposit-sync'
 import { getBookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
 import { getAppBaseUrl, getStripeClient } from '@/lib/stripe'
@@ -212,6 +213,11 @@ export async function confirmManualDepositAction(formData: FormData) {
       booking_id: bookingId as string,
       body: `${methodLabel} deposit manually confirmed${notes ? `: ${notes}` : '.'}`,
     })
+
+  const depositEmailResult = await sendBookingDepositReceivedEmail(admin, bookingId as string)
+  if (depositEmailResult.status === 'failed') {
+    console.error('[manual-deposit] deposit received email failed:', depositEmailResult.detail)
+  }
 
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
