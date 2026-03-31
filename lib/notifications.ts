@@ -89,6 +89,12 @@ type NotificationResult =
   | { ok: true }
   | { ok: false; reason: 'missing_config' | 'request_failed'; detail?: string }
 
+type BookingNotificationDispatchSummary = {
+  ownerEmailSent: boolean
+  clientReceiptSent: boolean
+  ownerSmsSent: boolean
+}
+
 function normalizeUsPhone(value: string | null | undefined): string | null {
   if (!value) return null
   const digits = value.replace(/\D/g, '')
@@ -449,6 +455,11 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
   }
 
   const results = await Promise.allSettled(tasks)
+  const summary: BookingNotificationDispatchSummary = {
+    ownerEmailSent: false,
+    clientReceiptSent: false,
+    ownerSmsSent: false,
+  }
 
   results.forEach((result, index) => {
     if (result.status === 'rejected') {
@@ -458,8 +469,15 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
 
     if (!result.value.ok) {
       console.error(`[booking-notification:${index}]`, result.value.reason, result.value.detail ?? '')
+      return
     }
+
+    if (index === 0) summary.ownerEmailSent = true
+    if (index === 1) summary.clientReceiptSent = true
+    if (index === 2) summary.ownerSmsSent = true
   })
+
+  return summary
 }
 
 export async function sendBookingInquiryReceipt(payload: BookingInquiryReceiptPayload) {

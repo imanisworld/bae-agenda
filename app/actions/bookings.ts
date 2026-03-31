@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getPrimaryBookingClient } from '@/lib/booking-client'
+import { stampBookingEmailSentAt } from '@/lib/booking-email-tracking'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
 import { sendBookingPostEventFollowUpEmail } from '@/lib/booking-email-workflows'
@@ -467,6 +468,8 @@ export async function resendBookingConfirmationAction(formData: FormData) {
     redirectWithError(`/admin/bookings/${bookingId}`, result.detail || 'Unable to send confirmation email.')
   }
 
+  await stampBookingEmailSentAt(admin, bookingId, 'confirmation_email_sent_at')
+
   await appendBookingTimelineNote(
     admin,
     bookingId,
@@ -514,6 +517,8 @@ export async function resendBookingInquiryReceiptAction(formData: FormData) {
     redirectWithError(`/admin/bookings/${bookingId}`, result.detail || 'Unable to send inquiry receipt email.')
   }
 
+  await stampBookingEmailSentAt(admin, bookingId, 'inquiry_receipt_sent_at')
+
   await appendBookingTimelineNote(
     admin,
     bookingId,
@@ -549,6 +554,8 @@ export async function sendBookingBalanceReminderAction(formData: FormData) {
   if (!result.ok) {
     redirectWithError(`/admin/bookings/${bookingId}`, result.detail || 'Unable to send balance reminder email.')
   }
+
+  await stampBookingEmailSentAt(admin, bookingId, 'last_balance_reminder_sent_at')
 
   await appendBookingTimelineNote(
     admin,
@@ -623,6 +630,7 @@ export async function updateBookingStatusAction(formData: FormData) {
 
   const confirmationResult = await sendConfirmationIfPresent(confirmationPayload)
   if (confirmationPayload && confirmationResult?.ok) {
+    await stampBookingEmailSentAt(admin, bookingId, 'confirmation_email_sent_at')
     await appendBookingTimelineNote(
       admin,
       bookingId,
@@ -718,6 +726,7 @@ export async function updateBookingDetailsAction(formData: FormData) {
 
   const confirmationResult = await sendConfirmationIfPresent(confirmationPayload)
   if (confirmationPayload && confirmationResult?.ok) {
+    await stampBookingEmailSentAt(admin, bookingId, 'confirmation_email_sent_at')
     await appendBookingTimelineNote(
       admin,
       bookingId,
@@ -1004,6 +1013,7 @@ export async function confirmBookingAction(formData: FormData) {
       const result = await sendBookingConfirmedNotification(payload)
       const client = getPrimaryBookingClient(booking.clients)
       if (result.ok) {
+        await stampBookingEmailSentAt(admin, bookingId as string, 'confirmation_email_sent_at')
         await appendBookingTimelineNote(admin, bookingId as string, `Booking confirmed. Confirmation and deposit request sent to ${client?.email ?? 'client'}.`)
       } else {
         await appendBookingTimelineNote(admin, bookingId as string, 'Booking confirmed. Confirmation email could not be sent.')
@@ -1061,6 +1071,7 @@ export async function requestFinalPaymentAction(formData: FormData) {
     if (payload) {
       const result = await sendBookingBalanceReminder(payload)
       if (result.ok) {
+        await stampBookingEmailSentAt(admin, bookingId as string, 'last_balance_reminder_sent_at')
         await appendBookingTimelineNote(admin, bookingId as string, `Final payment requested. Balance reminder sent to ${payload.email}.`)
       } else {
         await appendBookingTimelineNote(admin, bookingId as string, 'Final payment requested. Balance reminder email could not be sent.')

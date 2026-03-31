@@ -4,6 +4,7 @@ import { checkBookingAvailability } from "@/lib/booking-availability";
 import { isValidTimeZone, toEventISO } from "@/lib/date-time";
 import { limitBookingSubmission } from "@/lib/ratelimit";
 import { sendBookingNotifications } from "@/lib/notifications";
+import { stampBookingEmailSentAt } from "@/lib/booking-email-tracking";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const ALLOWED_ORIGINS = new Set([
@@ -241,7 +242,7 @@ export async function POST(req: NextRequest) {
       ? toEventISO(data.eventDate, data.timeZone, data.eventEndTime.trim())
       : null;
 
-    const { error: bookingError } = await admin
+    const { data: booking, error: bookingError } = await admin
       .from("bookings")
       .insert({
         client_id: client.id,
@@ -255,14 +256,16 @@ export async function POST(req: NextRequest) {
         package: optionalString(data.package),
         notes: optionalString(data.notes),
         status: "inquiry",
-      });
+      })
+      .select("id")
+      .single();
 
-    if (bookingError) {
+    if (bookingError || !booking?.id) {
       console.error("[booking] booking insert error:", bookingError);
       return NextResponse.json({ error: "Unable to save your booking request. Please try again." }, { status: 500 });
     }
 
-    await sendBookingNotifications({
+    const notificationSummary = await sendBookingNotifications({
       firstName: clientPayload.first_name,
       lastName: clientPayload.last_name,
       email: clientPayload.email,
@@ -276,6 +279,10 @@ export async function POST(req: NextRequest) {
       packageName: optionalString(data.package),
       notes: optionalString(data.notes),
     });
+
+    if (notificationSummary.clientReceiptSent) {
+      await stampBookingEmailSentAt(admin, booking.id, "inquiry_receipt_sent_at");
+    }
   } catch (error) {
     console.error("[booking] unexpected save error:", error);
     return NextResponse.json({ error: "Unable to process your booking request. Please try again." }, { status: 500 });

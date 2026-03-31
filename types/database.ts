@@ -81,6 +81,8 @@ export type Database = {
           deposit_confirmed_via: 'stripe' | 'manual' | null
           deposit_checkout_session_id: string | null
           lifecycle_status: 'new' | 'contacted' | 'negotiating' | 'confirmed' | 'completed' | 'lost'
+          inquiry_receipt_sent_at: string | null
+          confirmation_email_sent_at: string | null
           last_balance_reminder_sent_at: string | null
           last_event_reminder_sent_at: string | null
           deposit_received_email_sent_at: string | null

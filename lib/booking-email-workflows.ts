@@ -1,4 +1,5 @@
 import { getPostEventFollowUpPayloadFromBooking, type BookingPostEventFollowUpSource } from '@/lib/booking-email-payloads'
+import { stampBookingEmailSentAt } from '@/lib/booking-email-tracking'
 import { sendBookingPostEventFollowUp } from '@/lib/notifications'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -14,13 +15,6 @@ async function appendBookingTimelineNote(admin: AdminClient, bookingId: string, 
   const { error } = await admin.from('notes').insert({ booking_id: bookingId, body })
   if (error) {
     console.error('[booking-email-workflows] note insert failed:', error.message)
-  }
-}
-
-async function stampBookingEmail(admin: AdminClient, bookingId: string, column: 'post_event_follow_up_sent_at', sentAt: string) {
-  const { error } = await admin.from('bookings').update({ [column]: sentAt }).eq('id', bookingId)
-  if (error) {
-    console.error('[booking-email-workflows] sent-at stamp failed:', column, error.message)
   }
 }
 
@@ -63,7 +57,7 @@ export async function sendBookingPostEventFollowUpEmail(admin: AdminClient, book
   if (!result.ok) return { status: 'failed', detail: result.detail || 'Unable to send post-event follow-up email.' }
 
   if (!booking.post_event_follow_up_sent_at) {
-    await stampBookingEmail(admin, bookingId, 'post_event_follow_up_sent_at', options?.nowIso ?? new Date().toISOString())
+    await stampBookingEmailSentAt(admin, bookingId, 'post_event_follow_up_sent_at', options?.nowIso ?? new Date().toISOString())
   }
   await appendBookingTimelineNote(admin, bookingId, getPostEventFollowUpNote(payload.email, options?.mode ?? 'auto'))
   return { status: 'sent', email: payload.email }
