@@ -12,7 +12,9 @@ const DISMISS_KEY = 'baeagenda-install-prompt-dismissed'
 function isIosSafari() {
   if (typeof window === 'undefined') return false
   const ua = window.navigator.userAgent
-  const isIos = /iPad|iPhone|iPod/.test(ua)
+  const isLegacyIos = /iPad|iPhone|iPod/.test(ua)
+  const isModernIpad = window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1
+  const isIos = isLegacyIos || isModernIpad
   const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua)
   return isIos && isSafari
 }
@@ -114,6 +116,12 @@ export default function AddToHomeScreenPrompt() {
             cursor: 'pointer',
             fontSize: '18px',
             lineHeight: 1,
+            width: '44px',
+            minWidth: '44px',
+            height: '44px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             padding: 0,
           }}
         >
@@ -136,6 +144,7 @@ export default function AddToHomeScreenPrompt() {
             letterSpacing: '0.18em',
             textTransform: 'uppercase',
             cursor: 'pointer',
+            minHeight: '44px',
           }}
         >
           {installing ? 'Opening…' : 'Install The Bae'}
@@ -155,6 +164,7 @@ export default function AddToHomeScreenPrompt() {
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
               cursor: 'pointer',
+              minHeight: '44px',
             }}
           >
             {showIosInstructions ? 'Hide Steps' : 'How To Add It'}

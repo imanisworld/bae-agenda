@@ -20,7 +20,7 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body style={{ margin: 0, background: '#0d0d0f', color: '#faf8f3', fontFamily: 'DM Sans, sans-serif' }}>
-        <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: '24px' }}>
+        <div style={{ minHeight: '100dvh', display: 'grid', placeItems: 'center', padding: 'max(24px, calc(var(--safe-top) + 20px)) max(24px, calc(var(--safe-right) + 20px)) max(24px, calc(var(--safe-bottom) + 20px)) max(24px, calc(var(--safe-left) + 20px))' }}>
           <div style={{ maxWidth: '560px', width: '100%', border: '1px solid rgba(255,255,255,0.14)', background: '#151518', padding: '32px' }}>
             <div style={{ fontSize: '11px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(250,248,243,0.68)', marginBottom: '12px' }}>
               Unexpected Error

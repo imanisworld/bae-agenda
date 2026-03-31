@@ -121,6 +121,57 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['payments']['Insert']>
       }
 
+      client_portal_codes: {
+        Row: {
+          id: string
+          client_id: string
+          phone: string
+          code_hash: string
+          expires_at: string
+          consumed_at: string | null
+          request_ip: string | null
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['client_portal_codes']['Row'],
+          'id' | 'created_at'
+        > & { id?: string }
+        Update: Partial<Database['public']['Tables']['client_portal_codes']['Insert']>
+      }
+
+      client_portal_sessions: {
+        Row: {
+          id: string
+          client_id: string
+          token_hash: string
+          expires_at: string
+          revoked_at: string | null
+          last_seen_at: string | null
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['client_portal_sessions']['Row'],
+          'id' | 'created_at'
+        > & { id?: string }
+        Update: Partial<Database['public']['Tables']['client_portal_sessions']['Insert']>
+      }
+
+      booking_portal_requests: {
+        Row: {
+          id: string
+          booking_id: string
+          client_id: string
+          type: 'update' | 'cancellation'
+          message: string
+          preferred_contact: 'phone' | 'email' | null
+          status: 'new' | 'reviewed' | 'resolved'
+          resolved_at: string | null
+          created_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['booking_portal_requests']['Row'],
+          'id' | 'created_at'
+        > & { id?: string }
+        Update: Partial<Database['public']['Tables']['booking_portal_requests']['Insert']>
+      }
+
       // ── invoices ────────────────────────────────────────────────
       invoices: {
         Row: {

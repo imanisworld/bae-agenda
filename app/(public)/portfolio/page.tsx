@@ -31,7 +31,8 @@ function TagChip({ label }: { label: string }) {
       border: '1px solid rgba(155,93,229,0.2)',
       borderRadius: '100px',
       padding: '3px 8px',
-      whiteSpace: 'nowrap',
+      whiteSpace: 'normal',
+      overflowWrap: 'anywhere',
     }}>
       {label}
     </span>
@@ -56,7 +57,7 @@ export default async function PortfolioPage() {
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        padding: 'calc(68px + 48px) clamp(24px, 5vw, 72px) 48px',
+        padding: 'calc(var(--nav-height) + var(--safe-top) + 48px) max(24px, calc(var(--safe-right) + 20px)) 48px max(24px, calc(var(--safe-left) + 20px))',
         background: 'linear-gradient(180deg, var(--bg-sunken) 0%, var(--black) 100%)',
         borderBottom: '1px solid var(--border)',
         position: 'relative',
@@ -90,10 +91,10 @@ export default async function PortfolioPage() {
         </div>
       </section>
 
-      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 clamp(24px, 5vw, 72px)' }}>
+      <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 max(24px, calc(var(--safe-right) + 20px)) 0 max(24px, calc(var(--safe-left) + 20px))' }}>
 
         {/* ── Stats ─────────────────────────────────────────────── */}
-        <section style={{
+        <section className="portfolio-stats-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
           gap: '1px',
@@ -145,7 +146,7 @@ export default async function PortfolioPage() {
             </div>
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
               gap: '16px',
             }}>
               {featured.map((entry) => (

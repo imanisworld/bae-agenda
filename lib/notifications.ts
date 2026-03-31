@@ -407,6 +407,13 @@ async function sendSms(to: string, body: string): Promise<NotificationResult> {
   }
 }
 
+export async function sendClientPortalCodeSms(to: string, code: string): Promise<NotificationResult> {
+  return sendSms(
+    to,
+    `Your DJ B.A.E. portal code is ${code}. It expires in 10 minutes. If you did not request it, you can ignore this message.`
+  )
+}
+
 export async function sendBookingNotifications(payload: BookingNotificationPayload) {
   const ownerSummary = buildBookingSummaryLines(payload).join('\n')
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)

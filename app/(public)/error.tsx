@@ -18,7 +18,7 @@ export default function PublicError({
   }, [error])
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--black)', color: 'var(--white)', paddingTop: '68px' }}>
+    <div style={{ minHeight: '100dvh', background: 'var(--black)', color: 'var(--white)', paddingTop: 'calc(var(--nav-height) + var(--safe-top))', paddingBottom: 'var(--safe-bottom)' }}>
       <div className="section-container" style={{ maxWidth: '760px', paddingTop: 0 }}>
         <div style={{ border: '1px solid var(--border)', background: 'var(--surface)', padding: '32px' }}>
           <span className="section-label">Error</span>

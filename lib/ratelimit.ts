@@ -18,6 +18,9 @@ const limiterCache = {
   booking: null as Ratelimit | null,
   review: null as Ratelimit | null,
   invoiceSend: null as Ratelimit | null,
+  portalSendCode: null as Ratelimit | null,
+  portalVerifyCode: null as Ratelimit | null,
+  portalRequest: null as Ratelimit | null,
 }
 
 function getRedisClient() {
@@ -151,6 +154,45 @@ export async function limitInvoiceSend(headers: Headers, invoiceId: string) {
   const result = await limitByKey(
     `${ip}:${invoiceId}`,
     createLimiter('invoiceSend', 5, '15 m', 'ratelimit:invoice-send')
+  )
+
+  return {
+    ip,
+    ...result,
+  }
+}
+
+export async function limitPortalSendCode(headers: Headers, phone: string) {
+  const ip = getClientIp(headers)
+  const result = await limitByKey(
+    `${ip}:${phone}`,
+    createLimiter('portalSendCode', 5, '10 m', 'ratelimit:portal-send-code')
+  )
+
+  return {
+    ip,
+    ...result,
+  }
+}
+
+export async function limitPortalVerifyCode(headers: Headers, phone: string) {
+  const ip = getClientIp(headers)
+  const result = await limitByKey(
+    `${ip}:${phone}`,
+    createLimiter('portalVerifyCode', 10, '10 m', 'ratelimit:portal-verify-code')
+  )
+
+  return {
+    ip,
+    ...result,
+  }
+}
+
+export async function limitPortalRequest(headers: Headers, bookingId: string) {
+  const ip = getClientIp(headers)
+  const result = await limitByKey(
+    `${ip}:${bookingId}`,
+    createLimiter('portalRequest', 5, '30 m', 'ratelimit:portal-request')
   )
 
   return {

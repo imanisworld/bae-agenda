@@ -153,6 +153,7 @@ export default async function EventsSection() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-link"
+                  style={{ padding: '10px 0', minHeight: '44px', display: 'inline-flex', alignItems: 'center' }}
                 >
                   Follow on Instagram
                 </a>

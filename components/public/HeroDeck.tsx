@@ -177,6 +177,7 @@ export default function HeroDeck() {
               onPointerUp={finishDrag}
               onPointerCancel={finishDrag}
               onPointerLeave={finishDrag}
+              style={{ touchAction: 'none', userSelect: 'none' }}
             >
               <span className="hero-turntable-groove hero-turntable-groove-a" />
               <span className="hero-turntable-groove hero-turntable-groove-b" />

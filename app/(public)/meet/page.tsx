@@ -146,19 +146,23 @@ export default function MeetPage() {
             </div>
             {/* Mobile-only name overlay — visible when photo stacks above copy */}
             <div className="meet-hero-mobile-name" aria-hidden="true">
-              <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.5)', marginBottom: '6px', fontFamily: 'DM Sans, sans-serif' }}>
+              <div className="meet-hero-mobile-name-label">
                 Artist Profile
               </div>
-              <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(28px, 7vw, 40px)', fontWeight: 600, lineHeight: 0.95, color: 'var(--white)' }}>
+              <div className="meet-hero-mobile-name-title">
                 Meet<br />DJ B.A.E.
               </div>
+              <p className="meet-hero-mobile-name-copy">
+                Club sets, private events, branded experiences, and community nights with pressure, pacing, and payoff.
+              </p>
             </div>
           </div>
 
           <div className="meet-hero-copy-panel">
-            <div>
+            <div className="meet-hero-copy-main">
               {sectionLabel('Artist Profile')}
               <h1
+                className="meet-hero-copy-title"
                 style={{
                   fontFamily: 'Conthrax, sans-serif',
                   fontSize: 'clamp(38px, 6vw, 78px)',
@@ -172,7 +176,7 @@ export default function MeetPage() {
                 <br />
                 DJ B.A.E.
               </h1>
-              <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '640px', marginBottom: '18px' }}>
+              <p className="meet-hero-copy-summary">
                 DJ B.A.E. moves between club sets, private events, branded experiences, and community nights without flattening the personality of the room.
                 The through line is selection, pacing, and a set structure that knows when to push and when to hold back.
               </p>
@@ -181,6 +185,15 @@ export default function MeetPage() {
                 <div className="meet-hero-copy-rail-label">Operating Style</div>
                 <div className="meet-hero-copy-rail-value">Process-driven, but never mechanical. The setup serves the room.</div>
               </div>
+            </div>
+
+            <div className="meet-hero-actions" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <Link href="/book" className="btn-primary">
+                Book DJ B.A.E.
+              </Link>
+              <Link href="/press-kit" className="inline-link">
+                Open Press Kit
+              </Link>
             </div>
 
             <div className="meet-hero-module-grid">
@@ -193,15 +206,6 @@ export default function MeetPage() {
                   <div className="meet-hero-module-value">{item.value}</div>
                 </div>
               ))}
-            </div>
-
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <Link href="/book" className="btn-primary">
-                Book DJ B.A.E.
-              </Link>
-              <Link href="/press-kit" className="inline-link">
-                Open Press Kit
-              </Link>
             </div>
           </div>
         </section>

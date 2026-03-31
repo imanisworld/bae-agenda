@@ -30,6 +30,8 @@ export default function Sidebar({ userEmail, isOpen, onClose }: SidebarProps) {
         flexDirection: 'column',
         zIndex: 50,
         overflowY: 'auto',
+        paddingTop: 'var(--safe-top)',
+        paddingBottom: 'var(--safe-bottom)',
       }}
     >
       <div style={{ padding: '28px 24px 24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

@@ -36,7 +36,7 @@ export default function Footer() {
       <div className="footer-body" style={{
         maxWidth: '1280px',
         margin: '0 auto',
-        padding: 'clamp(40px, 5vw, 64px) clamp(24px, 5vw, 72px)',
+        padding: 'clamp(40px, 5vw, 64px) max(24px, calc(var(--safe-right) + 20px)) clamp(28px, 4vw, 40px) max(24px, calc(var(--safe-left) + 20px))',
         display: 'grid',
         gridTemplateColumns: '1fr auto 1fr',
         alignItems: 'center',
@@ -60,7 +60,7 @@ export default function Footer() {
           <ul style={{ listStyle: 'none', margin: 0, padding: 0, display: 'flex', gap: '24px', alignItems: 'center', flexWrap: 'wrap' }}>
             {NAV_LINKS.map(({ label, href }) => (
               <li key={href}>
-                <Link href={href} style={{ fontFamily: 'DM Sans, sans-serif', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}>
+                <Link href={href} style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px', fontFamily: 'DM Sans, sans-serif', fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--muted)', textDecoration: 'none' }}>
                   {label}
                 </Link>
               </li>
@@ -81,8 +81,8 @@ export default function Footer() {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: '32px',
-                height: '32px',
+                width: '44px',
+                height: '44px',
                 border: '1px solid var(--border)',
                 fontFamily: 'DM Sans, sans-serif',
                 fontSize: '9px',
@@ -104,7 +104,7 @@ export default function Footer() {
       <div style={{
         maxWidth: '1280px',
         margin: '0 auto',
-        padding: '14px clamp(24px, 5vw, 72px)',
+        padding: '14px max(24px, calc(var(--safe-right) + 20px)) calc(14px + var(--safe-bottom)) max(24px, calc(var(--safe-left) + 20px))',
         borderTop: '1px solid var(--border)',
         display: 'flex',
         alignItems: 'center',
@@ -115,7 +115,7 @@ export default function Footer() {
         <p style={{ margin: 0, fontSize: '10px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
           © {CURRENT_YEAR} DJ B.A.E. · The Bae Agenda. All rights reserved.
         </p>
-        <Link href="/privacy" className="inline-link" style={{ fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+        <Link href="/privacy" className="inline-link" style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
           Privacy
         </Link>
       </div>

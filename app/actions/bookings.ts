@@ -33,6 +33,8 @@ import { generateW9Pdf } from '@/lib/w9-pdf'
 import { shouldAutoSendW9ForPayment } from '@/lib/w9-automation'
 import type { BookingStatus, PaymentMethod, PaymentStatus, PaymentType } from '@/types/index'
 
+type PortalRequestStatus = 'new' | 'reviewed' | 'resolved'
+
 function redirectWithError(path: string, message: string) {
   const params = new URLSearchParams({ error: message })
   redirect(`${path}?${params.toString()}`)
@@ -86,6 +88,10 @@ function isPaymentMethod(value: string): value is PaymentMethod {
 
 function isPaymentStatus(value: string): value is PaymentStatus {
   return ['pending', 'received', 'refunded'].includes(value)
+}
+
+function isPortalRequestStatus(value: string): value is PortalRequestStatus {
+  return ['new', 'reviewed', 'resolved'].includes(value)
 }
 
 function parseOptionalDate(value: FormDataEntryValue | null): string | null {
@@ -1171,4 +1177,56 @@ export async function createBookingNoteAction(formData: FormData) {
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/dashboard')
   redirect(`/admin/bookings/${bookingId}`)
+}
+
+export async function updatePortalRequestStatusAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+  const requestId = optionalString(formData.get('request_id'))
+  const bookingId = optionalString(formData.get('booking_id'))
+  const nextStatus = optionalString(formData.get('status'))
+
+  if (!requestId || !bookingId || !nextStatus || !isPortalRequestStatus(nextStatus)) {
+    redirectWithError('/admin/bookings', 'Unable to update that portal request.')
+  }
+
+  const resolvedBookingId = bookingId as string
+  const status = nextStatus as PortalRequestStatus
+
+  const updatePayload: {
+    status: PortalRequestStatus
+    resolved_at?: string | null
+  } = {
+    status,
+  }
+
+  if (status === 'resolved') {
+    updatePayload.resolved_at = new Date().toISOString()
+  } else {
+    updatePayload.resolved_at = null
+  }
+
+  const { error } = await admin
+    .from('booking_portal_requests')
+    .update(updatePayload)
+    .eq('id', requestId)
+    .eq('booking_id', resolvedBookingId)
+
+  if (error) {
+    redirectWithError(`/admin/bookings/${resolvedBookingId}`, error.message || 'Unable to update portal request.')
+  }
+
+  const timelineMessage = status === 'resolved'
+    ? 'Marked a client portal request as resolved.'
+    : status === 'reviewed'
+      ? 'Marked a client portal request as in review.'
+      : 'Marked a client portal request as new.'
+
+  await appendBookingTimelineNote(admin, resolvedBookingId, timelineMessage)
+
+  revalidatePath(`/admin/bookings/${resolvedBookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/dashboard')
+  redirect(`/admin/bookings/${resolvedBookingId}?success=${encodeURIComponent('Portal request updated.')}`)
 }

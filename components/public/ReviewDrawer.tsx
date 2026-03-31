@@ -6,16 +6,13 @@
  * centered modal on desktop. Contains ReviewForm.
  */
 import { useState, useEffect } from 'react'
+import { useBodyScrollLock } from '@/components/hooks/useBodyScrollLock'
 import ReviewForm from '@/components/public/ReviewForm'
 
 export default function ReviewDrawer() {
   const [open, setOpen] = useState(false)
 
-  // Lock body scroll when open
-  useEffect(() => {
-    document.body.style.overflow = open ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [open])
+  useBodyScrollLock(open)
 
   // Close on Escape
   useEffect(() => {
@@ -28,6 +25,7 @@ export default function ReviewDrawer() {
   return (
     <>
       <button
+        type="button"
         onClick={() => setOpen(true)}
         className="btn-ghost"
         style={{ marginTop: '24px' }}
@@ -55,6 +53,8 @@ export default function ReviewDrawer() {
         role="dialog"
         aria-modal="true"
         aria-label="Leave a Review"
+        aria-hidden={!open}
+        className={`review-drawer-shell${open ? ' is-open' : ''}`}
         style={{
           position: 'fixed',
           zIndex: 201,
@@ -69,6 +69,8 @@ export default function ReviewDrawer() {
           width: 'min(520px, calc(100vw - 32px))',
           maxHeight: '90vh',
           overflowY: 'auto',
+          overscrollBehavior: 'contain',
+          WebkitOverflowScrolling: 'touch',
           padding: 'clamp(20px, 4vw, 32px)',
           opacity: open ? 1 : 0,
           pointerEvents: open ? 'auto' : 'none',
@@ -83,6 +85,7 @@ export default function ReviewDrawer() {
         }}>
           <span className="section-label" style={{ marginBottom: 0 }}>Leave a Review</span>
           <button
+            type="button"
             onClick={() => setOpen(false)}
             aria-label="Close"
             style={{
@@ -91,7 +94,12 @@ export default function ReviewDrawer() {
               color: 'var(--muted)',
               fontSize: '18px',
               cursor: 'pointer',
-              padding: '4px',
+              width: '44px',
+              height: '44px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 0,
               lineHeight: 1,
             }}
           >

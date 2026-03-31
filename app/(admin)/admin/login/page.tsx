@@ -57,12 +57,12 @@ function AdminLoginContent() {
   return (
     <div
       style={{
-        minHeight: '100vh',
+        minHeight: '100dvh',
         background: 'var(--black)',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: '24px',
+        padding: 'max(24px, calc(var(--safe-top) + 20px)) max(24px, calc(var(--safe-right) + 20px)) max(24px, calc(var(--safe-bottom) + 20px)) max(24px, calc(var(--safe-left) + 20px))',
       }}
     >
       {/* Subtle noise overlay — matches static site aesthetic */}

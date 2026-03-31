@@ -117,11 +117,11 @@ export default async function PayBookingPage({
   return (
     <main
       style={{
-        minHeight: '100vh',
+        minHeight: '100svh',
         background:
           'radial-gradient(circle at top, rgba(155,93,229,0.28), transparent 36%), linear-gradient(180deg, #0d0d0f 0%, #151518 100%)',
         color: 'var(--white)',
-        padding: '48px 20px 80px',
+        padding: 'max(48px, calc(var(--safe-top) + 32px)) max(20px, var(--safe-right)) calc(80px + var(--safe-bottom)) max(20px, var(--safe-left))',
       }}
     >
       <div
@@ -225,15 +225,20 @@ export default async function PayBookingPage({
                   disabled={!stripeReady || outstandingDeposit <= 0}
                   style={{
                     appearance: 'none',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     border: '1px solid rgba(155,93,229,0.4)',
                     background: !stripeReady || outstandingDeposit <= 0 ? 'rgba(155,93,229,0.16)' : 'linear-gradient(135deg, #9b5de5, #6d28d9)',
                     color: 'var(--white)',
                     padding: '14px 18px',
+                    minHeight: '48px',
                     fontSize: '12px',
                     letterSpacing: '0.18em',
                     textTransform: 'uppercase',
                     cursor: !stripeReady || outstandingDeposit <= 0 ? 'not-allowed' : 'pointer',
                     opacity: !stripeReady || outstandingDeposit <= 0 ? 0.6 : 1,
+                    textAlign: 'center',
                   }}
                 >
                   Open Stripe Checkout
@@ -253,7 +258,7 @@ export default async function PayBookingPage({
                     {process.env.BOOKING_ALERT_EMAIL ?? 'bookings@thebaeagenda.com'}
                   </a>.
                 </p>
-                <div style={{ border: '1px dashed rgba(255,255,255,0.18)', padding: '12px 14px', fontSize: '13px', lineHeight: 1.7 }}>
+                <div style={{ border: '1px dashed rgba(255,255,255,0.18)', padding: '12px 14px', fontSize: '13px', lineHeight: 1.7, overflowWrap: 'anywhere' }}>
                   Manual payments do not auto-confirm. The team will review the transfer and mark the deposit paid from the admin panel.
                 </div>
               </div>

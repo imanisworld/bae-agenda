@@ -43,7 +43,7 @@ export default async function PressKitPage() {
   const bookingEmail = content.booking_email ?? ''
 
   return (
-    <div className="press-kit-page" style={{ background: '#ece8df', color: '#111', padding: 'calc(68px + clamp(20px, 5vw, 32px)) 20px clamp(20px, 5vw, 40px)' }}>
+    <div className="press-kit-page" style={{ background: '#ece8df', color: '#111', padding: `calc(var(--nav-height) + var(--safe-top) + clamp(20px, 5vw, 32px)) max(20px, calc(var(--safe-right) + 16px)) max(clamp(20px, 5vw, 40px), calc(var(--safe-bottom) + 20px)) max(20px, calc(var(--safe-left) + 16px))` }}>
       <div style={{ maxWidth: '1180px', margin: '0 auto', display: 'grid', gap: '24px' }}>
         <div className="print-hide" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
           <Link
@@ -53,6 +53,7 @@ export default async function PressKitPage() {
               alignItems: 'center',
               gap: '8px',
               padding: '12px 18px',
+              minHeight: '44px',
               background: '#111',
               color: '#f4f1eb',
               textDecoration: 'none',

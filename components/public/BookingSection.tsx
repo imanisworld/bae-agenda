@@ -121,7 +121,7 @@ export default function BookingSection({ bookingEmail }: Props) {
               </div>
               {email && (
                 <p style={{ marginTop: '14px', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7 }}>
-                  Prefer email? <a href={`mailto:${email}`} className="inline-link">Reach out directly</a>.
+                  Prefer email? <a href={`mailto:${email}`} className="inline-link" style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Reach out directly</a>.
                 </p>
               )}
             </div>

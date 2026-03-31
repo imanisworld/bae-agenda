@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
   addDays,
@@ -162,6 +162,7 @@ function stepForField(field: string): Step {
 }
 
 export default function BookingForm() {
+  const formRef = useRef<HTMLFormElement | null>(null)
   const [step, setStep] = useState<Step>(1)
   const [form, setForm] = useState<FormState>(() => ({
     ...INITIAL_STATE,
@@ -262,6 +263,19 @@ export default function BookingForm() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [endTimeOptions, form.eventEndTime])
+
+  useEffect(() => {
+    const priorityField = getFirstErrorField(fieldErrors)
+    if (!priorityField) return
+
+    const target = formRef.current?.querySelector<HTMLElement>(`[data-booking-field="${priorityField}"]`)
+    if (!target) return
+
+    window.requestAnimationFrame(() => {
+      target.focus()
+      target.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    })
+  }, [fieldErrors])
 
   function validateStep(currentStep: Step): FieldErrors {
     const errors: FieldErrors = {}
@@ -517,7 +531,7 @@ export default function BookingForm() {
         />
         <input type="hidden" name="startedAt" value={form.startedAt} />
 
-        <form onSubmit={onSubmit}>
+        <form ref={formRef} onSubmit={onSubmit} noValidate>
           <div style={{
             background: 'var(--surface)',
             border: '1px solid var(--border)',
@@ -525,6 +539,14 @@ export default function BookingForm() {
             display: 'grid',
             gap: '20px',
           }}>
+            <div aria-live="polite" style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}>
+              {checkingAvailability
+                ? 'Checking availability.'
+                : loading
+                  ? 'Submitting booking request.'
+                  : availabilityError || error || blockedDatesError || Object.values(fieldErrors)[0] || ''}
+            </div>
+
             {step === 1 && (
               <EventStep
                 availabilityError={availabilityError}
@@ -633,7 +655,7 @@ function BookingSuccess() {
 
 function BookingProgress({ step }: { step: Step }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '28px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '28px' }}>
       {([1, 2, 3] as Step[]).map((value) => (
         <div key={value} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{
@@ -649,7 +671,7 @@ function BookingProgress({ step }: { step: Step }) {
             background: value === step ? 'var(--violet)' : value < step ? 'rgba(155,93,229,0.2)' : 'var(--surface)',
             color: value === step ? 'var(--black)' : value < step ? 'var(--violet)' : 'var(--muted)',
             border: `1px solid ${value === step ? 'var(--violet)' : value < step ? 'rgba(155,93,229,0.3)' : 'var(--border)'}`,
-            transition: 'all 200ms ease',
+            transition: 'background 200ms ease, border-color 200ms ease, color 200ms ease',
           }}>
             {value < step ? '✓' : value}
           </div>
@@ -716,6 +738,7 @@ function EventStep({
               onClick={() => set('eventType', form.eventType === type ? '' : type)}
               style={{
                 padding: '10px 12px',
+                minHeight: '44px',
                 fontSize: '11px',
                 letterSpacing: '0.08em',
                 textAlign: 'left',
@@ -723,7 +746,7 @@ function EventStep({
                 border: `1px solid ${form.eventType === type ? 'var(--violet)' : 'var(--border)'}`,
                 color: form.eventType === type ? 'var(--white)' : 'var(--muted)',
                 cursor: 'pointer',
-                transition: 'all 150ms ease',
+                transition: 'background 150ms ease, border-color 150ms ease, color 150ms ease',
                 fontFamily: 'DM Sans, sans-serif',
               }}
             >
@@ -735,7 +758,11 @@ function EventStep({
 
       <div style={{ display: 'grid', gap: '8px' }}>
         <span className="section-label" style={{ marginBottom: 0 }}>Event Date *</span>
-        <div style={calendarShellStyle(Boolean(fieldErrors.eventDate))}>
+        <div
+          data-booking-field="eventDate"
+          tabIndex={-1}
+          style={calendarShellStyle(Boolean(fieldErrors.eventDate))}
+        >
           <div style={calendarHeaderStyle()}>
             <div>
               <div style={{ fontSize: '12px', color: 'var(--muted)', marginBottom: '4px' }}>Selected Date</div>
@@ -786,6 +813,7 @@ function EventStep({
                   onClick={() => set('eventDate', dateValue)}
                   disabled={disabled}
                   aria-pressed={isSelected}
+                  aria-invalid={Boolean(fieldErrors.eventDate)}
                   style={calendarDayStyle({
                     isCurrentMonth: isSameMonth(day, visibleMonth),
                     isDisabled: disabled,
@@ -811,6 +839,8 @@ function EventStep({
         <label style={{ display: 'grid', gap: '8px' }}>
           <span className="section-label" style={{ marginBottom: 0 }}>Start Time</span>
           <select
+            data-booking-field="eventTime"
+            aria-invalid={Boolean(fieldErrors.eventTime)}
             value={normalizeTimeValue(form.eventTime)}
             onChange={(e) => set('eventTime', e.target.value)}
             style={inputStyle(Boolean(fieldErrors.eventTime))}
@@ -825,6 +855,8 @@ function EventStep({
         <label style={{ display: 'grid', gap: '8px' }}>
           <span className="section-label" style={{ marginBottom: 0 }}>End Time</span>
           <select
+            data-booking-field="eventEndTime"
+            aria-invalid={Boolean(fieldErrors.eventEndTime)}
             value={normalizeTimeValue(form.eventEndTime)}
             onChange={(e) => set('eventEndTime', e.target.value)}
             style={inputStyle(Boolean(fieldErrors.eventEndTime))}
@@ -842,6 +874,8 @@ function EventStep({
         <span className="section-label" style={{ marginBottom: 0 }}>Event Time Zone *</span>
         <select
           required
+          data-booking-field="timeZone"
+          aria-invalid={Boolean(fieldErrors.timeZone)}
           value={form.timeZone}
           onChange={(e) => set('timeZone', e.target.value)}
           style={inputStyle(Boolean(fieldErrors.timeZone))}
@@ -888,6 +922,10 @@ function ContactStep({
           <span className="section-label" style={{ marginBottom: 0 }}>First Name *</span>
           <input
             required
+            name="first_name"
+            autoComplete="given-name"
+            data-booking-field="firstName"
+            aria-invalid={Boolean(fieldErrors.firstName)}
             value={form.firstName}
             onChange={(e) => set('firstName', e.target.value)}
             style={inputStyle(Boolean(fieldErrors.firstName))}
@@ -897,6 +935,8 @@ function ContactStep({
         <label style={{ display: 'grid', gap: '8px' }}>
           <span className="section-label" style={{ marginBottom: 0 }}>Last Name</span>
           <input
+            name="last_name"
+            autoComplete="family-name"
             value={form.lastName}
             onChange={(e) => set('lastName', e.target.value)}
             style={inputStyle()}
@@ -910,6 +950,12 @@ function ContactStep({
           <input
             required
             type="email"
+            name="email"
+            autoComplete="email"
+            inputMode="email"
+            spellCheck={false}
+            data-booking-field="email"
+            aria-invalid={Boolean(fieldErrors.email)}
             value={form.email}
             onChange={(e) => set('email', e.target.value)}
             style={inputStyle(Boolean(fieldErrors.email))}
@@ -919,6 +965,10 @@ function ContactStep({
         <label style={{ display: 'grid', gap: '8px' }}>
           <span className="section-label" style={{ marginBottom: 0 }}>Phone</span>
           <input
+            type="tel"
+            name="phone"
+            autoComplete="tel"
+            inputMode="tel"
             value={form.phone}
             onChange={(e) => set('phone', e.target.value)}
             style={inputStyle()}
@@ -948,6 +998,10 @@ function DetailsStep({
         <span className="section-label" style={{ marginBottom: 0 }}>Event Name *</span>
         <input
           required
+          name="event_name"
+          autoComplete="off"
+          data-booking-field="eventName"
+          aria-invalid={Boolean(fieldErrors.eventName)}
           value={form.eventName}
           onChange={(e) => set('eventName', e.target.value)}
           style={inputStyle(Boolean(fieldErrors.eventName))}
@@ -958,9 +1012,11 @@ function DetailsStep({
       <label style={{ display: 'grid', gap: '8px' }}>
         <span className="section-label" style={{ marginBottom: 0 }}>Venue / Address</span>
         <input
+          name="venue"
+          autoComplete="street-address"
           value={form.venue}
           onChange={(e) => set('venue', e.target.value)}
-          placeholder="Venue name or full address"
+          placeholder="Venue name or full address…"
           style={inputStyle()}
         />
       </label>
@@ -969,9 +1025,11 @@ function DetailsStep({
         <span className="section-label" style={{ marginBottom: 0 }}>City</span>
         <input
           list="city-options"
+          name="city"
+          autoComplete="address-level2"
           value={form.city}
           onChange={(e) => setCity(e.target.value)}
-          placeholder="Choose or type any city"
+          placeholder="Choose or type any city…"
           style={inputStyle()}
         />
         <span style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
@@ -983,9 +1041,11 @@ function DetailsStep({
         <span className="section-label" style={{ marginBottom: 0 }}>Package</span>
         <input
           list="package-options"
+          name="package"
+          autoComplete="off"
           value={form.package}
           onChange={(e) => set('package', e.target.value)}
-          placeholder="Choose or type a package"
+          placeholder="Choose or type a package…"
           style={inputStyle()}
         />
       </label>
@@ -994,6 +1054,8 @@ function DetailsStep({
         <span className="section-label" style={{ marginBottom: 0 }}>Notes</span>
         <textarea
           rows={4}
+          name="notes"
+          autoComplete="off"
           value={form.notes}
           onChange={(e) => set('notes', e.target.value)}
           style={inputStyle()}
@@ -1033,6 +1095,11 @@ function inputStyle(hasError = false): React.CSSProperties {
 
 function fieldErrorStyle(): React.CSSProperties {
   return { fontSize: '12px', color: '#ff8da0', lineHeight: 1.5 }
+}
+
+function getFirstErrorField(errors: FieldErrors): FieldKey | null {
+  const priority: FieldKey[] = ['eventDate', 'timeZone', 'eventTime', 'eventEndTime', 'firstName', 'email', 'eventName']
+  return priority.find((field) => Boolean(errors[field])) ?? null
 }
 
 function twoColGrid(): React.CSSProperties {
@@ -1138,7 +1205,7 @@ function calendarDayStyle({
   isSelected: boolean
 }): React.CSSProperties {
   return {
-    minHeight: '42px',
+    minHeight: '44px',
     border: `1px solid ${
       isSelected ? 'var(--violet)' : isBlocked ? 'rgba(232, 93, 117, 0.4)' : 'var(--border)'
     }`,
@@ -1154,6 +1221,6 @@ function calendarDayStyle({
     opacity: isCurrentMonth ? 1 : 0.6,
     fontFamily: 'DM Sans, sans-serif',
     fontSize: '14px',
-    transition: 'all 150ms ease',
+    transition: 'background 150ms ease, border-color 150ms ease, color 150ms ease, opacity 150ms ease',
   }
 }

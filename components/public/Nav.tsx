@@ -11,6 +11,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useBodyScrollLock } from '@/components/hooks/useBodyScrollLock'
 import { PUBLIC_NAV } from '@/lib/constants'
 
 export default function Nav() {
@@ -19,17 +20,13 @@ export default function Nav() {
   const [menuOpen,     setMenuOpen]     = useState(false)
   const forceSolidNav = pathname !== '/'
 
+  useBodyScrollLock(menuOpen)
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
-
-  // Lock body scroll when drawer is open
-  useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [menuOpen])
 
   useEffect(() => {
     if (!menuOpen) return
@@ -54,6 +51,7 @@ export default function Nav() {
           position:    'fixed',
           top: 0, left: 0, right: 0,
           zIndex:      100,
+          paddingTop:  'var(--safe-top)',
           background:  scrolled || menuOpen || forceSolidNav
             ? 'rgba(8,8,8,0.95)'
             : 'linear-gradient(180deg, rgba(8,8,10,0.82) 0%, rgba(8,8,10,0.0) 100%)',
@@ -170,7 +168,7 @@ export default function Nav() {
         aria-hidden={!menuOpen}
         style={{
           position:   'fixed',
-          top:        '68px',
+          top:        'calc(var(--nav-height) + var(--safe-top))',
           left:       0,
           right:      0,
           bottom:     0,
@@ -182,7 +180,10 @@ export default function Nav() {
           overflowY:  'auto',
           overscrollBehavior: 'contain',
           WebkitOverflowScrolling: 'touch',
-          padding:    '40px 32px 48px',
+          paddingTop: '32px',
+          paddingRight: 'max(32px, calc(var(--safe-right) + 20px))',
+          paddingBottom: 'calc(48px + var(--safe-bottom))',
+          paddingLeft: 'max(32px, calc(var(--safe-left) + 20px))',
           gap:        '8px',
           transform:  menuOpen ? 'translateY(0)' : 'translateY(calc(-100% - 80px))',
           opacity:    menuOpen ? 1 : 0,

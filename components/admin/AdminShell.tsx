@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Sidebar from '@/components/admin/Sidebar'
+import { useBodyScrollLock } from '@/components/hooks/useBodyScrollLock'
 
 interface AdminShellProps {
   userEmail: string | undefined
@@ -11,11 +12,19 @@ interface AdminShellProps {
 export default function AdminShell({ userEmail, children }: AdminShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
+  useBodyScrollLock(sidebarOpen)
+
   useEffect(() => {
-    document.body.style.overflow = sidebarOpen ? 'hidden' : ''
-    return () => {
-      document.body.style.overflow = ''
+    if (!sidebarOpen) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSidebarOpen(false)
+      }
     }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
   }, [sidebarOpen])
 
   return (

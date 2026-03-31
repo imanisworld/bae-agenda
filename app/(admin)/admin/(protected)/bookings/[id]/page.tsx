@@ -9,7 +9,7 @@ import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } fr
 import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
+import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingLifecycleStatus, BookingStatus, BookingWorkflowPaymentStatus } from '@/types/index'
@@ -53,6 +53,16 @@ interface BookingDetailRow {
     id: string
     body: string
     created_at: string
+  }> | null
+  booking_portal_requests: Array<{
+    id: string
+    type: 'update' | 'cancellation'
+    message: string
+    preferred_contact: 'phone' | 'email' | null
+    status: 'new' | 'reviewed' | 'resolved'
+    resolved_at: string | null
+    created_at: string
+    client_id: string
   }> | null
 }
 
@@ -128,7 +138,8 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
       notes,
       clients(id, first_name, last_name, email, phone),
       payments(id, amount, type, method, status, paid_at, created_at, notes),
-      booking_notes:notes!booking_id(id, body, created_at)
+      booking_notes:notes!booking_id(id, body, created_at),
+      booking_portal_requests(id, type, message, preferred_contact, status, resolved_at, created_at, client_id)
     `)
     .eq('id', id)
     .maybeSingle()
@@ -139,6 +150,17 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
 function getMessage(param: string | string[] | undefined) {
   if (!param) return null
   return Array.isArray(param) ? param[0] ?? null : param
+}
+
+function getPortalRequestBadgeVariant(status: 'new' | 'reviewed' | 'resolved') {
+  switch (status) {
+    case 'resolved':
+      return 'paid'
+    case 'reviewed':
+      return 'pending'
+    default:
+      return 'unpaid'
+  }
 }
 
 export default async function EditBookingPage({
@@ -178,6 +200,9 @@ export default async function EditBookingPage({
     payments,
   })
   const internalNotes = booking.booking_notes ?? []
+  const portalRequests = (booking.booking_portal_requests ?? []).slice().sort((left, right) => {
+    return new Date(right.created_at).getTime() - new Date(left.created_at).getTime()
+  })
   const emailActivity = internalNotes.filter((note) => /\bemail\b/i.test(note.body)).slice(0, 4)
 
   return (
@@ -753,6 +778,102 @@ export default async function EditBookingPage({
             </button>
           </div>
         </form>
+      </div>
+
+      <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className="admin-section-title" style={{ marginBottom: '10px' }}>Portal Requests</div>
+            <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
+              Review client-submitted update and cancellation requests from the portal. These do not auto-change the booking.
+            </p>
+          </div>
+
+          <div style={{ minWidth: '180px' }}>
+            <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
+              Open Requests
+            </div>
+            <div style={{ color: 'var(--white)', fontFamily: 'Conthrax, sans-serif', fontSize: '22px' }}>
+              {portalRequests.filter((request) => request.status !== 'resolved').length}
+            </div>
+          </div>
+        </div>
+
+        {portalRequests.length === 0 ? (
+          <p style={{ color: 'var(--muted)', fontSize: '13px', margin: '20px 0 0' }}>
+            No client portal requests yet.
+          </p>
+        ) : (
+          <div style={{ marginTop: '20px', display: 'grid', gap: '12px' }}>
+            {portalRequests.map((request) => (
+              <div
+                key={request.id}
+                style={{
+                  border: request.status === 'new' ? '1px solid rgba(212, 175, 55, 0.28)' : '1px solid var(--border)',
+                  background: 'var(--bg-sunken)',
+                  padding: '16px',
+                  display: 'grid',
+                  gap: '12px',
+                }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+                  <div style={{ display: 'grid', gap: '4px' }}>
+                    <div style={{ color: 'var(--white)', fontSize: '14px', textTransform: 'capitalize' }}>
+                      {request.type} request
+                    </div>
+                    <div className="muted" style={{ fontSize: '12px', lineHeight: 1.6 }}>
+                      {formatDateTime(request.created_at)}
+                      {request.preferred_contact ? ` · Follow up by ${request.preferred_contact}` : ''}
+                    </div>
+                  </div>
+                  <Badge
+                    variant={getPortalRequestBadgeVariant(request.status)}
+                    label={request.status === 'resolved' ? 'resolved' : request.status === 'reviewed' ? 'in review' : 'new'}
+                  />
+                </div>
+
+                <div style={{ color: 'var(--white)', fontSize: '13px', lineHeight: 1.7 }}>
+                  {request.message}
+                </div>
+
+                {request.resolved_at && (
+                  <div className="muted" style={{ fontSize: '12px' }}>
+                    Resolved {formatDateTime(request.resolved_at)}
+                  </div>
+                )}
+
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  {request.status === 'new' && (
+                    <form action={updatePortalRequestStatusAction}>
+                      <input type="hidden" name="booking_id" value={booking.id} />
+                      <input type="hidden" name="request_id" value={request.id} />
+                      <input type="hidden" name="status" value="reviewed" />
+                      <button type="submit" className="admin-btn-ghost">Mark In Review</button>
+                    </form>
+                  )}
+
+                  {request.status !== 'resolved' && (
+                    <form action={updatePortalRequestStatusAction}>
+                      <input type="hidden" name="booking_id" value={booking.id} />
+                      <input type="hidden" name="request_id" value={request.id} />
+                      <input type="hidden" name="status" value="resolved" />
+                      <button type="submit" className="admin-btn-primary">Mark Resolved</button>
+                    </form>
+                  )}
+
+                  {request.status !== 'new' && (
+                    <form action={updatePortalRequestStatusAction}>
+                      <input type="hidden" name="booking_id" value={booking.id} />
+                      <input type="hidden" name="request_id" value={request.id} />
+                      <input type="hidden" name="status" value="new" />
+                      <button type="submit" className="admin-btn-ghost">Move Back To New</button>
+                    </form>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>

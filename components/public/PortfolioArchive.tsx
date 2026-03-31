@@ -34,7 +34,8 @@ const filterBtnBase: React.CSSProperties = {
   fontSize: '11px',
   letterSpacing: '0.12em',
   textTransform: 'uppercase',
-  padding: '9px 18px',
+  padding: '10px 18px',
+  minHeight: '44px',
   borderRadius: '100px',
   border: '1px solid var(--border)',
   background: 'transparent',
@@ -114,7 +115,7 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
 
       {/* Filter bar */}
       {(cities.length > 1 || tags.length > 0) && (
-        <div style={{
+        <div className="portfolio-filter-bar" style={{
           display: 'flex',
           gap: '8px',
           flexWrap: 'wrap',
@@ -172,6 +173,7 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
             return (
               <div
                 key={year}
+                className="portfolio-year-group"
                 style={{
                   display: 'grid',
                   gridTemplateColumns: 'clamp(60px, 8vw, 96px) 1fr',
@@ -181,9 +183,9 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
                   paddingBottom: '32px',
                   alignItems: 'start',
                 }}
-              >
-                {/* Year label */}
-                <div style={{
+                >
+                  {/* Year label */}
+                <div className="portfolio-year-label" style={{
                   fontFamily: 'Conthrax, sans-serif',
                   fontSize: 'clamp(24px, 3.5vw, 40px)',
                   color: 'rgba(250,248,243,0.12)',
@@ -196,10 +198,11 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
                 </div>
 
                 {/* Events list */}
-                <div style={{ display: 'grid', gap: '0' }}>
+                <div className="portfolio-year-events" style={{ display: 'grid', gap: '0', minWidth: 0 }}>
                   {yearEntries.map((entry, i) => (
                     <div
                       key={entry.id}
+                      className="portfolio-year-row"
                       style={{
                         display: 'grid',
                         gridTemplateColumns: '1fr auto',
@@ -211,13 +214,14 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
                           : 'none',
                       }}
                     >
-                      <div>
+                      <div style={{ minWidth: 0 }}>
                         <div style={{
                           fontSize: 'clamp(13px, 1.8vw, 15px)',
                           color: entry.featured ? 'var(--white)' : 'rgba(250,248,243,0.82)',
                           fontWeight: entry.featured ? 500 : 300,
                           marginBottom: entry.tags.length ? '6px' : 0,
                           lineHeight: 1.4,
+                          overflowWrap: 'anywhere',
                         }}>
                           {entry.event_name}
                           {entry.featured && (
@@ -241,10 +245,10 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
                           </div>
                         )}
                       </div>
-                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                        <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{entry.city}</div>
+                      <div className="portfolio-year-meta" style={{ textAlign: 'right', flexShrink: 0, minWidth: 0 }}>
+                        <div style={{ fontSize: '11px', color: 'var(--muted)', overflowWrap: 'anywhere' }}>{entry.city}</div>
                         {entry.venue && (
-                          <div style={{ fontSize: '10px', color: 'rgba(250,248,243,0.35)', marginTop: '2px' }}>
+                          <div style={{ fontSize: '10px', color: 'rgba(250,248,243,0.35)', marginTop: '2px', overflowWrap: 'anywhere' }}>
                             {entry.venue}
                           </div>
                         )}

@@ -81,7 +81,7 @@ export default async function BuiltPage() {
   const content = await getContentMap([...CONTENT_KEYS])
 
   return (
-    <div style={{ background: 'var(--black)', paddingTop: '68px' }}>
+    <div style={{ background: 'var(--black)', paddingTop: 'calc(var(--nav-height) + var(--safe-top))' }}>
       <div className="section-container" style={{ display: 'grid', gap: '56px', paddingTop: 0, paddingBottom: '56px' }}>
 
         {/* ── Hero ─────────────────────────────────────────────── */}

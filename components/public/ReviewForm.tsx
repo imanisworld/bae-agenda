@@ -154,10 +154,16 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
                 border:     'none',
                 cursor:     'pointer',
                 fontSize:   compact ? '24px' : '28px',
-                padding:    '2px',
+                width:      compact ? '44px' : '48px',
+                height:     compact ? '44px' : '48px',
+                display:    'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding:    0,
                 color:      n <= (hover || rating) ? 'var(--violet)' : 'rgba(255,255,255,0.15)',
                 transition: 'color 100ms ease',
                 lineHeight: 1,
+                touchAction: 'manipulation',
               }}
               aria-label={`${n} star${n > 1 ? 's' : ''}`}
             >

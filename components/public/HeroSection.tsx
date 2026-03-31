@@ -61,6 +61,7 @@ export default function HeroSection({ content = {} }: Props) {
         alt=""
         fill
         priority
+        sizes="100vw"
         aria-hidden="true"
         style={{ objectFit: 'cover', objectPosition: 'center 48%', opacity: 0.6 }}
       />
