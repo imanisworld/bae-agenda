@@ -132,6 +132,7 @@ async function getBookingConfirmationSource(admin: ReturnType<typeof createAdmin
       event_name,
       event_date,
       event_timezone,
+      quote,
       venue,
       city,
       deposit_amount,
@@ -155,8 +156,11 @@ async function getBookingInquiryReceiptSource(admin: ReturnType<typeof createAdm
     .select(`
       id,
       event_name,
+      event_type,
       event_date,
       event_timezone,
+      venue,
+      city,
       clients(first_name, last_name, email)
     `)
     .eq('id', bookingId)

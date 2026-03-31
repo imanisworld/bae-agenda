@@ -3,8 +3,9 @@ import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import Badge from '@/components/admin/Badge'
 import AdminNotice from '@/components/admin/AdminNotice'
+import BookingPricingFields from '@/components/admin/BookingPricingFields'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
-import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt, getDepositStatus } from '@/lib/booking-deposit'
+import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } from '@/lib/booking-deposit'
 import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
@@ -164,8 +165,8 @@ export default async function EditBookingPage({
   const payments = booking.payments ?? []
   const receivedTotal = getReceivedPaymentTotal(payments)
   const outstandingDeposit = getOutstandingDeposit(booking.deposit_amount, payments)
+  const recordedDeposit = Math.max(deposit - outstandingDeposit, 0)
   const outstandingBalance = getOutstandingBalance(booking.quote, payments)
-  const depositStatus = getDepositStatus(booking.deposit_amount, payments)
   const depositPaidAt = getDepositPaidAt(booking.deposit_amount, payments)
   const depositConfirmedVia = getDepositConfirmedVia(booking.deposit_amount, payments)
   const lifecycleStatus = getBookingLifecycleStatus(booking.lifecycle_status, booking.status)
@@ -213,6 +214,130 @@ export default async function EditBookingPage({
           {booking.clients?.phone && <span className="muted">{booking.clients.phone}</span>}
         </div>
       </div>
+
+      <form action={updateBookingDetailsAction} className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
+        <input type="hidden" name="id" value={booking.id} />
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start', marginBottom: '20px' }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className="admin-section-title" style={{ marginBottom: '10px' }}>Booking Details & Pricing</div>
+            <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
+              Set the event details, quote, and deposit here before sending invoice or payment requests.
+            </p>
+          </div>
+        </div>
+
+        <div className="admin-form-grid">
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Event Name *</span>
+            <input name="event_name" required defaultValue={booking.event_name} style={inputStyle()} />
+          </label>
+
+          <div className="admin-form-grid-two">
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Event Type</span>
+              <input name="event_type" defaultValue={booking.event_type ?? ''} style={inputStyle()} />
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Status *</span>
+              <select name="status" defaultValue={booking.status} style={inputStyle()}>
+                <option value="inquiry">Inquiry</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Lifecycle *</span>
+              <select name="lifecycle_status" defaultValue={lifecycleStatus} style={inputStyle()}>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="negotiating">Negotiating</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="lost">Lost</option>
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Payment Workflow *</span>
+              <select name="payment_status" defaultValue={paymentStatus} style={inputStyle()}>
+                <option value="unpaid">Unpaid</option>
+                <option value="deposit_requested">Deposit Requested</option>
+                <option value="deposit_paid">Deposit Paid</option>
+                <option value="balance_requested">Balance Requested</option>
+                <option value="paid">Paid</option>
+              </select>
+            </label>
+          </div>
+
+          <div className="admin-form-grid-two-wide">
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Event Date & Time *</span>
+              <input
+                name="event_date"
+                type="datetime-local"
+                required
+                defaultValue={toDateTimeLocal(booking.event_date)}
+                style={inputStyle()}
+              />
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Timezone *</span>
+              <input name="event_timezone" required defaultValue={booking.event_timezone} style={inputStyle()} />
+            </label>
+          </div>
+
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Event End Time</span>
+            <input
+              name="event_end_time"
+              type="datetime-local"
+              defaultValue={booking.event_end_time ? toDateTimeLocal(booking.event_end_time) : ''}
+              style={inputStyle()}
+            />
+          </label>
+
+          <div className="admin-form-grid-two">
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Venue</span>
+              <input name="venue" defaultValue={booking.venue ?? ''} style={inputStyle()} />
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">City</span>
+              <input name="city" defaultValue={booking.city ?? ''} style={inputStyle()} />
+            </label>
+          </div>
+
+          <div className="admin-form-grid-two">
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Package</span>
+              <input name="package" defaultValue={booking.package ?? ''} style={inputStyle()} />
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Hours</span>
+              <input name="hours" type="number" min={0} step="0.5" defaultValue={booking.hours ?? undefined} style={inputStyle()} />
+            </label>
+          </div>
+
+          <BookingPricingFields
+            defaultQuote={booking.quote}
+            defaultDepositAmount={booking.deposit_amount}
+          />
+
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Notes</span>
+            <textarea name="notes" rows={6} defaultValue={booking.notes ?? ''} style={inputStyle()} />
+          </label>
+
+          <div className="admin-form-actions">
+            <button type="submit" className="admin-btn-primary">
+              Save Changes
+            </button>
+            <Link href="/admin/bookings" className="admin-btn-ghost">
+              Cancel
+            </Link>
+          </div>
+        </div>
+      </form>
 
       <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
@@ -393,7 +518,6 @@ export default async function EditBookingPage({
               { label: 'Deposit', value: formatCurrency(deposit) },
               { label: 'Balance Due', value: formatCurrency(balance) },
               { label: 'Payment Status', value: BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS[paymentStatus] },
-              { label: 'Deposit Status', value: depositStatus.toUpperCase() },
               { label: 'Lifecycle', value: BOOKING_LIFECYCLE_STATUS_LABELS[lifecycleStatus] },
             ].map((item) => (
             <div
@@ -411,11 +535,6 @@ export default async function EditBookingPage({
                 <Badge variant={paymentStatus} />
               ) : item.label === 'Lifecycle' ? (
                 <Badge variant={lifecycleStatus} label={BOOKING_LIFECYCLE_STATUS_LABELS[lifecycleStatus]} />
-              ) : item.label === 'Deposit Status' ? (
-                <Badge
-                  variant={depositStatus === 'paid' ? 'paid' : depositStatus === 'pending' ? 'pending' : 'unpaid'}
-                  label={`Deposit ${depositStatus}`}
-                />
               ) : (
                 <div style={{ color: item.label === 'Balance Due' ? 'var(--violet)' : 'var(--white)', fontSize: '18px', fontFamily: 'Conthrax, sans-serif' }}>
                   {item.value}
@@ -468,9 +587,14 @@ export default async function EditBookingPage({
                 </select>
               </label>
               <div style={{ display: 'grid', gap: '7px' }}>
-                <span className="muted" style={{ fontSize: '12px' }}>Current Deposit</span>
+                <span className="muted" style={{ fontSize: '12px' }}>Amount To Record</span>
                 <div style={{ color: 'var(--white)', fontFamily: 'Conthrax, sans-serif', fontSize: '16px' }}>
                   {outstandingDeposit > 0 ? formatCurrency(outstandingDeposit) : 'Covered'}
+                </div>
+                <div className="muted" style={{ fontSize: '12px', lineHeight: 1.6 }}>
+                  {outstandingDeposit > 0
+                    ? `This records the remaining deposit gap. ${formatCurrency(recordedDeposit)} already logged, ${formatCurrency(outstandingDeposit)} left.`
+                    : `The configured deposit is already covered at ${formatCurrency(deposit)}.`}
                 </div>
               </div>
             </div>
@@ -644,127 +768,6 @@ export default async function EditBookingPage({
           </div>
         </form>
       </div>
-
-      <form action={updateBookingDetailsAction} className="admin-section" style={{ padding: '24px' }}>
-        <input type="hidden" name="id" value={booking.id} />
-        <div className="admin-form-grid">
-          <label style={{ display: 'grid', gap: '7px' }}>
-            <span className="admin-section-title">Event Name *</span>
-            <input name="event_name" required defaultValue={booking.event_name} style={inputStyle()} />
-          </label>
-
-          <div className="admin-form-grid-two">
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Event Type</span>
-              <input name="event_type" defaultValue={booking.event_type ?? ''} style={inputStyle()} />
-            </label>
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Status *</span>
-              <select name="status" defaultValue={booking.status} style={inputStyle()}>
-                <option value="inquiry">Inquiry</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="completed">Completed</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
-            </label>
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Lifecycle *</span>
-              <select name="lifecycle_status" defaultValue={lifecycleStatus} style={inputStyle()}>
-                <option value="new">New</option>
-                <option value="contacted">Contacted</option>
-                <option value="negotiating">Negotiating</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="completed">Completed</option>
-                <option value="lost">Lost</option>
-              </select>
-            </label>
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Payment Workflow *</span>
-              <select name="payment_status" defaultValue={paymentStatus} style={inputStyle()}>
-                <option value="unpaid">Unpaid</option>
-                <option value="deposit_requested">Deposit Requested</option>
-                <option value="deposit_paid">Deposit Paid</option>
-                <option value="balance_requested">Balance Requested</option>
-                <option value="paid">Paid</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="admin-form-grid-two-wide">
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Event Date & Time *</span>
-              <input
-                name="event_date"
-                type="datetime-local"
-                required
-                defaultValue={toDateTimeLocal(booking.event_date)}
-                style={inputStyle()}
-              />
-            </label>
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Timezone *</span>
-              <input name="event_timezone" required defaultValue={booking.event_timezone} style={inputStyle()} />
-            </label>
-          </div>
-
-          <label style={{ display: 'grid', gap: '7px' }}>
-            <span className="admin-section-title">Event End Time</span>
-            <input
-              name="event_end_time"
-              type="datetime-local"
-              defaultValue={booking.event_end_time ? toDateTimeLocal(booking.event_end_time) : ''}
-              style={inputStyle()}
-            />
-          </label>
-
-          <div className="admin-form-grid-two">
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Venue</span>
-              <input name="venue" defaultValue={booking.venue ?? ''} style={inputStyle()} />
-            </label>
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">City</span>
-              <input name="city" defaultValue={booking.city ?? ''} style={inputStyle()} />
-            </label>
-          </div>
-
-          <div className="admin-form-grid-two">
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Package</span>
-              <input name="package" defaultValue={booking.package ?? ''} style={inputStyle()} />
-            </label>
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Hours</span>
-              <input name="hours" type="number" min={0} step="0.5" defaultValue={booking.hours ?? undefined} style={inputStyle()} />
-            </label>
-          </div>
-
-          <div className="admin-form-grid-two">
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Quote</span>
-              <input name="quote" type="number" min={0} step="1" defaultValue={booking.quote ?? undefined} style={inputStyle()} />
-            </label>
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Deposit Amount</span>
-              <input name="deposit_amount" type="number" min={0} step="1" defaultValue={booking.deposit_amount ?? undefined} style={inputStyle()} />
-            </label>
-          </div>
-
-          <label style={{ display: 'grid', gap: '7px' }}>
-            <span className="admin-section-title">Notes</span>
-            <textarea name="notes" rows={6} defaultValue={booking.notes ?? ''} style={inputStyle()} />
-          </label>
-
-          <div className="admin-form-actions">
-            <button type="submit" className="admin-btn-primary">
-              Save Changes
-            </button>
-            <Link href="/admin/bookings" className="admin-btn-ghost">
-              Cancel
-            </Link>
-          </div>
-        </div>
-      </form>
     </div>
   )
 }

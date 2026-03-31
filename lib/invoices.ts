@@ -1,5 +1,6 @@
 import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
 import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
+import { getPaymentInstructionTextLines } from '@/lib/payment-instructions'
 
 export interface InvoiceBookingData {
   id: string
@@ -199,10 +200,10 @@ export async function generateInvoicePdf(booking: InvoiceBookingData) {
     lineGap: 3,
   })
 
-  page.drawText('INVOICE', {
+  page.drawText('EVENT INVOICE', {
     x: PAGE.width - 176,
     y: PAGE.top,
-    size: 22,
+    size: 18,
     font: fontBold,
     color: violet,
   })
@@ -386,12 +387,28 @@ export async function generateInvoicePdf(booking: InvoiceBookingData) {
     })
   }
 
-  page.drawText('Balance due on or before the event date. All sales final.', {
+  const paymentInstructionLines = getPaymentInstructionTextLines()
+  const invoiceFooter = [
+    'Payment Methods:',
+    ...paymentInstructionLines,
+    '',
+    'Deposit secures your booking.',
+    'Remaining balance due before event date.',
+    '',
+    'Terms:',
+    '- Deposit is non-refundable',
+    '- Date is not secured until deposit is received',
+    '- Final balance must be paid before event',
+  ].join('\n')
+
+  drawTextBlock(page, invoiceFooter, {
     x: PAGE.marginX,
-    y: PAGE.bottom,
-    size: 10,
+    y: PAGE.bottom + 44,
+    width: PAGE.width - PAGE.marginX * 2,
     font: fontRegular,
+    size: 10,
     color: muted,
+    lineGap: 3,
   })
 
   return pdf.save()

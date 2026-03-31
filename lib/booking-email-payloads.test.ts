@@ -24,6 +24,7 @@ describe('booking email payload helpers', () => {
       event_name: 'House Music Brunch',
       event_date: eventDate,
       event_timezone: eventTimeZone,
+      quote: 1200,
       venue: 'Canal Bistro',
       city: 'Indianapolis, IN',
       deposit_amount: 300,
@@ -38,6 +39,9 @@ describe('booking email payload helpers', () => {
       eventName: 'House Music Brunch',
       eventDate,
       eventTimeZone,
+      totalAmount: '$1,200.00',
+      depositAmount: '$300.00',
+      remainingAmount: '$900.00',
       venue: 'Canal Bistro',
       city: 'Indianapolis, IN',
       depositDue: '$200.00',
@@ -52,6 +56,7 @@ describe('booking email payload helpers', () => {
       event_name: null,
       event_date: eventDate,
       event_timezone: eventTimeZone,
+      quote: null,
       venue: null,
       city: null,
       deposit_amount: null,
@@ -69,6 +74,7 @@ describe('booking email payload helpers', () => {
       event_name: 'Sunset Set',
       event_date: eventDate,
       event_timezone: eventTimeZone,
+      quote: 900,
       venue: 'White River',
       city: 'Indianapolis, IN',
       deposit_amount: 300,
@@ -86,8 +92,11 @@ describe('booking email payload helpers', () => {
     const booking: BookingInquiryReceiptSource = {
       id: 'booking-3',
       event_name: 'Summer Kickoff',
+      event_type: 'Private Party',
       event_date: eventDate,
       event_timezone: eventTimeZone,
+      venue: 'Canal Bistro',
+      city: 'Indianapolis, IN',
       clients: [{ first_name: null, last_name: null, email: 'client@example.com' }],
     }
 
@@ -96,8 +105,10 @@ describe('booking email payload helpers', () => {
       lastName: null,
       email: 'client@example.com',
       eventName: 'Summer Kickoff',
+      eventType: 'Private Party',
       eventDate,
       eventTimeZone,
+      location: 'Canal Bistro, Indianapolis, IN',
     })
   })
 
@@ -140,7 +151,10 @@ describe('booking email payload helpers', () => {
       payments: [{ amount: 300, status: 'received' }],
     }
 
-    expect(getBalanceReminderPayloadFromBooking(booking)?.balanceDue).toBe('$900.00')
+    expect(getBalanceReminderPayloadFromBooking(booking)).toMatchObject({
+      balanceDue: '$900.00',
+      payUrl: null,
+    })
   })
 
   it('suppresses balance reminders when the quote is fully paid', () => {

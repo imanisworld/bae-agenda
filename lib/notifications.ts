@@ -1,3 +1,5 @@
+import { getPaymentInstructionRows, getPaymentInstructionTextLines } from '@/lib/payment-instructions'
+
 type BookingNotificationPayload = {
   firstName: string
   lastName?: string | null
@@ -20,6 +22,9 @@ type BookingConfirmedNotificationPayload = {
   eventName: string
   eventDate: string
   eventTimeZone: string
+  totalAmount?: string | null
+  depositAmount?: string | null
+  remainingAmount?: string | null
   venue?: string | null
   city?: string | null
   depositDue?: string | null
@@ -31,8 +36,10 @@ type BookingInquiryReceiptPayload = {
   lastName?: string | null
   email: string
   eventName: string
+  eventType?: string | null
   eventDate: string
   eventTimeZone: string
+  location?: string | null
 }
 
 type BookingDepositReminderPayload = {
@@ -54,6 +61,7 @@ type BookingBalanceReminderPayload = {
   eventDate: string
   eventTimeZone: string
   balanceDue: string
+  payUrl?: string | null
 }
 
 type BookingEventReminderPayload = {
@@ -429,8 +437,10 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
       lastName: payload.lastName,
       email: payload.email,
       eventName: payload.eventName,
+      eventType: payload.eventType,
       eventDate: payload.eventDate,
       eventTimeZone: payload.eventTimeZone,
+      location: [payload.venue, payload.city].filter(Boolean).join(', ') || null,
     }),
   ]
 
@@ -460,33 +470,35 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
 export async function sendBookingInquiryReceipt(payload: BookingInquiryReceiptPayload) {
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+  const eventType = payload.eventType?.trim() || payload.eventName
+  const location = payload.location?.trim()
+  const locationText = location ? ` in ${location}` : ''
 
   return sendEmail({
     to: payload.email,
-    subject: `We received your booking inquiry for ${payload.eventName}`,
+    subject: 'Booking Request Received – DJ B.A.E.',
     text: [
-      `Hi ${guestName},`,
+      `Hey ${guestName},`,
       '',
-      'Thanks for reaching out. Your booking inquiry came through successfully.',
+      `Got your request for ${eventType} on ${eventDateTime}${locationText}.`,
       '',
-      `Event: ${payload.eventName}`,
-      `Date: ${eventDateTime}`,
-      `Time Zone: ${payload.eventTimeZone}`,
+      'I’ll review the details and get back to you shortly with availability and next steps.',
       '',
-      'We will follow up soon.',
+      'If you have anything else to add in the meantime, just reply here.',
       '',
-      'DJ B.A.E. Bookings',
+      '– DJ B.A.E.',
     ].join('\n'),
     html: buildClientBookingEmailHtml({
       eyebrow: 'Booking inquiry received',
-      heading: 'We got your inquiry',
-      intro: `Hi ${escapeHtml(guestName)}, thanks for reaching out. Your booking inquiry came through successfully.`,
+      heading: 'Booking Request Received',
+      intro: `Hey ${escapeHtml(guestName)}, got your request for <strong>${escapeHtml(eventType)}</strong> on <strong>${escapeHtml(eventDateTime)}</strong>${location ? ` in <strong>${escapeHtml(location)}</strong>` : ''}.`,
       fields: [
         ['Event', payload.eventName],
-        ['Date', eventDateTime],
-        ['Time Zone', payload.eventTimeZone],
+        ...(payload.eventType ? [['Event Type', payload.eventType] as const] : []),
+        ['Event Date', eventDateTime],
+        ...(location ? [['Location', location] as const] : []),
       ] as const,
-      closing: 'We will follow up soon.',
+      closing: 'I’ll review the details and get back to you shortly with availability and next steps. If you have anything else to add in the meantime, just reply here.',
     }),
   })
 }
@@ -494,55 +506,46 @@ export async function sendBookingInquiryReceipt(payload: BookingInquiryReceiptPa
 export async function sendBookingConfirmedNotification(payload: BookingConfirmedNotificationPayload) {
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
-  const location = [payload.venue, payload.city].filter(Boolean).join(', ')
   const hasDepositLink = Boolean(payload.depositDue && payload.payUrl)
+  const paymentInstructionRows = getPaymentInstructionRows({
+    cardLabel: 'Card (secure link)',
+    cardUrl: hasDepositLink ? payload.payUrl : null,
+  })
+  const paymentInstructionLines = getPaymentInstructionTextLines({
+    cardLabel: 'Card (secure link)',
+    cardUrl: hasDepositLink ? payload.payUrl : null,
+  })
 
   return sendEmail({
     to: payload.email,
-    subject: `Your booking is confirmed for ${payload.eventName}`,
+    subject: 'Booking Confirmed – Deposit Required to Secure Date',
     text: [
-      `Hi ${guestName},`,
+      `Hey ${guestName},`,
       '',
-      `Your booking for ${payload.eventName} is officially confirmed.`,
+      `Your event on ${eventDateTime} is confirmed.`,
       '',
-      `Event: ${payload.eventName}`,
-      `Date: ${eventDateTime}`,
-      `Time Zone: ${payload.eventTimeZone}`,
-      ...(location ? [`Location: ${location}`] : []),
-      ...(hasDepositLink
-        ? [
-            `Deposit due: ${payload.depositDue}`,
-            `Payment link: ${payload.payUrl}`,
-          ]
-        : []),
+      `Total: ${payload.totalAmount ?? 'TBD'}`,
+      `Deposit Due: ${payload.depositAmount ?? payload.depositDue ?? 'TBD'}`,
+      `Remaining Balance: ${payload.remainingAmount ?? 'TBD'}`,
       '',
-      hasDepositLink
-        ? 'Use the payment link above to pay your deposit through Stripe Checkout, or reply if you need Zelle or Cash App instructions.'
-        : 'We are locked in and will follow up with any remaining details if needed.',
+      'Payment options:',
+      ...paymentInstructionLines,
       '',
-      'DJ B.A.E. Bookings',
+      'Once the deposit is sent, reply with confirmation so I can lock everything in.',
+      '',
+      '– DJ B.A.E.',
     ].join('\n'),
     html: buildClientBookingEmailHtml({
       eyebrow: 'Booking confirmed',
-      heading: 'Your booking is confirmed',
-      intro: hasDepositLink
-        ? `Hi ${escapeHtml(guestName)}, your booking for <strong>${escapeHtml(payload.eventName)}</strong> is officially confirmed. Your deposit is still due, and your payment link is included below.`
-        : `Hi ${escapeHtml(guestName)}, your booking for <strong>${escapeHtml(payload.eventName)}</strong> is officially confirmed.`,
+      heading: 'Booking Confirmed – Deposit Required',
+      intro: `Hey ${escapeHtml(guestName)}, your event on <strong>${escapeHtml(eventDateTime)}</strong> is confirmed.`,
       fields: [
-        ['Event', payload.eventName],
-        ['Date', eventDateTime],
-        ['Time Zone', payload.eventTimeZone],
-        ...(location ? [['Location', location] as const] : []),
-        ...(hasDepositLink
-          ? [
-              ['Deposit due', payload.depositDue as string] as const,
-              ['Payment link', payload.payUrl as string] as const,
-            ]
-          : []),
+        ['Total', payload.totalAmount ?? 'TBD'],
+        ['Deposit Due', payload.depositAmount ?? payload.depositDue ?? 'TBD'],
+        ['Remaining Balance', payload.remainingAmount ?? 'TBD'],
+        ...paymentInstructionRows,
       ],
-      closing: hasDepositLink
-        ? 'Use the payment link above for Stripe Checkout, or reply if you need Zelle or Cash App instructions.'
-        : 'We are locked in and will follow up with any remaining details if needed.',
+      closing: 'Once the deposit is sent, reply with confirmation so I can lock everything in.',
     }),
   })
 }
@@ -587,33 +590,41 @@ export async function sendBookingDepositReminder(payload: BookingDepositReminder
 export async function sendBookingBalanceReminder(payload: BookingBalanceReminderPayload) {
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+  const paymentInstructionRows = getPaymentInstructionRows({
+    cardLabel: 'Card',
+    cardUrl: payload.payUrl,
+  })
+  const paymentInstructionLines = getPaymentInstructionTextLines({
+    cardLabel: 'Card',
+    cardUrl: payload.payUrl,
+  })
 
   return sendEmail({
     to: payload.email,
-    subject: `Balance reminder for ${payload.eventName}`,
+    subject: `Final Payment Due – ${eventDateTime}`,
     text: [
-      `Hi ${guestName},`,
+      `Hey ${guestName},`,
       '',
-      `This is a quick reminder that the remaining balance for ${payload.eventName} is still outstanding.`,
+      `Your event is coming up on ${eventDateTime}.`,
       '',
-      `Event: ${payload.eventName}`,
-      `Date: ${eventDateTime}`,
-      `Balance due: ${payload.balanceDue}`,
+      `The remaining balance of ${payload.balanceDue} is due before the event.`,
       '',
-      'If you have any questions, just reply to this email.',
+      'Payment options:',
+      ...paymentInstructionLines,
       '',
-      'DJ B.A.E. Bookings',
+      'Once sent, just reply here to confirm.',
+      '',
+      '– DJ B.A.E.',
     ].join('\n'),
     html: buildClientBookingEmailHtml({
-      eyebrow: 'Balance reminder',
-      heading: 'Balance reminder',
-      intro: `Hi ${escapeHtml(guestName)}, this is a quick reminder that the remaining balance for <strong>${escapeHtml(payload.eventName)}</strong> is still outstanding.`,
+      eyebrow: 'Final payment due',
+      heading: 'Final Payment Due',
+      intro: `Hey ${escapeHtml(guestName)}, your event is coming up on <strong>${escapeHtml(eventDateTime)}</strong>. The remaining balance of <strong>${escapeHtml(payload.balanceDue)}</strong> is due before the event.`,
       fields: [
-        ['Event', payload.eventName],
-        ['Date', eventDateTime],
-        ['Balance due', payload.balanceDue],
+        ['Remaining Balance', payload.balanceDue],
+        ...paymentInstructionRows,
       ] as const,
-      closing: 'If you have any questions, just reply to this email.',
+      closing: 'Once sent, just reply here to confirm.',
     }),
   })
 }

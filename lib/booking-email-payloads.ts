@@ -21,6 +21,7 @@ export interface BookingConfirmationSource {
   event_name: string | null
   event_date: string
   event_timezone: string | null
+  quote: number | null
   venue: string | null
   city: string | null
   deposit_amount: number | null
@@ -34,8 +35,11 @@ export interface BookingConfirmationSource {
 export interface BookingInquiryReceiptSource {
   id: string
   event_name: string | null
+  event_type: string | null
   event_date: string
   event_timezone: string | null
+  venue: string | null
+  city: string | null
   clients: BookingClient[] | null
 }
 
@@ -95,6 +99,9 @@ export function getConfirmationPayloadFromBooking(booking: BookingConfirmationSo
     eventName: booking.event_name,
     eventDate: booking.event_date,
     eventTimeZone,
+    totalAmount: formatCurrency(booking.quote ?? 0),
+    depositAmount: formatCurrency(booking.deposit_amount ?? 0),
+    remainingAmount: formatCurrency(Math.max((booking.quote ?? 0) - (booking.deposit_amount ?? 0), 0)),
     venue: booking.venue,
     city: booking.city,
     depositDue: depositRemaining > 0 ? formatCurrency(depositRemaining) : null,
@@ -118,8 +125,10 @@ export function getInquiryReceiptPayloadFromBooking(booking: BookingInquiryRecei
     lastName: client?.last_name?.trim() || null,
     email: clientEmail,
     eventName: booking.event_name,
+    eventType: booking.event_type,
     eventDate: booking.event_date,
     eventTimeZone,
+    location: [booking.venue, booking.city].filter(Boolean).join(', ') || null,
   }
 }
 
@@ -167,6 +176,7 @@ export function getBalanceReminderPayloadFromBooking(booking: BookingBalanceRemi
     eventDate: booking.event_date,
     eventTimeZone,
     balanceDue: formatCurrency(balanceRemaining),
+    payUrl: null,
   }
 }
 
