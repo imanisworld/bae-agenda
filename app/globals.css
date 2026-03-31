@@ -3870,6 +3870,7 @@ body.has-custom-cursor * { cursor: none !important; }
 
 .bookings-admin-table {
   table-layout: fixed;
+  min-width: 860px;
 }
 
 .bookings-admin-table th,
@@ -3887,33 +3888,38 @@ body.has-custom-cursor * { cursor: none !important; }
   padding-right: 20px;
 }
 
+/* Event */
 .bookings-admin-table th:nth-child(1),
 .bookings-admin-table td:nth-child(1) {
-  width: 28%;
+  width: 24%;
 }
 
+/* Event Date */
 .bookings-admin-table th:nth-child(2),
 .bookings-admin-table td:nth-child(2) {
-  width: 18%;
+  width: 15%;
 }
 
+/* Package */
 .bookings-admin-table th:nth-child(3),
 .bookings-admin-table td:nth-child(3) {
   width: 12%;
 }
 
+/* Status, Payment, Deposit */
 .bookings-admin-table th:nth-child(4),
 .bookings-admin-table td:nth-child(4),
 .bookings-admin-table th:nth-child(5),
 .bookings-admin-table td:nth-child(5),
 .bookings-admin-table th:nth-child(6),
 .bookings-admin-table td:nth-child(6) {
-  width: 10%;
+  width: 11%;
 }
 
+/* Actions */
 .bookings-admin-table th:nth-child(7),
 .bookings-admin-table td:nth-child(7) {
-  width: 12%;
+  width: 16%;
 }
 
 .booking-event-cell {
@@ -3947,7 +3953,9 @@ body.has-custom-cursor * { cursor: none !important; }
   font-size: 11px;
   margin-top: 4px;
   line-height: 1.5;
-  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .booking-actions-cell {
