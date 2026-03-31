@@ -18,6 +18,7 @@ export default function Nav() {
   const pathname = usePathname()
   const [scrolled,     setScrolled]     = useState(false)
   const [menuOpen,     setMenuOpen]     = useState(false)
+  const [standaloneTopOffset, setStandaloneTopOffset] = useState(0)
   const forceSolidNav = pathname !== '/'
 
   useBodyScrollLock(menuOpen)
@@ -41,7 +42,29 @@ export default function Nav() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [menuOpen])
 
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+
+    const mediaQuery = window.matchMedia('(display-mode: standalone)')
+
+    const syncStandaloneOffset = () => {
+      const isStandalone = mediaQuery.matches || Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone)
+      setStandaloneTopOffset(isStandalone ? 10 : 0)
+    }
+
+    syncStandaloneOffset()
+    mediaQuery.addEventListener('change', syncStandaloneOffset)
+    window.addEventListener('orientationchange', syncStandaloneOffset)
+
+    return () => {
+      mediaQuery.removeEventListener('change', syncStandaloneOffset)
+      window.removeEventListener('orientationchange', syncStandaloneOffset)
+    }
+  }, [])
+
   const closeMenu = () => setMenuOpen(false)
+  const navTopPadding = `calc(var(--safe-top) + ${standaloneTopOffset}px)`
+  const drawerTop = `calc(var(--nav-height) + var(--safe-top) + ${standaloneTopOffset}px)`
 
   return (
     <>
@@ -51,7 +74,7 @@ export default function Nav() {
           position:    'fixed',
           top: 0, left: 0, right: 0,
           zIndex:      100,
-          paddingTop:  'var(--safe-top)',
+          paddingTop:  navTopPadding,
           background:  scrolled || menuOpen || forceSolidNav
             ? 'rgba(8,8,8,0.95)'
             : 'linear-gradient(180deg, rgba(8,8,10,0.82) 0%, rgba(8,8,10,0.0) 100%)',
@@ -168,7 +191,7 @@ export default function Nav() {
         aria-hidden={!menuOpen}
         style={{
           position:   'fixed',
-          top:        'calc(var(--nav-height) + var(--safe-top))',
+          top:        drawerTop,
           left:       0,
           right:      0,
           bottom:     0,
