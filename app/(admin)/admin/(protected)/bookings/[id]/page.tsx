@@ -6,12 +6,12 @@ import AdminNotice from '@/components/admin/AdminNotice'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt, getDepositStatus } from '@/lib/booking-deposit'
 import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
-import { getBookingPaymentStatus } from '@/lib/booking-payment-status'
+import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { createBookingNoteAction, createBookingPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, sendBookingBalanceReminderAction, sendBookingDepositReminderAction, sendBookingEventReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
-import { PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
-import type { BookingStatus } from '@/types/index'
+import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
+import type { BookingLifecycleStatus, BookingStatus, BookingWorkflowPaymentStatus } from '@/types/index'
 
 interface BookingDetailRow {
   id: string
@@ -27,6 +27,9 @@ interface BookingDetailRow {
   quote: number | null
   deposit_amount: number | null
   status: BookingStatus
+  lifecycle_status: BookingLifecycleStatus | null
+  payment_status: BookingWorkflowPaymentStatus | null
+  payment_method: string | null
   notes: string | null
   clients: {
     id: string
@@ -118,6 +121,9 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
       quote,
       deposit_amount,
       status,
+      lifecycle_status,
+      payment_status,
+      payment_method,
       notes,
       clients(id, first_name, last_name, email, phone),
       payments(id, amount, type, method, status, paid_at, created_at, notes),
@@ -162,7 +168,14 @@ export default async function EditBookingPage({
   const depositStatus = getDepositStatus(booking.deposit_amount, payments)
   const depositPaidAt = getDepositPaidAt(booking.deposit_amount, payments)
   const depositConfirmedVia = getDepositConfirmedVia(booking.deposit_amount, payments)
-  const paymentStatus = getBookingPaymentStatus(booking.quote, payments)
+  const lifecycleStatus = getBookingLifecycleStatus(booking.lifecycle_status, booking.status)
+  const paymentStatus = getBookingWorkflowPaymentStatus({
+    currentStatus: booking.payment_status,
+    quote: booking.quote,
+    depositAmount: booking.deposit_amount,
+    lifecycleStatus,
+    payments,
+  })
   const internalNotes = booking.booking_notes ?? []
   const emailActivity = internalNotes.filter((note) => /\bemail\b/i.test(note.body)).slice(0, 4)
 
@@ -193,7 +206,7 @@ export default async function EditBookingPage({
 
       <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap', alignItems: 'center', minWidth: 0 }}>
-          <Badge variant={booking.status} />
+          <Badge variant={lifecycleStatus} label={BOOKING_LIFECYCLE_STATUS_LABELS[lifecycleStatus]} />
           <Badge variant={paymentStatus} />
           {clientName && <span style={{ color: 'var(--white)', fontSize: '14px' }}>{clientName}</span>}
           {booking.clients?.email && <span className="muted">{booking.clients.email}</span>}
@@ -228,16 +241,16 @@ export default async function EditBookingPage({
               <button
                 type="submit"
                 className="admin-btn-ghost"
-                disabled={!booking.clients?.email || (booking.status !== 'confirmed' && booking.status !== 'completed')}
+                disabled={!booking.clients?.email || (lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed')}
                 style={
-                  !booking.clients?.email || (booking.status !== 'confirmed' && booking.status !== 'completed')
+                  !booking.clients?.email || (lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed')
                     ? { opacity: 0.55, cursor: 'not-allowed' }
                     : undefined
                 }
                 title={
                   !booking.clients?.email
                     ? 'Add a client email before sending.'
-                    : booking.status !== 'confirmed' && booking.status !== 'completed'
+                    : lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed'
                       ? 'Confirm the booking first before resending the confirmation email.'
                       : undefined
                 }
@@ -294,16 +307,16 @@ export default async function EditBookingPage({
               <button
                 type="submit"
                 className="admin-btn-ghost"
-                disabled={!booking.clients?.email || (booking.status !== 'confirmed' && booking.status !== 'completed')}
+                disabled={!booking.clients?.email || (lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed')}
                 style={
-                  !booking.clients?.email || (booking.status !== 'confirmed' && booking.status !== 'completed')
+                  !booking.clients?.email || (lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed')
                     ? { opacity: 0.55, cursor: 'not-allowed' }
                     : undefined
                 }
                 title={
                   !booking.clients?.email
                     ? 'Add a client email before sending.'
-                    : booking.status !== 'confirmed' && booking.status !== 'completed'
+                    : lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed'
                       ? 'Confirm the booking first before sending an event reminder.'
                       : undefined
                 }
@@ -379,8 +392,9 @@ export default async function EditBookingPage({
               { label: 'Quote', value: formatCurrency(total) },
               { label: 'Deposit', value: formatCurrency(deposit) },
               { label: 'Balance Due', value: formatCurrency(balance) },
-              { label: 'Payment Status', value: paymentStatus.toUpperCase() },
+              { label: 'Payment Status', value: BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS[paymentStatus] },
               { label: 'Deposit Status', value: depositStatus.toUpperCase() },
+              { label: 'Lifecycle', value: BOOKING_LIFECYCLE_STATUS_LABELS[lifecycleStatus] },
             ].map((item) => (
             <div
               key={item.label}
@@ -395,6 +409,8 @@ export default async function EditBookingPage({
               </div>
               {item.label === 'Payment Status' ? (
                 <Badge variant={paymentStatus} />
+              ) : item.label === 'Lifecycle' ? (
+                <Badge variant={lifecycleStatus} label={BOOKING_LIFECYCLE_STATUS_LABELS[lifecycleStatus]} />
               ) : item.label === 'Deposit Status' ? (
                 <Badge
                   variant={depositStatus === 'paid' ? 'paid' : depositStatus === 'pending' ? 'pending' : 'unpaid'}
@@ -649,6 +665,27 @@ export default async function EditBookingPage({
                 <option value="confirmed">Confirmed</option>
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Lifecycle *</span>
+              <select name="lifecycle_status" defaultValue={lifecycleStatus} style={inputStyle()}>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="negotiating">Negotiating</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="lost">Lost</option>
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: '7px' }}>
+              <span className="admin-section-title">Payment Workflow *</span>
+              <select name="payment_status" defaultValue={paymentStatus} style={inputStyle()}>
+                <option value="unpaid">Unpaid</option>
+                <option value="deposit_requested">Deposit Requested</option>
+                <option value="deposit_paid">Deposit Paid</option>
+                <option value="balance_requested">Balance Requested</option>
+                <option value="paid">Paid</option>
               </select>
             </label>
           </div>

@@ -33,6 +33,8 @@ export type ClientWithBookings = Client & {
 // Status types (pulled from DB constraints)
 // Note: events have no status column — upcoming vs past is determined by event_date
 export type BookingStatus = Booking['status']
+export type BookingLifecycleStatus = Booking['lifecycle_status']
+export type BookingWorkflowPaymentStatus = Booking['payment_status']
 export type PaymentStatus = Payment['status']
 export type PaymentType   = Payment['type']
 export type PaymentMethod = NonNullable<Payment['method']>

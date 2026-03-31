@@ -7,6 +7,13 @@ import { requireAdminUser } from '@/lib/admin-auth'
 import { getBookingPaymentStatus } from '@/lib/booking-payment-status'
 import { syncBookingDepositState } from '@/lib/booking-deposit-sync'
 import {
+  getBookingLifecycleStatus,
+  getBookingWorkflowPaymentStatus,
+  mapLifecycleStatusToLegacyBookingStatus,
+  type BookingLifecycleStatus,
+  type BookingWorkflowPaymentStatus,
+} from '@/lib/booking-workflow'
+import {
   getBalanceReminderPayloadFromBooking,
   getConfirmationPayloadFromBooking,
   getDepositReminderPayloadFromBooking,
@@ -21,7 +28,7 @@ import {
 import { toEventISO } from '@/lib/date-time'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
 import { sendBookingBalanceReminder, sendBookingConfirmedNotification, sendBookingDepositReminder, sendBookingEventReminder, sendBookingInquiryReceipt, sendW9Notification } from '@/lib/notifications'
-import { PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
+import { BOOKING_LIFECYCLE_STATUSES, BOOKING_WORKFLOW_PAYMENT_STATUSES, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import { generateW9Pdf } from '@/lib/w9-pdf'
 import { shouldAutoSendW9ForPayment } from '@/lib/w9-automation'
 import type { BookingStatus, PaymentMethod, PaymentStatus, PaymentType } from '@/types/index'
@@ -39,6 +46,14 @@ function optionalString(value: FormDataEntryValue | null): string | null {
 
 function isBookingStatus(value: string): value is BookingStatus {
   return ['inquiry', 'confirmed', 'completed', 'cancelled'].includes(value)
+}
+
+function isBookingLifecycleStatus(value: string): value is BookingLifecycleStatus {
+  return BOOKING_LIFECYCLE_STATUSES.includes(value as BookingLifecycleStatus)
+}
+
+function isBookingWorkflowPaymentStatus(value: string): value is BookingWorkflowPaymentStatus {
+  return BOOKING_WORKFLOW_PAYMENT_STATUSES.includes(value as BookingWorkflowPaymentStatus)
 }
 
 function parseDateTimeLocal(value: FormDataEntryValue | null) {
@@ -344,6 +359,54 @@ async function syncInvoicePaymentState(admin: ReturnType<typeof createAdminClien
 
   return { paymentStatus, updatedInvoice: true }
 }
+
+async function syncBookingWorkflowState(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
+  const { data: booking, error } = await admin
+    .from('bookings')
+    .select('status, lifecycle_status, payment_status, quote, deposit_amount, payments(amount, type, status, method)')
+    .eq('id', bookingId)
+    .maybeSingle()
+
+  if (error || !booking) {
+    console.error('[booking-workflow-sync] unable to load booking:', error)
+    return null
+  }
+
+  const lifecycleStatus = getBookingLifecycleStatus(
+    booking.lifecycle_status as BookingLifecycleStatus | null | undefined,
+    booking.status as BookingStatus | null | undefined,
+  )
+  const paymentStatus = getBookingWorkflowPaymentStatus({
+    currentStatus: booking.payment_status as BookingWorkflowPaymentStatus | null | undefined,
+    quote: booking.quote as number | null | undefined,
+    depositAmount: booking.deposit_amount as number | null | undefined,
+    lifecycleStatus,
+    payments: (booking.payments as Array<{
+      amount: number
+      type?: string | null
+      status: 'pending' | 'received' | 'refunded'
+      method?: string | null
+    }> | null | undefined) ?? null,
+  })
+
+  const { error: updateError } = await admin
+    .from('bookings')
+    .update({
+      lifecycle_status: lifecycleStatus,
+      payment_status: paymentStatus,
+      status: mapLifecycleStatusToLegacyBookingStatus(lifecycleStatus),
+      balance_paid_at: paymentStatus === 'paid' ? new Date().toISOString() : null,
+    })
+    .eq('id', bookingId)
+
+  if (updateError) {
+    console.error('[booking-workflow-sync] unable to update booking:', updateError.message)
+    return null
+  }
+
+  return { lifecycleStatus, paymentStatus }
+}
+
 async function getConfirmationPayloadIfNeeded(admin: ReturnType<typeof createAdminClient>, bookingId: string, nextStatus: BookingStatus) {
   if (nextStatus !== 'confirmed') return null
 
@@ -565,10 +628,16 @@ export async function updateBookingStatusAction(formData: FormData) {
   const bookingId = id as string
   const nextStatus = nextStatusRaw as BookingStatus
   const confirmationPayload = await getConfirmationPayloadIfNeeded(admin, bookingId, nextStatus)
+  const lifecycleStatus = getBookingLifecycleStatus(undefined, nextStatus)
+  const nextPaymentStatus: BookingWorkflowPaymentStatus = nextStatus === 'confirmed' ? 'deposit_requested' : 'unpaid'
 
   const { error } = await admin
     .from('bookings')
-    .update({ status: nextStatus })
+    .update({
+      status: nextStatus,
+      lifecycle_status: lifecycleStatus,
+      payment_status: nextPaymentStatus,
+    })
     .eq('id', bookingId)
 
   if (error) {
@@ -618,6 +687,8 @@ export async function updateBookingDetailsAction(formData: FormData) {
 
   const bookingId = id as string
   const nextStatus = statusRaw as BookingStatus
+  const lifecycleStatusRaw = optionalString(formData.get('lifecycle_status'))
+  const paymentWorkflowStatusRaw = optionalString(formData.get('payment_status'))
 
   const eventDate = toEventISO(eventDateTime!.date, eventTimeZone!, eventDateTime!.time)
   const eventEndTime = eventEndDateTime
@@ -629,6 +700,12 @@ export async function updateBookingDetailsAction(formData: FormData) {
   }
 
   const confirmationPayload = await getConfirmationPayloadIfNeeded(admin, bookingId, nextStatus)
+  const lifecycleStatus = lifecycleStatusRaw && isBookingLifecycleStatus(lifecycleStatusRaw)
+    ? lifecycleStatusRaw
+    : getBookingLifecycleStatus(undefined, nextStatus)
+  const paymentWorkflowStatus = paymentWorkflowStatusRaw && isBookingWorkflowPaymentStatus(paymentWorkflowStatusRaw)
+    ? paymentWorkflowStatusRaw
+    : (nextStatus === 'confirmed' ? 'deposit_requested' : 'unpaid')
 
   const { error } = await admin
     .from('bookings')
@@ -646,6 +723,8 @@ export async function updateBookingDetailsAction(formData: FormData) {
       deposit_amount: parseOptionalNumber(formData.get('deposit_amount')),
       notes: optionalString(formData.get('notes')),
       status: nextStatus,
+      lifecycle_status: lifecycleStatus,
+      payment_status: paymentWorkflowStatus,
     })
     .eq('id', bookingId)
 
@@ -680,6 +759,7 @@ export async function updateBookingDetailsAction(formData: FormData) {
   }
 
   await syncBookingDepositState(admin, bookingId)
+  await syncBookingWorkflowState(admin, bookingId)
 
   revalidatePath('/admin/bookings')
   revalidatePath(`/admin/bookings/${bookingId}`)
@@ -864,6 +944,7 @@ export async function createBookingPaymentAction(formData: FormData) {
 
   const invoicePaymentState = await syncInvoicePaymentState(admin, finalBookingId)
   await syncBookingDepositState(admin, finalBookingId)
+  await syncBookingWorkflowState(admin, finalBookingId)
   if (invoicePaymentState.paymentStatus === 'paid') {
     await appendBookingTimelineNote(
       admin,

@@ -9,8 +9,9 @@ import StatCard        from '@/components/admin/StatCard'
 import Badge           from '@/components/admin/Badge'
 import PageHeader      from '@/components/admin/PageHeader'
 import { getDepositStatus } from '@/lib/booking-deposit'
-import { getBookingPaymentStatus, type BookingPaymentStatus } from '@/lib/booking-payment-status'
+import { getBookingLifecycleStatus, getBookingWorkflowPaymentStatus, type BookingLifecycleStatus, type BookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
+import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS } from '@/lib/constants'
 import type { BookingStatus, PaymentStatus } from '@/types/index'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -21,8 +22,8 @@ interface RecentBooking {
   event_date:  string
   event_timezone: string
   client_name: string | null
-  status:      BookingStatus
-  payment_status: BookingPaymentStatus
+  status:      BookingLifecycleStatus
+  payment_status: BookingWorkflowPaymentStatus
   deposit_status: 'unpaid' | 'pending' | 'paid'
 }
 
@@ -55,6 +56,8 @@ interface BookingQueryRow {
   event_date: string
   event_timezone: string
   status: BookingStatus
+  lifecycle_status: BookingLifecycleStatus | null
+  payment_status: BookingWorkflowPaymentStatus | null
   quote: number | null
   deposit_amount: number | null
   clients: { first_name: string | null; last_name: string | null }[] | null
@@ -79,10 +82,10 @@ const MOCK_STATS: DashboardStats = {
 }
 
 const MOCK_BOOKINGS: RecentBooking[] = [
-  { id: 'm1', event_name: 'Birthday Celebration',    event_date: '2026-03-22', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Marcus Webb',    status: 'inquiry',   payment_status: 'unpaid',  deposit_status: 'unpaid' },
-  { id: 'm2', event_name: 'House Music Brunch',      event_date: '2026-03-15', event_timezone: 'America/Chicago',               client_name: 'Nadia Thomas',   status: 'confirmed', payment_status: 'partial', deposit_status: 'pending' },
+  { id: 'm1', event_name: 'Birthday Celebration',    event_date: '2026-03-22', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Marcus Webb',    status: 'new',       payment_status: 'unpaid',             deposit_status: 'unpaid' },
+  { id: 'm2', event_name: 'House Music Brunch',      event_date: '2026-03-15', event_timezone: 'America/Chicago',               client_name: 'Nadia Thomas',   status: 'confirmed', payment_status: 'deposit_requested',  deposit_status: 'pending' },
   { id: 'm3', event_name: 'Corporate After-Party',   event_date: '2026-04-05', event_timezone: 'America/Chicago',               client_name: 'Priya Sharma',   status: 'confirmed', payment_status: 'unpaid',  deposit_status: 'unpaid' },
-  { id: 'm4', event_name: 'Club Night at Spybar',    event_date: '2026-04-12', event_timezone: 'America/Chicago',               client_name: 'Jordan Lee',     status: 'inquiry',   payment_status: 'unpaid',  deposit_status: 'unpaid' },
+  { id: 'm4', event_name: 'Club Night at Spybar',    event_date: '2026-04-12', event_timezone: 'America/Chicago',               client_name: 'Jordan Lee',     status: 'new',       payment_status: 'unpaid',  deposit_status: 'unpaid' },
   { id: 'm5', event_name: 'Wedding Reception',       event_date: '2026-02-28', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Destiny Brown',  status: 'completed', payment_status: 'paid',    deposit_status: 'paid' },
 ]
 
@@ -133,12 +136,12 @@ async function getDashboardData() {
       supabase.from('events').select('*', { count: 'exact', head: true })
         .eq('public', true).gte('event_date', now),
       supabase.from('bookings').select('*', { count: 'exact', head: true })
-        .eq('status', 'confirmed'),
+        .eq('lifecycle_status', 'confirmed'),
       supabase.from('bookings').select('*', { count: 'exact', head: true })
-        .eq('status', 'inquiry'),
+        .in('lifecycle_status', ['new', 'contacted', 'negotiating']),
       supabase.from('clients').select('*', { count: 'exact', head: true }),
       supabase.from('bookings')
-        .select('id, event_name, event_date, event_timezone, status, quote, deposit_amount, clients(first_name, last_name), payments(amount, type, status)')
+        .select('id, event_name, event_date, event_timezone, status, lifecycle_status, payment_status, quote, deposit_amount, clients(first_name, last_name), payments(amount, type, status)')
         .order('created_at', { ascending: false }).limit(5),
       supabase.from('events')
         .select('id, title, event_date, venue, featured')
@@ -161,6 +164,7 @@ async function getDashboardData() {
       },
       recentBookings: ((bookingRows ?? []) as BookingQueryRow[]).map((b) => {
         const client = b.clients?.[0] ?? null
+        const lifecycleStatus = getBookingLifecycleStatus(b.lifecycle_status, b.status)
         return {
           id:          b.id,
           event_name:  b.event_name,
@@ -169,8 +173,14 @@ async function getDashboardData() {
           client_name: client
             ? `${client.first_name ?? ''} ${client.last_name ?? ''}`.trim() || null
             : null,
-          status: b.status as BookingStatus,
-          payment_status: getBookingPaymentStatus(b.quote, b.payments),
+          status: lifecycleStatus,
+          payment_status: getBookingWorkflowPaymentStatus({
+            currentStatus: b.payment_status,
+            quote: b.quote,
+            depositAmount: b.deposit_amount,
+            lifecycleStatus,
+            payments: b.payments,
+          }),
           deposit_status: getDepositStatus(b.deposit_amount, b.payments),
         }
       }) as RecentBooking[],
@@ -308,8 +318,8 @@ export default async function DashboardPage() {
                   <td data-label="Event" style={{ fontWeight: 400 }}>{b.event_name}</td>
                   <td data-label="Client" className="muted">{b.client_name ?? '—'}</td>
                   <td data-label="Date" className="muted">{fmtDate(b.event_date, b.event_timezone)}</td>
-                  <td data-label="Status"><Badge variant={b.status} /></td>
-                  <td data-label="Payment"><Badge variant={b.payment_status} /></td>
+                  <td data-label="Status"><Badge variant={b.status} label={BOOKING_LIFECYCLE_STATUS_LABELS[b.status]} /></td>
+                  <td data-label="Payment"><Badge variant={b.payment_status} label={BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS[b.payment_status]} /></td>
                   <td data-label="Deposit">
                     <Badge variant={b.deposit_status === 'paid' ? 'paid' : b.deposit_status === 'pending' ? 'pending' : 'unpaid'} label={`Deposit ${b.deposit_status}`} />
                   </td>

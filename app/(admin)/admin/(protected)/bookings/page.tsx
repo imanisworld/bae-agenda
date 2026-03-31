@@ -8,8 +8,9 @@ import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import AdminNotice     from '@/components/admin/AdminNotice'
 import { createEventFromBookingAction, updateBookingStatusAction } from '@/app/actions/bookings'
 import { getDepositStatus } from '@/lib/booking-deposit'
-import { getBookingPaymentStatus, type BookingPaymentStatus } from '@/lib/booking-payment-status'
+import { getBookingLifecycleStatus, getBookingWorkflowPaymentStatus, type BookingLifecycleStatus, type BookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
+import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS } from '@/lib/constants'
 import type { BookingStatus } from '@/types/index'
 import Link from 'next/link'
 
@@ -22,8 +23,8 @@ interface BookingRow {
   city:        string | null
   client_name: string | null
   package:     string | null
-  status:      BookingStatus
-  payment_status: BookingPaymentStatus
+  status:      BookingLifecycleStatus
+  payment_status: BookingWorkflowPaymentStatus
   deposit_status: 'unpaid' | 'pending' | 'paid'
   created_at:  string
 }
@@ -39,6 +40,8 @@ interface BookingQueryRow {
   quote: number | null
   deposit_amount: number | null
   status: BookingStatus
+  lifecycle_status: BookingLifecycleStatus | null
+  payment_status: BookingWorkflowPaymentStatus | null
   created_at: string
   clients: { first_name: string | null; last_name: string | null }[] | null
   payments: { amount: number; status: 'pending' | 'received' | 'refunded' }[] | null
@@ -72,11 +75,12 @@ async function getBookings(): Promise<BookingRow[]> {
     const supabase = createClient()
     const { data } = await supabase
       .from('bookings')
-      .select('id, event_name, event_date, event_timezone, venue, city, package, quote, deposit_amount, status, created_at, clients(first_name, last_name), payments(amount, type, status)')
+      .select('id, event_name, event_date, event_timezone, venue, city, package, quote, deposit_amount, status, lifecycle_status, payment_status, created_at, clients(first_name, last_name), payments(amount, type, status)')
       .order('created_at', { ascending: false })
     const rows = (data ?? []) as BookingQueryRow[]
     return rows.map((b) => {
       const client = b.clients?.[0] ?? null
+      const lifecycleStatus = getBookingLifecycleStatus(b.lifecycle_status, b.status)
       return {
         id:          b.id,
         event_name:  b.event_name,
@@ -88,8 +92,14 @@ async function getBookings(): Promise<BookingRow[]> {
           ? `${client.first_name ?? ''} ${client.last_name ?? ''}`.trim() || null
           : null,
         package:    b.package,
-        status:     b.status as BookingStatus,
-        payment_status: getBookingPaymentStatus(b.quote, b.payments),
+        status:     lifecycleStatus,
+        payment_status: getBookingWorkflowPaymentStatus({
+          currentStatus: b.payment_status,
+          quote: b.quote,
+          depositAmount: b.deposit_amount,
+          lifecycleStatus,
+          payments: b.payments as Array<{ amount: number; type: string; status: 'pending' | 'received' | 'refunded' }> | null,
+        }),
         deposit_status: getDepositStatus(b.deposit_amount, b.payments as Array<{ amount: number; type: string; status: 'pending' | 'received' | 'refunded' }> | null),
         created_at: b.created_at,
       }
@@ -104,8 +114,8 @@ function getErrorMessage(errorParam: string | string[] | undefined) {
   return Array.isArray(errorParam) ? errorParam[0] ?? null : errorParam
 }
 
-function getBookingActions(status: BookingStatus) {
-  if (status === 'inquiry') {
+function getBookingActions(status: BookingLifecycleStatus) {
+  if (status === 'new' || status === 'contacted' || status === 'negotiating') {
     return [
       { label: 'Confirm', nextStatus: 'confirmed' as const, tone: 'primary' as const },
       { label: 'Cancel', nextStatus: 'cancelled' as const, tone: 'danger' as const },
@@ -130,7 +140,7 @@ function getBookingActions(status: BookingStatus) {
   ]
 }
 
-function canCreateEvent(status: BookingStatus) {
+function canCreateEvent(status: BookingLifecycleStatus) {
   return status === 'confirmed' || status === 'completed'
 }
 
@@ -197,8 +207,8 @@ export default async function BookingsPage({
                       </div>
                     </td>
                     <td data-label="Package" className="muted">{b.package ?? '—'}</td>
-                    <td data-label="Status"><Badge variant={b.status} /></td>
-                    <td data-label="Payment"><Badge variant={b.payment_status} /></td>
+                    <td data-label="Status"><Badge variant={b.status} label={BOOKING_LIFECYCLE_STATUS_LABELS[b.status]} /></td>
+                    <td data-label="Payment"><Badge variant={b.payment_status} label={BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS[b.payment_status]} /></td>
                     <td data-label="Deposit">
                       <Badge variant={b.deposit_status === 'paid' ? 'paid' : b.deposit_status === 'pending' ? 'pending' : 'unpaid'} label={`Deposit ${b.deposit_status}`} />
                     </td>

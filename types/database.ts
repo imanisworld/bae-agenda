@@ -80,8 +80,12 @@ export type Database = {
           deposit_paid_at: string | null
           deposit_confirmed_via: 'stripe' | 'manual' | null
           deposit_checkout_session_id: string | null
+          lifecycle_status: 'new' | 'contacted' | 'negotiating' | 'confirmed' | 'completed' | 'lost'
           last_balance_reminder_sent_at: string | null
           last_event_reminder_sent_at: string | null
+          balance_paid_at: string | null
+          payment_method: 'cash' | 'venmo' | 'zelle' | 'cash_app' | 'stripe' | 'check' | 'ach' | 'other' | null
+          payment_status: 'unpaid' | 'deposit_requested' | 'deposit_paid' | 'balance_requested' | 'paid'
           status:         'inquiry' | 'confirmed' | 'completed' | 'cancelled'
           notes:          string | null
           created_at:     string

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { syncBookingDepositState } from '@/lib/booking-deposit-sync'
+import { getBookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
 import { getStripeClient } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -83,10 +84,28 @@ export async function POST(request: NextRequest) {
 
       await syncBookingDepositState(admin, bookingId)
 
+      const { data: bookingForWorkflow } = await admin
+        .from('bookings')
+        .select('quote, deposit_amount, payments(amount, type, status)')
+        .eq('id', bookingId)
+        .maybeSingle()
+
       const { error: bookingSnapshotError } = await admin
         .from('bookings')
         .update({
           deposit_checkout_session_id: reference,
+          payment_status: getBookingWorkflowPaymentStatus({
+            currentStatus: 'deposit_requested',
+            quote: bookingForWorkflow?.quote as number | null | undefined,
+            depositAmount: bookingForWorkflow?.deposit_amount as number | null | undefined,
+            lifecycleStatus: 'confirmed',
+            payments: (bookingForWorkflow?.payments as Array<{
+              amount: number
+              type?: string | null
+              status: 'pending' | 'received' | 'refunded'
+            }> | null | undefined) ?? null,
+          }),
+          payment_method: 'stripe',
         })
         .eq('id', bookingId)
 

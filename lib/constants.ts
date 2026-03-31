@@ -30,6 +30,8 @@ export const ADMIN_NAV = [
 
 // ---- Booking -----------------------------------------------
 export const BOOKING_STATUSES = ['inquiry', 'confirmed', 'completed', 'cancelled'] as const
+export const BOOKING_LIFECYCLE_STATUSES = ['new', 'contacted', 'negotiating', 'confirmed', 'completed', 'lost'] as const
+export const BOOKING_WORKFLOW_PAYMENT_STATUSES = ['unpaid', 'deposit_requested', 'deposit_paid', 'balance_requested', 'paid'] as const
 
 export const BOOKING_STATUS_LABELS: Record<string, string> = {
   inquiry:   'Inquiry',
@@ -38,12 +40,29 @@ export const BOOKING_STATUS_LABELS: Record<string, string> = {
   cancelled: 'Cancelled',
 }
 
+export const BOOKING_LIFECYCLE_STATUS_LABELS: Record<string, string> = {
+  new: 'New',
+  contacted: 'Contacted',
+  negotiating: 'Negotiating',
+  confirmed: 'Confirmed',
+  completed: 'Completed',
+  lost: 'Lost',
+}
+
 // CSS color values for the Badge component (inline styles, not Tailwind utilities)
 export const BOOKING_STATUS_COLORS: Record<string, string> = {
   inquiry:   'var(--gold)',
   confirmed: 'var(--violet)',
   completed: '#34d399',
   cancelled: '#e85d75',
+}
+
+export const BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS: Record<string, string> = {
+  unpaid: 'Unpaid',
+  deposit_requested: 'Deposit Requested',
+  deposit_paid: 'Deposit Paid',
+  balance_requested: 'Balance Requested',
+  paid: 'Paid',
 }
 
 // ---- Packages ----------------------------------------------

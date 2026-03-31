@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getOutstandingDeposit } from '@/lib/booking-finance'
 import { syncBookingDepositState } from '@/lib/booking-deposit-sync'
+import { getBookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
 import { getAppBaseUrl, getStripeClient } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
@@ -29,6 +30,7 @@ async function updateBookingDepositCheckoutSnapshot(admin: ReturnType<typeof cre
     .update({
       deposit_status: 'pending',
       deposit_checkout_session_id: sessionId,
+      payment_status: 'deposit_requested',
     })
     .eq('id', bookingId)
 
@@ -150,7 +152,7 @@ export async function confirmManualDepositAction(formData: FormData) {
 
   const { data: booking, error } = await admin
     .from('bookings')
-    .select('deposit_amount, payments(amount, status)')
+    .select('quote, deposit_amount, payments(amount, status)')
     .eq('id', bookingId as string)
     .maybeSingle()
 
@@ -186,6 +188,23 @@ export async function confirmManualDepositAction(formData: FormData) {
   }
 
   await syncBookingDepositState(admin, bookingId as string)
+
+  await admin
+    .from('bookings')
+    .update({
+      payment_status: getBookingWorkflowPaymentStatus({
+        currentStatus: 'deposit_requested',
+        quote: bookingRecord.quote as number | null,
+        depositAmount: bookingRecord.deposit_amount as number | null,
+        lifecycleStatus: 'confirmed',
+        payments: [
+          ...(((bookingRecord.payments as Array<{ amount: number; status: 'pending' | 'received' | 'refunded' }> | null) ?? [])),
+          { amount: outstandingDeposit, status: 'received', type: 'deposit' },
+        ],
+      }),
+      payment_method: method,
+    })
+    .eq('id', bookingId as string)
 
   await admin
     .from('notes')
