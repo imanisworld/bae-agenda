@@ -1181,6 +1181,201 @@ export async function createBookingPaymentAction(formData: FormData) {
   redirect(`/admin/bookings/${finalBookingId}`)
 }
 
+// ─── WORKFLOW TRANSITION ACTIONS ─────────────────────────────────────────────
+
+export async function markBookingContactedAction(formData: FormData) {
+  await requireAdminUser()
+  const admin = createAdminClient()
+  const bookingId = optionalString(formData.get('booking_id'))
+  if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+
+  const { error } = await admin
+    .from('bookings')
+    .update({ lifecycle_status: 'contacted' })
+    .eq('id', bookingId as string)
+
+  if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to update booking.')
+
+  await appendBookingTimelineNote(admin, bookingId as string, 'Marked as contacted.')
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/dashboard')
+  redirect(`/admin/bookings/${bookingId}`)
+}
+
+export async function confirmBookingAction(formData: FormData) {
+  await requireAdminUser()
+  const admin = createAdminClient()
+  const bookingId = optionalString(formData.get('booking_id'))
+  if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+
+  const { error } = await admin
+    .from('bookings')
+    .update({
+      lifecycle_status: 'confirmed',
+      payment_status: 'deposit_requested',
+      status: 'confirmed',
+    })
+    .eq('id', bookingId as string)
+
+  if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to confirm booking.')
+
+  const booking = await getBookingConfirmationSource(admin, bookingId as string)
+  if (booking) {
+    const payload = getConfirmationPayloadFromBooking(booking)
+    if (payload) {
+      const result = await sendBookingConfirmedNotification(payload)
+      const client = getPrimaryBookingClient(booking.clients)
+      if (result.ok) {
+        await appendBookingTimelineNote(admin, bookingId as string, `Booking confirmed. Confirmation and deposit request sent to ${client?.email ?? 'client'}.`)
+      } else {
+        await appendBookingTimelineNote(admin, bookingId as string, 'Booking confirmed. Confirmation email could not be sent.')
+      }
+    } else {
+      await appendBookingTimelineNote(admin, bookingId as string, 'Booking confirmed. No client email on file — confirmation not sent.')
+    }
+  }
+
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/dashboard')
+  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Booking confirmed.')}`)
+}
+
+export async function markDepositReceivedAction(formData: FormData) {
+  await requireAdminUser()
+  const admin = createAdminClient()
+  const bookingId = optionalString(formData.get('booking_id'))
+  if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+
+  const { error } = await admin
+    .from('bookings')
+    .update({
+      payment_status: 'deposit_paid',
+      deposit_paid_at: new Date().toISOString(),
+    })
+    .eq('id', bookingId as string)
+
+  if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to mark deposit received.')
+
+  await sendBookingDepositReceivedEmail(admin, bookingId as string, { force: true })
+
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/payments')
+  revalidatePath('/admin/dashboard')
+  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Deposit marked as received.')}`)
+}
+
+export async function requestFinalPaymentAction(formData: FormData) {
+  await requireAdminUser()
+  const admin = createAdminClient()
+  const bookingId = optionalString(formData.get('booking_id'))
+  if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+
+  const { error } = await admin
+    .from('bookings')
+    .update({ payment_status: 'balance_requested' })
+    .eq('id', bookingId as string)
+
+  if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to request final payment.')
+
+  const source = await getBookingBalanceReminderSource(admin, bookingId as string)
+  if (source) {
+    const payload = await getBalanceReminderPayloadFromBooking(source)
+    if (payload) {
+      const result = await sendBookingBalanceReminder(payload)
+      if (result.ok) {
+        await appendBookingTimelineNote(admin, bookingId as string, `Final payment requested. Balance reminder sent to ${payload.email}.`)
+      } else {
+        await appendBookingTimelineNote(admin, bookingId as string, 'Final payment requested. Balance reminder email could not be sent.')
+      }
+    } else {
+      await appendBookingTimelineNote(admin, bookingId as string, 'Final payment requested. No client email on file — balance reminder not sent.')
+    }
+  }
+
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/dashboard')
+  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Final payment requested.')}`)
+}
+
+export async function markFullyPaidAction(formData: FormData) {
+  await requireAdminUser()
+  const admin = createAdminClient()
+  const bookingId = optionalString(formData.get('booking_id'))
+  if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+
+  const { error } = await admin
+    .from('bookings')
+    .update({
+      payment_status: 'paid',
+      balance_paid_at: new Date().toISOString(),
+    })
+    .eq('id', bookingId as string)
+
+  if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to mark booking as fully paid.')
+
+  await sendBookingFullyPaidEmail(admin, bookingId as string, { force: true })
+
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/payments')
+  revalidatePath('/admin/dashboard')
+  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Booking marked as fully paid.')}`)
+}
+
+export async function markBookingCompleteAction(formData: FormData) {
+  await requireAdminUser()
+  const admin = createAdminClient()
+  const bookingId = optionalString(formData.get('booking_id'))
+  if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+
+  const { error } = await admin
+    .from('bookings')
+    .update({
+      lifecycle_status: 'completed',
+      status: 'completed',
+    })
+    .eq('id', bookingId as string)
+
+  if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to mark booking as complete.')
+
+  await sendBookingPostEventFollowUpEmail(admin, bookingId as string, { force: true })
+
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/dashboard')
+  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Booking marked as complete.')}`)
+}
+
+export async function markBookingLostAction(formData: FormData) {
+  await requireAdminUser()
+  const admin = createAdminClient()
+  const bookingId = optionalString(formData.get('booking_id'))
+  if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+
+  const { error } = await admin
+    .from('bookings')
+    .update({
+      lifecycle_status: 'lost',
+      status: 'cancelled',
+    })
+    .eq('id', bookingId as string)
+
+  if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to mark booking as lost.')
+
+  await appendBookingTimelineNote(admin, bookingId as string, 'Marked as lost.')
+
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/dashboard')
+  redirect(`/admin/bookings/${bookingId}`)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export async function createBookingNoteAction(formData: FormData) {
   await requireAdminUser()
 

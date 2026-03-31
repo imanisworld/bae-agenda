@@ -9,7 +9,7 @@ import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } fr
 import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { createBookingNoteAction, createBookingPaymentAction, resendBookingConfirmationAction, resendBookingDepositReceivedAction, resendBookingFullyPaidAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingDepositReminderAction, sendBookingEventReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
+import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingDepositReceivedAction, resendBookingFullyPaidAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingDepositReminderAction, sendBookingEventReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingLifecycleStatus, BookingStatus, BookingWorkflowPaymentStatus } from '@/types/index'
@@ -214,6 +214,61 @@ export default async function EditBookingPage({
           {booking.clients?.phone && <span className="muted">{booking.clients.phone}</span>}
         </div>
       </div>
+
+      {lifecycleStatus !== 'completed' && lifecycleStatus !== 'lost' && (
+        <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
+          <div className="admin-section-title" style={{ marginBottom: '14px' }}>Next Step</div>
+          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
+
+            {(lifecycleStatus === 'new') && (
+              <form action={markBookingContactedAction}>
+                <input type="hidden" name="booking_id" value={booking.id} />
+                <button type="submit" className="admin-btn-ghost">Mark Contacted</button>
+              </form>
+            )}
+
+            {(lifecycleStatus === 'new' || lifecycleStatus === 'contacted' || lifecycleStatus === 'negotiating') && (
+              <form action={confirmBookingAction}>
+                <input type="hidden" name="booking_id" value={booking.id} />
+                <button type="submit" className="admin-btn-primary">Confirm Booking</button>
+              </form>
+            )}
+
+            {lifecycleStatus === 'confirmed' && paymentStatus === 'deposit_requested' && (
+              <form action={markDepositReceivedAction}>
+                <input type="hidden" name="booking_id" value={booking.id} />
+                <button type="submit" className="admin-btn-primary">Mark Deposit Received</button>
+              </form>
+            )}
+
+            {lifecycleStatus === 'confirmed' && paymentStatus === 'deposit_paid' && (
+              <form action={requestFinalPaymentAction}>
+                <input type="hidden" name="booking_id" value={booking.id} />
+                <button type="submit" className="admin-btn-primary">Request Final Payment</button>
+              </form>
+            )}
+
+            {lifecycleStatus === 'confirmed' && paymentStatus === 'balance_requested' && (
+              <form action={markFullyPaidAction}>
+                <input type="hidden" name="booking_id" value={booking.id} />
+                <button type="submit" className="admin-btn-primary">Mark Fully Paid</button>
+              </form>
+            )}
+
+            {lifecycleStatus === 'confirmed' && paymentStatus === 'paid' && (
+              <form action={markBookingCompleteAction}>
+                <input type="hidden" name="booking_id" value={booking.id} />
+                <button type="submit" className="admin-btn-primary">Mark Complete</button>
+              </form>
+            )}
+
+            <form action={markBookingLostAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button type="submit" className="admin-btn-ghost" style={{ color: '#e85d75' }}>Mark Lost</button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <form action={updateBookingDetailsAction} className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
         <input type="hidden" name="id" value={booking.id} />
