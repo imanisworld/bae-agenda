@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { DM_Sans } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
@@ -13,10 +13,12 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
+  applicationName: 'The Bae Agenda',
   title: {
     default: 'DJ B.A.E. | Official Website | DJ in Indianapolis & Chicago',
     template: '%s | DJ B.A.E.',
   },
+  manifest: '/manifest.webmanifest',
   alternates: {
     canonical: '/',
   },
@@ -35,7 +37,18 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'THE BAE',
+  },
   metadataBase: new URL('https://thebaeagenda.com'),
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({

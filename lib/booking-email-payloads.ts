@@ -1,4 +1,4 @@
-import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
+import { getOutstandingBalance, getOutstandingDeposit } from '@/lib/booking-finance'
 import { getPrimaryBookingClient, type BookingClientRelation } from '@/lib/booking-client'
 import { getAppBaseUrl } from '@/lib/stripe'
 import type { BookingStatus, PaymentStatus } from '@/types/index'
@@ -44,69 +44,12 @@ export interface BookingInquiryReceiptSource {
   clients: BookingClientRelation<BookingClient>
 }
 
-export interface BookingDepositReminderSource {
-  id: string
-  event_name: string | null
-  event_date: string
-  event_timezone: string | null
-  deposit_amount: number | null
-  clients: BookingClientRelation<BookingClient>
-  payments: Array<{
-    amount: number
-    status: PaymentStatus
-  }> | null
-}
-
 export interface BookingBalanceReminderSource {
   id: string
   event_name: string | null
   event_date: string
   event_timezone: string | null
   quote: number | null
-  clients: BookingClientRelation<BookingClient>
-  payments: Array<{
-    amount: number
-    status: PaymentStatus
-  }> | null
-}
-
-export interface BookingEventReminderSource {
-  id: string
-  status: BookingStatus
-  event_name: string | null
-  event_date: string
-  event_timezone: string | null
-  venue: string | null
-  city: string | null
-  clients: BookingClientRelation<BookingClient>
-}
-
-export interface BookingDepositReceivedSource {
-  id: string
-  status: BookingStatus
-  event_name: string | null
-  event_date: string
-  event_timezone: string | null
-  quote: number | null
-  deposit_amount: number | null
-  venue: string | null
-  city: string | null
-  clients: BookingClientRelation<BookingClient>
-  payments: Array<{
-    amount: number
-    status: PaymentStatus
-  }> | null
-}
-
-export interface BookingFullyPaidSource {
-  id: string
-  status: BookingStatus
-  event_name: string | null
-  event_date: string
-  event_timezone: string | null
-  quote: number | null
-  venue: string | null
-  city: string | null
   clients: BookingClientRelation<BookingClient>
   payments: Array<{
     amount: number
@@ -177,30 +120,6 @@ export function getInquiryReceiptPayloadFromBooking(booking: BookingInquiryRecei
   }
 }
 
-export function getDepositReminderPayloadFromBooking(booking: BookingDepositReminderSource | null) {
-  if (!booking) return null
-
-  const client = getPrimaryBookingClient(booking.clients)
-  const clientEmail = client?.email?.trim()
-  const eventTimeZone = booking.event_timezone?.trim()
-  const depositRemaining = getOutstandingDeposit(booking.deposit_amount, booking.payments)
-
-  if (!clientEmail || !booking.event_name || !eventTimeZone || depositRemaining <= 0) {
-    return null
-  }
-
-  return {
-    firstName: client?.first_name?.trim() || 'there',
-    lastName: client?.last_name?.trim() || null,
-    email: clientEmail,
-    eventName: booking.event_name,
-    eventDate: booking.event_date,
-    eventTimeZone,
-    depositDue: formatCurrency(depositRemaining),
-    payUrl: `${getAppBaseUrl()}/pay/${booking.id}`,
-  }
-}
-
 export function getBalanceReminderPayloadFromBooking(booking: BookingBalanceReminderSource | null) {
   if (!booking) return null
 
@@ -222,84 +141,6 @@ export function getBalanceReminderPayloadFromBooking(booking: BookingBalanceRemi
     eventTimeZone,
     balanceDue: formatCurrency(balanceRemaining),
     payUrl: null,
-  }
-}
-
-export function getEventReminderPayloadFromBooking(booking: BookingEventReminderSource | null) {
-  if (!booking) return null
-
-  const client = getPrimaryBookingClient(booking.clients)
-  const clientEmail = client?.email?.trim()
-  const eventTimeZone = booking.event_timezone?.trim()
-
-  if (!clientEmail || !booking.event_name || !eventTimeZone) {
-    return null
-  }
-
-  return {
-    firstName: client?.first_name?.trim() || 'there',
-    lastName: client?.last_name?.trim() || null,
-    email: clientEmail,
-    eventName: booking.event_name,
-    eventDate: booking.event_date,
-    eventTimeZone,
-    venue: booking.venue,
-    city: booking.city,
-  }
-}
-
-export function getDepositReceivedPayloadFromBooking(booking: BookingDepositReceivedSource | null) {
-  if (!booking) return null
-
-  const client = getPrimaryBookingClient(booking.clients)
-  const clientEmail = client?.email?.trim()
-  const eventTimeZone = booking.event_timezone?.trim()
-  const depositAmount = booking.deposit_amount ?? 0
-  const depositRemaining = getOutstandingDeposit(booking.deposit_amount, booking.payments)
-  const balanceRemaining = getOutstandingBalance(booking.quote, booking.payments)
-
-  if (!clientEmail || !booking.event_name || !eventTimeZone || depositAmount <= 0 || depositRemaining > 0) {
-    return null
-  }
-
-  return {
-    firstName: client?.first_name?.trim() || 'there',
-    lastName: client?.last_name?.trim() || null,
-    email: clientEmail,
-    eventName: booking.event_name,
-    eventDate: booking.event_date,
-    eventTimeZone,
-    totalAmount: formatCurrency(booking.quote ?? 0),
-    depositAmount: formatCurrency(depositAmount),
-    remainingAmount: formatCurrency(balanceRemaining),
-    venue: booking.venue,
-    city: booking.city,
-  }
-}
-
-export function getFullyPaidPayloadFromBooking(booking: BookingFullyPaidSource | null) {
-  if (!booking) return null
-
-  const client = getPrimaryBookingClient(booking.clients)
-  const clientEmail = client?.email?.trim()
-  const eventTimeZone = booking.event_timezone?.trim()
-  const balanceRemaining = getOutstandingBalance(booking.quote, booking.payments)
-  const receivedTotal = getReceivedPaymentTotal(booking.payments)
-
-  if (!clientEmail || !booking.event_name || !eventTimeZone || (booking.quote ?? 0) <= 0 || balanceRemaining > 0 || receivedTotal <= 0) {
-    return null
-  }
-
-  return {
-    firstName: client?.first_name?.trim() || 'there',
-    lastName: client?.last_name?.trim() || null,
-    email: clientEmail,
-    eventName: booking.event_name,
-    eventDate: booking.event_date,
-    eventTimeZone,
-    totalPaid: formatCurrency(receivedTotal),
-    venue: booking.venue,
-    city: booking.city,
   }
 }
 

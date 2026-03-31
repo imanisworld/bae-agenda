@@ -3,12 +3,10 @@ import { sendBookingPostEventFollowUpEmail } from '@/lib/booking-email-workflows
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
   getBalanceReminderPayloadFromBooking,
-  getEventReminderPayloadFromBooking,
   type BookingBalanceReminderSource,
-  type BookingEventReminderSource,
 } from '@/lib/booking-email-payloads'
-import { isCalendarDaysOut, isHoursAwayWithinRange } from '@/lib/date-time'
-import { sendBookingBalanceReminder, sendBookingEventReminder } from '@/lib/notifications'
+import { isCalendarDaysOut } from '@/lib/date-time'
+import { sendBookingBalanceReminder } from '@/lib/notifications'
 
 function isAuthorizedCron(request: NextRequest) {
   const secret = process.env.CRON_SECRET
@@ -33,13 +31,11 @@ async function appendBookingTimelineNote(
   }
 }
 
-type CronBookingReminderSource = BookingBalanceReminderSource &
-  BookingEventReminderSource & {
-    status: 'confirmed' | 'completed'
-    post_event_follow_up_sent_at: string | null
-    last_balance_reminder_sent_at: string | null
-    last_event_reminder_sent_at: string | null
-  }
+type CronBookingReminderSource = BookingBalanceReminderSource & {
+  status: 'confirmed' | 'completed'
+  post_event_follow_up_sent_at: string | null
+  last_balance_reminder_sent_at: string | null
+}
 
 async function sendScheduledBalanceReminder(
   admin: ReturnType<typeof createAdminClient>,
@@ -73,46 +69,7 @@ async function sendScheduledBalanceReminder(
   await appendBookingTimelineNote(
     admin,
     booking.id,
-    `Scheduled balance reminder email sent to ${payload.email}.`
-  )
-
-  return true
-}
-
-async function sendScheduledEventReminder(
-  admin: ReturnType<typeof createAdminClient>,
-  booking: CronBookingReminderSource,
-  now: Date,
-  nowIso: string
-) {
-  if (booking.last_event_reminder_sent_at) {
-    return false
-  }
-
-  if (!isHoursAwayWithinRange(booking.event_date, 47, 49, now)) {
-    return false
-  }
-
-  const payload = getEventReminderPayloadFromBooking(booking)
-  if (!payload) {
-    return false
-  }
-
-  const result = await sendBookingEventReminder(payload)
-  if (!result.ok) {
-    console.error('[cron-payment-reminders] event email failed:', booking.id, result.reason, result.detail ?? '')
-    return false
-  }
-
-  await admin
-    .from('bookings')
-    .update({ last_event_reminder_sent_at: nowIso })
-    .eq('id', booking.id)
-
-  await appendBookingTimelineNote(
-    admin,
-    booking.id,
-    `Scheduled event reminder email sent to ${payload.email} about 48 hours before the event.`
+    `Scheduled final payment reminder email sent to ${payload.email}.`
   )
 
   return true
@@ -173,7 +130,6 @@ export async function GET(request: NextRequest) {
       city,
       post_event_follow_up_sent_at,
       last_balance_reminder_sent_at,
-      last_event_reminder_sent_at,
       clients(first_name, last_name, email),
       payments(amount, status)
     `)
@@ -187,30 +143,26 @@ export async function GET(request: NextRequest) {
 
   const bookings = (data ?? []) as CronBookingReminderSource[]
   let balanceSent = 0
-  let eventSent = 0
   let followUpSent = 0
   let skipped = 0
 
   for (const booking of bookings) {
-    const [balanceReminderSent, eventReminderSent, postEventFollowUpSent] = await Promise.all([
+    const [balanceReminderSent, postEventFollowUpSent] = await Promise.all([
       sendScheduledBalanceReminder(admin, booking, nowIso),
-      sendScheduledEventReminder(admin, booking, now, nowIso),
       sendScheduledPostEventFollowUp(admin, booking, now, nowIso),
     ])
 
     if (balanceReminderSent) balanceSent += 1
-    if (eventReminderSent) eventSent += 1
     if (postEventFollowUpSent) followUpSent += 1
-    if (!balanceReminderSent && !eventReminderSent && !postEventFollowUpSent) skipped += 1
+    if (!balanceReminderSent && !postEventFollowUpSent) skipped += 1
   }
 
   return NextResponse.json({
     ok: true,
     processed: bookings.length,
     balanceSent,
-    eventSent,
     followUpSent,
-    sent: balanceSent + eventSent + followUpSent,
+    sent: balanceSent + followUpSent,
     skipped,
   })
 }

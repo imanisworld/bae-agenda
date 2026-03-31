@@ -9,7 +9,7 @@ import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } fr
 import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingDepositReceivedAction, resendBookingFullyPaidAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingDepositReminderAction, sendBookingEventReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
+import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, updateBookingDetailsAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingLifecycleStatus, BookingStatus, BookingWorkflowPaymentStatus } from '@/types/index'
@@ -399,7 +399,7 @@ export default async function EditBookingPage({
           <div style={{ minWidth: 0, flex: 1 }}>
             <div className="admin-section-title" style={{ marginBottom: '10px' }}>Client Emails</div>
             <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
-              Resend the original inquiry receipt or the confirmed-booking email without changing the current booking details.
+              Send the lean client flow from here: inquiry receipt, booking confirmation, final payment reminder, and the post-event thank-you.
             </p>
           </div>
 
@@ -438,28 +438,6 @@ export default async function EditBookingPage({
                 Resend Confirmation Email
               </button>
             </form>
-            <form action={sendBookingDepositReminderAction}>
-              <input type="hidden" name="booking_id" value={booking.id} />
-              <button
-                type="submit"
-                className="admin-btn-ghost"
-                disabled={!booking.clients?.email || outstandingDeposit <= 0}
-                style={
-                  !booking.clients?.email || outstandingDeposit <= 0
-                    ? { opacity: 0.55, cursor: 'not-allowed' }
-                    : undefined
-                }
-                title={
-                  !booking.clients?.email
-                    ? 'Add a client email before sending.'
-                    : outstandingDeposit <= 0
-                      ? 'No deposit reminder is needed because the current deposit amount is already covered.'
-                      : undefined
-                }
-              >
-                Send Deposit Reminder
-              </button>
-            </form>
             <form action={sendBookingBalanceReminderAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
               <button
@@ -479,73 +457,7 @@ export default async function EditBookingPage({
                       : undefined
                 }
               >
-                Send Balance Reminder
-              </button>
-            </form>
-            <form action={sendBookingEventReminderAction}>
-              <input type="hidden" name="booking_id" value={booking.id} />
-              <button
-                type="submit"
-                className="admin-btn-ghost"
-                disabled={!booking.clients?.email || (lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed')}
-                style={
-                  !booking.clients?.email || (lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed')
-                    ? { opacity: 0.55, cursor: 'not-allowed' }
-                    : undefined
-                }
-                title={
-                  !booking.clients?.email
-                    ? 'Add a client email before sending.'
-                    : lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed'
-                      ? 'Confirm the booking first before sending an event reminder.'
-                      : undefined
-                }
-              >
-                Send Event Reminder
-              </button>
-            </form>
-            <form action={resendBookingDepositReceivedAction}>
-              <input type="hidden" name="booking_id" value={booking.id} />
-              <button
-                type="submit"
-                className="admin-btn-ghost"
-                disabled={!booking.clients?.email || outstandingDeposit > 0}
-                style={
-                  !booking.clients?.email || outstandingDeposit > 0
-                    ? { opacity: 0.55, cursor: 'not-allowed' }
-                    : undefined
-                }
-                title={
-                  !booking.clients?.email
-                    ? 'Add a client email before sending.'
-                    : outstandingDeposit > 0
-                      ? 'Wait until the deposit is fully covered before sending this email.'
-                      : undefined
-                }
-              >
-                Send Deposit Received
-              </button>
-            </form>
-            <form action={resendBookingFullyPaidAction}>
-              <input type="hidden" name="booking_id" value={booking.id} />
-              <button
-                type="submit"
-                className="admin-btn-ghost"
-                disabled={!booking.clients?.email || outstandingBalance > 0}
-                style={
-                  !booking.clients?.email || outstandingBalance > 0
-                    ? { opacity: 0.55, cursor: 'not-allowed' }
-                    : undefined
-                }
-                title={
-                  !booking.clients?.email
-                    ? 'Add a client email before sending.'
-                    : outstandingBalance > 0
-                      ? 'Wait until the balance is fully covered before sending this email.'
-                      : undefined
-                }
-              >
-                Send Fully Paid
+                Send Final Payment Reminder
               </button>
             </form>
             <form action={resendBookingPostEventFollowUpAction}>

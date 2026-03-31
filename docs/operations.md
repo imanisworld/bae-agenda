@@ -16,9 +16,8 @@ From a booking detail page you can manually send:
 
 - Inquiry receipt
 - Confirmation email
-- Deposit reminder
-- Balance reminder
-- Event reminder
+- Final payment reminder
+- Post-event thank-you
 - Invoice email
 
 Each successful send writes a timeline note to the booking so the communication history stays visible.
@@ -27,9 +26,8 @@ Each successful send writes a timeline note to the booking so the communication 
 
 - Use inquiry receipt resend when the client says they never got the original message
 - Use confirmation resend only after the booking is confirmed or completed
-- Use deposit reminder only when deposit is still outstanding
-- Use balance reminder only when total balance is still outstanding
-- Use event reminder only for confirmed or completed bookings
+- Use final payment reminder only when total balance is still outstanding
+- Use post-event thank-you only after the booking is completed
 
 ## Best Automation Candidates Later
 
@@ -37,9 +35,8 @@ These are the strongest automation opportunities once the manual workflow feels 
 
 - Auto-follow-up for new inquiries after a set delay
 - Auto-send confirmation when a booking becomes `confirmed`
-- Scheduled deposit reminders based on event date or booking date
-- Scheduled balance reminders based on event proximity
-- Scheduled event reminders one or more days before the event
+- Scheduled final payment reminders based on event proximity
+- Scheduled post-event thank-you sends after completion
 - Daily digest for stale inquiries, pending reviews, and upcoming events
 
 ## Things To Keep Manual For Now
@@ -68,4 +65,5 @@ npm run build
 ## Notes
 
 - CI now runs lint and build on pushes to `main` and pull requests
+- Vercel cron scheduling is intentionally disabled for booking reminders right now
 - `.env.example` and the root `README.md` should stay current as env vars or flows change

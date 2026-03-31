@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { getPrimaryBookingClient } from '@/lib/booking-client'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
-import { sendBookingDepositReceivedEmail, sendBookingFullyPaidEmail, sendBookingPostEventFollowUpEmail } from '@/lib/booking-email-workflows'
+import { sendBookingPostEventFollowUpEmail } from '@/lib/booking-email-workflows'
 import { getBookingPaymentStatus } from '@/lib/booking-payment-status'
 import { syncBookingDepositState } from '@/lib/booking-deposit-sync'
 import {
@@ -18,22 +18,16 @@ import {
 import {
   getBalanceReminderPayloadFromBooking,
   getConfirmationPayloadFromBooking,
-  getDepositReminderPayloadFromBooking,
-  getEventReminderPayloadFromBooking,
-  getFullyPaidPayloadFromBooking,
   getInquiryReceiptPayloadFromBooking,
   getPostEventFollowUpPayloadFromBooking,
   type BookingBalanceReminderSource,
   type BookingConfirmationSource,
-  type BookingDepositReminderSource,
-  type BookingEventReminderSource,
-  type BookingFullyPaidSource,
   type BookingInquiryReceiptSource,
   type BookingPostEventFollowUpSource,
 } from '@/lib/booking-email-payloads'
 import { toEventISO } from '@/lib/date-time'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
-import { sendBookingBalanceReminder, sendBookingConfirmedNotification, sendBookingDepositReminder, sendBookingEventReminder, sendBookingInquiryReceipt, sendW9Notification } from '@/lib/notifications'
+import { sendBookingBalanceReminder, sendBookingConfirmedNotification, sendBookingInquiryReceipt, sendW9Notification } from '@/lib/notifications'
 import { BOOKING_LIFECYCLE_STATUSES, BOOKING_WORKFLOW_PAYMENT_STATUSES, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import { generateW9Pdf } from '@/lib/w9-pdf'
 import { shouldAutoSendW9ForPayment } from '@/lib/w9-automation'
@@ -189,29 +183,6 @@ async function getBookingInquiryReceiptSource(admin: ReturnType<typeof createAdm
   return data as BookingInquiryReceiptSource
 }
 
-async function getBookingDepositReminderSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
-  const { data, error } = await admin
-    .from('bookings')
-    .select(`
-      id,
-      event_name,
-      event_date,
-      event_timezone,
-      deposit_amount,
-      clients(first_name, last_name, email),
-      payments(amount, status)
-    `)
-    .eq('id', bookingId)
-    .maybeSingle()
-
-  if (error || !data) {
-    console.error('[booking-deposit] unable to load booking:', error)
-    return null
-  }
-
-  return data as BookingDepositReminderSource
-}
-
 async function getBookingBalanceReminderSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
   const { data, error } = await admin
     .from('bookings')
@@ -233,56 +204,6 @@ async function getBookingBalanceReminderSource(admin: ReturnType<typeof createAd
   }
 
   return data as BookingBalanceReminderSource
-}
-
-async function getBookingEventReminderSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
-  const { data, error } = await admin
-    .from('bookings')
-    .select(`
-      id,
-      status,
-      event_name,
-      event_date,
-      event_timezone,
-      venue,
-      city,
-      clients(first_name, last_name, email)
-    `)
-    .eq('id', bookingId)
-    .maybeSingle()
-
-  if (error || !data) {
-    console.error('[booking-event] unable to load booking:', error)
-    return null
-  }
-
-  return data as BookingEventReminderSource
-}
-
-async function getBookingFullyPaidSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
-  const { data, error } = await admin
-    .from('bookings')
-    .select(`
-      id,
-      status,
-      event_name,
-      event_date,
-      event_timezone,
-      quote,
-      venue,
-      city,
-      clients(first_name, last_name, email),
-      payments(amount, status)
-    `)
-    .eq('id', bookingId)
-    .maybeSingle()
-
-  if (error || !data) {
-    console.error('[booking-fully-paid] unable to load booking:', error)
-    return null
-  }
-
-  return data as BookingFullyPaidSource
 }
 
 async function getBookingPostEventFollowUpSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
@@ -596,42 +517,6 @@ export async function resendBookingInquiryReceiptAction(formData: FormData) {
   redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Inquiry receipt email sent to ${inquiryPayload.email}.`)}`)
 }
 
-export async function sendBookingDepositReminderAction(formData: FormData) {
-  await requireAdminUser()
-
-  const admin = createAdminClient()
-  const bookingIdRaw = optionalString(formData.get('booking_id'))
-
-  if (!bookingIdRaw) {
-    redirectWithError('/admin/bookings', 'Missing booking id for deposit reminder email.')
-  }
-
-  const bookingId = bookingIdRaw as string
-  const booking = await getBookingDepositReminderSource(admin, bookingId)
-  if (!booking) {
-    redirectWithError('/admin/bookings', 'Could not find that booking.')
-  }
-
-  const payload = getDepositReminderPayloadFromBooking(booking as BookingDepositReminderSource)
-  if (!payload) {
-    redirectWithError(`/admin/bookings/${bookingId}`, 'This booking does not currently have an outstanding deposit reminder to send.')
-  }
-
-  const depositPayload = payload as NonNullable<typeof payload>
-  const result = await sendBookingDepositReminder(depositPayload)
-  if (!result.ok) {
-    redirectWithError(`/admin/bookings/${bookingId}`, result.detail || 'Unable to send deposit reminder email.')
-  }
-
-  await appendBookingTimelineNote(
-    admin,
-    bookingId,
-    `Deposit reminder email sent to ${depositPayload.email} for ${depositPayload.depositDue}.`
-  )
-
-  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Deposit reminder email sent to ${depositPayload.email}.`)}`)
-}
-
 export async function sendBookingBalanceReminderAction(formData: FormData) {
   await requireAdminUser()
 
@@ -662,116 +547,10 @@ export async function sendBookingBalanceReminderAction(formData: FormData) {
   await appendBookingTimelineNote(
     admin,
     bookingId,
-    `Balance reminder email sent to ${balancePayload.email} for ${balancePayload.balanceDue}.`
+    `Final payment reminder email sent to ${balancePayload.email} for ${balancePayload.balanceDue}.`
   )
 
-  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Balance reminder email sent to ${balancePayload.email}.`)}`)
-}
-
-export async function sendBookingEventReminderAction(formData: FormData) {
-  await requireAdminUser()
-
-  const admin = createAdminClient()
-  const bookingIdRaw = optionalString(formData.get('booking_id'))
-
-  if (!bookingIdRaw) {
-    redirectWithError('/admin/bookings', 'Missing booking id for event reminder email.')
-  }
-
-  const bookingId = bookingIdRaw as string
-  const booking = await getBookingEventReminderSource(admin, bookingId)
-  if (!booking) {
-    redirectWithError('/admin/bookings', 'Could not find that booking.')
-  }
-
-  const bookingRecord = booking as BookingEventReminderSource
-  if (bookingRecord.status !== 'confirmed' && bookingRecord.status !== 'completed') {
-    redirectWithError(`/admin/bookings/${bookingId}`, 'Only confirmed bookings can send an event reminder.')
-  }
-
-  const eventClient = getPrimaryBookingClient(bookingRecord.clients)
-  const eventMissing = listMissingFields([
-    { label: 'client email', present: Boolean(eventClient?.email?.trim()) },
-    { label: 'event name', present: Boolean(bookingRecord.event_name?.trim()) },
-    { label: 'timezone', present: Boolean(bookingRecord.event_timezone?.trim()) },
-  ])
-  const eventMissingMessage = formatMissingFieldsMessage('Event reminder', eventMissing)
-  if (eventMissingMessage) {
-    redirectWithError(`/admin/bookings/${bookingId}`, eventMissingMessage)
-  }
-
-  const payload = getEventReminderPayloadFromBooking(bookingRecord)
-  if (!payload) {
-    redirectWithError(`/admin/bookings/${bookingId}`, 'Event reminder could not be prepared from this booking record.')
-  }
-
-  const eventPayload = payload as NonNullable<typeof payload>
-  const result = await sendBookingEventReminder(eventPayload)
-  if (!result.ok) {
-    redirectWithError(`/admin/bookings/${bookingId}`, result.detail || 'Unable to send event reminder email.')
-  }
-
-  await appendBookingTimelineNote(
-    admin,
-    bookingId,
-    `Event reminder email sent to ${eventPayload.email}.`
-  )
-
-  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Event reminder email sent to ${eventPayload.email}.`)}`)
-}
-
-export async function resendBookingDepositReceivedAction(formData: FormData) {
-  await requireAdminUser()
-
-  const admin = createAdminClient()
-  const bookingIdRaw = optionalString(formData.get('booking_id'))
-
-  if (!bookingIdRaw) {
-    redirectWithError('/admin/bookings', 'Missing booking id for deposit received email.')
-  }
-
-  const bookingId = bookingIdRaw as string
-  const result = await sendBookingDepositReceivedEmail(admin, bookingId, { force: true, mode: 'resend' })
-  if (result.status === 'failed') {
-    redirectWithError(`/admin/bookings/${bookingId}`, result.detail)
-  }
-  if (result.status === 'sent') {
-    redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Deposit received email sent to ${result.email}.`)}`)
-  }
-
-  redirectWithError(`/admin/bookings/${bookingId}`, 'This booking does not currently qualify for a deposit received email.')
-}
-
-export async function resendBookingFullyPaidAction(formData: FormData) {
-  await requireAdminUser()
-
-  const admin = createAdminClient()
-  const bookingIdRaw = optionalString(formData.get('booking_id'))
-
-  if (!bookingIdRaw) {
-    redirectWithError('/admin/bookings', 'Missing booking id for fully paid email.')
-  }
-
-  const bookingId = bookingIdRaw as string
-  const booking = await getBookingFullyPaidSource(admin, bookingId)
-  if (!booking) {
-    redirectWithError('/admin/bookings', 'Could not find that booking.')
-  }
-
-  const payload = getFullyPaidPayloadFromBooking(booking as BookingFullyPaidSource)
-  if (!payload) {
-    redirectWithError(`/admin/bookings/${bookingId}`, 'This booking is not fully paid yet.')
-  }
-
-  const result = await sendBookingFullyPaidEmail(admin, bookingId, { force: true, mode: 'resend' })
-  if (result.status === 'failed') {
-    redirectWithError(`/admin/bookings/${bookingId}`, result.detail)
-  }
-  if (result.status === 'sent') {
-    redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Fully paid email sent to ${result.email}.`)}`)
-  }
-
-  redirectWithError(`/admin/bookings/${bookingId}`, 'This booking is not ready for a fully paid email yet.')
+  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Final payment reminder email sent to ${balancePayload.email}.`)}`)
 }
 
 export async function resendBookingPostEventFollowUpAction(formData: FormData) {
@@ -1151,14 +930,6 @@ export async function createBookingPaymentAction(formData: FormData) {
   const invoicePaymentState = await syncInvoicePaymentState(admin, finalBookingId)
   await syncBookingDepositState(admin, finalBookingId)
   const workflowState = await syncBookingWorkflowState(admin, finalBookingId)
-  const depositEmailResult = await sendBookingDepositReceivedEmail(admin, finalBookingId)
-  if (depositEmailResult.status === 'failed') {
-    console.error('[booking-payment] deposit received email failed:', depositEmailResult.detail)
-  }
-  const fullyPaidEmailResult = await sendBookingFullyPaidEmail(admin, finalBookingId)
-  if (fullyPaidEmailResult.status === 'failed') {
-    console.error('[booking-payment] fully paid email failed:', fullyPaidEmailResult.detail)
-  }
   if (workflowState?.lifecycleStatus === 'completed') {
     const followUpResult = await sendBookingPostEventFollowUpEmail(admin, finalBookingId)
     if (followUpResult.status === 'failed') {
@@ -1258,8 +1029,6 @@ export async function markDepositReceivedAction(formData: FormData) {
 
   if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to mark deposit received.')
 
-  await sendBookingDepositReceivedEmail(admin, bookingId as string, { force: true })
-
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/payments')
@@ -1316,8 +1085,6 @@ export async function markFullyPaidAction(formData: FormData) {
     .eq('id', bookingId as string)
 
   if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to mark booking as fully paid.')
-
-  await sendBookingFullyPaidEmail(admin, bookingId as string, { force: true })
 
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')

@@ -42,17 +42,6 @@ type BookingInquiryReceiptPayload = {
   location?: string | null
 }
 
-type BookingDepositReminderPayload = {
-  firstName: string
-  lastName?: string | null
-  email: string
-  eventName: string
-  eventDate: string
-  eventTimeZone: string
-  depositDue: string
-  payUrl: string
-}
-
 type BookingBalanceReminderPayload = {
   firstName: string
   lastName?: string | null
@@ -62,43 +51,6 @@ type BookingBalanceReminderPayload = {
   eventTimeZone: string
   balanceDue: string
   payUrl?: string | null
-}
-
-type BookingEventReminderPayload = {
-  firstName: string
-  lastName?: string | null
-  email: string
-  eventName: string
-  eventDate: string
-  eventTimeZone: string
-  venue?: string | null
-  city?: string | null
-}
-
-type BookingDepositReceivedPayload = {
-  firstName: string
-  lastName?: string | null
-  email: string
-  eventName: string
-  eventDate: string
-  eventTimeZone: string
-  totalAmount?: string | null
-  depositAmount?: string | null
-  remainingAmount?: string | null
-  venue?: string | null
-  city?: string | null
-}
-
-type BookingFullyPaidPayload = {
-  firstName: string
-  lastName?: string | null
-  email: string
-  eventName: string
-  eventDate: string
-  eventTimeZone: string
-  totalPaid?: string | null
-  venue?: string | null
-  city?: string | null
 }
 
 type BookingPostEventFollowUpPayload = {
@@ -586,43 +538,6 @@ export async function sendBookingConfirmedNotification(payload: BookingConfirmed
   })
 }
 
-export async function sendBookingDepositReminder(payload: BookingDepositReminderPayload) {
-  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
-  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
-
-  return sendEmail({
-    to: payload.email,
-    subject: `Deposit reminder for ${payload.eventName}`,
-    text: [
-      `Hi ${guestName},`,
-      '',
-      `This is a quick reminder that the deposit for ${payload.eventName} is still outstanding.`,
-      '',
-      `Event: ${payload.eventName}`,
-      `Date: ${eventDateTime}`,
-      `Deposit due: ${payload.depositDue}`,
-      `Payment link: ${payload.payUrl}`,
-      '',
-      'If you prefer Zelle or Cash App, reply to this email and we will help you confirm the transfer.',
-      'If you have any questions, just reply to this email.',
-      '',
-      'DJ B.A.E. Bookings',
-    ].join('\n'),
-    html: buildClientBookingEmailHtml({
-      eyebrow: 'Deposit reminder',
-      heading: 'Deposit reminder',
-      intro: `Hi ${escapeHtml(guestName)}, this is a quick reminder that the deposit for <strong>${escapeHtml(payload.eventName)}</strong> is still outstanding.`,
-      fields: [
-        ['Event', payload.eventName],
-        ['Date', eventDateTime],
-        ['Deposit due', payload.depositDue],
-        ['Payment link', payload.payUrl],
-      ] as const,
-      closing: 'Use the payment link above for Stripe Checkout, or reply if you need Zelle or Cash App instructions.',
-    }),
-  })
-}
-
 export async function sendBookingBalanceReminder(payload: BookingBalanceReminderPayload) {
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
@@ -661,119 +576,6 @@ export async function sendBookingBalanceReminder(payload: BookingBalanceReminder
         ...paymentInstructionRows,
       ] as const,
       closing: 'Once sent, just reply here to confirm.',
-    }),
-  })
-}
-
-export async function sendBookingEventReminder(payload: BookingEventReminderPayload) {
-  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
-  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
-  const location = [payload.venue, payload.city].filter(Boolean).join(', ')
-
-  return sendEmail({
-    to: payload.email,
-    subject: `Event reminder for ${payload.eventName}`,
-    text: [
-      `Hi ${guestName},`,
-      '',
-      `This is a quick reminder for your upcoming event: ${payload.eventName}.`,
-      '',
-      `Event: ${payload.eventName}`,
-      `Date: ${eventDateTime}`,
-      `Time Zone: ${payload.eventTimeZone}`,
-      ...(location ? [`Location: ${location}`] : []),
-      '',
-      'If any details have changed, just reply to this email.',
-      '',
-      'DJ B.A.E. Bookings',
-    ].join('\n'),
-    html: buildClientBookingEmailHtml({
-      eyebrow: 'Event reminder',
-      heading: 'Your event is coming up',
-      intro: `Hi ${escapeHtml(guestName)}, this is a quick reminder for your upcoming event: <strong>${escapeHtml(payload.eventName)}</strong>.`,
-      fields: [
-        ['Event', payload.eventName],
-        ['Date', eventDateTime],
-        ['Time Zone', payload.eventTimeZone],
-        ...(location ? [['Location', location] as const] : []),
-      ],
-      closing: 'If any details have changed, just reply to this email.',
-    }),
-  })
-}
-
-export async function sendBookingDepositReceivedNotification(payload: BookingDepositReceivedPayload) {
-  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
-  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
-  const location = [payload.venue, payload.city].filter(Boolean).join(', ')
-
-  return sendEmail({
-    to: payload.email,
-    subject: "Deposit Received - You're Booked",
-    text: [
-      `Hey ${guestName},`,
-      '',
-      `Your deposit for ${payload.eventName} on ${eventDateTime} came through, and your date is officially locked in.`,
-      '',
-      `Event: ${payload.eventName}`,
-      `Date: ${eventDateTime}`,
-      `Deposit received: ${payload.depositAmount ?? 'Paid'}`,
-      `Remaining balance: ${payload.remainingAmount ?? 'TBD'}`,
-      ...(location ? [`Location: ${location}`] : []),
-      '',
-      'If any event details change between now and then, just reply here and keep me posted.',
-      '',
-      '- DJ B.A.E.',
-    ].join('\n'),
-    html: buildClientBookingEmailHtml({
-      eyebrow: 'Deposit received',
-      heading: "Deposit Received - You're Booked",
-      intro: `Hey ${escapeHtml(guestName)}, your deposit for <strong>${escapeHtml(payload.eventName)}</strong> on <strong>${escapeHtml(eventDateTime)}</strong> came through, and your date is officially locked in.`,
-      fields: [
-        ['Event', payload.eventName],
-        ['Event Date', eventDateTime],
-        ['Deposit Received', payload.depositAmount ?? 'Paid'],
-        ['Remaining Balance', payload.remainingAmount ?? 'TBD'],
-        ...(location ? [['Location', location] as const] : []),
-      ] as const,
-      closing: 'If any event details change between now and then, just reply here and keep me posted.',
-    }),
-  })
-}
-
-export async function sendBookingFullyPaidNotification(payload: BookingFullyPaidPayload) {
-  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
-  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
-  const location = [payload.venue, payload.city].filter(Boolean).join(', ')
-
-  return sendEmail({
-    to: payload.email,
-    subject: `Fully Paid - Ready for ${eventDateTime}`,
-    text: [
-      `Hey ${guestName},`,
-      '',
-      `You're officially fully paid for ${payload.eventName} on ${eventDateTime}.`,
-      '',
-      `Event: ${payload.eventName}`,
-      `Date: ${eventDateTime}`,
-      `Total paid: ${payload.totalPaid ?? 'Paid in full'}`,
-      ...(location ? [`Location: ${location}`] : []),
-      '',
-      'We are all set on the payment side. If any timing or logistics shift before the event, just reply here.',
-      '',
-      '- DJ B.A.E.',
-    ].join('\n'),
-    html: buildClientBookingEmailHtml({
-      eyebrow: 'Fully paid',
-      heading: 'Fully Paid - Ready To Go',
-      intro: `Hey ${escapeHtml(guestName)}, you're officially fully paid for <strong>${escapeHtml(payload.eventName)}</strong> on <strong>${escapeHtml(eventDateTime)}</strong>.`,
-      fields: [
-        ['Event', payload.eventName],
-        ['Event Date', eventDateTime],
-        ['Total Paid', payload.totalPaid ?? 'Paid in full'],
-        ...(location ? [['Location', location] as const] : []),
-      ] as const,
-      closing: 'We are all set on the payment side. If any timing or logistics shift before the event, just reply here.',
     }),
   })
 }

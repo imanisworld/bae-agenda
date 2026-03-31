@@ -8,7 +8,7 @@
 - W-9 auto-send on qualifying received payments was added.
 - Invoice draft auto-create/refresh on booking confirmation was added.
 - Computed payment state (`unpaid` / `partial` / `paid`) was added to the admin UI.
-- Daily cron route was added for 7-day unpaid balance reminders.
+- Booking client email flow was trimmed to four sends.
 
 ## Completed
 
@@ -28,20 +28,18 @@
   - computed `unpaid` / `partial` / `paid`
   - shown in admin views
   - invoice payment state synced on payment logging
-- Timed reminder foundation:
-  - protected cron endpoint for payment reminders
-  - once-only reminder timestamp on bookings
-  - `vercel.json` cron schedule added
+- Booking email cleanup:
+  - extra deposit/event/fully-paid emails removed from active flow
+  - admin email actions trimmed to the lean set
+  - cron schedule disabled in `vercel.json`
 
 ## Still Needs Setup
 
 - Apply the latest Supabase migrations.
-- Set `CRON_SECRET` in Vercel.
-- Deploy so production cron jobs can run.
 
 ## Next
 
-1. Implement `48 hours before event -> auto-send event reminder` using the same cron/timestamp pattern.
+1. Decide later whether final payment reminders or thank-you emails should be re-automated.
 2. Add post-event review request automation.
 3. Add completed-booking auto-archive.
 4. Add content-publish email notifications.
@@ -61,13 +59,11 @@ Current state:
 - W-9 auto-send on qualifying received payments added.
 - Invoice draft auto-create on booking confirmation added.
 - Computed payment state (`unpaid/partial/paid`) added to admin UI.
-- Daily cron route added for 7-day unpaid balance reminders.
+- Booking email flow trimmed to inquiry, confirmation, final payment reminder, and thank-you.
 
 Important pending setup:
 - Apply newest Supabase migrations.
-- Set `CRON_SECRET` in Vercel.
-- Deploy so cron runs in production.
 
 Next task:
-- Implement 48-hours-before-event automatic event reminder using the same cron/timestamp pattern.
+- Decide whether to keep the reminder cron disabled or bring back selected automations later.
 ```

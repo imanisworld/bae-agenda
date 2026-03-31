@@ -23,10 +23,6 @@ export default function Sidebar({ userEmail, isOpen, onClose }: SidebarProps) {
     <aside
       className={`admin-sidebar${isOpen ? ' admin-sidebar--open' : ''}`}
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        bottom: 0,
         width: '240px',
         background: 'var(--surface)',
         borderRight: '1px solid var(--border)',

@@ -80,8 +80,16 @@ function sectionLabel(text: string) {
 
 export default function MeetPage() {
   return (
-    <div style={{ background: 'var(--black)', paddingTop: '68px' }}>
-      <div className="section-container" style={{ display: 'grid', gap: '24px', paddingTop: 0, paddingBottom: '32px' }}>
+    <div style={{ background: 'var(--black)' }}>
+      <div
+        className="section-container"
+        style={{
+          display: 'grid',
+          gap: '24px',
+          paddingTop: 'calc(var(--safe-top) + 12px)',
+          paddingBottom: '32px',
+        }}
+      >
         <section
           className="meet-hero-grid"
           style={{

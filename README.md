@@ -9,7 +9,7 @@ Booking, admin, content, and client-communications app for DJ B.A.E. built with 
 - Booking inquiry intake with availability checks, rate limiting, and email/SMS notifications
 - Invoice PDF generation and invoice email sending
 - Manual client email actions from the booking detail page:
-  inquiry receipt, confirmation resend, deposit reminder, balance reminder, and event reminder
+  inquiry receipt, confirmation resend, final payment reminder, and post-event thank-you
 - Internal timeline notes on bookings for follow-up and email history
 
 ## Stack
@@ -100,9 +100,8 @@ From the booking detail page you can manually send:
 
 - Inquiry receipt
 - Booking confirmation
-- Deposit reminder
-- Balance reminder
-- Event reminder
+- Final payment reminder
+- Post-event thank-you
 - Invoice email
 
 Recent email activity is shown in the booking page and logged to booking notes.
@@ -125,6 +124,7 @@ npm run build
 
 ## Current Operational Guidance
 
+- Cron-based booking reminder sends are currently disabled in `vercel.json`
 - Use manual email actions first, then automate the ones you trust repeatedly
 - Keep `ADMIN_EMAILS` populated so admin access stays restricted
 - Watch the booking detail timeline notes for send history and follow-up context

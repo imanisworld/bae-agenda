@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
-import { sendBookingDepositReceivedEmail } from '@/lib/booking-email-workflows'
 import { syncBookingDepositState } from '@/lib/booking-deposit-sync'
 import { getBookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
 import { getStripeClient } from '@/lib/stripe'
@@ -112,11 +111,6 @@ export async function POST(request: NextRequest) {
 
       if (bookingSnapshotError && !(bookingSnapshotError.message ?? '').includes('column bookings.deposit_checkout_session_id does not exist')) {
         console.error('[stripe-webhook] unable to save checkout session id:', bookingSnapshotError.message)
-      }
-
-      const depositEmailResult = await sendBookingDepositReceivedEmail(admin, bookingId, { nowIso: paidAt })
-      if (depositEmailResult.status === 'failed') {
-        console.error('[stripe-webhook] deposit received email failed:', depositEmailResult.detail)
       }
 
       revalidatePath(`/pay/${bookingId}`)
