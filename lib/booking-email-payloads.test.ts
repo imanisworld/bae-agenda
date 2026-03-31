@@ -118,6 +118,25 @@ describe('booking email payload helpers', () => {
     })
   })
 
+  it('accepts a one-to-one joined client object from Supabase', () => {
+    const booking: BookingInquiryReceiptSource = {
+      id: 'booking-3b',
+      event_name: 'Summer Kickoff',
+      event_type: 'Private Party',
+      event_date: eventDate,
+      event_timezone: eventTimeZone,
+      venue: 'Canal Bistro',
+      city: 'Indianapolis, IN',
+      clients: { first_name: 'Imani', last_name: 'Crumble', email: 'client@example.com' },
+    }
+
+    expect(getInquiryReceiptPayloadFromBooking(booking)).toMatchObject({
+      firstName: 'Imani',
+      email: 'client@example.com',
+      eventName: 'Summer Kickoff',
+    })
+  })
+
   it('builds a deposit reminder only when some deposit is still unpaid', () => {
     const booking: BookingDepositReminderSource = {
       id: 'booking-4',

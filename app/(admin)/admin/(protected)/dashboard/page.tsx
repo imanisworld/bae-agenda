@@ -8,6 +8,7 @@ import Link            from 'next/link'
 import StatCard        from '@/components/admin/StatCard'
 import Badge           from '@/components/admin/Badge'
 import PageHeader      from '@/components/admin/PageHeader'
+import { getPrimaryBookingClient } from '@/lib/booking-client'
 import { getDepositStatus } from '@/lib/booking-deposit'
 import { getBookingLifecycleStatus, getBookingWorkflowPaymentStatus, type BookingLifecycleStatus, type BookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
@@ -163,7 +164,7 @@ async function getDashboardData() {
         totalClients:     totalClients     ?? 0,
       },
       recentBookings: ((bookingRows ?? []) as BookingQueryRow[]).map((b) => {
-        const client = b.clients?.[0] ?? null
+        const client = getPrimaryBookingClient(b.clients)
         const lifecycleStatus = getBookingLifecycleStatus(b.lifecycle_status, b.status)
         return {
           id:          b.id,

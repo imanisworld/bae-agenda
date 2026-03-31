@@ -1,4 +1,5 @@
 import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
+import { getPrimaryBookingClient, type BookingClientRelation } from '@/lib/booking-client'
 import { getAppBaseUrl } from '@/lib/stripe'
 import type { BookingStatus, PaymentStatus } from '@/types/index'
 
@@ -25,7 +26,7 @@ export interface BookingConfirmationSource {
   venue: string | null
   city: string | null
   deposit_amount: number | null
-  clients: BookingClient[] | null
+  clients: BookingClientRelation<BookingClient>
   payments: Array<{
     amount: number
     status: PaymentStatus
@@ -40,7 +41,7 @@ export interface BookingInquiryReceiptSource {
   event_timezone: string | null
   venue: string | null
   city: string | null
-  clients: BookingClient[] | null
+  clients: BookingClientRelation<BookingClient>
 }
 
 export interface BookingDepositReminderSource {
@@ -49,7 +50,7 @@ export interface BookingDepositReminderSource {
   event_date: string
   event_timezone: string | null
   deposit_amount: number | null
-  clients: BookingClient[] | null
+  clients: BookingClientRelation<BookingClient>
   payments: Array<{
     amount: number
     status: PaymentStatus
@@ -62,7 +63,7 @@ export interface BookingBalanceReminderSource {
   event_date: string
   event_timezone: string | null
   quote: number | null
-  clients: BookingClient[] | null
+  clients: BookingClientRelation<BookingClient>
   payments: Array<{
     amount: number
     status: PaymentStatus
@@ -77,7 +78,7 @@ export interface BookingEventReminderSource {
   event_timezone: string | null
   venue: string | null
   city: string | null
-  clients: BookingClient[] | null
+  clients: BookingClientRelation<BookingClient>
 }
 
 export interface BookingDepositReceivedSource {
@@ -90,7 +91,7 @@ export interface BookingDepositReceivedSource {
   deposit_amount: number | null
   venue: string | null
   city: string | null
-  clients: BookingClient[] | null
+  clients: BookingClientRelation<BookingClient>
   payments: Array<{
     amount: number
     status: PaymentStatus
@@ -106,7 +107,7 @@ export interface BookingFullyPaidSource {
   quote: number | null
   venue: string | null
   city: string | null
-  clients: BookingClient[] | null
+  clients: BookingClientRelation<BookingClient>
   payments: Array<{
     amount: number
     status: PaymentStatus
@@ -121,13 +122,13 @@ export interface BookingPostEventFollowUpSource {
   event_timezone: string | null
   venue: string | null
   city: string | null
-  clients: BookingClient[] | null
+  clients: BookingClientRelation<BookingClient>
 }
 
 export function getConfirmationPayloadFromBooking(booking: BookingConfirmationSource | null) {
   if (!booking) return null
 
-  const client = booking.clients?.[0] ?? null
+  const client = getPrimaryBookingClient(booking.clients)
   const clientEmail = client?.email?.trim()
   const eventTimeZone = booking.event_timezone?.trim()
   const depositRemaining = getOutstandingDeposit(booking.deposit_amount, booking.payments)
@@ -156,7 +157,7 @@ export function getConfirmationPayloadFromBooking(booking: BookingConfirmationSo
 export function getInquiryReceiptPayloadFromBooking(booking: BookingInquiryReceiptSource | null) {
   if (!booking) return null
 
-  const client = booking.clients?.[0] ?? null
+  const client = getPrimaryBookingClient(booking.clients)
   const clientEmail = client?.email?.trim()
   const eventTimeZone = booking.event_timezone?.trim()
 
@@ -179,7 +180,7 @@ export function getInquiryReceiptPayloadFromBooking(booking: BookingInquiryRecei
 export function getDepositReminderPayloadFromBooking(booking: BookingDepositReminderSource | null) {
   if (!booking) return null
 
-  const client = booking.clients?.[0] ?? null
+  const client = getPrimaryBookingClient(booking.clients)
   const clientEmail = client?.email?.trim()
   const eventTimeZone = booking.event_timezone?.trim()
   const depositRemaining = getOutstandingDeposit(booking.deposit_amount, booking.payments)
@@ -203,7 +204,7 @@ export function getDepositReminderPayloadFromBooking(booking: BookingDepositRemi
 export function getBalanceReminderPayloadFromBooking(booking: BookingBalanceReminderSource | null) {
   if (!booking) return null
 
-  const client = booking.clients?.[0] ?? null
+  const client = getPrimaryBookingClient(booking.clients)
   const clientEmail = client?.email?.trim()
   const eventTimeZone = booking.event_timezone?.trim()
   const balanceRemaining = getOutstandingBalance(booking.quote, booking.payments)
@@ -227,7 +228,7 @@ export function getBalanceReminderPayloadFromBooking(booking: BookingBalanceRemi
 export function getEventReminderPayloadFromBooking(booking: BookingEventReminderSource | null) {
   if (!booking) return null
 
-  const client = booking.clients?.[0] ?? null
+  const client = getPrimaryBookingClient(booking.clients)
   const clientEmail = client?.email?.trim()
   const eventTimeZone = booking.event_timezone?.trim()
 
@@ -250,7 +251,7 @@ export function getEventReminderPayloadFromBooking(booking: BookingEventReminder
 export function getDepositReceivedPayloadFromBooking(booking: BookingDepositReceivedSource | null) {
   if (!booking) return null
 
-  const client = booking.clients?.[0] ?? null
+  const client = getPrimaryBookingClient(booking.clients)
   const clientEmail = client?.email?.trim()
   const eventTimeZone = booking.event_timezone?.trim()
   const depositAmount = booking.deposit_amount ?? 0
@@ -279,7 +280,7 @@ export function getDepositReceivedPayloadFromBooking(booking: BookingDepositRece
 export function getFullyPaidPayloadFromBooking(booking: BookingFullyPaidSource | null) {
   if (!booking) return null
 
-  const client = booking.clients?.[0] ?? null
+  const client = getPrimaryBookingClient(booking.clients)
   const clientEmail = client?.email?.trim()
   const eventTimeZone = booking.event_timezone?.trim()
   const balanceRemaining = getOutstandingBalance(booking.quote, booking.payments)
@@ -305,7 +306,7 @@ export function getFullyPaidPayloadFromBooking(booking: BookingFullyPaidSource |
 export function getPostEventFollowUpPayloadFromBooking(booking: BookingPostEventFollowUpSource | null) {
   if (!booking) return null
 
-  const client = booking.clients?.[0] ?? null
+  const client = getPrimaryBookingClient(booking.clients)
   const clientEmail = client?.email?.trim()
   const eventTimeZone = booking.event_timezone?.trim()
 

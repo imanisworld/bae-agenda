@@ -2,6 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { getPrimaryBookingClient } from '@/lib/booking-client'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
 import { sendBookingDepositReceivedEmail, sendBookingFullyPaidEmail, sendBookingPostEventFollowUpEmail } from '@/lib/booking-email-workflows'
@@ -109,6 +110,15 @@ function formatCurrency(value: number): string {
     style: 'currency',
     currency: 'USD',
   })
+}
+
+function listMissingFields(fields: Array<{ label: string; present: boolean }>) {
+  return fields.filter((field) => !field.present).map((field) => field.label)
+}
+
+function formatMissingFieldsMessage(actionLabel: string, missingFields: string[]) {
+  if (missingFields.length === 0) return null
+  return `${actionLabel} is blocked. Missing: ${missingFields.join(', ')}.`
 }
 
 async function appendBookingTimelineNote(
@@ -376,7 +386,11 @@ async function getBookingW9Recipient(admin: ReturnType<typeof createAdminClient>
   return data as {
     id: string
     event_name: string | null
-    clients: Array<{
+    clients: {
+      first_name: string | null
+      last_name: string | null
+      email: string | null
+    } | Array<{
       first_name: string | null
       last_name: string | null
       email: string | null
@@ -504,9 +518,20 @@ export async function resendBookingConfirmationAction(formData: FormData) {
     redirectWithError(`/admin/bookings/${bookingId}`, 'Only confirmed bookings can resend the confirmation email.')
   }
 
+  const confirmationClient = getPrimaryBookingClient(bookingRecord.clients)
+  const confirmationMissing = listMissingFields([
+    { label: 'client email', present: Boolean(confirmationClient?.email?.trim()) },
+    { label: 'event name', present: Boolean(bookingRecord.event_name?.trim()) },
+    { label: 'timezone', present: Boolean(bookingRecord.event_timezone?.trim()) },
+  ])
+  const confirmationMissingMessage = formatMissingFieldsMessage('Confirmation email', confirmationMissing)
+  if (confirmationMissingMessage) {
+    redirectWithError(`/admin/bookings/${bookingId}`, confirmationMissingMessage)
+  }
+
   const payload = getConfirmationPayloadFromBooking(bookingRecord)
   if (!payload) {
-    redirectWithError(`/admin/bookings/${bookingId}`, 'This booking needs a client email, event name, and timezone before sending.')
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Confirmation email could not be prepared from this booking record.')
   }
 
   const confirmationPayload = payload as NonNullable<typeof payload>
@@ -540,9 +565,20 @@ export async function resendBookingInquiryReceiptAction(formData: FormData) {
     redirectWithError('/admin/bookings', 'Could not find that booking.')
   }
 
+  const inquiryClient = getPrimaryBookingClient((booking as BookingInquiryReceiptSource).clients)
+  const inquiryMissing = listMissingFields([
+    { label: 'client email', present: Boolean(inquiryClient?.email?.trim()) },
+    { label: 'event name', present: Boolean((booking as BookingInquiryReceiptSource).event_name?.trim()) },
+    { label: 'timezone', present: Boolean((booking as BookingInquiryReceiptSource).event_timezone?.trim()) },
+  ])
+  const inquiryMissingMessage = formatMissingFieldsMessage('Inquiry receipt', inquiryMissing)
+  if (inquiryMissingMessage) {
+    redirectWithError(`/admin/bookings/${bookingId}`, inquiryMissingMessage)
+  }
+
   const payload = getInquiryReceiptPayloadFromBooking(booking as BookingInquiryReceiptSource)
   if (!payload) {
-    redirectWithError(`/admin/bookings/${bookingId}`, 'This booking needs a client email, event name, and timezone before sending.')
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Inquiry receipt could not be prepared from this booking record.')
   }
 
   const inquiryPayload = payload as NonNullable<typeof payload>
@@ -653,9 +689,20 @@ export async function sendBookingEventReminderAction(formData: FormData) {
     redirectWithError(`/admin/bookings/${bookingId}`, 'Only confirmed bookings can send an event reminder.')
   }
 
+  const eventClient = getPrimaryBookingClient(bookingRecord.clients)
+  const eventMissing = listMissingFields([
+    { label: 'client email', present: Boolean(eventClient?.email?.trim()) },
+    { label: 'event name', present: Boolean(bookingRecord.event_name?.trim()) },
+    { label: 'timezone', present: Boolean(bookingRecord.event_timezone?.trim()) },
+  ])
+  const eventMissingMessage = formatMissingFieldsMessage('Event reminder', eventMissing)
+  if (eventMissingMessage) {
+    redirectWithError(`/admin/bookings/${bookingId}`, eventMissingMessage)
+  }
+
   const payload = getEventReminderPayloadFromBooking(bookingRecord)
   if (!payload) {
-    redirectWithError(`/admin/bookings/${bookingId}`, 'This booking needs a client email, event name, and timezone before sending.')
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Event reminder could not be prepared from this booking record.')
   }
 
   const eventPayload = payload as NonNullable<typeof payload>
@@ -1058,7 +1105,7 @@ export async function createBookingPaymentAction(formData: FormData) {
 
   if (shouldAutoSendW9ForPayment(finalAmount, finalStatus)) {
     const booking = await getBookingW9Recipient(admin, finalBookingId)
-    const client = booking?.clients?.[0] ?? null
+    const client = getPrimaryBookingClient(booking?.clients)
     const clientEmail = client?.email?.trim()
     const eventName = booking?.event_name?.trim()
 
