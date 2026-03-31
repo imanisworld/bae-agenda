@@ -576,6 +576,11 @@ export default function BookingForm() {
                 form={form}
                 set={set}
                 setCity={setCity}
+                onEditTimes={() => {
+                  setFieldErrors({})
+                  setAvailabilityError('')
+                  setStep(1)
+                }}
               />
             )}
           </div>
@@ -984,13 +989,35 @@ function DetailsStep({
   form,
   set,
   setCity,
+  onEditTimes,
 }: {
   error: string
   fieldErrors: FieldErrors
   form: FormState
   set: <K extends keyof FormState>(key: K, value: FormState[K]) => void
   setCity: (value: string) => void
+  onEditTimes: () => void
 }) {
+  const normalizedStart = normalizeTimeValue(form.eventTime)
+  const normalizedEnd = normalizeTimeValue(form.eventEndTime)
+  const startMin = parseFormTime(normalizedStart)
+  const endMin = parseFormTime(normalizedEnd)
+  const durationHours = (startMin !== null && endMin !== null && endMin > startMin)
+    ? (endMin - startMin) / 60
+    : null
+
+  const startLabel = TIME_OPTIONS.find((o) => o.value === normalizedStart)?.label ?? normalizedStart
+  const endLabel = TIME_OPTIONS.find((o) => o.value === normalizedEnd)?.label ?? normalizedEnd
+
+  const matchedPkg = PACKAGES.find(
+    (pkg) => pkg.price !== null && form.package.startsWith(pkg.name)
+  ) as { name: string; price: number; hours: number } | undefined
+  const estimatedTotal = durationHours !== null && matchedPkg
+    ? durationHours * matchedPkg.price
+    : null
+
+  const hasTimes = form.eventTime && form.eventEndTime
+
   return (
     <>
       <label style={{ display: 'grid', gap: '8px' }}>
@@ -1048,6 +1075,59 @@ function DetailsStep({
           style={inputStyle()}
         />
       </label>
+
+      {hasTimes && (
+        <div style={{
+          border: '1px solid var(--border)',
+          background: 'rgba(255,255,255,0.03)',
+          padding: '16px 18px',
+          display: 'grid',
+          gap: '10px',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <span className="section-label" style={{ marginBottom: 0 }}>Booking Summary</span>
+            <button
+              type="button"
+              onClick={onEditTimes}
+              style={{ background: 'none', border: 'none', padding: 0, color: 'var(--violet)', fontSize: '12px', cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              ← Edit times
+            </button>
+          </div>
+
+          <div style={{ display: 'grid', gap: '6px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '14px' }}>
+              <span style={{ color: 'var(--muted)' }}>Time</span>
+              <span>{startLabel} → {endLabel}</span>
+            </div>
+
+            {durationHours !== null && (
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '14px' }}>
+                <span style={{ color: 'var(--muted)' }}>Duration</span>
+                <span>
+                  {durationHours % 1 === 0
+                    ? `${durationHours} hr${durationHours !== 1 ? 's' : ''}`
+                    : `${durationHours.toFixed(1)} hrs`}
+                </span>
+              </div>
+            )}
+
+            {estimatedTotal !== null ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '14px' }}>
+                <span style={{ color: 'var(--muted)' }}>Estimated Total</span>
+                <span style={{ fontFamily: 'Conthrax, sans-serif' }}>
+                  {formatCurrency(estimatedTotal)}
+                </span>
+              </div>
+            ) : matchedPkg === undefined && form.package ? (
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '14px' }}>
+                <span style={{ color: 'var(--muted)' }}>Rate</span>
+                <span style={{ color: 'var(--muted)' }}>Custom — we&apos;ll follow up</span>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      )}
 
       <label style={{ display: 'grid', gap: '8px' }}>
         <span className="section-label" style={{ marginBottom: 0 }}>Notes</span>
