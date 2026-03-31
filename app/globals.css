@@ -3453,6 +3453,31 @@ body.has-custom-cursor * { cursor: none !important; }
   padding-top: 8px;
 }
 
+@media (max-width: 720px) {
+  .meet-page-shell .section-container {
+    gap: 18px !important;
+    padding-top: max(var(--safe-top), 6px) !important;
+    padding-left: max(16px, var(--safe-left)) !important;
+    padding-right: max(16px, var(--safe-right)) !important;
+  }
+
+  .meet-hero-grid--intro {
+    gap: 18px !important;
+  }
+
+  .meet-hero-grid--intro .meet-hero-photo-shell {
+    min-height: clamp(320px, 64vw, 420px) !important;
+    margin-left: calc(-1 * max(16px, var(--safe-left)));
+    margin-right: calc(-1 * max(16px, var(--safe-right)));
+    border-left: none;
+    border-right: none;
+  }
+
+  .meet-hero-grid--intro .meet-hero-copy-panel {
+    padding: 16px !important;
+  }
+}
+
 @keyframes meet-photo-settle {
   0% {
     opacity: 0;

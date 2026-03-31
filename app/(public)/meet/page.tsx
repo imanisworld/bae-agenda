@@ -80,7 +80,7 @@ function sectionLabel(text: string) {
 
 export default function MeetPage() {
   return (
-    <div style={{ background: 'var(--black)' }}>
+    <div className="meet-page-shell" style={{ background: 'var(--black)' }}>
       <div
         className="section-container"
         style={{
@@ -91,7 +91,7 @@ export default function MeetPage() {
         }}
       >
         <section
-          className="meet-hero-grid"
+          className="meet-hero-grid meet-hero-grid--intro"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',

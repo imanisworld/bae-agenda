@@ -47,7 +47,7 @@ export default function HeroSection({ content = {} }: Props) {
       aria-label="DJ B.A.E. — The Bae Agenda"
       style={{
         position:      'relative',
-        minHeight:     '100vh',
+        minHeight:     '100dvh',
         background:    'var(--black)',
         overflow:      'hidden',
         display:       'flex',
