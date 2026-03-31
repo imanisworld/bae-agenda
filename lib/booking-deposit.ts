@@ -22,7 +22,11 @@ export function getDepositStatus(
   depositAmount: number | null | undefined,
   payments: Array<DepositPaymentLike> | null | undefined
 ): DepositSnapshotStatus {
-  const due = depositAmount ?? 0
+  if (depositAmount === null || depositAmount === undefined) {
+    return 'unpaid'
+  }
+
+  const due = depositAmount
 
   if (due <= 0) return 'paid'
   if (getReceivedPaymentTotal(payments) >= due) return 'paid'

@@ -6,6 +6,10 @@ describe('booking deposit helpers', () => {
     expect(getDepositStatus(300, null)).toBe('unpaid')
   })
 
+  it('marks the deposit unpaid when no deposit amount is configured yet', () => {
+    expect(getDepositStatus(null, null)).toBe('unpaid')
+  })
+
   it('marks the deposit pending when a pending deposit payment exists', () => {
     expect(getDepositStatus(300, [{ amount: 300, type: 'deposit', status: 'pending' }])).toBe('pending')
   })
