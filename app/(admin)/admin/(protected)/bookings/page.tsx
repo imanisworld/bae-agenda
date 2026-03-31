@@ -44,7 +44,7 @@ interface BookingQueryRow {
   lifecycle_status: BookingLifecycleStatus | null
   payment_status: BookingWorkflowPaymentStatus | null
   created_at: string
-  clients: { first_name: string | null; last_name: string | null }[] | null
+  clients: { first_name: string | null; last_name: string | null; email: string | null }[] | null
   payments: { amount: number; status: 'pending' | 'received' | 'refunded' }[] | null
 }
 
@@ -93,7 +93,7 @@ async function getBookings(): Promise<BookingRow[]> {
     const supabase = createClient()
     const { data } = await supabase
       .from('bookings')
-      .select('id, event_name, event_date, event_timezone, venue, city, package, quote, deposit_amount, status, lifecycle_status, payment_status, created_at, clients(first_name, last_name), payments(amount, type, status)')
+      .select('id, event_name, event_date, event_timezone, venue, city, package, quote, deposit_amount, status, lifecycle_status, payment_status, created_at, clients(first_name, last_name, email), payments(amount, type, status)')
       .order('created_at', { ascending: false })
     const rows = (data ?? []) as BookingQueryRow[]
     return rows.map((b) => {

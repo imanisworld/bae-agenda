@@ -61,7 +61,7 @@ interface BookingQueryRow {
   payment_status: BookingWorkflowPaymentStatus | null
   quote: number | null
   deposit_amount: number | null
-  clients: { first_name: string | null; last_name: string | null }[] | null
+  clients: { first_name: string | null; last_name: string | null; email: string | null }[] | null
   payments: { amount: number; type: string; status: 'pending' | 'received' | 'refunded' }[] | null
 }
 
@@ -142,7 +142,7 @@ async function getDashboardData() {
         .in('lifecycle_status', ['new', 'contacted', 'negotiating']),
       supabase.from('clients').select('*', { count: 'exact', head: true }),
       supabase.from('bookings')
-        .select('id, event_name, event_date, event_timezone, status, lifecycle_status, payment_status, quote, deposit_amount, clients(first_name, last_name), payments(amount, type, status)')
+        .select('id, event_name, event_date, event_timezone, status, lifecycle_status, payment_status, quote, deposit_amount, clients(first_name, last_name, email), payments(amount, type, status)')
         .order('created_at', { ascending: false }).limit(5),
       supabase.from('events')
         .select('id, title, event_date, venue, featured')

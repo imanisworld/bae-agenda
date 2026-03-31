@@ -2,10 +2,11 @@
 
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import { getPrimaryBookingClient } from '@/lib/booking-client'
 import { getOutstandingDeposit } from '@/lib/booking-finance'
 import { sendBookingDepositReceivedEmail } from '@/lib/booking-email-workflows'
 import { syncBookingDepositState } from '@/lib/booking-deposit-sync'
-import { getBookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
+import { getBookingLifecycleStatus, getBookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
 import { getAppBaseUrl, getStripeClient } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
@@ -77,7 +78,7 @@ export async function startStripeDepositCheckoutAction(formData: FormData) {
   }
 
   const { admin, booking } = loaded as NonNullable<typeof loaded>
-  const client = Array.isArray(booking.clients) ? booking.clients[0] ?? null : booking.clients
+  const client = getPrimaryBookingClient(booking.clients)
   const payments = (booking.payments as Array<{ amount: number; status: 'pending' | 'received' | 'refunded' }> | null) ?? null
   const depositAmount = (booking.deposit_amount as number | null) ?? null
   const outstandingDeposit = getOutstandingDeposit(depositAmount, payments)
@@ -153,7 +154,7 @@ export async function confirmManualDepositAction(formData: FormData) {
 
   const { data: booking, error } = await admin
     .from('bookings')
-    .select('quote, deposit_amount, payments(amount, status)')
+    .select('status, lifecycle_status, quote, deposit_amount, payments(amount, status)')
     .eq('id', bookingId as string)
     .maybeSingle()
 
@@ -197,7 +198,10 @@ export async function confirmManualDepositAction(formData: FormData) {
         currentStatus: 'deposit_requested',
         quote: bookingRecord.quote as number | null,
         depositAmount: bookingRecord.deposit_amount as number | null,
-        lifecycleStatus: 'confirmed',
+        lifecycleStatus: getBookingLifecycleStatus(
+          bookingRecord.lifecycle_status as Parameters<typeof getBookingLifecycleStatus>[0],
+          bookingRecord.status as Parameters<typeof getBookingLifecycleStatus>[1],
+        ),
         payments: [
           ...(((bookingRecord.payments as Array<{ amount: number; status: 'pending' | 'received' | 'refunded' }> | null) ?? [])),
           { amount: outstandingDeposit, status: 'received', type: 'deposit' },
