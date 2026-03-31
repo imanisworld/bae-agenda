@@ -3504,6 +3504,33 @@ body.has-custom-cursor * { cursor: none !important; }
   gap: 12px;
 }
 
+.meet-signal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.meet-signal-card {
+  display: grid;
+  gap: 7px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(18,18,24,0.94), rgba(10,10,14,0.96));
+}
+
+.meet-signal-label {
+  font-size: 8px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.46);
+}
+
+.meet-signal-value {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--white);
+}
+
 .meet-hero-actions {
   display: flex;
   gap: 16px;
@@ -3646,8 +3673,22 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 
   .meet-hero-module-grid {
-    order: 3;
+    order: 4;
     margin-top: 2px;
+  }
+
+  .meet-signal-grid {
+    order: 3;
+    grid-template-columns: 1fr;
+  }
+
+  .meet-signal-card {
+    padding: 12px 14px;
+  }
+
+  .meet-signal-value {
+    font-size: 11px;
+    line-height: 1.55;
   }
 
   .meet-hero-module {
@@ -4445,15 +4486,11 @@ body.has-custom-cursor * { cursor: none !important; }
   .bookings-admin-table {
     table-layout: auto;
     display: block;
+    min-width: 0;
   }
 
   .bookings-admin-table thead {
     display: none;
-  }
-
-  .bookings-admin-table tbody,
-  .bookings-admin-table tr {
-    display: block;
   }
 
   .bookings-admin-table tbody {
@@ -4462,7 +4499,10 @@ body.has-custom-cursor * { cursor: none !important; }
     padding: 14px;
   }
 
+  /* TR as flex-wrap so we can group status badges into one row */
   .bookings-admin-table tr {
+    display: flex;
+    flex-wrap: wrap;
     padding: 16px;
     border: 1px solid var(--border);
     background: var(--surface);
@@ -4472,13 +4512,13 @@ body.has-custom-cursor * { cursor: none !important; }
     border-bottom: 1px solid var(--border);
   }
 
+  /* Most TDs: full row, label + value stacked */
   .bookings-admin-table td {
+    flex: 0 0 100%;
     display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
-    width: 100%;
-    padding: 7px 0;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px 0;
     border-bottom: none;
     text-align: left;
   }
@@ -4490,16 +4530,14 @@ body.has-custom-cursor * { cursor: none !important; }
     letter-spacing: 0.14em;
     text-transform: uppercase;
     text-align: left;
-    flex: 0 0 96px;
+    flex: none;
   }
 
   .bookings-admin-table td > * {
-    margin-left: 0;
     min-width: 0;
   }
 
   .bookings-admin-table td[data-label='Event'] {
-    display: block;
     padding-top: 0;
   }
 
@@ -4507,45 +4545,31 @@ body.has-custom-cursor * { cursor: none !important; }
     display: none;
   }
 
+  /* Status / Payment / Deposit: 3 per row */
+  .bookings-admin-table td[data-label='Status'],
+  .bookings-admin-table td[data-label='Payment'],
+  .bookings-admin-table td[data-label='Deposit'] {
+    flex: 0 0 33%;
+  }
+
+  /* Package: smaller font */
+  .bookings-admin-table td[data-label='Package'] {
+    font-size: 12px;
+  }
+
+  /* Actions: MANAGE and ••• side by side */
   .bookings-admin-table td[data-label='Actions'] {
-    display: block;
     text-align: left;
   }
 
   .bookings-admin-table td[data-label='Actions']::before {
-    display: block;
-    margin-bottom: 10px;
+    margin-bottom: 6px;
   }
 
   .booking-event-meta--mobile {
     display: block;
   }
 
-  /* Status / Payment / Deposit: group all three on one row */
-  .bookings-admin-table td[data-label='Status'],
-  .bookings-admin-table td[data-label='Payment'],
-  .bookings-admin-table td[data-label='Deposit'] {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 32%;
-    gap: 5px;
-    padding: 6px 0;
-    border-bottom: none;
-  }
-
-  .bookings-admin-table td[data-label='Status']::before,
-  .bookings-admin-table td[data-label='Payment']::before,
-  .bookings-admin-table td[data-label='Deposit']::before {
-    flex: none;
-  }
-
-  /* Package: smaller font, prevent excessive wrapping */
-  .bookings-admin-table td[data-label='Package'] {
-    font-size: 12px;
-  }
-
-  /* Actions: MANAGE and ••• side by side */
   .booking-actions-inline {
     flex-direction: row;
     gap: 8px;
@@ -4577,30 +4601,6 @@ body.has-custom-cursor * { cursor: none !important; }
 
   .bookings-admin-table tr {
     padding: 14px;
-  }
-
-  .bookings-admin-table td {
-    display: grid;
-    gap: 6px;
-  }
-
-  .bookings-admin-table td::before {
-    flex: none;
-  }
-
-  /* Keep status badges inline even when td goes to grid */
-  .bookings-admin-table td[data-label='Status'],
-  .bookings-admin-table td[data-label='Payment'],
-  .bookings-admin-table td[data-label='Deposit'] {
-    display: inline-flex;
-  }
-
-  /* Actions stay side by side at 720px too */
-  .bookings-admin-table td[data-label='Actions'] .booking-manage-link,
-  .bookings-admin-table td[data-label='Actions'] .booking-actions-trigger {
-    flex: 1;
-    width: auto;
-    justify-content: center;
   }
 
 

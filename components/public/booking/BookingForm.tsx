@@ -813,7 +813,6 @@ function EventStep({
                   onClick={() => set('eventDate', dateValue)}
                   disabled={disabled}
                   aria-pressed={isSelected}
-                  aria-invalid={Boolean(fieldErrors.eventDate)}
                   style={calendarDayStyle({
                     isCurrentMonth: isSameMonth(day, visibleMonth),
                     isDisabled: disabled,

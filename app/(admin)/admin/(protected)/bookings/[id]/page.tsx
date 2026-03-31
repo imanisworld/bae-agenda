@@ -422,130 +422,7 @@ export default async function EditBookingPage({
       <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div className="admin-section-title" style={{ marginBottom: '10px' }}>Client Emails</div>
-            <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
-              Send the lean client flow from here: inquiry receipt, booking confirmation, final payment reminder, and the post-event thank-you.
-            </p>
-          </div>
-
-          <div className="admin-form-actions">
-            <form action={resendBookingInquiryReceiptAction}>
-              <input type="hidden" name="booking_id" value={booking.id} />
-              <button
-                type="submit"
-                className="admin-btn-ghost"
-                disabled={!booking.clients?.email}
-                style={!booking.clients?.email ? { opacity: 0.55, cursor: 'not-allowed' } : undefined}
-                title={!booking.clients?.email ? 'Add a client email before sending.' : undefined}
-              >
-                Resend Inquiry Receipt
-              </button>
-            </form>
-            <form action={resendBookingConfirmationAction}>
-              <input type="hidden" name="booking_id" value={booking.id} />
-              <button
-                type="submit"
-                className="admin-btn-ghost"
-                disabled={!booking.clients?.email || (lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed')}
-                style={
-                  !booking.clients?.email || (lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed')
-                    ? { opacity: 0.55, cursor: 'not-allowed' }
-                    : undefined
-                }
-                title={
-                  !booking.clients?.email
-                    ? 'Add a client email before sending.'
-                    : lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed'
-                      ? 'Confirm the booking first before resending the confirmation email.'
-                      : undefined
-                }
-              >
-                Resend Confirmation Email
-              </button>
-            </form>
-            <form action={sendBookingBalanceReminderAction}>
-              <input type="hidden" name="booking_id" value={booking.id} />
-              <button
-                type="submit"
-                className="admin-btn-ghost"
-                disabled={!booking.clients?.email || outstandingBalance <= 0}
-                style={
-                  !booking.clients?.email || outstandingBalance <= 0
-                    ? { opacity: 0.55, cursor: 'not-allowed' }
-                    : undefined
-                }
-                title={
-                  !booking.clients?.email
-                    ? 'Add a client email before sending.'
-                    : outstandingBalance <= 0
-                      ? 'No balance reminder is needed because the current balance is already covered.'
-                      : undefined
-                }
-              >
-                Send Final Payment Reminder
-              </button>
-            </form>
-            <form action={resendBookingPostEventFollowUpAction}>
-              <input type="hidden" name="booking_id" value={booking.id} />
-              <button
-                type="submit"
-                className="admin-btn-ghost"
-                disabled={!booking.clients?.email || lifecycleStatus !== 'completed'}
-                style={
-                  !booking.clients?.email || lifecycleStatus !== 'completed'
-                    ? { opacity: 0.55, cursor: 'not-allowed' }
-                    : undefined
-                }
-                title={
-                  !booking.clients?.email
-                    ? 'Add a client email before sending.'
-                    : lifecycleStatus !== 'completed'
-                      ? 'Mark the booking completed before sending the post-event follow-up.'
-                      : undefined
-                }
-              >
-                Send Post-Event Follow-Up
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <div style={{ marginTop: '20px' }}>
-          <div className="admin-section-title" style={{ marginBottom: '10px' }}>Recent Email Activity</div>
-          {emailActivity.length === 0 ? (
-            <p style={{ color: 'var(--muted)', fontSize: '13px', margin: 0 }}>
-              No email activity logged for this booking yet.
-            </p>
-          ) : (
-            <div style={{ display: 'grid', gap: '10px' }}>
-              {emailActivity.map((note) => (
-                <div
-                  key={note.id}
-                  style={{
-                    border: '1px solid var(--border)',
-                    background: 'var(--bg-sunken)',
-                    padding: '14px 16px',
-                    display: 'grid',
-                    gap: '6px',
-                  }}
-                >
-                  <div className="muted" style={{ fontSize: '11px' }}>
-                    {formatDateTime(note.created_at)}
-                  </div>
-                  <div style={{ color: 'var(--white)', fontSize: '13px', lineHeight: 1.6 }}>
-                    {note.body}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-          <div style={{ minWidth: 0, flex: 1 }}>
-            <div className="admin-section-title" style={{ marginBottom: '10px' }}>Invoice</div>
+            <div className="admin-section-title" style={{ marginBottom: '10px' }}>Invoice & Pricing Snapshot</div>
             <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
               Preview the client invoice, download the PDF, and keep the quote, deposit, and balance in sync with this booking.
             </p>
@@ -778,6 +655,129 @@ export default async function EditBookingPage({
             </button>
           </div>
         </form>
+      </div>
+
+      <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap', alignItems: 'flex-start' }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <div className="admin-section-title" style={{ marginBottom: '10px' }}>Client Emails</div>
+            <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
+              Send the lean client flow from here: inquiry receipt, confirmation, final payment reminder, and the post-event thank-you.
+            </p>
+          </div>
+
+          <div className="admin-form-actions">
+            <form action={resendBookingInquiryReceiptAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email}
+                style={!booking.clients?.email ? { opacity: 0.55, cursor: 'not-allowed' } : undefined}
+                title={!booking.clients?.email ? 'Add a client email before sending.' : undefined}
+              >
+                Resend Inquiry Receipt
+              </button>
+            </form>
+            <form action={resendBookingConfirmationAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || (lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed')}
+                style={
+                  !booking.clients?.email || (lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed')
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed'
+                      ? 'Confirm the booking first before resending the confirmation email.'
+                      : undefined
+                }
+              >
+                Resend Confirmation
+              </button>
+            </form>
+            <form action={sendBookingBalanceReminderAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || outstandingBalance <= 0}
+                style={
+                  !booking.clients?.email || outstandingBalance <= 0
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : outstandingBalance <= 0
+                      ? 'No balance reminder is needed because the current balance is already covered.'
+                      : undefined
+                }
+              >
+                Send Final Payment Reminder
+              </button>
+            </form>
+            <form action={resendBookingPostEventFollowUpAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || lifecycleStatus !== 'completed'}
+                style={
+                  !booking.clients?.email || lifecycleStatus !== 'completed'
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : lifecycleStatus !== 'completed'
+                      ? 'Mark the booking completed before sending the post-event follow-up.'
+                      : undefined
+                }
+              >
+                Send Post-Event Follow-Up
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div style={{ marginTop: '20px' }}>
+          <div className="admin-section-title" style={{ marginBottom: '10px' }}>Recent Email Activity</div>
+          {emailActivity.length === 0 ? (
+            <p style={{ color: 'var(--muted)', fontSize: '13px', margin: 0 }}>
+              No email activity logged for this booking yet.
+            </p>
+          ) : (
+            <div style={{ display: 'grid', gap: '10px' }}>
+              {emailActivity.map((note) => (
+                <div
+                  key={note.id}
+                  style={{
+                    border: '1px solid var(--border)',
+                    background: 'var(--bg-sunken)',
+                    padding: '14px 16px',
+                    display: 'grid',
+                    gap: '6px',
+                  }}
+                >
+                  <div className="muted" style={{ fontSize: '11px' }}>
+                    {formatDateTime(note.created_at)}
+                  </div>
+                  <div style={{ color: 'var(--white)', fontSize: '13px', lineHeight: 1.6 }}>
+                    {note.body}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>

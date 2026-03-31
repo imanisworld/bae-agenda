@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -8,6 +8,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const DISMISS_KEY = 'baeagenda-install-prompt-dismissed'
+const INSTALL_PROMPT_STATE_EVENT = 'baeagenda-install-prompt-state'
 
 function isIosSafari() {
   if (typeof window === 'undefined') return false
@@ -26,16 +27,38 @@ function isStandalone() {
 
 export default function AddToHomeScreenPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [dismissed, setDismissed] = useState(true)
   const [installing, setInstalling] = useState(false)
-  const [isInstalled, setIsInstalled] = useState(false)
   const [showIosInstructions, setShowIosInstructions] = useState(false)
+
+  const installState = useSyncExternalStore(
+    (onStoreChange) => {
+      if (typeof window === 'undefined') {
+        return () => {}
+      }
+
+      const onChange = () => onStoreChange()
+      window.addEventListener('appinstalled', onChange)
+      window.addEventListener('storage', onChange)
+      window.addEventListener(INSTALL_PROMPT_STATE_EVENT, onChange)
+
+      return () => {
+        window.removeEventListener('appinstalled', onChange)
+        window.removeEventListener('storage', onChange)
+        window.removeEventListener(INSTALL_PROMPT_STATE_EVENT, onChange)
+      }
+    },
+    () => ({
+      dismissed: typeof window !== 'undefined' ? window.localStorage.getItem(DISMISS_KEY) === '1' : true,
+      isInstalled: typeof window !== 'undefined' ? isStandalone() : false,
+    }),
+    () => ({
+      dismissed: true,
+      isInstalled: false,
+    }),
+  )
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    const previouslyDismissed = window.localStorage.getItem(DISMISS_KEY) === '1'
-    setDismissed(previouslyDismissed)
-    setIsInstalled(isStandalone())
 
     const onBeforeInstallPrompt = (event: Event) => {
       event.preventDefault()
@@ -43,9 +66,9 @@ export default function AddToHomeScreenPrompt() {
     }
 
     const onInstalled = () => {
-      setIsInstalled(true)
       setDeferredPrompt(null)
       setShowIosInstructions(false)
+      window.dispatchEvent(new Event(INSTALL_PROMPT_STATE_EVENT))
     }
 
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
@@ -58,11 +81,11 @@ export default function AddToHomeScreenPrompt() {
   }, [])
 
   const mode = useMemo(() => {
-    if (isInstalled || dismissed) return 'hidden'
+    if (installState.isInstalled || installState.dismissed) return 'hidden'
     if (deferredPrompt) return 'android'
     if (isIosSafari()) return 'ios'
     return 'hidden'
-  }, [deferredPrompt, dismissed, isInstalled])
+  }, [deferredPrompt, installState.dismissed, installState.isInstalled])
 
   if (mode === 'hidden') return null
 
@@ -77,8 +100,8 @@ export default function AddToHomeScreenPrompt() {
 
   function handleDismiss() {
     window.localStorage.setItem(DISMISS_KEY, '1')
-    setDismissed(true)
     setShowIosInstructions(false)
+    window.dispatchEvent(new Event(INSTALL_PROMPT_STATE_EVENT))
   }
 
   return (

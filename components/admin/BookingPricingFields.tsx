@@ -3,8 +3,6 @@
 import type { CSSProperties } from 'react'
 import { useState } from 'react'
 
-type DepositPreset = '25' | '50' | '75' | 'custom'
-
 interface BookingPricingFieldsProps {
   defaultQuote: number | null
   defaultDepositAmount: number | null
@@ -29,28 +27,40 @@ function inputStyle(): CSSProperties {
   }
 }
 
-function inferPreset(quote: number | null, depositAmount: number | null): DepositPreset {
+function inferPercent(quote: number | null, depositAmount: number | null) {
   if (!quote || quote <= 0 || depositAmount === null || depositAmount === undefined) {
-    return 'custom'
-  }
-
-  const percentage = Math.round((depositAmount / quote) * 100)
-  if (percentage === 25 || percentage === 50 || percentage === 75) {
-    return String(percentage) as DepositPreset
-  }
-
-  return 'custom'
-}
-
-function getPresetDepositAmount(quote: string, preset: DepositPreset) {
-  if (preset === 'custom') return null
-
-  const quoteValue = Number(quote)
-  if (!Number.isFinite(quoteValue) || quoteValue <= 0) {
     return ''
   }
 
-  return String(Math.round(quoteValue * (Number(preset) / 100)))
+  const percentage = (depositAmount / quote) * 100
+  if (!Number.isFinite(percentage)) return ''
+
+  return Number.isInteger(percentage) ? String(percentage) : percentage.toFixed(1).replace(/\.0$/, '')
+}
+
+function getDepositAmountFromPercent(quote: string, percent: string) {
+  const quoteValue = Number(quote)
+  const percentValue = Number(percent)
+
+  if (!Number.isFinite(quoteValue) || quoteValue <= 0 || !Number.isFinite(percentValue) || percentValue < 0) {
+    return ''
+  }
+
+  return String(Math.round(quoteValue * (percentValue / 100)))
+}
+
+function getPercentFromDeposit(quote: string, depositAmount: string) {
+  const quoteValue = Number(quote)
+  const depositValue = Number(depositAmount)
+
+  if (!Number.isFinite(quoteValue) || quoteValue <= 0 || !Number.isFinite(depositValue) || depositValue < 0) {
+    return ''
+  }
+
+  const percentage = (depositValue / quoteValue) * 100
+  if (!Number.isFinite(percentage)) return ''
+
+  return Number.isInteger(percentage) ? String(percentage) : percentage.toFixed(1).replace(/\.0$/, '')
 }
 
 export default function BookingPricingFields({
@@ -59,15 +69,13 @@ export default function BookingPricingFields({
 }: BookingPricingFieldsProps) {
   const [quote, setQuote] = useState<string>(defaultQuote?.toString() ?? '')
   const [depositAmount, setDepositAmount] = useState<string>(defaultDepositAmount?.toString() ?? '')
-  const [depositPreset, setDepositPreset] = useState<DepositPreset>(
-    inferPreset(defaultQuote, defaultDepositAmount),
-  )
+  const [depositPercent, setDepositPercent] = useState<string>(inferPercent(defaultQuote, defaultDepositAmount))
 
   const quoteValue = Number(quote)
   const depositValue = Number(depositAmount)
   const hasQuote = Number.isFinite(quoteValue) && quoteValue > 0
   const hasDeposit = Number.isFinite(depositValue) && depositValue >= 0
-  const depositPercent = hasQuote && hasDeposit ? Math.round((depositValue / quoteValue) * 100) : null
+  const calculatedPercent = hasQuote && hasDeposit ? Math.round((depositValue / quoteValue) * 1000) / 10 : null
 
   return (
     <div className="admin-form-grid-two">
@@ -82,10 +90,8 @@ export default function BookingPricingFields({
           onChange={(event) => {
             const nextQuote = event.target.value
             setQuote(nextQuote)
-
-            const nextDeposit = getPresetDepositAmount(nextQuote, depositPreset)
-            if (nextDeposit !== null) {
-              setDepositAmount(nextDeposit)
+            if (depositPercent.trim()) {
+              setDepositAmount(getDepositAmountFromPercent(nextQuote, depositPercent))
             }
           }}
           style={inputStyle()}
@@ -93,6 +99,56 @@ export default function BookingPricingFields({
       </label>
 
       <div style={{ display: 'grid', gap: '12px' }}>
+        <div className="admin-form-grid-two" style={{ gap: '12px' }}>
+          <label style={{ display: 'grid', gap: '7px' }}>
+            <span className="admin-section-title">Deposit %</span>
+            <input
+              type="number"
+              min={0}
+              max={100}
+              step="0.1"
+              value={depositPercent}
+              onChange={(event) => {
+                const nextPercent = event.target.value
+                setDepositPercent(nextPercent)
+                setDepositAmount(getDepositAmountFromPercent(quote, nextPercent))
+              }}
+              style={inputStyle()}
+              placeholder="25"
+            />
+          </label>
+
+          <div style={{ display: 'grid', gap: '7px' }}>
+            <span className="muted" style={{ fontSize: '12px' }}>Quick Set</span>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              {['25', '50', '75'].map((percent) => (
+                <button
+                  key={percent}
+                  type="button"
+                  className="admin-btn-ghost"
+                  onClick={() => {
+                    setDepositPercent(percent)
+                    setDepositAmount(getDepositAmountFromPercent(quote, percent))
+                  }}
+                  style={{ minWidth: 'unset', padding: '10px 12px' }}
+                >
+                  {percent}%
+                </button>
+              ))}
+              <button
+                type="button"
+                className="admin-btn-ghost"
+                onClick={() => {
+                  setDepositPercent('')
+                }}
+                style={{ minWidth: 'unset', padding: '10px 12px' }}
+              >
+                Manual
+              </button>
+            </div>
+          </div>
+        </div>
+
         <label style={{ display: 'grid', gap: '7px' }}>
           <span className="admin-section-title">Deposit Amount</span>
           <input
@@ -102,33 +158,12 @@ export default function BookingPricingFields({
             step="1"
             value={depositAmount}
             onChange={(event) => {
-              setDepositPreset('custom')
-              setDepositAmount(event.target.value)
+              const nextDepositAmount = event.target.value
+              setDepositAmount(nextDepositAmount)
+              setDepositPercent(getPercentFromDeposit(quote, nextDepositAmount))
             }}
             style={inputStyle()}
           />
-        </label>
-
-        <label style={{ display: 'grid', gap: '7px' }}>
-          <span className="muted" style={{ fontSize: '12px' }}>Deposit Preset</span>
-          <select
-            value={depositPreset}
-            onChange={(event) => {
-              const nextPreset = event.target.value as DepositPreset
-              setDepositPreset(nextPreset)
-
-              const nextDeposit = getPresetDepositAmount(quote, nextPreset)
-              if (nextDeposit !== null) {
-                setDepositAmount(nextDeposit)
-              }
-            }}
-            style={inputStyle()}
-          >
-            <option value="25">25%</option>
-            <option value="50">50%</option>
-            <option value="75">75%</option>
-            <option value="custom">Custom</option>
-          </select>
         </label>
 
         <div
@@ -144,12 +179,12 @@ export default function BookingPricingFields({
           {hasQuote && hasDeposit ? (
             <>
               Deposit is {formatCurrency(depositValue)}.
-              {depositPercent !== null ? ` That is about ${depositPercent}% of the ${formatCurrency(quoteValue)} quote.` : ''}
+              {calculatedPercent !== null ? ` That is about ${calculatedPercent}% of the ${formatCurrency(quoteValue)} quote.` : ''}
             </>
           ) : hasQuote ? (
-            <>25% = {formatCurrency(Math.round(quoteValue * 0.25))}, 50% = {formatCurrency(Math.round(quoteValue * 0.5))}, 75% = {formatCurrency(Math.round(quoteValue * 0.75))}.</>
+            <>Enter a deposit percentage to auto-calculate the amount, or type a manual amount and we will back-fill the percentage for you.</>
           ) : (
-            'Set the quote first to auto-fill common deposit percentages.'
+            'Set the quote first, then use a deposit percentage or manual amount.'
           )}
         </div>
       </div>

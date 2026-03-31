@@ -68,6 +68,12 @@ const operatingRange = [
   },
 ] as const
 
+const meetSignals = [
+  { label: 'Rooms', value: 'Clubs, weddings, private events, rooftops, branded sets' },
+  { label: 'Travel', value: 'Indianapolis based with travel-ready booking support' },
+  { label: 'Setup', value: 'Controller, club booth, or adaptable event rig' },
+] as const
+
 function sectionLabel(text: string) {
   return (
     <div className="hardware-heading">
@@ -196,6 +202,15 @@ export default function MeetPage() {
               </Link>
             </div>
 
+            <div className="meet-signal-grid">
+              {meetSignals.map((item) => (
+                <div key={item.label} className="meet-signal-card">
+                  <div className="meet-signal-label">{item.label}</div>
+                  <div className="meet-signal-value">{item.value}</div>
+                </div>
+              ))}
+            </div>
+
             <div className="meet-hero-module-grid">
               {profileModules.map((item, index) => (
                 <div key={item.label} className="meet-hero-module">
@@ -276,7 +291,7 @@ export default function MeetPage() {
               Booking
             </div>
             <div style={{ fontSize: '15px', color: 'var(--white)', lineHeight: 1.7, maxWidth: '620px' }}>
-              Need a DJ who can move between curation, crowd reading, and clean execution without turning the night into a template?
+              Need a DJ who can move between curation, crowd reading, and clean execution without flattening the night into a template?
             </div>
           </div>
           <Link href="/book" className="btn-primary">

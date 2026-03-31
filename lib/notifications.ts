@@ -471,15 +471,15 @@ export async function sendBookingInquiryReceipt(payload: BookingInquiryReceiptPa
 
   return sendEmail({
     to: payload.email,
-    subject: 'Booking Request Received – DJ B.A.E.',
+    subject: 'DJ B.A.E. inquiry received',
     text: [
       `Hey ${guestName},`,
       '',
       `Got your request for ${eventType} on ${eventDateTime}${locationText}.`,
       '',
-      'I’ll review the details and get back to you shortly with availability and next steps.',
+      'I’m reviewing the details now and I’ll follow up shortly with availability and next steps.',
       '',
-      'If you have anything else to add in the meantime, just reply here.',
+      'If anything changes before then, just reply to this email.',
       '',
       '– DJ B.A.E.',
     ].join('\n'),
@@ -493,7 +493,7 @@ export async function sendBookingInquiryReceipt(payload: BookingInquiryReceiptPa
         ['Event Date', eventDateTime],
         ...(location ? [['Location', location] as const] : []),
       ] as const,
-      closing: 'I’ll review the details and get back to you shortly with availability and next steps. If you have anything else to add in the meantime, just reply here.',
+      closing: 'I’m reviewing the details now and I’ll follow up shortly with availability and next steps. If anything changes before then, just reply to this email.',
     }),
   })
 }
@@ -513,7 +513,7 @@ export async function sendBookingConfirmedNotification(payload: BookingConfirmed
 
   return sendEmail({
     to: payload.email,
-    subject: 'Booking Confirmed – Deposit Required to Secure Date',
+    subject: 'DJ B.A.E. booking confirmed',
     text: [
       `Hey ${guestName},`,
       '',
@@ -526,7 +526,9 @@ export async function sendBookingConfirmedNotification(payload: BookingConfirmed
       'Payment options:',
       ...paymentInstructionLines,
       '',
-      'Once the deposit is sent, reply with confirmation so I can lock everything in.',
+      hasDepositLink
+        ? 'Send the deposit through the payment link above to lock the date in fully.'
+        : 'The deposit is already covered. Reply here if you need anything else before the event.',
       '',
       '– DJ B.A.E.',
     ].join('\n'),
@@ -540,7 +542,9 @@ export async function sendBookingConfirmedNotification(payload: BookingConfirmed
         ['Remaining Balance', payload.remainingAmount ?? 'TBD'],
         ...paymentInstructionRows,
       ],
-      closing: 'Once the deposit is sent, reply with confirmation so I can lock everything in.',
+      closing: hasDepositLink
+        ? 'Send the deposit through the payment link above to lock the date in fully.'
+        : 'The deposit is already covered. Reply here if you need anything else before the event.',
     }),
   })
 }
@@ -559,7 +563,7 @@ export async function sendBookingBalanceReminder(payload: BookingBalanceReminder
 
   return sendEmail({
     to: payload.email,
-    subject: `Final Payment Due – ${eventDateTime}`,
+    subject: 'DJ B.A.E. final payment reminder',
     text: [
       `Hey ${guestName},`,
       '',
@@ -570,7 +574,7 @@ export async function sendBookingBalanceReminder(payload: BookingBalanceReminder
       'Payment options:',
       ...paymentInstructionLines,
       '',
-      'Once sent, just reply here to confirm.',
+      'Once the balance is sent, just reply here so I can mark it complete on my side.',
       '',
       '– DJ B.A.E.',
     ].join('\n'),
@@ -582,7 +586,7 @@ export async function sendBookingBalanceReminder(payload: BookingBalanceReminder
         ['Remaining Balance', payload.balanceDue],
         ...paymentInstructionRows,
       ] as const,
-      closing: 'Once sent, just reply here to confirm.',
+      closing: 'Once the balance is sent, just reply here so I can mark it complete on my side.',
     }),
   })
 }
@@ -593,14 +597,14 @@ export async function sendBookingPostEventFollowUp(payload: BookingPostEventFoll
 
   return sendEmail({
     to: payload.email,
-    subject: 'Appreciate You - DJ B.A.E.',
+    subject: 'Thank you for booking DJ B.A.E.',
     text: [
       `Hey ${guestName},`,
       '',
       `Appreciate you for having me for ${payload.eventName} on ${eventDateTime}.`,
       '',
-      'Thank you for trusting me with the vibe. If you have any photos, videos, or feedback you want to share, just reply here.',
-      'And if you are planning anything else later on, I would love to work together again.',
+      'Thank you for trusting me with the room. If you have any photos, videos, or feedback you want to share, just reply here.',
+      'If you are planning anything else later on, I would love to work together again.',
       '',
       '- DJ B.A.E.',
     ].join('\n'),
@@ -613,7 +617,7 @@ export async function sendBookingPostEventFollowUp(payload: BookingPostEventFoll
         ['Event Date', eventDateTime],
         ...(payload.location ? [['Location', payload.location] as const] : []),
       ] as const,
-      closing: 'Thank you for trusting me with the vibe. If you have any photos, videos, or feedback you want to share, just reply here.',
+      closing: 'Thank you for trusting me with the room. If you have any photos, videos, or feedback you want to share, just reply here.',
     }),
   })
 }
