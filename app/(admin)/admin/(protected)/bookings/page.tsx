@@ -70,6 +70,23 @@ function fmtSubmittedDate(iso: string) {
   })
 }
 
+function getCompactPaymentLabel(status: BookingWorkflowPaymentStatus) {
+  switch (status) {
+    case 'deposit_requested':
+      return 'Deposit Req'
+    case 'deposit_paid':
+      return 'Deposit Paid'
+    case 'balance_requested':
+      return 'Balance Req'
+    default:
+      return BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS[status]
+  }
+}
+
+function getCompactDepositLabel(status: 'unpaid' | 'pending' | 'paid') {
+  return status.charAt(0).toUpperCase() + status.slice(1)
+}
+
 async function getBookings(): Promise<BookingRow[]> {
   try {
     const supabase = createClient()
@@ -174,81 +191,85 @@ export default async function BookingsPage({
           />
         ) : (
           <div className="admin-table-wrap">
-            <table className="admin-table admin-table-stack">
+            <table className="admin-table bookings-admin-table">
               <thead>
                 <tr>
                   <th>Event</th>
-                  <th>Client</th>
                   <th>Event Date</th>
                   <th>Package</th>
                   <th>Status</th>
                   <th>Payment</th>
                   <th>Deposit</th>
-                  <th>Submitted</th>
                   <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {bookings.map((b) => (
                   <tr key={b.id}>
-                    <td data-label="Event" style={{ fontWeight: 400 }}>
-                      {b.event_name}
+                    <td data-label="Event" className="booking-event-cell">
+                      <div className="booking-event-title">{b.event_name}</div>
+                      <div className="booking-event-meta">
+                        {b.client_name ?? 'Client pending'}
+                      </div>
                       {(b.venue || b.city) && (
-                        <div className="muted" style={{ marginTop: '4px' }}>
+                        <div className="booking-event-meta">
                           {[b.venue, b.city].filter(Boolean).join(' · ')}
                         </div>
                       )}
+                      <div className="booking-event-meta booking-event-meta--mobile">
+                        Submitted {fmtSubmittedDate(b.created_at)}
+                      </div>
                     </td>
-                    <td data-label="Client" className="muted">{b.client_name ?? '—'}</td>
-                    <td data-label="Event Date" className="muted">
-                      {fmtEventDate(b.event_date, b.event_timezone)}
-                      <div style={{ fontSize: '11px', marginTop: '4px' }}>
+                    <td data-label="Event Date" className="muted booking-date-cell">
+                      <div>{fmtEventDate(b.event_date, b.event_timezone)}</div>
+                      <div className="booking-date-detail">
                         {fmtEventTime(b.event_date, b.event_timezone)} · {b.event_timezone}
                       </div>
                     </td>
                     <td data-label="Package" className="muted">{b.package ?? '—'}</td>
                     <td data-label="Status"><Badge variant={b.status} label={BOOKING_LIFECYCLE_STATUS_LABELS[b.status]} /></td>
-                    <td data-label="Payment"><Badge variant={b.payment_status} label={BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS[b.payment_status]} /></td>
+                    <td data-label="Payment"><Badge variant={b.payment_status} label={getCompactPaymentLabel(b.payment_status)} /></td>
                     <td data-label="Deposit">
-                      <Badge variant={b.deposit_status === 'paid' ? 'paid' : b.deposit_status === 'pending' ? 'pending' : 'unpaid'} label={`Deposit ${b.deposit_status}`} />
+                      <Badge variant={b.deposit_status === 'paid' ? 'paid' : b.deposit_status === 'pending' ? 'pending' : 'unpaid'} label={getCompactDepositLabel(b.deposit_status)} />
                     </td>
-                    <td data-label="Submitted" className="muted">{fmtSubmittedDate(b.created_at)}</td>
-                    <td data-label="Actions">
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                        {getBookingActions(b.status).map((action) => (
-                          <form key={action.nextStatus} action={updateBookingStatusAction}>
-                            <input type="hidden" name="id" value={b.id} />
-                            <input type="hidden" name="next_status" value={action.nextStatus} />
-                            <button
-                              type="submit"
-                              className={action.tone === 'primary' ? 'admin-btn-primary' : 'admin-btn-ghost'}
-                              style={
-                                action.tone === 'danger'
-                                  ? {
-                                      color: '#e85d75',
-                                      borderColor: 'rgba(232,93,117,0.35)',
-                                    }
-                                  : undefined
-                              }
-                            >
-                              {action.label}
-                            </button>
-                          </form>
-                        ))}
-                        {canCreateEvent(b.status) && (
-                          <form action={createEventFromBookingAction}>
-                            <input type="hidden" name="booking_id" value={b.id} />
-                            <button type="submit" className="admin-btn-ghost">
-                              Create Event
-                            </button>
-                          </form>
-                        )}
-                        <Link href={`/admin/bookings/${b.id}`} className="admin-view-all" style={{ alignSelf: 'center' }}>
-                          Edit →
+                    <td data-label="Actions" className="booking-actions-cell">
+                      <div className="booking-actions-inline">
+                        <Link href={`/admin/bookings/${b.id}`} className="admin-btn-ghost booking-manage-link">
+                          Manage
                         </Link>
-                        <a href={`/api/invoice/${b.id}`} download className="admin-view-all" style={{ alignSelf: 'center' }}>
-                          PDF ↓
-                        </a>
+                        <details className="booking-actions-menu">
+                          <summary className="booking-actions-trigger" aria-label="More actions">•••</summary>
+                          <div className="booking-actions-popover">
+                            {getBookingActions(b.status).map((action) => (
+                              <form key={action.nextStatus} action={updateBookingStatusAction}>
+                                <input type="hidden" name="id" value={b.id} />
+                                <input type="hidden" name="next_status" value={action.nextStatus} />
+                                <button
+                                  type="submit"
+                                  className="booking-actions-item"
+                                  style={
+                                    action.tone === 'danger'
+                                      ? { color: '#e85d75' }
+                                      : undefined
+                                  }
+                                >
+                                  {action.label}
+                                </button>
+                              </form>
+                            ))}
+                            {canCreateEvent(b.status) && (
+                              <form action={createEventFromBookingAction}>
+                                <input type="hidden" name="booking_id" value={b.id} />
+                                <button type="submit" className="booking-actions-item">
+                                  Create Event
+                                </button>
+                              </form>
+                            )}
+                            <a href={`/api/invoice/${b.id}`} download className="booking-actions-item">
+                              Download PDF
+                            </a>
+                          </div>
+                        </details>
                       </div>
                     </td>
                   </tr>
