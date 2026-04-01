@@ -5,8 +5,8 @@ import Badge from '@/components/admin/Badge'
 import AdminNotice from '@/components/admin/AdminNotice'
 import BookingPricingFields from '@/components/admin/BookingPricingFields'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import { getBookingFinancialSnapshot } from '@/lib/booking-finance'
 import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } from '@/lib/booking-deposit'
-import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
@@ -193,21 +193,25 @@ export default async function EditBookingPage({
     : ''
   const total = booking.quote ?? 0
   const deposit = booking.deposit_amount ?? 0
-  const balance = total - deposit
   const payments = booking.payments ?? []
-  const receivedTotal = getReceivedPaymentTotal(payments)
-  const outstandingDeposit = getOutstandingDeposit(booking.deposit_amount, payments)
+  const financials = getBookingFinancialSnapshot({
+    totalDue: booking.quote,
+    depositAmount: booking.deposit_amount,
+    payments,
+  })
+  const receivedTotal = financials.totalPaid
+  const outstandingDeposit = financials.remainingDeposit
   const recordedDeposit = Math.max(deposit - outstandingDeposit, 0)
-  const outstandingBalance = getOutstandingBalance(booking.quote, payments)
+  const outstandingBalance = financials.remainingBalance
   const depositPaidAt = getDepositPaidAt(booking.deposit_amount, payments)
   const depositConfirmedVia = getDepositConfirmedVia(booking.deposit_amount, payments)
   const lifecycleStatus = getBookingLifecycleStatus(booking.lifecycle_status, booking.status)
   const paymentStatus = getBookingWorkflowPaymentStatus({
-    currentStatus: booking.payment_status,
     quote: booking.quote,
     depositAmount: booking.deposit_amount,
     lifecycleStatus,
     payments,
+    lastBalanceReminderSentAt: booking.last_balance_reminder_sent_at,
   })
   const internalNotes = booking.booking_notes ?? []
   const portalRequests = (booking.booking_portal_requests ?? []).slice().sort((left, right) => {
@@ -354,16 +358,6 @@ export default async function EditBookingPage({
                 <option value="lost">Lost</option>
               </select>
             </label>
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Payment Workflow *</span>
-              <select name="payment_status" defaultValue={paymentStatus} style={inputStyle()}>
-                <option value="unpaid">Unpaid</option>
-                <option value="deposit_requested">Deposit Requested</option>
-                <option value="deposit_paid">Deposit Paid</option>
-                <option value="balance_requested">Balance Requested</option>
-                <option value="paid">Paid</option>
-              </select>
-            </label>
           </div>
 
           <div className="admin-form-grid-two-wide">
@@ -468,7 +462,7 @@ export default async function EditBookingPage({
             {[
               { label: 'Quote', value: formatCurrency(total) },
               { label: 'Deposit', value: formatCurrency(deposit) },
-              { label: 'Balance Due', value: formatCurrency(balance) },
+              { label: 'Balance Due', value: formatCurrency(financials.remainingBalance) },
               { label: 'Payment Status', value: BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS[paymentStatus] },
               { label: 'Lifecycle', value: BOOKING_LIFECYCLE_STATUS_LABELS[lifecycleStatus] },
             ].map((item) => (

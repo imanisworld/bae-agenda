@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { portalSignOutAction } from '@/app/actions/portal'
 import Badge from '@/components/admin/Badge'
 import { getOutstandingBalance, getReceivedPaymentTotal } from '@/lib/booking-finance'
+import { getBookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
 import { requirePortalSessionClient } from '@/lib/portal-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -116,6 +117,12 @@ export default async function PortalHomePage() {
             {bookings.map((booking) => {
               const receivedTotal = getReceivedPaymentTotal(booking.payments)
               const outstandingBalance = getOutstandingBalance(booking.quote, booking.payments)
+              const paymentStatus = getBookingWorkflowPaymentStatus({
+                quote: booking.quote,
+                depositAmount: booking.deposit_amount,
+                lifecycleStatus: booking.lifecycle_status ?? undefined,
+                payments: booking.payments,
+              })
 
               return (
                 <article
@@ -139,7 +146,7 @@ export default async function PortalHomePage() {
                       </p>
                     </div>
 
-                    <Badge variant={toBadgeVariant(booking.payment_status)} label={booking.payment_status?.replaceAll('_', ' ') ?? 'unpaid'} />
+                    <Badge variant={toBadgeVariant(paymentStatus)} label={paymentStatus.replaceAll('_', ' ')} />
                   </div>
 
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '12px' }}>

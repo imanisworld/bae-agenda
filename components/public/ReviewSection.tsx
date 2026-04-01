@@ -3,7 +3,7 @@
  * Shows approved reviews from Supabase + a form to submit a new one.
  * Falls back to hardcoded quotes if DB has no approved reviews yet.
  */
-import { createAdminClient } from '@/lib/supabase/admin'
+import { createClient } from '@/lib/supabase/server'
 import ReviewForm from '@/components/public/ReviewForm'
 
 interface Review {
@@ -22,7 +22,7 @@ const FALLBACK_REVIEWS: Review[] = [
 
 async function getApprovedReviews(): Promise<Review[]> {
   try {
-    const supabase = createAdminClient()
+    const supabase = await createClient()
     const { data } = await supabase
       .from('reviews')
       .select('id, name, event_type, rating, message')

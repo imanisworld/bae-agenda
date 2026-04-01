@@ -1,4 +1,4 @@
-import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
+import { getBookingFinancialSnapshot } from '@/lib/booking-finance'
 
 export type BookingLifecycleStatus =
   | 'new'
@@ -82,42 +82,39 @@ export function assertValidLifecycleTransition(
 }
 
 export function getBookingWorkflowPaymentStatus(args: {
-  currentStatus?: BookingWorkflowPaymentStatus | null
   quote: number | null | undefined
   depositAmount: number | null | undefined
   lifecycleStatus?: BookingLifecycleStatus | null
   payments: Array<PaymentLike> | null | undefined
+  lastBalanceReminderSentAt?: string | null | undefined
 }): BookingWorkflowPaymentStatus {
-  const currentStatus = args.currentStatus ?? 'unpaid'
-  const quote = args.quote ?? 0
-  const depositAmount = args.depositAmount ?? 0
   const lifecycleStatus = args.lifecycleStatus ?? 'new'
-  const payments = args.payments ?? null
-  const receivedTotal = getReceivedPaymentTotal(payments)
-  const outstandingBalance = getOutstandingBalance(quote, payments)
-  const outstandingDeposit = getOutstandingDeposit(depositAmount, payments)
+  const { totalPaid, remainingBalance, remainingDeposit } = getBookingFinancialSnapshot({
+    totalDue: args.quote,
+    depositAmount: args.depositAmount,
+    payments: args.payments ?? null,
+  })
 
-  if (quote > 0 && outstandingBalance <= 0 && receivedTotal > 0) {
+  if (remainingBalance <= 0 && totalPaid > 0) {
     return 'paid'
   }
 
-  if (depositAmount > 0 && outstandingDeposit <= 0) {
-    if (currentStatus === 'balance_requested') {
+  if ((args.depositAmount ?? 0) > 0 && remainingDeposit > 0) {
+    if (lifecycleStatus === 'confirmed' || lifecycleStatus === 'completed') {
+      return 'deposit_requested'
+    }
+    return 'unpaid'
+  }
+
+  if (remainingBalance > 0 && totalPaid > 0) {
+    if (args.lastBalanceReminderSentAt) {
       return 'balance_requested'
     }
     return 'deposit_paid'
   }
 
-  if (currentStatus === 'balance_requested') {
+  if (remainingBalance > 0 && args.lastBalanceReminderSentAt) {
     return 'balance_requested'
-  }
-
-  if (currentStatus === 'deposit_requested') {
-    return 'deposit_requested'
-  }
-
-  if (lifecycleStatus === 'confirmed' && depositAmount > 0) {
-    return 'deposit_requested'
   }
 
   return 'unpaid'

@@ -14,6 +14,10 @@ export default function ScrollFader() {
   const [activeId, setActiveId] = useState<(typeof SECTIONS)[number]['id']>('home')
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof document === 'undefined' || typeof IntersectionObserver === 'undefined') {
+      return
+    }
+
     const sections = SECTIONS
       .map((section) => document.getElementById(section.id))
       .filter((node): node is HTMLElement => Boolean(node))

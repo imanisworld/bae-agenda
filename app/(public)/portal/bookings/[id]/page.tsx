@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Badge from '@/components/admin/Badge'
 import { submitPortalBookingRequestAction } from '@/app/actions/portal'
 import { getOutstandingBalance, getReceivedPaymentTotal } from '@/lib/booking-finance'
+import { getBookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
 import { requirePortalSessionClient } from '@/lib/portal-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -155,6 +156,12 @@ export default async function PortalBookingDetailPage({
   const requestError = getMessage(resolvedSearchParams?.request_error)
   const receivedTotal = getReceivedPaymentTotal(booking.payments)
   const outstandingBalance = getOutstandingBalance(booking.quote, booking.payments)
+  const paymentStatus = getBookingWorkflowPaymentStatus({
+    quote: booking.quote,
+    depositAmount: booking.deposit_amount,
+    lifecycleStatus: booking.lifecycle_status ?? undefined,
+    payments: booking.payments,
+  })
   const paymentRows = booking.payments ?? []
   const portalRequests = (booking.booking_portal_requests ?? []).slice().sort((left, right) => {
     return new Date(right.created_at).getTime() - new Date(left.created_at).getTime()
@@ -167,7 +174,7 @@ export default async function PortalBookingDetailPage({
           <Link href="/portal" className="inline-link">
             Back To Portal
           </Link>
-          <Badge variant={toPaymentBadgeVariant(booking.payment_status)} label={booking.payment_status?.replaceAll('_', ' ') ?? 'unpaid'} />
+          <Badge variant={toPaymentBadgeVariant(paymentStatus)} label={paymentStatus.replaceAll('_', ' ')} />
         </div>
 
         <div style={{ border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '28px', display: 'grid', gap: '18px' }}>

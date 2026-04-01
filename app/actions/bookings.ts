@@ -3,7 +3,9 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { getPrimaryBookingClient } from '@/lib/booking-client'
+import { getOutstandingBalance, getOutstandingDeposit } from '@/lib/booking-finance'
 import { stampBookingEmailSentAt } from '@/lib/booking-email-tracking'
+import { syncComputedBookingPaymentState } from '@/lib/booking-payment-sync'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
 import { sendBookingPostEventFollowUpEmail, sendBookingReviewRequestEmail } from '@/lib/booking-email-workflows'
@@ -15,7 +17,6 @@ import {
   getBookingWorkflowPaymentStatus,
   mapLifecycleStatusToLegacyBookingStatus,
   type BookingLifecycleStatus,
-  type BookingWorkflowPaymentStatus,
 } from '@/lib/booking-workflow'
 import { logBookingActivity } from '@/lib/booking-activity'
 import {
@@ -33,7 +34,7 @@ import {
 import { toEventISO } from '@/lib/date-time'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
 import { sendBookingBalanceReminder, sendBookingConfirmedNotification, sendBookingInquiryReceipt, sendW9Notification } from '@/lib/notifications'
-import { BOOKING_LIFECYCLE_STATUSES, BOOKING_WORKFLOW_PAYMENT_STATUSES, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
+import { BOOKING_LIFECYCLE_STATUSES, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import { generateW9Pdf } from '@/lib/w9-pdf'
 import { shouldAutoSendW9ForPayment } from '@/lib/w9-automation'
 import type { BookingStatus, PaymentMethod, PaymentStatus, PaymentType } from '@/types/index'
@@ -57,10 +58,6 @@ function isBookingStatus(value: string): value is BookingStatus {
 
 function isBookingLifecycleStatus(value: string): value is BookingLifecycleStatus {
   return BOOKING_LIFECYCLE_STATUSES.includes(value as BookingLifecycleStatus)
-}
-
-function isBookingWorkflowPaymentStatus(value: string): value is BookingWorkflowPaymentStatus {
-  return BOOKING_WORKFLOW_PAYMENT_STATUSES.includes(value as BookingWorkflowPaymentStatus)
 }
 
 function parseDateTimeLocal(value: FormDataEntryValue | null) {
@@ -390,7 +387,7 @@ async function syncInvoicePaymentState(admin: ReturnType<typeof createAdminClien
 async function syncBookingWorkflowState(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
   const { data: booking, error } = await admin
     .from('bookings')
-    .select('status, lifecycle_status, payment_status, quote, deposit_amount, payments(amount, type, status, method)')
+    .select('status, lifecycle_status, quote, deposit_amount, last_balance_reminder_sent_at, payments(amount, type, status, method)')
     .eq('id', bookingId)
     .maybeSingle()
 
@@ -404,7 +401,6 @@ async function syncBookingWorkflowState(admin: ReturnType<typeof createAdminClie
     booking.status as BookingStatus | null | undefined,
   )
   const paymentStatus = getBookingWorkflowPaymentStatus({
-    currentStatus: booking.payment_status as BookingWorkflowPaymentStatus | null | undefined,
     quote: booking.quote as number | null | undefined,
     depositAmount: booking.deposit_amount as number | null | undefined,
     lifecycleStatus,
@@ -414,6 +410,7 @@ async function syncBookingWorkflowState(admin: ReturnType<typeof createAdminClie
       status: 'pending' | 'received' | 'refunded'
       method?: string | null
     }> | null | undefined) ?? null,
+    lastBalanceReminderSentAt: booking.last_balance_reminder_sent_at as string | null | undefined,
   })
 
   const { error: updateError } = await admin
@@ -671,14 +668,12 @@ export async function updateBookingStatusAction(formData: FormData) {
   const nextStatus = nextStatusRaw as BookingStatus
   const confirmationPayload = await getConfirmationPayloadIfNeeded(admin, bookingId, nextStatus)
   const lifecycleStatus = getBookingLifecycleStatus(undefined, nextStatus)
-  const nextPaymentStatus: BookingWorkflowPaymentStatus = nextStatus === 'confirmed' ? 'deposit_requested' : 'unpaid'
 
   const { error } = await admin
     .from('bookings')
     .update({
       status: nextStatus,
       lifecycle_status: lifecycleStatus,
-      payment_status: nextPaymentStatus,
     })
     .eq('id', bookingId)
 
@@ -738,7 +733,6 @@ export async function updateBookingDetailsAction(formData: FormData) {
   const bookingId = id as string
   const nextStatus = statusRaw as BookingStatus
   const lifecycleStatusRaw = optionalString(formData.get('lifecycle_status'))
-  const paymentWorkflowStatusRaw = optionalString(formData.get('payment_status'))
 
   const eventDate = toEventISO(eventDateTime!.date, eventTimeZone!, eventDateTime!.time)
   const eventEndTime = eventEndDateTime
@@ -768,10 +762,6 @@ export async function updateBookingDetailsAction(formData: FormData) {
       redirectWithError(`/admin/bookings/${bookingId}`, err instanceof Error ? err.message : 'Invalid lifecycle transition.')
     }
   }
-  const paymentWorkflowStatus = paymentWorkflowStatusRaw && isBookingWorkflowPaymentStatus(paymentWorkflowStatusRaw)
-    ? paymentWorkflowStatusRaw
-    : (nextStatus === 'confirmed' ? 'deposit_requested' : 'unpaid')
-
   const { error } = await admin
     .from('bookings')
     .update({
@@ -789,7 +779,6 @@ export async function updateBookingDetailsAction(formData: FormData) {
       notes: optionalString(formData.get('notes')),
       status: nextStatus,
       lifecycle_status: lifecycleStatus,
-      payment_status: paymentWorkflowStatus,
     })
     .eq('id', bookingId)
 
@@ -1113,12 +1102,13 @@ export async function confirmBookingAction(formData: FormData) {
     .from('bookings')
     .update({
       lifecycle_status: 'confirmed',
-      payment_status: 'deposit_requested',
       status: 'confirmed',
     })
     .eq('id', bookingId as string)
 
   if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to confirm booking.')
+
+  await syncComputedBookingPaymentState(admin, bookingId as string)
 
   void logBookingActivity({
     bookingId: bookingId as string,
@@ -1156,15 +1146,41 @@ export async function markDepositReceivedAction(formData: FormData) {
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
 
-  const { error } = await admin
+  const { data: booking, error } = await admin
     .from('bookings')
-    .update({
-      payment_status: 'deposit_paid',
-      deposit_paid_at: new Date().toISOString(),
-    })
+    .select('deposit_amount, payments(amount, status)')
     .eq('id', bookingId as string)
+    .maybeSingle()
 
-  if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to mark deposit received.')
+  if (error || !booking) {
+    redirectWithError(`/admin/bookings/${bookingId}`, error?.message || 'Unable to load booking payment state.')
+  }
+
+  const bookingRecord = booking as NonNullable<typeof booking>
+  const outstandingDeposit = getOutstandingDeposit(
+    bookingRecord.deposit_amount as number | null,
+    (bookingRecord.payments as Array<{ amount: number; status: 'pending' | 'received' | 'refunded' }> | null) ?? null,
+  )
+
+  if (outstandingDeposit <= 0) {
+    redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Deposit is already fully recorded.')}`)
+  }
+
+  const { error: paymentError } = await admin
+    .from('payments')
+    .insert({
+      booking_id: bookingId as string,
+      amount: outstandingDeposit,
+      type: 'deposit',
+      status: 'received',
+      paid_at: new Date().toISOString(),
+      notes: 'Deposit marked received from booking workflow quick action.',
+    })
+
+  if (paymentError) redirectWithError(`/admin/bookings/${bookingId}`, paymentError.message || 'Unable to record deposit payment.')
+
+  await syncBookingDepositState(admin, bookingId as string)
+  await syncComputedBookingPaymentState(admin, bookingId as string)
 
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
@@ -1178,13 +1194,6 @@ export async function requestFinalPaymentAction(formData: FormData) {
   const admin = createAdminClient()
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
-
-  const { error } = await admin
-    .from('bookings')
-    .update({ payment_status: 'balance_requested' })
-    .eq('id', bookingId as string)
-
-  if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to request final payment.')
 
   const source = await getBookingBalanceReminderSource(admin, bookingId as string)
   if (source) {
@@ -1202,6 +1211,8 @@ export async function requestFinalPaymentAction(formData: FormData) {
     }
   }
 
+  await syncComputedBookingPaymentState(admin, bookingId as string)
+
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/dashboard')
@@ -1214,15 +1225,40 @@ export async function markFullyPaidAction(formData: FormData) {
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
 
-  const { error } = await admin
+  const { data: booking, error } = await admin
     .from('bookings')
-    .update({
-      payment_status: 'paid',
-      balance_paid_at: new Date().toISOString(),
-    })
+    .select('quote, payments(amount, status)')
     .eq('id', bookingId as string)
+    .maybeSingle()
 
-  if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to mark booking as fully paid.')
+  if (error || !booking) {
+    redirectWithError(`/admin/bookings/${bookingId}`, error?.message || 'Unable to load booking payment state.')
+  }
+
+  const bookingRecord = booking as NonNullable<typeof booking>
+  const remainingBalance = getOutstandingBalance(
+    bookingRecord.quote as number | null,
+    (bookingRecord.payments as Array<{ amount: number; status: 'pending' | 'received' | 'refunded' }> | null) ?? null,
+  )
+
+  if (remainingBalance <= 0) {
+    redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Booking is already fully paid.')}`)
+  }
+
+  const { error: paymentError } = await admin
+    .from('payments')
+    .insert({
+      booking_id: bookingId as string,
+      amount: remainingBalance,
+      type: 'balance',
+      status: 'received',
+      paid_at: new Date().toISOString(),
+      notes: 'Balance marked received from booking workflow quick action.',
+    })
+
+  if (paymentError) redirectWithError(`/admin/bookings/${bookingId}`, paymentError.message || 'Unable to record the final payment.')
+
+  await syncComputedBookingPaymentState(admin, bookingId as string)
 
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')

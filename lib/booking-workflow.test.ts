@@ -38,7 +38,6 @@ describe('booking workflow helpers', () => {
 
   it('marks deposit covered bookings as deposit paid', () => {
     expect(getBookingWorkflowPaymentStatus({
-      currentStatus: 'deposit_requested',
       quote: 1200,
       depositAmount: 300,
       lifecycleStatus: 'confirmed',
@@ -48,17 +47,16 @@ describe('booking workflow helpers', () => {
 
   it('preserves balance requested until the booking is fully paid', () => {
     expect(getBookingWorkflowPaymentStatus({
-      currentStatus: 'balance_requested',
       quote: 1200,
       depositAmount: 300,
       lifecycleStatus: 'confirmed',
       payments: [{ amount: 300, type: 'deposit', status: 'received' }],
+      lastBalanceReminderSentAt: '2026-03-01T12:00:00.000Z',
     })).toBe('balance_requested')
   })
 
   it('marks fully paid bookings as paid', () => {
     expect(getBookingWorkflowPaymentStatus({
-      currentStatus: 'balance_requested',
       quote: 1200,
       depositAmount: 300,
       lifecycleStatus: 'confirmed',
@@ -67,5 +65,15 @@ describe('booking workflow helpers', () => {
         { amount: 900, type: 'balance', status: 'received' },
       ],
     })).toBe('paid')
+  })
+
+  it('treats unpaid no-deposit bookings as balance requested once a reminder has been sent', () => {
+    expect(getBookingWorkflowPaymentStatus({
+      quote: 1200,
+      depositAmount: 0,
+      lifecycleStatus: 'confirmed',
+      payments: [],
+      lastBalanceReminderSentAt: '2026-03-01T12:00:00.000Z',
+    })).toBe('balance_requested')
   })
 })

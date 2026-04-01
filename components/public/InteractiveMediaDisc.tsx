@@ -21,11 +21,18 @@ function usePrefersReducedMotion() {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
     const onChange = () => setPrefersReducedMotion(mediaQuery.matches)
     onChange()
-    mediaQuery.addEventListener('change', onChange)
-    return () => mediaQuery.removeEventListener('change', onChange)
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', onChange)
+      return () => mediaQuery.removeEventListener('change', onChange)
+    }
+
+    mediaQuery.addListener(onChange)
+    return () => mediaQuery.removeListener(onChange)
   }, [])
 
   return prefersReducedMotion
@@ -75,7 +82,7 @@ export default function InteractiveMediaDisc({
 
   useEffect(() => {
     const node = buttonRef.current
-    if (!node) return
+    if (!node || typeof IntersectionObserver === 'undefined') return
 
     const observer = new IntersectionObserver(
       ([entry]) => {

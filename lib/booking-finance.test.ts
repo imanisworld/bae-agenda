@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from './booking-finance'
+import { getBookingFinancialSnapshot, getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from './booking-finance'
 
 describe('booking finance helpers', () => {
   const payments = [
@@ -28,5 +28,18 @@ describe('booking finance helpers', () => {
     expect(getReceivedPaymentTotal(null)).toBe(0)
     expect(getOutstandingDeposit(null, null)).toBe(0)
     expect(getOutstandingBalance(undefined, undefined)).toBe(0)
+  })
+
+  it('returns a deterministic booking finance snapshot', () => {
+    expect(getBookingFinancialSnapshot({
+      totalDue: 1200,
+      depositAmount: 300,
+      payments,
+    })).toEqual({
+      totalDue: 1200,
+      totalPaid: 300,
+      remainingBalance: 900,
+      remainingDeposit: 0,
+    })
   })
 })

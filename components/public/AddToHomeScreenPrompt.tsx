@@ -10,19 +10,36 @@ interface BeforeInstallPromptEvent extends Event {
 const DISMISS_KEY = 'baeagenda-install-prompt-dismissed'
 const INSTALL_PROMPT_STATE_EVENT = 'baeagenda-install-prompt-state'
 
+function getDismissedState() {
+  if (typeof window === 'undefined') return true
+  try {
+    return window.localStorage.getItem(DISMISS_KEY) === '1'
+  } catch {
+    return true
+  }
+}
+
 function isIosSafari() {
   if (typeof window === 'undefined') return false
-  const ua = window.navigator.userAgent
-  const isLegacyIos = /iPad|iPhone|iPod/.test(ua)
-  const isModernIpad = window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1
-  const isIos = isLegacyIos || isModernIpad
-  const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua)
-  return isIos && isSafari
+  try {
+    const ua = window.navigator.userAgent
+    const isLegacyIos = /iPad|iPhone|iPod/.test(ua)
+    const isModernIpad = window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1
+    const isIos = isLegacyIos || isModernIpad
+    const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS/.test(ua)
+    return isIos && isSafari
+  } catch {
+    return false
+  }
 }
 
 function isStandalone() {
   if (typeof window === 'undefined') return false
-  return window.matchMedia('(display-mode: standalone)').matches || Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone)
+  try {
+    return window.matchMedia('(display-mode: standalone)').matches || Boolean((window.navigator as Navigator & { standalone?: boolean }).standalone)
+  } catch {
+    return false
+  }
 }
 
 export default function AddToHomeScreenPrompt() {
@@ -48,7 +65,7 @@ export default function AddToHomeScreenPrompt() {
       }
     },
     () => ({
-      dismissed: typeof window !== 'undefined' ? window.localStorage.getItem(DISMISS_KEY) === '1' : true,
+      dismissed: getDismissedState(),
       isInstalled: typeof window !== 'undefined' ? isStandalone() : false,
     }),
     () => ({
@@ -99,7 +116,11 @@ export default function AddToHomeScreenPrompt() {
   }
 
   function handleDismiss() {
-    window.localStorage.setItem(DISMISS_KEY, '1')
+    try {
+      window.localStorage.setItem(DISMISS_KEY, '1')
+    } catch {
+      return
+    }
     setShowIosInstructions(false)
     window.dispatchEvent(new Event(INSTALL_PROMPT_STATE_EVENT))
   }

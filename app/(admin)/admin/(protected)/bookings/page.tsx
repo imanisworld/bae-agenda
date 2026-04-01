@@ -112,7 +112,6 @@ async function getBookings(): Promise<BookingRow[]> {
         package:    b.package,
         status:     lifecycleStatus,
         payment_status: getBookingWorkflowPaymentStatus({
-          currentStatus: b.payment_status,
           quote: b.quote,
           depositAmount: b.deposit_amount,
           lifecycleStatus,
