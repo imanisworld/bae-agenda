@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { sendBookingPostEventFollowUpEmail } from '@/lib/booking-email-workflows'
+import { sendBookingPostEventFollowUpEmail, sendBookingReviewRequestEmail } from '@/lib/booking-email-workflows'
 import { createAdminClient } from '@/lib/supabase/admin'
 import {
   getBalanceReminderPayloadFromBooking,
@@ -34,6 +34,7 @@ async function appendBookingTimelineNote(
 type CronBookingReminderSource = BookingBalanceReminderSource & {
   status: 'confirmed' | 'completed'
   post_event_follow_up_sent_at: string | null
+  review_request_sent_at: string | null
   last_balance_reminder_sent_at: string | null
 }
 
@@ -104,6 +105,35 @@ async function sendScheduledPostEventFollowUp(
   return result.status === 'sent'
 }
 
+async function sendScheduledReviewRequest(
+  admin: ReturnType<typeof createAdminClient>,
+  booking: CronBookingReminderSource,
+  now: Date,
+  nowIso: string
+) {
+  if (booking.status !== 'completed' || booking.review_request_sent_at) {
+    return false
+  }
+
+  const eventDate = new Date(booking.event_date)
+  if (Number.isNaN(eventDate.getTime())) {
+    return false
+  }
+
+  const hoursSinceEvent = (now.getTime() - eventDate.getTime()) / (1000 * 60 * 60)
+  if (hoursSinceEvent < 72 || hoursSinceEvent >= 240) {
+    return false
+  }
+
+  const result = await sendBookingReviewRequestEmail(admin, booking.id, { nowIso, mode: 'scheduled' })
+  if (result.status === 'failed') {
+    console.error('[cron-payment-reminders] review request failed:', booking.id, result.detail)
+    return false
+  }
+
+  return result.status === 'sent'
+}
+
 export async function GET(request: NextRequest) {
   if (!isAuthorizedCron(request)) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -129,6 +159,7 @@ export async function GET(request: NextRequest) {
       venue,
       city,
       post_event_follow_up_sent_at,
+      review_request_sent_at,
       last_balance_reminder_sent_at,
       clients(first_name, last_name, email),
       payments(amount, status)
@@ -144,17 +175,20 @@ export async function GET(request: NextRequest) {
   const bookings = (data ?? []) as CronBookingReminderSource[]
   let balanceSent = 0
   let followUpSent = 0
+  let reviewRequestSent = 0
   let skipped = 0
 
   for (const booking of bookings) {
-    const [balanceReminderSent, postEventFollowUpSent] = await Promise.all([
+    const [balanceReminderSent, postEventFollowUpSent, reviewRequestEmailSent] = await Promise.all([
       sendScheduledBalanceReminder(admin, booking, nowIso),
       sendScheduledPostEventFollowUp(admin, booking, now, nowIso),
+      sendScheduledReviewRequest(admin, booking, now, nowIso),
     ])
 
     if (balanceReminderSent) balanceSent += 1
     if (postEventFollowUpSent) followUpSent += 1
-    if (!balanceReminderSent && !postEventFollowUpSent) skipped += 1
+    if (reviewRequestEmailSent) reviewRequestSent += 1
+    if (!balanceReminderSent && !postEventFollowUpSent && !reviewRequestEmailSent) skipped += 1
   }
 
   return NextResponse.json({
@@ -162,7 +196,8 @@ export async function GET(request: NextRequest) {
     processed: bookings.length,
     balanceSent,
     followUpSent,
-    sent: balanceSent + followUpSent,
+    reviewRequestSent,
+    sent: balanceSent + followUpSent + reviewRequestSent,
     skipped,
   })
 }

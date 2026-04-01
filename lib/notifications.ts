@@ -63,6 +63,16 @@ type BookingPostEventFollowUpPayload = {
   location?: string | null
 }
 
+type BookingReviewRequestPayload = {
+  firstName: string
+  lastName?: string | null
+  email: string
+  eventName: string
+  eventDate: string
+  eventTimeZone: string
+  reviewUrl: string
+}
+
 type InvoiceNotificationPayload = {
   to: string
   clientName: string
@@ -636,6 +646,39 @@ export async function sendBookingPostEventFollowUp(payload: BookingPostEventFoll
         ...(payload.location ? [['Location', payload.location] as const] : []),
       ] as const,
       closing: 'Thank you for trusting me with the room. If you have any photos, videos, or feedback you want to share, just reply here.',
+    }),
+  })
+}
+
+export async function sendBookingReviewRequest(payload: BookingReviewRequestPayload) {
+  const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
+  const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
+
+  return sendEmail({
+    to: payload.email,
+    subject: 'How did DJ B.A.E. do?',
+    text: [
+      `Hey ${guestName},`,
+      '',
+      `Thank you again for having me for ${payload.eventName} on ${eventDateTime}.`,
+      '',
+      'If you have a minute, I would really appreciate a quick review about the experience:',
+      payload.reviewUrl,
+      '',
+      'Your feedback helps a lot and makes it easier for future clients to know what working together feels like.',
+      '',
+      '- DJ B.A.E.',
+    ].join('\n'),
+    html: buildClientBookingEmailHtml({
+      eyebrow: 'Quick review request',
+      heading: 'Share A Quick Review',
+      intro: `Hey ${escapeHtml(guestName)}, thank you again for having me for <strong>${escapeHtml(payload.eventName)}</strong> on <strong>${escapeHtml(eventDateTime)}</strong>.`,
+      fields: [
+        ['Event', payload.eventName],
+        ['Event Date', eventDateTime],
+        ['Review Link', payload.reviewUrl],
+      ] as const,
+      closing: `If you have a minute, I would really appreciate a quick review. You can share it here: <a href="${escapeHtml(payload.reviewUrl)}" style="color:#c084fc;">${escapeHtml(payload.reviewUrl)}</a>`,
     }),
   })
 }

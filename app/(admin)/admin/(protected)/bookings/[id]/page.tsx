@@ -9,7 +9,7 @@ import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } fr
 import { getOutstandingBalance, getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
+import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingLifecycleStatus, BookingStatus, BookingWorkflowPaymentStatus } from '@/types/index'
@@ -34,6 +34,7 @@ interface BookingDetailRow {
   confirmation_email_sent_at: string | null
   last_balance_reminder_sent_at: string | null
   post_event_follow_up_sent_at: string | null
+  review_request_sent_at: string | null
   payment_method: string | null
   notes: string | null
   clients: {
@@ -142,6 +143,7 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
       confirmation_email_sent_at,
       last_balance_reminder_sent_at,
       post_event_follow_up_sent_at,
+      review_request_sent_at,
       payment_method,
       notes,
       clients(id, first_name, last_name, email, phone),
@@ -217,6 +219,7 @@ export default async function EditBookingPage({
     { label: 'Confirmation', sentAt: booking.confirmation_email_sent_at },
     { label: 'Final Payment', sentAt: booking.last_balance_reminder_sent_at },
     { label: 'Post-Event', sentAt: booking.post_event_follow_up_sent_at },
+    { label: 'Review Request', sentAt: booking.review_request_sent_at },
   ]
 
   return (
@@ -266,7 +269,7 @@ export default async function EditBookingPage({
               </form>
             )}
 
-            {(lifecycleStatus === 'new' || lifecycleStatus === 'contacted' || lifecycleStatus === 'negotiating') && (
+            {lifecycleStatus === 'negotiating' && (
               <form action={confirmBookingAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
                 <button type="submit" className="admin-btn-primary">Confirm Booking</button>
@@ -676,7 +679,7 @@ export default async function EditBookingPage({
           <div style={{ minWidth: 0, flex: 1 }}>
             <div className="admin-section-title" style={{ marginBottom: '10px' }}>Client Emails</div>
             <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
-              Send the lean client flow from here: inquiry receipt, confirmation, final payment reminder, and the post-event thank-you.
+              Send client-facing emails from here: inquiry receipt, confirmation, payment reminder, thank-you, and a review request after completed events.
             </p>
           </div>
 
@@ -759,6 +762,28 @@ export default async function EditBookingPage({
                 Send Post-Event Follow-Up
               </button>
             </form>
+            <form action={sendBookingReviewRequestAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button
+                type="submit"
+                className="admin-btn-ghost"
+                disabled={!booking.clients?.email || lifecycleStatus !== 'completed'}
+                style={
+                  !booking.clients?.email || lifecycleStatus !== 'completed'
+                    ? { opacity: 0.55, cursor: 'not-allowed' }
+                    : undefined
+                }
+                title={
+                  !booking.clients?.email
+                    ? 'Add a client email before sending.'
+                    : lifecycleStatus !== 'completed'
+                      ? 'Mark the booking completed before sending the review request.'
+                      : undefined
+                }
+              >
+                Send Review Request
+              </button>
+            </form>
           </div>
         </div>
 
@@ -792,10 +817,10 @@ export default async function EditBookingPage({
         </div>
 
         <div style={{ marginTop: '20px' }}>
-          <div className="admin-section-title" style={{ marginBottom: '10px' }}>Recent Email Activity</div>
+          <div className="admin-section-title" style={{ marginBottom: '10px' }}>Recent Sends</div>
           {emailActivity.length === 0 ? (
             <p style={{ color: 'var(--muted)', fontSize: '13px', margin: 0 }}>
-              No email activity logged for this booking yet.
+              No client emails have been sent from this booking yet.
             </p>
           ) : (
             <div style={{ display: 'grid', gap: '10px' }}>

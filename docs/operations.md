@@ -37,6 +37,7 @@ These are the strongest automation opportunities once the manual workflow feels 
 - Auto-send confirmation when a booking becomes `confirmed`
 - Scheduled final payment reminders based on event proximity
 - Scheduled post-event thank-you sends after completion
+- Scheduled review requests after completed bookings
 - Daily digest for stale inquiries, pending reviews, and upcoming events
 
 ## Things To Keep Manual For Now
@@ -65,5 +66,5 @@ npm run build
 ## Notes
 
 - CI now runs lint and build on pushes to `main` and pull requests
-- Vercel cron scheduling is intentionally disabled for booking reminders right now
+- Daily Vercel cron scheduling is configured for booking reminders, follow-ups, and review requests
 - `.env.example` and the root `README.md` should stay current as env vars or flows change

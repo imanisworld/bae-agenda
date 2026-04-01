@@ -68,6 +68,15 @@ export interface BookingPostEventFollowUpSource {
   clients: BookingClientRelation<BookingClient>
 }
 
+export interface BookingReviewRequestSource {
+  id: string
+  status: BookingStatus
+  event_name: string | null
+  event_date: string
+  event_timezone: string | null
+  clients: BookingClientRelation<BookingClient>
+}
+
 export function getConfirmationPayloadFromBooking(booking: BookingConfirmationSource | null) {
   if (!booking) return null
 
@@ -163,5 +172,27 @@ export function getPostEventFollowUpPayloadFromBooking(booking: BookingPostEvent
     eventDate: booking.event_date,
     eventTimeZone,
     location: [booking.venue, booking.city].filter(Boolean).join(', ') || null,
+  }
+}
+
+export function getReviewRequestPayloadFromBooking(booking: BookingReviewRequestSource | null) {
+  if (!booking) return null
+
+  const client = getPrimaryBookingClient(booking.clients)
+  const clientEmail = client?.email?.trim()
+  const eventTimeZone = booking.event_timezone?.trim()
+
+  if (!clientEmail || !booking.event_name || !eventTimeZone || booking.status !== 'completed') {
+    return null
+  }
+
+  return {
+    firstName: client?.first_name?.trim() || 'there',
+    lastName: client?.last_name?.trim() || null,
+    email: clientEmail,
+    eventName: booking.event_name,
+    eventDate: booking.event_date,
+    eventTimeZone,
+    reviewUrl: `${getAppBaseUrl()}/#leave-review`,
   }
 }

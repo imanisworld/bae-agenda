@@ -4,10 +4,12 @@ import {
   getConfirmationPayloadFromBooking,
   getInquiryReceiptPayloadFromBooking,
   getPostEventFollowUpPayloadFromBooking,
+  getReviewRequestPayloadFromBooking,
   type BookingBalanceReminderSource,
   type BookingConfirmationSource,
   type BookingInquiryReceiptSource,
   type BookingPostEventFollowUpSource,
+  type BookingReviewRequestSource,
 } from './booking-email-payloads'
 
 const baseClient = [{ first_name: 'Imani', last_name: 'Crumble', email: 'client@example.com' }]
@@ -196,5 +198,39 @@ describe('booking email payload helpers', () => {
     }
 
     expect(getPostEventFollowUpPayloadFromBooking(booking)).toBeNull()
+  })
+
+  it('builds the review request payload for completed bookings', () => {
+    const booking: BookingReviewRequestSource = {
+      id: 'booking-10',
+      status: 'completed',
+      event_name: 'After Hours Set',
+      event_date: eventDate,
+      event_timezone: eventTimeZone,
+      clients: baseClient,
+    }
+
+    expect(getReviewRequestPayloadFromBooking(booking)).toEqual({
+      firstName: 'Imani',
+      lastName: 'Crumble',
+      email: 'client@example.com',
+      eventName: 'After Hours Set',
+      eventDate,
+      eventTimeZone,
+      reviewUrl: 'http://localhost:3000/#leave-review',
+    })
+  })
+
+  it('suppresses the review request payload until the booking is completed', () => {
+    const booking: BookingReviewRequestSource = {
+      id: 'booking-11',
+      status: 'confirmed',
+      event_name: 'After Hours Set',
+      event_date: eventDate,
+      event_timezone: eventTimeZone,
+      clients: baseClient,
+    }
+
+    expect(getReviewRequestPayloadFromBooking(booking)).toBeNull()
   })
 })

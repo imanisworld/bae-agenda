@@ -60,6 +60,27 @@ export function getBookingLifecycleStatus(
   return lifecycleStatus ?? mapLegacyBookingStatusToLifecycleStatus(legacyStatus)
 }
 
+const VALID_LIFECYCLE_TRANSITIONS: Record<BookingLifecycleStatus, BookingLifecycleStatus[]> = {
+  new:          ['contacted', 'lost'],
+  contacted:    ['negotiating', 'lost'],
+  negotiating:  ['confirmed', 'lost'],
+  confirmed:    ['completed', 'lost'],
+  completed:    [],
+  lost:         [],
+}
+
+export function assertValidLifecycleTransition(
+  from: BookingLifecycleStatus,
+  to: BookingLifecycleStatus,
+): void {
+  const allowed = VALID_LIFECYCLE_TRANSITIONS[from]
+  if (!allowed.includes(to)) {
+    throw new Error(
+      `Invalid lifecycle transition: ${from} → ${to}. Allowed from ${from}: ${allowed.join(', ') || 'none'}`,
+    )
+  }
+}
+
 export function getBookingWorkflowPaymentStatus(args: {
   currentStatus?: BookingWorkflowPaymentStatus | null
   quote: number | null | undefined

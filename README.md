@@ -11,6 +11,7 @@ Booking, admin, content, and client-communications app for DJ B.A.E. built with 
 - Manual client email actions from the booking detail page:
   inquiry receipt, confirmation resend, final payment reminder, and post-event thank-you
 - Internal timeline notes on bookings for follow-up and email history
+- Daily cron automation for final payment reminders, post-event thank-yous, and review requests
 
 ## Stack
 
@@ -124,7 +125,8 @@ npm run build
 
 ## Current Operational Guidance
 
-- Cron-based booking reminder sends are currently disabled in `vercel.json`
-- Use manual email actions first, then automate the ones you trust repeatedly
+- Daily cron sends are configured for:
+  seven-day final payment reminders, post-event thank-you follow-ups, and review requests
+- Keep manual email actions available as the fallback path from the booking detail page
 - Keep `ADMIN_EMAILS` populated so admin access stays restricted
 - Watch the booking detail timeline notes for send history and follow-up context

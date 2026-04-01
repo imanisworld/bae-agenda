@@ -7,6 +7,7 @@ export type BookingEmailStampColumn =
   | 'confirmation_email_sent_at'
   | 'last_balance_reminder_sent_at'
   | 'post_event_follow_up_sent_at'
+  | 'review_request_sent_at'
 
 export async function stampBookingEmailSentAt(
   admin: AdminClient,

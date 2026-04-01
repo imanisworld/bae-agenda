@@ -9,6 +9,7 @@
 - Invoice draft auto-create/refresh on booking confirmation was added.
 - Computed payment state (`unpaid` / `partial` / `paid`) was added to the admin UI.
 - Booking client email flow was trimmed to four sends.
+- Scheduled review request emails were added for completed bookings.
 
 ## Completed
 
@@ -31,19 +32,22 @@
 - Booking email cleanup:
   - extra deposit/event/fully-paid emails removed from active flow
   - admin email actions trimmed to the lean set
-  - cron schedule disabled in `vercel.json`
+- Review request automation:
+  - scheduled review request email sends 3-10 days after completed bookings
+  - review request send history now stamps on the booking record
+- Booking cron:
+  - daily cron restored in `vercel.json` for reminder/follow-up/review sends
 
 ## Still Needs Setup
 
-- Apply the latest Supabase migrations.
+- Link the Supabase project locally and apply the latest migrations.
 
 ## Next
 
 1. Decide later whether final payment reminders or thank-you emails should be re-automated.
-2. Add post-event review request automation.
-3. Add completed-booking auto-archive.
-4. Add content-publish email notifications.
-5. Add a pipeline health-check cron.
+2. Add completed-booking auto-archive.
+3. Add content-publish email notifications.
+4. Add a pipeline health-check cron.
 
 ## New Thread Handoff
 
@@ -60,10 +64,11 @@ Current state:
 - Invoice draft auto-create on booking confirmation added.
 - Computed payment state (`unpaid/partial/paid`) added to admin UI.
 - Booking email flow trimmed to inquiry, confirmation, final payment reminder, and thank-you.
+- Scheduled review request email automation added.
 
 Important pending setup:
-- Apply newest Supabase migrations.
+- Link Supabase locally and apply newest migrations.
 
 Next task:
-- Decide whether to keep the reminder cron disabled or bring back selected automations later.
+- Add the next lightweight automation after review requests, likely completed-booking auto-archive.
 ```

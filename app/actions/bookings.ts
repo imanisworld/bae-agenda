@@ -6,25 +6,29 @@ import { getPrimaryBookingClient } from '@/lib/booking-client'
 import { stampBookingEmailSentAt } from '@/lib/booking-email-tracking'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
-import { sendBookingPostEventFollowUpEmail } from '@/lib/booking-email-workflows'
+import { sendBookingPostEventFollowUpEmail, sendBookingReviewRequestEmail } from '@/lib/booking-email-workflows'
 import { getBookingPaymentStatus } from '@/lib/booking-payment-status'
 import { syncBookingDepositState } from '@/lib/booking-deposit-sync'
 import {
+  assertValidLifecycleTransition,
   getBookingLifecycleStatus,
   getBookingWorkflowPaymentStatus,
   mapLifecycleStatusToLegacyBookingStatus,
   type BookingLifecycleStatus,
   type BookingWorkflowPaymentStatus,
 } from '@/lib/booking-workflow'
+import { logBookingActivity } from '@/lib/booking-activity'
 import {
   getBalanceReminderPayloadFromBooking,
   getConfirmationPayloadFromBooking,
   getInquiryReceiptPayloadFromBooking,
   getPostEventFollowUpPayloadFromBooking,
+  getReviewRequestPayloadFromBooking,
   type BookingBalanceReminderSource,
   type BookingConfirmationSource,
   type BookingInquiryReceiptSource,
   type BookingPostEventFollowUpSource,
+  type BookingReviewRequestSource,
 } from '@/lib/booking-email-payloads'
 import { toEventISO } from '@/lib/date-time'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
@@ -235,6 +239,28 @@ async function getBookingPostEventFollowUpSource(admin: ReturnType<typeof create
   }
 
   return data as BookingPostEventFollowUpSource
+}
+
+async function getBookingReviewRequestSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
+  const { data, error } = await admin
+    .from('bookings')
+    .select(`
+      id,
+      status,
+      event_name,
+      event_date,
+      event_timezone,
+      clients(first_name, last_name, email)
+    `)
+    .eq('id', bookingId)
+    .maybeSingle()
+
+  if (error || !data) {
+    console.error('[booking-review-request] unable to load booking:', error)
+    return null
+  }
+
+  return data as BookingReviewRequestSource
 }
 
 async function getBookingInvoiceDraftSource(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
@@ -598,6 +624,38 @@ export async function resendBookingPostEventFollowUpAction(formData: FormData) {
   redirectWithError(`/admin/bookings/${bookingId}`, 'This booking is not ready for the post-event follow-up email yet.')
 }
 
+export async function sendBookingReviewRequestAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+  const bookingIdRaw = optionalString(formData.get('booking_id'))
+
+  if (!bookingIdRaw) {
+    redirectWithError('/admin/bookings', 'Missing booking id for review request email.')
+  }
+
+  const bookingId = bookingIdRaw as string
+  const booking = await getBookingReviewRequestSource(admin, bookingId)
+  if (!booking) {
+    redirectWithError('/admin/bookings', 'Could not find that booking.')
+  }
+
+  const payload = getReviewRequestPayloadFromBooking(booking as BookingReviewRequestSource)
+  if (!payload) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Only completed bookings can send the review request email.')
+  }
+
+  const result = await sendBookingReviewRequestEmail(admin, bookingId, { force: true, mode: 'resend' })
+  if (result.status === 'failed') {
+    redirectWithError(`/admin/bookings/${bookingId}`, result.detail)
+  }
+  if (result.status === 'sent') {
+    redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Review request email sent to ${result.email}.`)}`)
+  }
+
+  redirectWithError(`/admin/bookings/${bookingId}`, 'This booking is not ready for the review request email yet.')
+}
+
 export async function updateBookingStatusAction(formData: FormData) {
   await requireAdminUser()
 
@@ -691,10 +749,25 @@ export async function updateBookingDetailsAction(formData: FormData) {
     redirectWithError(`/admin/bookings/${id}`, 'Please use a valid event date, time, and timezone.')
   }
 
+  const { data: currentBooking } = await admin
+    .from('bookings')
+    .select('lifecycle_status')
+    .eq('id', bookingId)
+    .maybeSingle()
+
   const confirmationPayload = await getConfirmationPayloadIfNeeded(admin, bookingId, nextStatus)
   const lifecycleStatus = lifecycleStatusRaw && isBookingLifecycleStatus(lifecycleStatusRaw)
     ? lifecycleStatusRaw
     : getBookingLifecycleStatus(undefined, nextStatus)
+
+  const currentLifecycle = (currentBooking?.lifecycle_status ?? 'new') as BookingLifecycleStatus
+  if (lifecycleStatus !== currentLifecycle) {
+    try {
+      assertValidLifecycleTransition(currentLifecycle, lifecycleStatus)
+    } catch (err) {
+      redirectWithError(`/admin/bookings/${bookingId}`, err instanceof Error ? err.message : 'Invalid lifecycle transition.')
+    }
+  }
   const paymentWorkflowStatus = paymentWorkflowStatusRaw && isBookingWorkflowPaymentStatus(paymentWorkflowStatusRaw)
     ? paymentWorkflowStatusRaw
     : (nextStatus === 'confirmed' ? 'deposit_requested' : 'unpaid')
@@ -722,6 +795,15 @@ export async function updateBookingDetailsAction(formData: FormData) {
 
   if (error) {
     redirectWithError('/admin/bookings', error.message || 'Unable to update booking.')
+  }
+
+  if (lifecycleStatus !== currentLifecycle) {
+    void logBookingActivity({
+      bookingId,
+      type: 'status_changed',
+      description: `Lifecycle status changed: ${currentLifecycle} → ${lifecycleStatus}`,
+      metadata: { from: currentLifecycle, to: lifecycleStatus },
+    })
   }
 
   const confirmationResult = await sendConfirmationIfPresent(confirmationPayload)
@@ -975,6 +1057,19 @@ export async function markBookingContactedAction(formData: FormData) {
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
 
+  const { data: current } = await admin
+    .from('bookings')
+    .select('lifecycle_status')
+    .eq('id', bookingId as string)
+    .maybeSingle()
+
+  const currentLifecycle = (current?.lifecycle_status ?? 'new') as BookingLifecycleStatus
+  try {
+    assertValidLifecycleTransition(currentLifecycle, 'contacted')
+  } catch (err) {
+    redirectWithError(`/admin/bookings/${bookingId}`, err instanceof Error ? err.message : 'Invalid transition.')
+  }
+
   const { error } = await admin
     .from('bookings')
     .update({ lifecycle_status: 'contacted' })
@@ -983,6 +1078,12 @@ export async function markBookingContactedAction(formData: FormData) {
   if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to update booking.')
 
   await appendBookingTimelineNote(admin, bookingId as string, 'Marked as contacted.')
+  void logBookingActivity({
+    bookingId: bookingId as string,
+    type: 'status_changed',
+    description: `Lifecycle status changed: ${currentLifecycle} → contacted`,
+    metadata: { from: currentLifecycle, to: 'contacted' },
+  })
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/dashboard')
@@ -995,6 +1096,19 @@ export async function confirmBookingAction(formData: FormData) {
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
 
+  const { data: current } = await admin
+    .from('bookings')
+    .select('lifecycle_status')
+    .eq('id', bookingId as string)
+    .maybeSingle()
+
+  const currentLifecycle = (current?.lifecycle_status ?? 'new') as BookingLifecycleStatus
+  try {
+    assertValidLifecycleTransition(currentLifecycle, 'confirmed')
+  } catch (err) {
+    redirectWithError(`/admin/bookings/${bookingId}`, err instanceof Error ? err.message : 'Invalid transition.')
+  }
+
   const { error } = await admin
     .from('bookings')
     .update({
@@ -1005,6 +1119,13 @@ export async function confirmBookingAction(formData: FormData) {
     .eq('id', bookingId as string)
 
   if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to confirm booking.')
+
+  void logBookingActivity({
+    bookingId: bookingId as string,
+    type: 'status_changed',
+    description: `Lifecycle status changed: ${currentLifecycle} → confirmed`,
+    metadata: { from: currentLifecycle, to: 'confirmed' },
+  })
 
   const booking = await getBookingConfirmationSource(admin, bookingId as string)
   if (booking) {
@@ -1116,6 +1237,19 @@ export async function markBookingCompleteAction(formData: FormData) {
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
 
+  const { data: current } = await admin
+    .from('bookings')
+    .select('lifecycle_status')
+    .eq('id', bookingId as string)
+    .maybeSingle()
+
+  const currentLifecycle = (current?.lifecycle_status ?? 'new') as BookingLifecycleStatus
+  try {
+    assertValidLifecycleTransition(currentLifecycle, 'completed')
+  } catch (err) {
+    redirectWithError(`/admin/bookings/${bookingId}`, err instanceof Error ? err.message : 'Invalid transition.')
+  }
+
   const { error } = await admin
     .from('bookings')
     .update({
@@ -1125,6 +1259,13 @@ export async function markBookingCompleteAction(formData: FormData) {
     .eq('id', bookingId as string)
 
   if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to mark booking as complete.')
+
+  void logBookingActivity({
+    bookingId: bookingId as string,
+    type: 'status_changed',
+    description: `Lifecycle status changed: ${currentLifecycle} → completed`,
+    metadata: { from: currentLifecycle, to: 'completed' },
+  })
 
   await sendBookingPostEventFollowUpEmail(admin, bookingId as string, { force: true })
 
@@ -1140,6 +1281,19 @@ export async function markBookingLostAction(formData: FormData) {
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
 
+  const { data: current } = await admin
+    .from('bookings')
+    .select('lifecycle_status')
+    .eq('id', bookingId as string)
+    .maybeSingle()
+
+  const currentLifecycle = (current?.lifecycle_status ?? 'new') as BookingLifecycleStatus
+  try {
+    assertValidLifecycleTransition(currentLifecycle, 'lost')
+  } catch (err) {
+    redirectWithError(`/admin/bookings/${bookingId}`, err instanceof Error ? err.message : 'Invalid transition.')
+  }
+
   const { error } = await admin
     .from('bookings')
     .update({
@@ -1151,6 +1305,12 @@ export async function markBookingLostAction(formData: FormData) {
   if (error) redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to mark booking as lost.')
 
   await appendBookingTimelineNote(admin, bookingId as string, 'Marked as lost.')
+  void logBookingActivity({
+    bookingId: bookingId as string,
+    type: 'status_changed',
+    description: `Lifecycle status changed: ${currentLifecycle} → lost`,
+    metadata: { from: currentLifecycle, to: 'lost' },
+  })
 
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
