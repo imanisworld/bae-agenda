@@ -41,11 +41,6 @@ const GENRES = [
 export default function HeroSection({ content = {} }: Props) {
   const title      = content.hero_title?.trim() || 'THE BAE AGENDA'
   const subtitle   = content.hero_subtitle?.trim() || 'DJ sets for clubs, private events, weddings, branded rooms, and parties that need real energy control.'
-  const conversionSignals = [
-    { label: 'Based In', value: 'Indianapolis + Chicago' },
-    { label: 'Booking', value: 'Private Events + Clubs' },
-    { label: 'Response', value: '24-48 Hour Follow-Up' },
-  ]
 
   return (
     <section
@@ -144,37 +139,6 @@ export default function HeroSection({ content = {} }: Props) {
           >
             {subtitle}
           </p>
-
-          <div
-            style={{
-              marginTop: '18px',
-              display: 'flex',
-              gap: '10px',
-              flexWrap: 'wrap',
-            }}
-          >
-            {conversionSignals.map((item) => (
-              <div
-                key={item.label}
-                style={{
-                  display: 'grid',
-                  gap: '4px',
-                  minWidth: '160px',
-                  padding: '12px 14px',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  background: 'linear-gradient(180deg, rgba(10,10,14,0.44), rgba(10,10,14,0.2))',
-                  backdropFilter: 'blur(8px)',
-                }}
-              >
-                <span style={{ fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(250,248,243,0.5)' }}>
-                  {item.label}
-                </span>
-                <span style={{ fontSize: '13px', color: 'var(--white)', lineHeight: 1.45 }}>
-                  {item.value}
-                </span>
-              </div>
-            ))}
-          </div>
 
           <div style={{ marginTop: '28px', display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
             <Link href="/book" className="btn-primary">
