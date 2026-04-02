@@ -43,7 +43,7 @@ export default function Nav() {
   }, [menuOpen])
 
   useEffect(() => {
-    if (typeof window === 'undefined') return
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
 
     const mediaQuery = window.matchMedia('(display-mode: standalone)')
 
@@ -53,11 +53,20 @@ export default function Nav() {
     }
 
     syncStandaloneOffset()
-    mediaQuery.addEventListener('change', syncStandaloneOffset)
     window.addEventListener('orientationchange', syncStandaloneOffset)
 
+    if (typeof mediaQuery.addEventListener === 'function') {
+      mediaQuery.addEventListener('change', syncStandaloneOffset)
+      return () => {
+        mediaQuery.removeEventListener('change', syncStandaloneOffset)
+        window.removeEventListener('orientationchange', syncStandaloneOffset)
+      }
+    }
+
+    mediaQuery.addListener(syncStandaloneOffset)
+
     return () => {
-      mediaQuery.removeEventListener('change', syncStandaloneOffset)
+      mediaQuery.removeListener(syncStandaloneOffset)
       window.removeEventListener('orientationchange', syncStandaloneOffset)
     }
   }, [])

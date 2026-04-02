@@ -13,6 +13,8 @@ export default function HeroGlowLayer() {
   const goldRef   = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
+
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const isTouch        = window.matchMedia('(hover: none)').matches
     if (prefersReduced || isTouch) return

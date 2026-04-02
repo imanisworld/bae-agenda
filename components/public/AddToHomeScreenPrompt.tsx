@@ -9,6 +9,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 const DISMISS_KEY = 'baeagenda-install-prompt-dismissed'
 const INSTALL_PROMPT_STATE_EVENT = 'baeagenda-install-prompt-state'
+const SERVER_INSTALL_STATE_SNAPSHOT = '1:0'
 
 function getDismissedState() {
   if (typeof window === 'undefined') return true
@@ -42,37 +43,39 @@ function isStandalone() {
   }
 }
 
+function subscribeToInstallState(onStoreChange: () => void) {
+  if (typeof window === 'undefined') {
+    return () => {}
+  }
+
+  window.addEventListener('appinstalled', onStoreChange)
+  window.addEventListener('storage', onStoreChange)
+  window.addEventListener(INSTALL_PROMPT_STATE_EVENT, onStoreChange)
+
+  return () => {
+    window.removeEventListener('appinstalled', onStoreChange)
+    window.removeEventListener('storage', onStoreChange)
+    window.removeEventListener(INSTALL_PROMPT_STATE_EVENT, onStoreChange)
+  }
+}
+
+function getInstallStateSnapshot() {
+  return `${getDismissedState() ? '1' : '0'}:${isStandalone() ? '1' : '0'}`
+}
+
 export default function AddToHomeScreenPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [installing, setInstalling] = useState(false)
   const [showIosInstructions, setShowIosInstructions] = useState(false)
 
-  const installState = useSyncExternalStore(
-    (onStoreChange) => {
-      if (typeof window === 'undefined') {
-        return () => {}
-      }
-
-      const onChange = () => onStoreChange()
-      window.addEventListener('appinstalled', onChange)
-      window.addEventListener('storage', onChange)
-      window.addEventListener(INSTALL_PROMPT_STATE_EVENT, onChange)
-
-      return () => {
-        window.removeEventListener('appinstalled', onChange)
-        window.removeEventListener('storage', onChange)
-        window.removeEventListener(INSTALL_PROMPT_STATE_EVENT, onChange)
-      }
-    },
-    () => ({
-      dismissed: getDismissedState(),
-      isInstalled: typeof window !== 'undefined' ? isStandalone() : false,
-    }),
-    () => ({
-      dismissed: true,
-      isInstalled: false,
-    }),
+  const installStateSnapshot = useSyncExternalStore(
+    subscribeToInstallState,
+    getInstallStateSnapshot,
+    () => SERVER_INSTALL_STATE_SNAPSHOT,
   )
+  const [dismissedSnapshot, installedSnapshot] = installStateSnapshot.split(':')
+  const isDismissed = dismissedSnapshot === '1'
+  const isInstalled = installedSnapshot === '1'
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -98,11 +101,11 @@ export default function AddToHomeScreenPrompt() {
   }, [])
 
   const mode = useMemo(() => {
-    if (installState.isInstalled || installState.dismissed) return 'hidden'
+    if (isInstalled || isDismissed) return 'hidden'
     if (deferredPrompt) return 'android'
     if (isIosSafari()) return 'ios'
     return 'hidden'
-  }, [deferredPrompt, installState.dismissed, installState.isInstalled])
+  }, [deferredPrompt, isDismissed, isInstalled])
 
   if (mode === 'hidden') return null
 
