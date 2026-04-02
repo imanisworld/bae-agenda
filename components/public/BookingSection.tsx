@@ -43,6 +43,11 @@ function PackageModule({
 
 export default function BookingSection({ bookingEmail }: Props) {
   const email = bookingEmail ?? CONTENT_DEFAULTS.booking_email
+  const bookingSignals = [
+    'Private events, clubs, weddings, branded rooms',
+    'Clear inquiry to deposit flow',
+    'Custom format available when the room calls for it',
+  ]
 
   return (
     <section id="booking" aria-label="Book DJ B.A.E." style={{
@@ -116,8 +121,23 @@ export default function BookingSection({ bookingEmail }: Props) {
                 Short set, full night, or something custom — the format shapes
                 around the room, the crowd, and the energy you want.
               </p>
+              <div style={{ marginTop: '18px', display: 'grid', gap: '8px' }}>
+                {bookingSignals.map((signal) => (
+                  <div
+                    key={signal}
+                    style={{
+                      fontSize: '12px',
+                      lineHeight: 1.65,
+                      color: 'rgba(250,248,243,0.76)',
+                    }}
+                  >
+                    {signal}
+                  </div>
+                ))}
+              </div>
               <div style={{ marginTop: '24px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                 <Link href="/book" className="btn-primary">Start Booking →</Link>
+                <Link href="/portfolio" className="btn-ghost">See Event Proof →</Link>
               </div>
               {email && (
                 <p style={{ marginTop: '14px', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7 }}>

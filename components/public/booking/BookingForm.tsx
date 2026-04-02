@@ -60,6 +60,15 @@ type BookingSubmitPayload = {
   conflicts?: Array<{ title: string; time: string; type: string }>
 }
 
+type BookingSuccessState = {
+  firstName: string
+  email: string
+  eventName: string
+  eventDate: string
+  eventType: string
+  city: string
+}
+
 const INITIAL_STATE: FormState = {
   firstName: '',
   lastName: '',
@@ -175,6 +184,7 @@ export default function BookingForm() {
   const [availabilityError, setAvailabilityError] = useState('')
   const [blockedDatesError, setBlockedDatesError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [successState, setSuccessState] = useState<BookingSuccessState | null>(null)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [blockedDates, setBlockedDates] = useState<string[]>([])
   const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()))
@@ -486,6 +496,14 @@ export default function BookingForm() {
         hasPackage: Boolean(form.package.trim()),
         hasCity: Boolean(form.city.trim()),
       })
+      setSuccessState({
+        firstName: form.firstName.trim(),
+        email: form.email.trim(),
+        eventName: form.eventName.trim(),
+        eventDate: form.eventDate,
+        eventType: form.eventType.trim(),
+        city: form.city.trim(),
+      })
       setSuccess(true)
       setForm({ ...INITIAL_STATE, startedAt: String(Date.now()) })
       setStep(1)
@@ -498,7 +516,7 @@ export default function BookingForm() {
   }
 
   if (success) {
-    return <BookingSuccess />
+    return <BookingSuccess summary={successState} />
   }
 
   return (
@@ -643,16 +661,81 @@ export default function BookingForm() {
   )
 }
 
-function BookingSuccess() {
+function BookingSuccess({ summary }: { summary: BookingSuccessState | null }) {
+  const submittedDate = summary?.eventDate
+    ? format(parseISO(`${summary.eventDate}T00:00:00`), 'MMMM d, yyyy')
+    : null
+
   return (
     <div style={{ background: 'var(--off-black)', paddingTop: '68px', minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ textAlign: 'center', maxWidth: '480px', padding: '48px 24px' }}>
+      <div style={{ width: 'min(100%, 640px)', padding: '48px 24px' }}>
+        <div
+          style={{
+            border: '1px solid var(--border)',
+            background: 'linear-gradient(180deg, rgba(18,18,22,0.98), rgba(12,12,16,0.98))',
+            padding: 'clamp(24px, 4vw, 40px)',
+            display: 'grid',
+            gap: '22px',
+          }}
+        >
         <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '22px', color: 'var(--violet)', marginBottom: '16px' }}>◈</div>
-        <h1 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(22px, 4vw, 32px)', color: 'var(--white)', marginBottom: '16px' }}>Request Received</h1>
-        <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.75, marginBottom: '32px' }}>
-          We&apos;ll review your details and reach back within 24–48 hours.
-        </p>
-        <Link href="/" className="btn-ghost">Back to homepage</Link>
+          <div>
+            <div className="section-label" style={{ marginBottom: '10px' }}>Inquiry Sent</div>
+            <h1 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(22px, 4vw, 32px)', color: 'var(--white)', margin: 0 }}>Request Received</h1>
+            <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.75, margin: '16px 0 0' }}>
+              We&apos;ll review your details and reach back within 24–48 hours. Keep an eye on <span style={{ color: 'var(--white)' }}>{summary?.email || 'your inbox'}</span> for the first follow-up.
+            </p>
+          </div>
+
+          {summary ? (
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gap: '12px',
+              }}
+            >
+              {[
+                { label: 'Event', value: summary.eventName || 'Booking inquiry' },
+                { label: 'Date', value: submittedDate || 'Date received' },
+                { label: 'Type', value: summary.eventType || 'Event details received' },
+                { label: 'City', value: summary.city || 'Location pending' },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  style={{
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    background: 'rgba(255,255,255,0.02)',
+                    padding: '14px 16px',
+                    display: 'grid',
+                    gap: '6px',
+                  }}
+                >
+                  <div style={{ fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                    {item.label}
+                  </div>
+                  <div style={{ fontSize: '13px', lineHeight: 1.55, color: 'var(--white)' }}>
+                    {item.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          <div style={{ display: 'grid', gap: '10px' }}>
+            <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+              What Happens Next
+            </div>
+            <div style={{ fontSize: '14px', lineHeight: 1.75, color: 'rgba(250,248,243,0.76)' }}>
+              We review availability, format, and event fit first. If it looks like a match, the next email will cover follow-up questions, pricing clarity, and what it takes to lock the date in.
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <Link href="/" className="btn-ghost">Back to homepage</Link>
+            <Link href="/portfolio" className="btn-primary">See Recent Events →</Link>
+          </div>
+        </div>
       </div>
     </div>
   )

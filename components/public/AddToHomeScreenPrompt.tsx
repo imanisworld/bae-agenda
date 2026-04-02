@@ -1,6 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react'
+import {
+  encodeInstallStateSnapshot,
+  parseInstallStateSnapshot,
+  SERVER_INSTALL_STATE_SNAPSHOT,
+} from '@/lib/install-prompt-state'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>
@@ -9,7 +14,6 @@ interface BeforeInstallPromptEvent extends Event {
 
 const DISMISS_KEY = 'baeagenda-install-prompt-dismissed'
 const INSTALL_PROMPT_STATE_EVENT = 'baeagenda-install-prompt-state'
-const SERVER_INSTALL_STATE_SNAPSHOT = '1:0'
 
 function getDismissedState() {
   if (typeof window === 'undefined') return true
@@ -60,7 +64,7 @@ function subscribeToInstallState(onStoreChange: () => void) {
 }
 
 function getInstallStateSnapshot() {
-  return `${getDismissedState() ? '1' : '0'}:${isStandalone() ? '1' : '0'}`
+  return encodeInstallStateSnapshot(getDismissedState(), isStandalone())
 }
 
 export default function AddToHomeScreenPrompt() {
@@ -73,9 +77,7 @@ export default function AddToHomeScreenPrompt() {
     getInstallStateSnapshot,
     () => SERVER_INSTALL_STATE_SNAPSHOT,
   )
-  const [dismissedSnapshot, installedSnapshot] = installStateSnapshot.split(':')
-  const isDismissed = dismissedSnapshot === '1'
-  const isInstalled = installedSnapshot === '1'
+  const { dismissed: isDismissed, isInstalled } = parseInstallStateSnapshot(installStateSnapshot)
 
   useEffect(() => {
     if (typeof window === 'undefined') return

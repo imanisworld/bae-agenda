@@ -169,6 +169,14 @@ export default async function BookingsPage({
   const bookings = await getBookings()
   const resolvedSearchParams = searchParams ? await searchParams : undefined
   const errorMessage = getErrorMessage(resolvedSearchParams?.error)
+  const newInquiryCount = bookings.filter((booking) => booking.status === 'new').length
+  const activeFollowUpCount = bookings.filter((booking) => booking.status === 'contacted' || booking.status === 'negotiating').length
+  const paymentAttentionCount = bookings.filter(
+    (booking) => booking.status === 'confirmed' && booking.payment_status !== 'paid'
+  ).length
+  const readyToScheduleCount = bookings.filter(
+    (booking) => booking.status === 'confirmed' || booking.status === 'completed'
+  ).length
 
   return (
     <div className="admin-page">
@@ -178,6 +186,46 @@ export default async function BookingsPage({
       />
 
       {errorMessage && <AdminNotice message={errorMessage} />}
+
+      {bookings.length > 0 && (
+        <div
+          className="admin-section"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: '12px',
+            marginBottom: '16px',
+          }}
+        >
+          {[
+            { label: 'New Inquiries', value: String(newInquiryCount), hint: 'Fresh requests waiting for first response' },
+            { label: 'Active Follow-Up', value: String(activeFollowUpCount), hint: 'Conversations still in motion' },
+            { label: 'Payment Attention', value: String(paymentAttentionCount), hint: 'Confirmed bookings not fully paid yet' },
+            { label: 'Ready To Schedule', value: String(readyToScheduleCount), hint: 'Confirmed or completed event records' },
+          ].map((card) => (
+            <div
+              key={card.label}
+              style={{
+                border: '1px solid var(--border)',
+                background: 'var(--surface)',
+                padding: '16px 18px',
+                display: 'grid',
+                gap: '6px',
+              }}
+            >
+              <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                {card.label}
+              </div>
+              <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '26px', color: 'var(--white)' }}>
+                {card.value}
+              </div>
+              <div style={{ fontSize: '12px', lineHeight: 1.6, color: 'var(--muted)' }}>
+                {card.hint}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="admin-section" style={{ marginBottom: 0 }}>
         <div className="admin-section-header">

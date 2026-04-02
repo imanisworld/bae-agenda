@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import MixesSection from '@/components/public/MixesSection'
+import { getPublishedMixes } from '@/lib/db/mixes'
 
 export const metadata: Metadata = {
   title: 'Lab',
@@ -21,10 +22,12 @@ export const metadata: Metadata = {
   },
 }
 
-export default function LabPage() {
+export default async function LabPage() {
+  const mixes = await getPublishedMixes()
+
   return (
     <div style={{ background: 'var(--off-black)', paddingTop: '68px' }}>
-      <MixesSection sectionId={undefined} variant="page" />
+      <MixesSection sectionId={undefined} variant="page" mixes={mixes} />
     </div>
   )
 }
