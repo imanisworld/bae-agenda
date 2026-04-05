@@ -147,44 +147,6 @@ export default function HeroSection({ content = {} }: Props) {
             <Link href="/portfolio" className="btn-ghost">
               See the Work
             </Link>
-            <Link href="/lab" className="btn-ghost">
-              Hear The Mixes
-            </Link>
-          </div>
-
-          <div
-            style={{
-              marginTop: '16px',
-              display: 'flex',
-              gap: '18px',
-              flexWrap: 'wrap',
-              alignItems: 'center',
-            }}
-          >
-            <a
-              href="#booking"
-              style={{
-                color: 'rgba(250,248,243,0.82)',
-                textDecoration: 'none',
-                fontSize: '11px',
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Start With Rates
-            </a>
-            <a
-              href="#events"
-              style={{
-                color: 'rgba(250,248,243,0.62)',
-                textDecoration: 'none',
-                fontSize: '11px',
-                letterSpacing: '0.16em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Upcoming Dates
-            </a>
           </div>
 
           <AddToHomeScreenPrompt />

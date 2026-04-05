@@ -23,55 +23,60 @@ export const metadata: Metadata = {
   },
 }
 
+// Passed to SetControlSection — shown in console topbar + module cards.
+// Angle: technical execution (what actually happens in a set).
 const techItems = [
   {
-    label: 'Setup',
-    value: 'Controller, club booth, house mixer, or private-event rig. If there is a workable sound path, I can play on it.',
+    label: 'Selection',
+    value: 'Open-format across hip-hop, R&B, house, Afrobeats, dancehall, and edits — pulled from what the room needs, not a pre-built tracklist.',
   },
   {
-    label: 'Approach',
-    value: 'Reads the room early, tightens transitions fast, and keeps the energy moving without forcing it.',
+    label: 'Timing',
+    value: 'Reads the energy early. Builds pressure through pacing. Opens the floor when the room earns it, not on a clock.',
   },
   {
-    label: 'Formats',
-    value: 'Residencies, branded nights, weddings, birthdays, rooftops, after-parties, and custom curations.',
+    label: 'Rig',
+    value: 'Controller, club booth, house mixer, or private-event setup. Adapts to whatever sound path is available.',
   },
 ]
 
+// Hero panel modules — angle: artist philosophy (how B.A.E. thinks about music and crowds).
 const profileModules = [
   {
     label: 'Sound',
-    value: 'Open-format backbone with real range across hip-hop, R&B, house, Afrobeats, dancehall, and edits.',
-  },
-  {
-    label: 'Travel',
-    value: 'Available for local and travel bookings when the event is the right fit and the room calls for it.',
+    value: 'Full genre range without losing the thread. The selection is shaped by the room — not locked into a single lane.',
   },
   {
     label: 'Read',
-    value: 'Selection shifts with the floor, not against it. The goal is pressure, pacing, and payoff.',
+    value: 'The floor tells you when to push. Energy compounds across the set — the peak lands where the crowd earns it.',
+  },
+  {
+    label: 'Build',
+    value: 'Pressure through pacing, not volume. The set structure knows when to hold back as much as when to open up.',
   },
 ] as const
 
+// "Operating Range" section — angle: room contexts (what kinds of events and environments).
 const operatingRange = [
   {
-    label: 'Formats',
-    value: 'Residencies, branded nights, weddings, birthdays, rooftops, after-parties, and private events.',
+    label: 'Clubs & Residencies',
+    value: 'Full-night sets, warm-up slots, and resident rotations. Room energy and crowd age dictate pace — no template.',
   },
   {
-    label: 'Sound Path',
-    value: 'Controller, club booth, house mixer, or private-event rig. If there is a workable path, the set adapts.',
+    label: 'Private Events',
+    value: 'Weddings, birthdays, rooftops, and branded nights. Format is built around the crowd and the vibe, not forced.',
   },
   {
-    label: 'Approach',
-    value: 'Read early. Build pressure slowly. Open the room up when it is ready instead of forcing the night forward.',
+    label: 'Travel',
+    value: 'Indianapolis-based with travel-ready logistics. Available beyond the local market when the event is the right fit.',
   },
 ] as const
 
+// Hero quick-facts signal strip — angle: raw at-a-glance data points.
 const meetSignals = [
-  { label: 'Rooms', value: 'Clubs, weddings, private events, rooftops, branded sets' },
-  { label: 'Travel', value: 'Indianapolis based with travel-ready booking support' },
-  { label: 'Setup', value: 'Controller, club booth, or adaptable event rig' },
+  { label: 'Base',   value: 'Indianapolis · travel-ready' },
+  { label: 'Format', value: 'Open-format · hip-hop, R&B, house, Afrobeats' },
+  { label: 'Rooms',  value: 'Clubs · private events · weddings · rooftops' },
 ] as const
 
 function sectionLabel(text: string) {

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/events',
   },
-  description: 'Upcoming DJ sets, club nights, and appearances by DJ B.A.E. in Chicago and beyond.',
+  description: 'Upcoming DJ sets, club nights, and appearances by DJ B.A.E. — Indianapolis based, available for travel.',
   openGraph: {
     title: 'Events | DJ B.A.E.',
     description: 'Upcoming DJ sets, club nights, and appearances by DJ B.A.E.',

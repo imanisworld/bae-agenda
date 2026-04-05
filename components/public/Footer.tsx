@@ -8,7 +8,10 @@ import { SOCIALS } from '@/lib/constants'
 const CURRENT_YEAR = new Date().getFullYear()
 
 const NAV_LINKS = [
+  { label: 'Events',    href: '/events'    },
+  { label: 'Meet',      href: '/meet'      },
   { label: 'Portfolio', href: '/portfolio' },
+  { label: 'Lab',       href: '/lab'       },
   { label: 'Book',      href: '/book'      },
   { label: 'Built',     href: '/built'     },
 ]

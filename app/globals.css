@@ -1014,10 +1014,18 @@ button,
 .scroll-fader-body {
   width: 74px;
   padding: 14px 10px;
-  border-radius: 999px;
-  background: rgba(15,15,20,0.74);
-  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 18px;
+  /* Brushed panel surface */
+  background:
+    linear-gradient(180deg, rgba(48,48,56,0.97) 0%, rgba(18,18,22,0.97) 100%);
+  border: 1px solid rgba(255,255,255,0.10);
   backdrop-filter: blur(12px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.12),
+    inset 0 -1px 0 rgba(0,0,0,0.55),
+    0 0 0 1px rgba(0,0,0,0.80),
+    0 0 0 2px rgba(255,255,255,0.05),
+    0 8px 28px rgba(0,0,0,0.55);
 }
 
 .scroll-fader-label {
@@ -1039,40 +1047,60 @@ button,
 .scroll-fader-thumb {
   position: absolute;
   left: 50%;
-  width: 30px;
-  height: 32px;
-  margin-left: -15px;
-  border-radius: 12px;
+  width: 34px;
+  height: 36px;
+  margin-left: -17px;
+  border-radius: 6px;
+  /* Light-grey rubber/plastic cap */
   background:
-    linear-gradient(180deg, rgba(218,218,212,0.96), rgba(146,146,140,0.92));
+    linear-gradient(180deg,
+      rgba(232,230,224,0.99) 0%,
+      rgba(178,176,170,0.97) 45%,
+      rgba(196,194,188,0.98) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.72),
-    0 6px 14px rgba(0,0,0,0.28);
+    inset 0 1px 0 rgba(255,255,255,0.88),
+    inset 0 -2px 4px rgba(0,0,0,0.22),
+    0 0 0 1px rgba(0,0,0,0.60),
+    0 4px 14px rgba(0,0,0,0.62),
+    0 2px 4px rgba(0,0,0,0.42);
   transition: top var(--motion-medium) var(--ease-standard);
 }
 
+/* Grip ribs across the fader cap */
 .scroll-fader-thumb::before {
   content: '';
   position: absolute;
-  left: 50%;
-  top: 5px;
-  bottom: 5px;
-  width: 3px;
-  margin-left: -1.5px;
-  border-radius: 999px;
-  background: rgba(48,48,54,0.42);
+  left: 18%;
+  right: 18%;
+  top: 50%;
+  height: 16px;
+  transform: translateY(-50%);
+  border-radius: 1px;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      rgba(72,70,76,0.68) 0px,
+      rgba(72,70,76,0.68) 1px,
+      transparent 1px,
+      transparent 4px
+    );
 }
 
+/* Sunken inset rail */
 .scroll-fader-track::before {
   content: '';
   position: absolute;
   left: 50%;
   top: 8px;
   bottom: 8px;
-  width: 6px;
-  margin-left: -3px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.22), rgba(255,255,255,0.08));
+  width: 8px;
+  margin-left: -4px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(4,4,6,1), rgba(14,14,18,1) 50%, rgba(4,4,6,1));
+  box-shadow:
+    inset 0 2px 7px rgba(0,0,0,0.98),
+    inset 0 0 0 1px rgba(0,0,0,0.75),
+    0 0 0 1px rgba(255,255,255,0.045);
 }
 
 .scroll-fader-stop {
@@ -1654,13 +1682,25 @@ button,
   isolation: isolate;
   border-radius: 34px;
   padding: 18px;
+  /* Brushed aluminum sheen top-left, dark panel base */
   background:
-    linear-gradient(180deg, rgba(58,58,64,0.4), rgba(20,20,24,0.2)),
-    linear-gradient(135deg, rgba(19,19,22,0.98), rgba(34,34,38,0.98));
-  border: 1px solid rgba(255,255,255,0.12);
+    linear-gradient(148deg, rgba(82,82,94,0.48) 0%, rgba(52,52,60,0.18) 22%, transparent 46%),
+    linear-gradient(135deg, rgba(20,20,24,0.99), rgba(34,34,40,0.99));
+  border: 1px solid rgba(255,255,255,0.14);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.08),
-    0 30px 60px rgba(0,0,0,0.34);
+    /* Top edge highlight — catches the light like a beveled panel edge */
+    inset 0 1px 0 rgba(255,255,255,0.15),
+    /* Bottom edge shadow */
+    inset 0 -1px 0 rgba(0,0,0,0.70),
+    /* Side edge shadow */
+    inset -1px 0 0 rgba(0,0,0,0.28),
+    /* Outer dark bezel ring — gives the console a raised chassis feel */
+    0 0 0 1px rgba(0,0,0,0.88),
+    /* Subtle outer rim highlight */
+    0 0 0 2px rgba(255,255,255,0.06),
+    /* Panel depth shadows */
+    0 32px 72px rgba(0,0,0,0.58),
+    0 12px 28px rgba(0,0,0,0.38);
 }
 
 .built-console-hardware-image,
@@ -1968,14 +2008,44 @@ button,
   width: 72px;
   height: 72px;
   border-radius: 50%;
+  /* Knurled outer ring over metal base */
   background:
-    radial-gradient(circle at 32% 32%, rgba(64,64,70,1), rgba(13,13,16,1) 58%),
-    linear-gradient(180deg, rgba(255,255,255,0.08), transparent);
+    repeating-conic-gradient(
+      rgba(255,255,255,0.052) 0deg 4deg,
+      transparent 4deg 8deg
+    ),
+    radial-gradient(circle, rgba(56,56,64,1) 0%, rgba(24,24,28,1) 55%, rgba(11,11,13,1) 100%);
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.14),
-    0 0 0 1px rgba(255,255,255,0.05);
+    /* top rim light */
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    /* bottom edge shadow */
+    inset 0 -1px 3px rgba(0,0,0,0.80),
+    /* outer bezel — dark ring that creates physical depth */
+    0 0 0 1px rgba(0,0,0,0.90),
+    /* subtle outer rim highlight */
+    0 0 0 2px rgba(255,255,255,0.055),
+    /* drop shadow */
+    0 6px 20px rgba(0,0,0,0.82),
+    0 2px 6px rgba(0,0,0,0.55);
 }
 
+/* Concave inner dome — the actual knob surface */
+.build-console-knob::after {
+  content: '';
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 28%, rgba(88,88,100,1) 0%, rgba(30,30,36,1) 42%, rgba(7,7,9,1) 100%);
+  box-shadow:
+    inset 0 3px 8px rgba(0,0,0,0.98),
+    inset 0 1px 3px rgba(0,0,0,0.85),
+    inset 0 -1px 2px rgba(255,255,255,0.04),
+    0 0 0 1px rgba(0,0,0,0.65);
+  pointer-events: none;
+}
+
+/* Indicator mark — sits above the dome */
 .build-console-knob::before {
   content: '';
   position: absolute;
@@ -1985,9 +2055,11 @@ button,
   height: 18px;
   margin-left: -1.5px;
   border-radius: 999px;
-  background: rgba(255,255,255,0.9);
+  background: linear-gradient(180deg, #ffffff 0%, rgba(210,210,210,0.72) 100%);
+  box-shadow: 0 0 6px rgba(255,255,255,0.55);
   transform: rotate(26deg);
   transform-origin: 50% 26px;
+  z-index: 2;
 }
 
 .build-console-knob-text {

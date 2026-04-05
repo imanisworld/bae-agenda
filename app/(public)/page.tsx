@@ -27,7 +27,7 @@ export const dynamic = 'force-dynamic'
 const HOME_OG_IMAGE = '/photos/images/outside.jpg'
 
 export const metadata: Metadata = {
-  title: 'Official Website',
+  title: 'DJ B.A.E. | The Bae Agenda',
   alternates: {
     canonical: '/',
   },

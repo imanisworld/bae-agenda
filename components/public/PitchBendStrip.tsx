@@ -105,14 +105,16 @@ export default function PitchBendStrip() {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
         style={{
-          position:   'relative',
-          width:      '28px',
-          height:     '120px',
-          background: 'rgba(8,8,12,0.9)',
-          border:     '1px solid rgba(155,93,229,0.25)',
-          borderRadius: '3px',
-          cursor:     'ns-resize',
-          touchAction: 'none',
+          position:     'relative',
+          width:        '28px',
+          height:       '120px',
+          /* Sunken machined channel */
+          background:   'linear-gradient(180deg, rgba(4,4,6,1) 0%, rgba(12,12,16,0.96) 50%, rgba(4,4,6,1) 100%)',
+          border:       'none',
+          borderRadius: '5px',
+          boxShadow:    'inset 0 2px 8px rgba(0,0,0,0.98), inset 0 0 0 1px rgba(0,0,0,0.85), 0 0 0 1px rgba(255,255,255,0.05)',
+          cursor:       'ns-resize',
+          touchAction:  'none',
         }}
       >
         {/* Center reference line */}
@@ -137,29 +139,34 @@ export default function PitchBendStrip() {
           transition: 'background 60ms ease',
         }} />
 
-        {/* Thumb */}
+        {/* Thumb — rubber fader pad */}
         <div style={{
-          position:    'absolute',
-          left:        '10%',
-          right:       '10%',
-          top:         `calc(${thumbPct}% - 8px)`,
-          height:      '16px',
-          background:  `rgba(155,93,229,${0.5 + intensity * 0.5})`,
-          borderRadius: '2px',
-          boxShadow:   intensity > 0.05
-            ? `0 0 ${8 + intensity * 12}px rgba(155,93,229,${0.4 + intensity * 0.4})`
-            : 'none',
-          transition:  'background 60ms ease, box-shadow 60ms ease',
-          // Grip lines
-          display:     'flex',
-          flexDirection: 'column',
-          alignItems:  'center',
-          justifyContent: 'center',
-          gap:         '3px',
-        }}>
-          <span style={{ display: 'block', width: '60%', height: '1px', background: 'rgba(255,255,255,0.4)' }} />
-          <span style={{ display: 'block', width: '60%', height: '1px', background: 'rgba(255,255,255,0.4)' }} />
-        </div>
+          position:      'absolute',
+          left:          '8%',
+          right:         '8%',
+          top:           `calc(${thumbPct}% - 9px)`,
+          height:        '18px',
+          background:    `linear-gradient(180deg,
+            rgba(${100 + Math.round(intensity * 55)},${62 + Math.round(intensity * 28)},${180 + Math.round(intensity * 49)},0.96) 0%,
+            rgba(${58 + Math.round(intensity * 28)},${36 + Math.round(intensity * 14)},${108 + Math.round(intensity * 30)},0.99) 100%)`,
+          borderRadius:  '3px',
+          boxShadow:     `inset 0 1px 0 rgba(255,255,255,${0.14 + intensity * 0.14}),
+            inset 0 -1px 0 rgba(0,0,0,0.72),
+            0 0 0 1px rgba(0,0,0,0.65),
+            0 2px 6px rgba(0,0,0,0.75)
+            ${intensity > 0.05 ? `, 0 0 ${8 + Math.round(intensity * 16)}px rgba(155,93,229,${(0.35 + intensity * 0.45).toFixed(2)})` : ''}`,
+          transition:    'background 60ms ease, box-shadow 60ms ease',
+          /* Grip rib texture via repeating background */
+          backgroundImage: `
+            repeating-linear-gradient(
+              180deg,
+              rgba(0,0,0,0.28) 0px, rgba(0,0,0,0.28) 1px,
+              transparent 1px, transparent 4px
+            ),
+            linear-gradient(180deg,
+              rgba(${100 + Math.round(intensity * 55)},${62 + Math.round(intensity * 28)},${180 + Math.round(intensity * 49)},0.96) 0%,
+              rgba(${58 + Math.round(intensity * 28)},${36 + Math.round(intensity * 14)},${108 + Math.round(intensity * 30)},0.99) 100%)`,
+        }} />
       </div>
 
       {/* Label bottom */}
