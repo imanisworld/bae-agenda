@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { label: 'Lab',       href: '/lab'       },
   { label: 'Book',      href: '/book'      },
   { label: 'Built',     href: '/built'     },
+  { label: 'Press Kit', href: '/press-kit' },
 ]
 
 const FOOTER_SOCIALS = SOCIALS.filter(s =>

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import SetControlSection from '@/components/public/SetControlSection'
 
 export const metadata: Metadata = {
-  title: 'Meet',
+  title: 'Meet DJ B.A.E.',
   alternates: {
     canonical: '/meet',
   },

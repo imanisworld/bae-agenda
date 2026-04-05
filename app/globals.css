@@ -1173,6 +1173,13 @@ button,
   cursor: default;
 }
 
+/* Sticky booking CTA — desktop only (matches scroll-fader breakpoint) */
+@media (min-width: 1181px) {
+  .sticky-booking-cta {
+    display: block !important;
+  }
+}
+
 @keyframes hero-record-spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }

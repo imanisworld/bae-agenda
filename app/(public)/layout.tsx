@@ -6,9 +6,10 @@
  * Route group (public) doesn't affect the URL — /lab, /events, /book
  * are still at their root paths, but share this layout.
  */
-import Nav          from '@/components/public/Nav'
-import Footer       from '@/components/public/Footer'
+import Nav             from '@/components/public/Nav'
+import Footer          from '@/components/public/Footer'
 import PublicPageStage from '@/components/public/PublicPageStage'
+import StickyBookingCTA from '@/components/public/StickyBookingCTA'
 
 export default function PublicLayout({
   children,
@@ -24,6 +25,7 @@ export default function PublicLayout({
       }}
     >
       <Nav />
+      <StickyBookingCTA />
       <main id="main-content" tabIndex={-1} style={{ flex: 1 }}>
         <PublicPageStage>{children}</PublicPageStage>
       </main>

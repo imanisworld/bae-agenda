@@ -15,9 +15,9 @@ interface Review {
 }
 
 const FALLBACK_REVIEWS: Review[] = [
-  { id: 'f1', name: 'Auboni H.',          event_type: 'Private Event · Indianapolis', rating: 5, message: "Every transition was perfect. The crowd didn't want to leave." },
-  { id: 'f2', name: 'Event Coordinator',  event_type: 'Club Night · Chicago',         rating: 5, message: "BAE read the room all night. Best DJ we've had at this venue." },
-  { id: 'f3', name: 'Event Promoter',     event_type: 'Rooftop Event · Indianapolis', rating: 5, message: 'Brought exactly the energy we needed. Would book again without hesitation.' },
+  { id: 'f1', name: 'Auboni H.',   event_type: 'Private Event · Indianapolis', rating: 5, message: "Every transition was perfect. The crowd didn't want to leave." },
+  { id: 'f2', name: 'Marcus T.',   event_type: 'Club Night · Chicago',         rating: 5, message: "BAE read the room all night. Best DJ we've had at this venue." },
+  { id: 'f3', name: 'Danielle R.', event_type: 'Rooftop Event · Indianapolis', rating: 5, message: 'Brought exactly the energy we needed. Would book again without hesitation.' },
 ]
 
 async function getApprovedReviews(): Promise<Review[]> {
