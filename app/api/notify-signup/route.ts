@@ -78,8 +78,8 @@ export async function POST(request: Request) {
   }
 
   const apiKey = process.env.RESEND_API_KEY
-  const fromAddr = process.env.FROM_EMAIL
-  const toAddr = process.env.ALERT_EMAIL ?? 'baebookings@proton.me'
+  const fromAddr = process.env.BOOKING_FROM_EMAIL
+  const toAddr = process.env.BOOKING_ALERT_EMAIL ?? 'baebookings@proton.me'
 
   if (!apiKey || !fromAddr) {
     console.error('Notify signup misconfigured: missing env vars')

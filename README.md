@@ -51,22 +51,31 @@ npm run dev
 
 See [`.env.example`](/Users/djb.a.e/MAINVSCODE/bae-agenda/.env.example).
 
-Main groups:
+Production envs break down like this:
 
-- Supabase:
-  `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
-- Admin access:
+- Core app required:
+  `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- Required for booking writes, admin mutations, portal requests, and cron actions:
+  `SUPABASE_SERVICE_ROLE_KEY`
+- Required for admin access control:
   `ADMIN_EMAILS`
-- Booking emails:
-  `RESEND_API_KEY`, `BOOKING_FROM_EMAIL`, `BOOKING_ALERT_EMAIL`, `BOOKING_ALERT_PHONE`
-- Stripe:
-  `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_APP_URL`
-- Mix notify signup:
-  `FROM_EMAIL`, `ALERT_EMAIL`
-- Twilio:
+- Required only if you want booking and mix signup emails to send:
+  `RESEND_API_KEY`, `BOOKING_FROM_EMAIL`
+- Optional booking alert overrides:
+  `BOOKING_ALERT_EMAIL`, `BOOKING_ALERT_PHONE`, `BOOKING_ZELLE_HANDLE`, `BOOKING_CASH_APP_HANDLE`
+- Required only for Stripe payment routes and the `/pay/[id]` payment experience:
+  `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
+- Optional URL override for links inside emails and Stripe flows:
+  `NEXT_PUBLIC_APP_URL`
+- Optional Twilio SMS alerts:
   `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`
-- Upstash rate limiting:
+- Optional Upstash rate limiting:
   `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
+
+Not used by this codebase:
+
+- `OPENAI_API_KEY`
+- `REDIS_URL`
 
 ## Core Flows
 
@@ -121,7 +130,7 @@ npm run build
 - Stripe deposit flow also requires the Stripe env vars above plus a webhook endpoint pointed at
   `https://thebaeagenda.com/api/stripe/webhook`
 - Twilio is optional unless SMS alerts are required
-- Upstash is required for the shared rate-limit paths
+- Upstash is optional. If omitted, the site still builds and runs, but shared rate limits are disabled
 
 ## Current Operational Guidance
 
