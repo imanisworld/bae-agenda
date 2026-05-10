@@ -6,6 +6,21 @@ import { sendInvoiceNotification } from '@/lib/notifications'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
 import { limitInvoiceSend } from '@/lib/ratelimit'
 
+function isAllowedOrigin(origin: string, requestHost: string) {
+  if (!origin) return true
+
+  try {
+    const url = new URL(origin)
+    if (['localhost', '127.0.0.1'].includes(url.hostname)) {
+      return true
+    }
+
+    return Boolean(requestHost) && url.host === requestHost
+  } catch {
+    return false
+  }
+}
+
 function formatCurrency(value: number) {
   return value.toLocaleString('en-US', {
     style: 'currency',
@@ -17,13 +32,10 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const origin = request.headers.get('origin')
-  const host = request.headers.get('host')
-  if (origin && host) {
-    const originHost = new URL(origin).host
-    if (originHost !== host) {
-      return NextResponse.json({ error: 'Invalid submission origin.' }, { status: 403 })
-    }
+  const origin = request.headers.get('origin') ?? ''
+  const requestHost = request.headers.get('x-forwarded-host') ?? request.headers.get('host') ?? ''
+  if (!isAllowedOrigin(origin, requestHost)) {
+    return NextResponse.json({ error: 'Invalid submission origin.' }, { status: 403 })
   }
 
   const { id } = await params
