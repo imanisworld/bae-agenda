@@ -72,6 +72,10 @@ export default function Nav() {
   }, [])
 
   const closeMenu = () => setMenuOpen(false)
+
+  // Active for exact matches and nested routes (/events/summer-set → Events).
+  const isActive = (href: string) =>
+    href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
   const navTopPadding = `calc(var(--safe-top) + ${standaloneTopOffset}px)`
   const drawerTop = `calc(var(--nav-height) + var(--safe-top) + ${standaloneTopOffset}px)`
 
@@ -133,11 +137,21 @@ export default function Nav() {
           >
             {PUBLIC_NAV.map((item) =>
               item.label === 'Book' ? (
-                <Link key={item.href} href={item.href} className="nav-book">
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="nav-book"
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                >
                   {item.label}
                 </Link>
               ) : (
-                <Link key={item.href} href={item.href} className="nav-link">
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={isActive(item.href) ? 'nav-link nav-link-active' : 'nav-link'}
+                  aria-current={isActive(item.href) ? 'page' : undefined}
+                >
                   {item.label}
                 </Link>
               )
@@ -230,7 +244,8 @@ export default function Nav() {
               key={item.href}
               href={item.href}
               onClick={closeMenu}
-              className="nav-drawer-book"
+              className={isActive(item.href) ? 'nav-drawer-book nav-drawer-active' : 'nav-drawer-book'}
+              aria-current={isActive(item.href) ? 'page' : undefined}
               style={{ animationDelay: `${i * 40}ms` }}
             >
               {item.label}
@@ -240,7 +255,8 @@ export default function Nav() {
               key={item.href}
               href={item.href}
               onClick={closeMenu}
-              className="nav-drawer-link"
+              className={isActive(item.href) ? 'nav-drawer-link nav-drawer-active' : 'nav-drawer-link'}
+              aria-current={isActive(item.href) ? 'page' : undefined}
               style={{ animationDelay: `${i * 40}ms` }}
             >
               {item.label}

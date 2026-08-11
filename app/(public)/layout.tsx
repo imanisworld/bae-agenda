@@ -24,6 +24,9 @@ export default function PublicLayout({
         flexDirection: 'column',
       }}
     >
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <Nav />
       <StickyBookingCTA />
       <main id="main-content" tabIndex={-1} style={{ flex: 1 }}>

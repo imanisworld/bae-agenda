@@ -242,8 +242,32 @@ button,
   color: var(--gold);
 }
 
+/* Skip link — visually hidden until keyboard focus */
+.skip-link {
+  position: fixed;
+  top: calc(var(--safe-top) + 12px);
+  left: calc(var(--safe-left) + 12px);
+  z-index: 200;
+  padding: 12px 20px;
+  background: var(--violet);
+  color: var(--white);
+  text-decoration: none;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  border-radius: 4px;
+  transform: translateY(calc(-100% - var(--safe-top) - 24px));
+  transition: transform var(--motion-fast) var(--ease-standard);
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--white);
+  outline-offset: 2px;
+}
+
 /* Nav link hover */
 .nav-link {
+  position: relative;
   text-decoration: none;
   font-size: 10px;
   letter-spacing: 0.2em;
@@ -252,6 +276,21 @@ button,
   transition: color var(--motion-fast) var(--ease-standard);
 }
 .nav-link:hover { color: var(--white); }
+
+/* Active route: illuminated violet underline */
+.nav-link.nav-link-active {
+  color: var(--white);
+}
+.nav-link.nav-link-active::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: var(--violet);
+  box-shadow: 0 0 8px var(--violet);
+}
 
 /* Nav Book CTA */
 .nav-book {
@@ -295,6 +334,23 @@ button,
   transition: color 0.15s ease;
 }
 .nav-drawer-link:hover { color: var(--white); }
+
+/* Active route in the drawer: violet indicator + full-strength text */
+.nav-drawer-link.nav-drawer-active,
+.nav-drawer-book.nav-drawer-active {
+  color: var(--white);
+  gap: 14px;
+}
+.nav-drawer-link.nav-drawer-active::before,
+.nav-drawer-book.nav-drawer-active::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--violet);
+  box-shadow: 0 0 10px var(--violet);
+  flex-shrink: 0;
+}
 
 .nav-drawer-book {
   text-decoration: none;
