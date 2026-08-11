@@ -27,7 +27,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '2px' }}>
       <div style={{ width: '18px', height: '2px', background: '#b8820e', flexShrink: 0 }} />
-      <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#b8820e', fontWeight: 600 }}>
+      <div style={{ fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#b8820e', fontWeight: 600 }}>
         {children}
       </div>
     </div>
@@ -135,7 +135,7 @@ export default async function PressKitPage() {
                   <span
                     key={item}
                     style={{
-                      fontSize: '9px',
+                      fontSize: '10px',
                       letterSpacing: '0.16em',
                       textTransform: 'uppercase',
                       padding: '6px 8px',

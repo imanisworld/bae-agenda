@@ -149,7 +149,7 @@ export default function AddToHomeScreenPrompt() {
           <div style={{ fontSize: '10px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'rgba(250,248,243,0.72)' }}>
             Add To Home Screen
           </div>
-          <div style={{ fontSize: '13px', lineHeight: 1.6, color: 'var(--white)' }}>
+          <div style={{ fontSize: '14px', lineHeight: 1.6, color: 'var(--white)' }}>
             Save <span style={{ color: '#9b5de5' }}>The Bae Agenda</span> like an app for faster access and a cleaner full-screen launch.
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function AddToHomeScreenPrompt() {
           </button>
 
           {showIosInstructions ? (
-            <div style={{ fontSize: '12px', lineHeight: 1.7, color: 'rgba(250,248,243,0.78)' }}>
+            <div style={{ fontSize: '13px', lineHeight: 1.7, color: 'rgba(250,248,243,0.78)' }}>
               In Safari, tap <strong>Share</strong>, then choose <strong>Add to Home Screen</strong>.
             </div>
           ) : null}

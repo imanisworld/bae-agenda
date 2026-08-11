@@ -711,10 +711,10 @@ function BookingSuccess({ summary }: { summary: BookingSuccessState | null }) {
                     gap: '6px',
                   }}
                 >
-                  <div style={{ fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                  <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
                     {item.label}
                   </div>
-                  <div style={{ fontSize: '13px', lineHeight: 1.55, color: 'var(--white)' }}>
+                  <div style={{ fontSize: '15px', lineHeight: 1.55, color: 'var(--white)' }}>
                     {item.value}
                   </div>
                 </div>
@@ -775,7 +775,7 @@ function BookingProgress({ step }: { step: Step }) {
       ))}
       <span style={{
         marginLeft: '8px',
-        fontSize: '11px',
+        fontSize: '12px',
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         color: 'var(--muted)',
@@ -853,7 +853,7 @@ function EventStep({
         >
           <div style={calendarHeaderStyle()}>
             <div>
-              <div style={{ fontSize: '12px', color: 'var(--muted)', marginBottom: '4px' }}>Selected Date</div>
+              <div style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '4px' }}>Selected Date</div>
               <div style={{ color: 'var(--white)', fontSize: '15px' }}>
                 {selectedDate ? format(selectedDate, 'EEEE, MMMM d, yyyy') : 'Choose an available date'}
               </div>
@@ -879,7 +879,7 @@ function EventStep({
             </div>
           </div>
 
-          <div style={{ fontSize: '13px', color: 'var(--white)', marginBottom: '12px' }}>
+          <div style={{ fontSize: '14px', color: 'var(--white)', marginBottom: '12px' }}>
             {format(visibleMonth, 'MMMM yyyy')}
           </div>
 
@@ -914,10 +914,10 @@ function EventStep({
             })}
           </div>
         </div>
-        <span style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+        <span style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.6 }}>
           Past dates and dates already used in bookings or admin events are unavailable.
         </span>
-        {loadingBlockedDates && <span style={{ fontSize: '12px', color: 'var(--muted)' }}>Loading unavailable dates…</span>}
+        {loadingBlockedDates && <span style={{ fontSize: '13px', color: 'var(--muted)' }}>Loading unavailable dates…</span>}
         {blockedDatesError && <span style={fieldErrorStyle()}>{blockedDatesError}</span>}
         {fieldErrors.eventDate && <span style={fieldErrorStyle()}>{fieldErrors.eventDate}</span>}
       </div>
@@ -979,7 +979,7 @@ function EventStep({
           background: 'rgba(232, 93, 117, 0.1)',
           border: '1px solid rgba(232, 93, 117, 0.4)',
           padding: '12px 14px',
-          fontSize: '13px',
+          fontSize: '14px',
           color: '#ff8da0',
           lineHeight: 1.6,
         }}>
@@ -1141,7 +1141,7 @@ function DetailsStep({
           placeholder="Choose or type any city…"
           style={inputStyle()}
         />
-        <span style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+        <span style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.6 }}>
           Type any city. The list is a shortcut.
         </span>
       </label>
@@ -1179,13 +1179,13 @@ function DetailsStep({
           </div>
 
           <div style={{ display: 'grid', gap: '6px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '15px' }}>
               <span style={{ color: 'var(--muted)' }}>Time</span>
               <span>{startLabel} → {endLabel}</span>
             </div>
 
             {durationHours !== null && (
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '15px' }}>
                 <span style={{ color: 'var(--muted)' }}>Duration</span>
                 <span>
                   {durationHours % 1 === 0
@@ -1196,14 +1196,14 @@ function DetailsStep({
             )}
 
             {estimatedTotal !== null ? (
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '15px' }}>
                 <span style={{ color: 'var(--muted)' }}>Estimated Total</span>
                 <span style={{ fontFamily: 'Conthrax, sans-serif' }}>
                   {formatCurrency(estimatedTotal)}
                 </span>
               </div>
             ) : matchedPkg === undefined && form.package ? (
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '14px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '15px' }}>
                 <span style={{ color: 'var(--muted)' }}>Rate</span>
                 <span style={{ color: 'var(--muted)' }}>Custom — we&apos;ll follow up</span>
               </div>
@@ -1229,7 +1229,7 @@ function DetailsStep({
           background: 'rgba(232, 93, 117, 0.1)',
           border: '1px solid rgba(232, 93, 117, 0.4)',
           padding: '12px 14px',
-          fontSize: '13px',
+          fontSize: '14px',
           color: '#ff8da0',
           lineHeight: 1.6,
         }}>
@@ -1270,7 +1270,7 @@ function selectStyle(hasError = false): React.CSSProperties {
 }
 
 function fieldErrorStyle(): React.CSSProperties {
-  return { fontSize: '12px', color: '#ff8da0', lineHeight: 1.5 }
+  return { fontSize: '13px', color: '#ff8da0', lineHeight: 1.5 }
 }
 
 function getFirstErrorField(errors: FieldErrors): FieldKey | null {

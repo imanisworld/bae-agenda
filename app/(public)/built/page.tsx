@@ -25,13 +25,13 @@ const WEB_INQUIRY_EMAIL = 'imanicru@pm.me'
 function statCard(label: string, value: string, sub: string) {
   return (
     <div className="build-console-module">
-      <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '10px' }}>
+      <div style={{ fontSize: '10px', letterSpacing: '0.28em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '10px' }}>
         {label}
       </div>
       <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(24px, 3vw, 34px)', color: 'var(--white)', marginBottom: '8px' }}>
         {value}
       </div>
-      <div style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+      <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.6 }}>
         {sub}
       </div>
     </div>
@@ -180,7 +180,7 @@ export default async function BuiltPage() {
               }}>
                 <div>
                   <div style={{
-                    fontSize: '9px',
+                    fontSize: '10px',
                     letterSpacing: '0.28em',
                     textTransform: 'uppercase',
                     color: 'var(--muted)',
@@ -208,7 +208,7 @@ export default async function BuiltPage() {
                 <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: '8px' }}>
                   {items.map((item) => (
                     <li key={item} style={{
-                      fontSize: '12px',
+                      fontSize: '13px',
                       color: 'var(--muted)',
                       lineHeight: 1.6,
                       paddingLeft: '14px',
@@ -228,7 +228,7 @@ export default async function BuiltPage() {
             ))}
           </div>
 
-          <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7 }}>
+          <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.7 }}>
             Not sure which fits?{' '}
             <a
               href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`}
@@ -350,13 +350,13 @@ export default async function BuiltPage() {
               }}>
                 <div style={{
                   fontFamily: 'Conthrax, sans-serif',
-                  fontSize: '13px',
+                  fontSize: '15px',
                   color: 'var(--white)',
                   lineHeight: 1.5,
                 }}>
                   {q}
                 </div>
-                <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.85 }}>
+                <div style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.85 }}>
                   {a}
                 </div>
               </div>

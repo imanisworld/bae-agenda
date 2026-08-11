@@ -385,7 +385,7 @@ button,
   justify-content: space-between;
   gap: 16px;
   padding: 16px 18px;
-  font-size: 13px;
+  font-size: 15px;
   letter-spacing: 0.04em;
   color: var(--white);
   user-select: none;
@@ -409,7 +409,7 @@ button,
 .booking-faq-answer {
   margin: 0;
   padding: 0 18px 18px;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.75;
   color: var(--muted);
   max-width: 56ch;
@@ -1970,7 +1970,7 @@ button,
 
 .build-console-body,
 .build-console-quote {
-  font-size: 13px;
+  font-size: 15px;
   color: var(--muted);
   line-height: 1.75;
 }
@@ -2051,7 +2051,7 @@ button,
 
 .build-console-module-category,
 .build-console-module-index {
-  font-size: 8px;
+  font-size: 10px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
 }
@@ -2066,14 +2066,14 @@ button,
 
 .build-console-module-name {
   font-family: 'Conthrax', sans-serif;
-  font-size: 11px;
+  font-size: 15px;
   line-height: 1.35;
   color: var(--white);
   margin-bottom: 8px;
 }
 
 .build-console-module-desc {
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.6;
   color: var(--muted);
   min-height: 54px;

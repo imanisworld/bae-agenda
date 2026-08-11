@@ -154,7 +154,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                 }}
               >
                 <div style={{
-                  fontSize: '8px',
+                  fontSize: '10px',
                   letterSpacing: '0.22em',
                   textTransform: 'uppercase',
                   color: 'var(--muted)',
@@ -162,8 +162,9 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                   {item.label}
                 </div>
                 <div style={{
-                  fontSize: '13px',
-                  lineHeight: 1.5,
+                  fontFamily: 'Conthrax, sans-serif',
+                  fontSize: 'clamp(16px, 2vw, 22px)',
+                  lineHeight: 1.1,
                   color: 'var(--white)',
                 }}>
                   {item.value}
@@ -228,7 +229,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                   marginTop: '6px',
                   paddingTop: '18px',
                   borderTop: '1px solid rgba(255,255,255,0.08)',
-                  fontSize: '12px',
+                  fontSize: '14px',
                   lineHeight: 1.7,
                   color: 'var(--muted)',
                 }}>
@@ -478,12 +479,12 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                         <h4 style={{ margin: 0, fontSize: '18px', lineHeight: 1.3, color: 'var(--white)' }}>
                           {mix.title}
                         </h4>
-                        <div style={{ marginTop: '8px', fontSize: '12px', lineHeight: 1.7, color: 'var(--muted)' }}>
+                        <div style={{ marginTop: '8px', fontSize: '13px', lineHeight: 1.7, color: 'var(--muted)' }}>
                           {[mix.genre || 'Open Format', formatDuration(mix.duration)].join(' · ')}
                         </div>
                       </div>
 
-                      <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.7, color: 'rgba(250,248,243,0.72)' }}>
+                      <p style={{ margin: 0, fontSize: '14px', lineHeight: 1.7, color: 'rgba(250,248,243,0.72)' }}>
                         {mix.description?.trim() || 'Archive drop from the current rotation.'}
                       </p>
 

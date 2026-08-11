@@ -67,7 +67,7 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
         }}>
           Thank you
         </div>
-        <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7 }}>
+        <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.7 }}>
           Your review has been submitted and will be published once approved.
         </p>
         <button
@@ -97,7 +97,8 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
     color:       'var(--white)',
     padding:     compact ? '10px 12px' : '12px 14px',
     fontFamily:  'DM Sans, sans-serif',
-    fontSize:    compact ? '13px' : '14px',
+    // 16px avoids iOS Safari zooming the viewport on input focus.
+    fontSize:    '16px',
     fontWeight:  300,
     boxSizing:   'border-box',
     boxShadow:   'inset 0 1px 0 rgba(255,255,255,0.03)',
@@ -210,7 +211,7 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
 
       {/* Error */}
       {errorMsg && (
-        <p role="alert" style={{ fontSize: '12px', color: '#e85d75', margin: 0 }}>
+        <p role="alert" style={{ fontSize: '13px', color: '#e85d75', margin: 0 }}>
           {errorMsg}
         </p>
       )}

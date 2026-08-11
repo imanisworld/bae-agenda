@@ -100,7 +100,7 @@ export default async function EventsPage() {
             borderBottom: '1px solid var(--border)',
           }}>
             <p style={{
-              fontSize: '13px',
+              fontSize: '14px',
               color: 'var(--muted)',
               letterSpacing: '0.04em',
               lineHeight: 1.7,
@@ -143,7 +143,7 @@ export default async function EventsPage() {
                       {day}
                     </div>
                     <div style={{
-                      fontSize: '9px',
+                      fontSize: '10px',
                       letterSpacing: '0.2em',
                       color: 'var(--muted)',
                       textTransform: 'uppercase',
@@ -169,7 +169,7 @@ export default async function EventsPage() {
                           color: 'var(--violet)',
                           border: '1px solid rgba(155,93,229,0.3)',
                           padding: '2px 7px',
-                          fontSize: '8px',
+                          fontSize: '10px',
                         }}>
                           Featured
                         </span>
@@ -186,7 +186,7 @@ export default async function EventsPage() {
                     </div>
                     {location && (
                       <div style={{
-                        fontSize: '12px',
+                        fontSize: '13px',
                         color: 'var(--muted)',
                         letterSpacing: '0.03em',
                       }}>
@@ -195,7 +195,7 @@ export default async function EventsPage() {
                     )}
                     {(event as { show_description?: boolean }).show_description && event.description && (
                       <div style={{
-                        fontSize: '12px',
+                        fontSize: '14px',
                         color: 'var(--muted)',
                         marginTop: '8px',
                         lineHeight: 1.6,
@@ -229,7 +229,7 @@ export default async function EventsPage() {
           gap: '20px',
         }}>
           <p style={{
-            fontSize: '13px',
+            fontSize: '15px',
             color: 'var(--muted)',
             lineHeight: 1.7,
           }}>

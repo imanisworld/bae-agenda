@@ -89,7 +89,7 @@ export default async function EventsSection() {
             Upcoming<br />Dates
           </h2>
 
-          <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, maxWidth: '320px' }}>
+          <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.7, maxWidth: '320px' }}>
             Catch DJ B.A.E. live. Follow on social for last-minute announcements and pop-up sets.
           </p>
         </div>
@@ -111,7 +111,7 @@ export default async function EventsSection() {
                     See All Events →
                   </Link>
                 </div>
-                <p style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
+                <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
                   For last-minute announcements and pop-up sets, follow{' '}
                   <a
                     href="https://www.instagram.com/dj_b.a.e/"
@@ -139,7 +139,7 @@ export default async function EventsSection() {
                 <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--gold)', marginBottom: '8px' }}>
                   No Public Dates Yet
                 </div>
-                <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
+                <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.7, margin: 0 }}>
                   Public events are not posted yet. For pop-up updates, follow Instagram. For private bookings, send an inquiry.
                 </p>
               </div>

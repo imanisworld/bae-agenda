@@ -92,7 +92,7 @@ export default async function ReviewSection({ hideForm = false }: { hideForm?: b
             <p className="review-section-subtitle" style={{
               maxWidth: '520px',
               margin: '8px 0 0',
-              fontSize: '11px',
+              fontSize: '13px',
               color: 'var(--muted)',
               lineHeight: 1.55,
             }}>
@@ -224,7 +224,7 @@ export default async function ReviewSection({ hideForm = false }: { hideForm?: b
           }}>
             <div style={{ marginBottom: '12px' }}>
               <span className="section-label" style={{ marginBottom: '6px' }}>Leave a Review</span>
-              <p style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>
+              <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>
                 Share your experience and it will stay private until approved.
               </p>
             </div>

@@ -81,7 +81,7 @@ export default function BookingSection({ bookingEmail }: Props) {
               gap: '6px',
             }}>
               <div style={{
-                fontSize: '9px',
+                fontSize: '10px',
                 letterSpacing: '0.28em',
                 textTransform: 'uppercase',
                 color: 'var(--violet)',
@@ -90,12 +90,12 @@ export default function BookingSection({ bookingEmail }: Props) {
               </div>
               <div style={{
                 fontFamily: 'Conthrax, sans-serif',
-                fontSize: '13px',
+                fontSize: '15px',
                 color: 'var(--white)',
               }}>
                 {label}
               </div>
-              <div style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+              <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.6 }}>
                 {desc}
               </div>
             </div>
@@ -126,7 +126,7 @@ export default function BookingSection({ bookingEmail }: Props) {
                   <div
                     key={signal}
                     style={{
-                      fontSize: '12px',
+                      fontSize: '14px',
                       lineHeight: 1.65,
                       color: 'rgba(250,248,243,0.76)',
                     }}
@@ -140,7 +140,7 @@ export default function BookingSection({ bookingEmail }: Props) {
                 <Link href="/portfolio" className="btn-ghost">See Event Proof →</Link>
               </div>
               {email && (
-                <p style={{ marginTop: '14px', fontSize: '12px', color: 'var(--muted)', lineHeight: 1.7 }}>
+                <p style={{ marginTop: '14px', fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7 }}>
                   Prefer email? <a href={`mailto:${email}`} className="inline-link" style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px' }}>Reach out directly</a>.
                 </p>
               )}

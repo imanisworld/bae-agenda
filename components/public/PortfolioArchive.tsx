@@ -15,7 +15,7 @@ interface Entry {
 function TagChip({ label }: { label: string }) {
   return (
     <span style={{
-      fontSize: '9px',
+      fontSize: '10px',
       letterSpacing: '0.16em',
       textTransform: 'uppercase',
       color: 'var(--violet)',
@@ -163,7 +163,7 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
       )}
 
       {filtered.length === 0 ? (
-        <div style={{ padding: '48px 0', textAlign: 'center', color: 'var(--muted)', fontSize: '13px' }}>
+        <div style={{ padding: '48px 0', textAlign: 'center', color: 'var(--muted)', fontSize: '14px' }}>
           No events match the selected filters.
         </div>
       ) : (
@@ -248,7 +248,7 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
                       <div className="portfolio-year-meta" style={{ textAlign: 'right', flexShrink: 0, minWidth: 0 }}>
                         <div style={{ fontSize: '11px', color: 'var(--muted)', overflowWrap: 'anywhere' }}>{entry.city}</div>
                         {entry.venue && (
-                          <div style={{ fontSize: '10px', color: 'rgba(250,248,243,0.35)', marginTop: '2px', overflowWrap: 'anywhere' }}>
+                          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px', overflowWrap: 'anywhere' }}>
                             {entry.venue}
                           </div>
                         )}

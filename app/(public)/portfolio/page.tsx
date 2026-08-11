@@ -23,7 +23,7 @@ export const metadata: Metadata = {
 function TagChip({ label }: { label: string }) {
   return (
     <span style={{
-      fontSize: '9px',
+      fontSize: '10px',
       letterSpacing: '0.16em',
       textTransform: 'uppercase',
       color: 'var(--violet)',
@@ -116,7 +116,7 @@ export default async function PortfolioPage() {
               minWidth: 0,
             }}>
               <div style={{
-                fontSize: '9px',
+                fontSize: '10px',
                 letterSpacing: '0.28em',
                 textTransform: 'uppercase',
                 color: 'var(--muted)',
@@ -196,7 +196,7 @@ export default async function PortfolioPage() {
                       </span>
                     </div>
 
-                    <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                    <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
                       {[entry.venue, entry.city].filter(Boolean).join(' · ')}
                     </div>
 
@@ -285,7 +285,7 @@ export default async function PortfolioPage() {
           }}>
             Let&apos;s add your event to this list.
           </p>
-          <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '24px' }}>
+          <p style={{ fontSize: '15px', color: 'var(--muted)', marginBottom: '24px' }}>
             Open to club nights, festivals, private events, and everything in between.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>

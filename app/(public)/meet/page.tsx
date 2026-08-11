@@ -258,7 +258,7 @@ export default function MeetPage() {
                 }}
               >
                 <div style={{
-                  fontSize: '9px',
+                  fontSize: '10px',
                   letterSpacing: '0.22em',
                   textTransform: 'uppercase',
                   color: 'var(--violet)',
@@ -267,7 +267,7 @@ export default function MeetPage() {
                   {item.label}
                 </div>
                 <div style={{
-                  fontSize: '13px',
+                  fontSize: '15px',
                   lineHeight: 1.72,
                   color: 'var(--muted)',
                 }}>

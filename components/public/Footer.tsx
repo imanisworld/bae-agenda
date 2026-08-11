@@ -54,7 +54,7 @@ export default function Footer() {
               DJ <span style={{ color: 'var(--violet)' }}>B.A.E.</span>
             </span>
           </Link>
-          <p style={{ margin: '6px 0 0', fontSize: '12px', color: 'var(--muted)', fontFamily: 'DM Sans, sans-serif', lineHeight: 1.55 }}>
+          <p style={{ margin: '6px 0 0', fontSize: '13px', color: 'var(--muted)', fontFamily: 'DM Sans, sans-serif', lineHeight: 1.55 }}>
             Selector. Genre Bender. Sound Architect.
           </p>
         </div>

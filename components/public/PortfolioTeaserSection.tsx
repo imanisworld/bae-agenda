@@ -78,7 +78,7 @@ export default async function PortfolioTeaserSection() {
             <p style={{
               marginTop: '12px',
               maxWidth: '520px',
-              fontSize: '13px',
+              fontSize: '15px',
               lineHeight: 1.75,
               color: 'var(--muted)',
             }}>
@@ -158,7 +158,7 @@ export default async function PortfolioTeaserSection() {
                 }}>
                   {entry.event_name}
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
+                <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
                   {entry.city}
                 </div>
                 {entry.tags.length > 0 && (
@@ -167,7 +167,7 @@ export default async function PortfolioTeaserSection() {
                       <span
                         key={tag}
                         style={{
-                          fontSize: '8px',
+                          fontSize: '10px',
                           letterSpacing: '0.14em',
                           textTransform: 'uppercase',
                           color: 'var(--violet)',
