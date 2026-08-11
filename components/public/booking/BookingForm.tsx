@@ -170,6 +170,65 @@ function stepForField(field: string): Step {
   return 1
 }
 
+// Draft recovery — losing an in-progress booking to an accidental reload or
+// a locked phone is exactly the kind of friction that talks people out of
+// finishing. Saved locally only; never sent anywhere until real submit.
+const DRAFT_STORAGE_KEY = 'bae-booking-draft-v1'
+const DRAFT_MAX_AGE_MS = 14 * 24 * 60 * 60 * 1000 // 14 days
+
+type BookingDraft = {
+  form: FormState
+  step: Step
+  savedAt: number
+}
+
+// Whether the form has anything worth recovering — an untouched form is not
+// a draft, it's just the initial state, and shouldn't trigger a restore banner.
+function hasDraftContent(form: FormState): boolean {
+  return Boolean(
+    form.firstName.trim() || form.email.trim() || form.eventName.trim() ||
+    form.eventDate.trim() || form.eventType.trim() || form.venue.trim() ||
+    form.city.trim() || form.package.trim() || form.notes.trim()
+  )
+}
+
+function readDraft(): BookingDraft | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = window.localStorage.getItem(DRAFT_STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as Partial<BookingDraft>
+    if (!parsed.form || !parsed.step || !parsed.savedAt) return null
+    if (Date.now() - parsed.savedAt > DRAFT_MAX_AGE_MS) return null
+    if (!hasDraftContent(parsed.form)) return null
+    return parsed as BookingDraft
+  } catch {
+    return null
+  }
+}
+
+function writeDraft(form: FormState, step: Step) {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(
+      DRAFT_STORAGE_KEY,
+      JSON.stringify({ form, step, savedAt: Date.now() } satisfies BookingDraft)
+    )
+  } catch {
+    // Storage may be full or blocked (private browsing) — drafts are a
+    // convenience, not a requirement, so fail silently.
+  }
+}
+
+function clearDraft() {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.removeItem(DRAFT_STORAGE_KEY)
+  } catch {
+    // Same as above — non-critical if this fails.
+  }
+}
+
 export default function BookingForm() {
   const formRef = useRef<HTMLFormElement | null>(null)
   const [step, setStep] = useState<Step>(1)
@@ -188,6 +247,36 @@ export default function BookingForm() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
   const [blockedDates, setBlockedDates] = useState<string[]>([])
   const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()))
+  const [draftRestored, setDraftRestored] = useState(false)
+  const hasCheckedDraft = useRef(false)
+
+  // Restore a saved draft once, on first mount only.
+  useEffect(() => {
+    if (hasCheckedDraft.current) return
+    hasCheckedDraft.current = true
+
+    const draft = readDraft()
+    if (!draft) return
+
+    setForm({ ...draft.form, website: '', startedAt: String(Date.now()) })
+    setStep(draft.step)
+    setDraftRestored(true)
+  }, [])
+
+  // Persist on every change, once there's something worth saving.
+  useEffect(() => {
+    if (!hasDraftContent(form)) return
+    writeDraft(form, step)
+  }, [form, step])
+
+  function startOver() {
+    clearDraft()
+    setForm({ ...INITIAL_STATE, startedAt: String(Date.now()) })
+    setStep(1)
+    setFieldErrors({})
+    setAvailabilityError('')
+    setDraftRestored(false)
+  }
 
   const blockedDateSet = useMemo(() => new Set(blockedDates), [blockedDates])
   const normalizedStartTime = normalizeTimeValue(form.eventTime)
@@ -505,6 +594,7 @@ export default function BookingForm() {
         city: form.city.trim(),
       })
       setSuccess(true)
+      clearDraft()
       setForm({ ...INITIAL_STATE, startedAt: String(Date.now()) })
       setStep(1)
       setLoading(false)
@@ -535,6 +625,40 @@ export default function BookingForm() {
             Book DJ B.A.E.<span style={{ color: 'var(--gold)' }}>.</span>
           </h1>
         </div>
+
+        {draftRestored && (
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            flexWrap: 'wrap',
+            marginBottom: '20px',
+            padding: '12px 16px',
+            border: '1px solid rgba(155,93,229,0.28)',
+            background: 'rgba(155,93,229,0.08)',
+          }}>
+            <span style={{ fontSize: '13px', color: 'var(--white)', lineHeight: 1.5 }}>
+              Picked up where you left off.
+            </span>
+            <button
+              type="button"
+              onClick={startOver}
+              style={{
+                background: 'none',
+                border: 'none',
+                padding: 0,
+                color: 'var(--violet)',
+                fontSize: '12px',
+                letterSpacing: '0.06em',
+                textDecoration: 'underline',
+                cursor: 'pointer',
+              }}
+            >
+              Start over
+            </button>
+          </div>
+        )}
 
         <BookingProgress step={step} />
 
