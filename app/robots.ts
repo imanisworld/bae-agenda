@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/admin/', '/api/'],
+      disallow: ['/admin/', '/api/', '/portal/', '/pay/', '/admin-demo/'],
     },
     sitemap: 'https://thebaeagenda.com/sitemap.xml',
     host: 'https://thebaeagenda.com',

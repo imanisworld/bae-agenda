@@ -37,6 +37,29 @@ function formatPublishedDate(value: string | null) {
   }).format(date)
 }
 
+// Stored links are often plain page URLs (e.g. soundcloud.com/artist/track), which
+// refuse to render inside an iframe — convert them to real embed player URLs.
+function toEmbedSrc(embedUrl: string) {
+  const normalized = embedUrl.toLowerCase()
+
+  if (normalized.includes('w.soundcloud.com/player') || normalized.includes('/embed/')) {
+    return embedUrl
+  }
+
+  if (normalized.includes('soundcloud.com')) {
+    return `https://w.soundcloud.com/player/?url=${encodeURIComponent(embedUrl)}&color=%239b5de5&auto_play=false&hide_related=true&show_comments=false&visual=true`
+  }
+
+  const youtubeMatch = embedUrl.match(
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{6,})/i
+  )
+  if (youtubeMatch) {
+    return `https://www.youtube.com/embed/${youtubeMatch[1]}`
+  }
+
+  return embedUrl
+}
+
 function getPlatformLabel(embedUrl: string | null) {
   if (!embedUrl) return 'Listen'
 
@@ -88,9 +111,9 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                     Lab
                   </span>
                 </div>
-                <h2 className="section-heading" style={{ marginBottom: 0 }}>
+                <h1 className="section-heading" style={{ marginBottom: 0 }}>
                   Bae&apos;s in the Lab
-                </h2>
+                </h1>
                 <p style={{
                   marginTop: '16px',
                   maxWidth: '640px',
@@ -297,7 +320,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                       {featuredMix.embed_url ? (
                         <iframe
                           title={`${featuredMix.title} player`}
-                          src={featuredMix.embed_url}
+                          src={toEmbedSrc(featuredMix.embed_url)}
                           loading="lazy"
                           allow="autoplay; encrypted-media; picture-in-picture"
                           style={{ width: '100%', minHeight: '320px', border: 0 }}

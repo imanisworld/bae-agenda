@@ -6,7 +6,7 @@ import { SELECTED_WORK } from '@/lib/portfolio-data'
 import { getContentMap } from '@/lib/db/content'
 
 export const metadata: Metadata = {
-  title: 'Press Kit — DJ B.A.E.',
+  title: 'Press Kit',
   alternates: {
     canonical: '/press-kit',
   },

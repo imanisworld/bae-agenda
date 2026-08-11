@@ -6,7 +6,7 @@ import BuildPads from '@/components/public/BuildPads'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Built | Custom Web Development for Artists & Brands — DJ B.A.E.',
+  title: 'Built | Custom Web Development for Artists & Brands',
   alternates: {
     canonical: '/built',
   },

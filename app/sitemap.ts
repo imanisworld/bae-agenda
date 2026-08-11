@@ -9,7 +9,6 @@ const routes = [
   '/events',
   '/lab',
   '/meet',
-  '/mixes',
   '/portfolio',
   '/press-kit',
   '/privacy',
