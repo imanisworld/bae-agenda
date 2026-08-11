@@ -72,14 +72,16 @@ export default async function HomePage() {
           }}
         />
       </HomepageSectionBoundary>
-      <HomepageSectionBoundary section="mixes"><MixesSection /></HomepageSectionBoundary>
-      <HomepageSectionBoundary section="events"><EventsSection /></HomepageSectionBoundary>
+      {/* Proof comes right after the hero: photos, gig history, and reviews
+          give someone deciding whether to book a reason before anything else. */}
       <HomepageSectionBoundary section="photo-strip"><PhotoStrip /></HomepageSectionBoundary>
       <HomepageSectionBoundary section="portfolio"><PortfolioTeaserSection /></HomepageSectionBoundary>
+      <HomepageSectionBoundary section="reviews"><ReviewSection /></HomepageSectionBoundary>
+      <HomepageSectionBoundary section="mixes"><MixesSection /></HomepageSectionBoundary>
+      <HomepageSectionBoundary section="events"><EventsSection /></HomepageSectionBoundary>
       <HomepageSectionBoundary section="booking">
         <BookingSection bookingEmail={content.booking_email} />
       </HomepageSectionBoundary>
-      <HomepageSectionBoundary section="reviews"><ReviewSection /></HomepageSectionBoundary>
       <HomepageSectionBoundary section="connect">
         <ConnectSection
           socialOverrides={{
