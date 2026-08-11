@@ -125,7 +125,20 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
         </div>
         <div style={{ display: 'grid', gap: '8px' }}>
           <label htmlFor="rv-event" style={labelStyle}>Event Type</label>
-          <select id="rv-event" name="event_type" style={{ ...inputStyle, appearance: 'none' }}>
+          <select
+            id="rv-event"
+            name="event_type"
+            style={{
+              ...inputStyle,
+              appearance: 'none',
+              paddingRight: '38px',
+              backgroundImage:
+                "url(\"data:image/svg+xml,%3Csvg width='14' height='9' viewBox='0 0 14 9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L7 7.5L13 1.5' stroke='%238f8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")",
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 14px center',
+              backgroundSize: '14px 9px',
+            }}
+          >
             <option value="">Select type…</option>
             {EVENT_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
           </select>

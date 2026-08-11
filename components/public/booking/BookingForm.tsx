@@ -930,7 +930,7 @@ function EventStep({
             aria-invalid={Boolean(fieldErrors.eventTime)}
             value={normalizeTimeValue(form.eventTime)}
             onChange={(e) => set('eventTime', e.target.value)}
-            style={inputStyle(Boolean(fieldErrors.eventTime))}
+            style={selectStyle(Boolean(fieldErrors.eventTime))}
           >
             <option value="">Select a start time</option>
             {TIME_OPTIONS.map((option) => (
@@ -946,7 +946,7 @@ function EventStep({
             aria-invalid={Boolean(fieldErrors.eventEndTime)}
             value={normalizeTimeValue(form.eventEndTime)}
             onChange={(e) => set('eventEndTime', e.target.value)}
-            style={inputStyle(Boolean(fieldErrors.eventEndTime))}
+            style={selectStyle(Boolean(fieldErrors.eventEndTime))}
           >
             <option value="">Select an end time</option>
             {getEndTimeOptions(normalizeTimeValue(form.eventTime)).map((option) => (
@@ -965,7 +965,7 @@ function EventStep({
           aria-invalid={Boolean(fieldErrors.timeZone)}
           value={form.timeZone}
           onChange={(e) => set('timeZone', e.target.value)}
-          style={inputStyle(Boolean(fieldErrors.timeZone))}
+          style={selectStyle(Boolean(fieldErrors.timeZone))}
         >
           {TIME_ZONE_OPTIONS.map((option) => (
             <option key={option.value} value={option.value}>{option.label}</option>
@@ -1252,6 +1252,20 @@ function inputStyle(hasError = false): React.CSSProperties {
     fontFamily: 'DM Sans, sans-serif',
     borderRadius: '0',
     appearance: 'none',
+  }
+}
+
+// inputStyle strips native select chrome (appearance: none), so selects need
+// their own dropdown indicator or they read as plain text boxes.
+function selectStyle(hasError = false): React.CSSProperties {
+  return {
+    ...inputStyle(hasError),
+    paddingRight: '44px',
+    backgroundImage:
+      "url(\"data:image/svg+xml,%3Csvg width='14' height='9' viewBox='0 0 14 9' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L7 7.5L13 1.5' stroke='%238f8f98' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")",
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 14px center',
+    backgroundSize: '14px 9px',
   }
 }
 
