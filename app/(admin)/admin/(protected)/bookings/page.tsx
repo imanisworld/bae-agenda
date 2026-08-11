@@ -131,6 +131,23 @@ function getErrorMessage(errorParam: string | string[] | undefined) {
   return Array.isArray(errorParam) ? errorParam[0] ?? null : errorParam
 }
 
+// Status filter chips — "in_progress" groups the two mid-pipeline statuses.
+const BOOKING_FILTERS = [
+  { key: 'all',         label: 'All',         matches: () => true },
+  { key: 'new',         label: 'New',         matches: (s: BookingLifecycleStatus) => s === 'new' },
+  { key: 'in_progress', label: 'In Progress', matches: (s: BookingLifecycleStatus) => s === 'contacted' || s === 'negotiating' },
+  { key: 'confirmed',   label: 'Confirmed',   matches: (s: BookingLifecycleStatus) => s === 'confirmed' },
+  { key: 'completed',   label: 'Completed',   matches: (s: BookingLifecycleStatus) => s === 'completed' },
+  { key: 'lost',        label: 'Lost',        matches: (s: BookingLifecycleStatus) => s === 'lost' },
+] as const
+
+type BookingFilterKey = (typeof BOOKING_FILTERS)[number]['key']
+
+function resolveFilter(filterParam: string | string[] | undefined): BookingFilterKey {
+  const value = Array.isArray(filterParam) ? filterParam[0] : filterParam
+  return BOOKING_FILTERS.some((f) => f.key === value) ? (value as BookingFilterKey) : 'all'
+}
+
 function getBookingActions(status: BookingLifecycleStatus) {
   if (status === 'new' || status === 'contacted' || status === 'negotiating') {
     return [
@@ -164,11 +181,14 @@ function canCreateEvent(status: BookingLifecycleStatus) {
 export default async function BookingsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ error?: string | string[] }>
+  searchParams?: Promise<{ error?: string | string[]; filter?: string | string[] }>
 }) {
   const bookings = await getBookings()
   const resolvedSearchParams = searchParams ? await searchParams : undefined
   const errorMessage = getErrorMessage(resolvedSearchParams?.error)
+  const activeFilter = resolveFilter(resolvedSearchParams?.filter)
+  const activeMatcher = BOOKING_FILTERS.find((f) => f.key === activeFilter) ?? BOOKING_FILTERS[0]
+  const visibleBookings = bookings.filter((b) => activeMatcher.matches(b.status))
   const newInquiryCount = bookings.filter((booking) => booking.status === 'new').length
   const activeFollowUpCount = bookings.filter((booking) => booking.status === 'contacted' || booking.status === 'negotiating').length
   const paymentAttentionCount = bookings.filter(
@@ -232,10 +252,35 @@ export default async function BookingsPage({
           <span className="admin-section-title">All Bookings</span>
         </div>
 
+        {bookings.length > 0 && (
+          <nav aria-label="Filter bookings by status" className="admin-filter-chips">
+            {BOOKING_FILTERS.map((f) => {
+              const count = bookings.filter((b) => f.matches(b.status)).length
+              const isCurrent = f.key === activeFilter
+              return (
+                <Link
+                  key={f.key}
+                  href={f.key === 'all' ? '/admin/bookings' : `/admin/bookings?filter=${f.key}`}
+                  className={isCurrent ? 'admin-filter-chip admin-filter-chip-active' : 'admin-filter-chip'}
+                  aria-current={isCurrent ? 'true' : undefined}
+                >
+                  {f.label}
+                  <span className="admin-filter-chip-count">{count}</span>
+                </Link>
+              )
+            })}
+          </nav>
+        )}
+
         {bookings.length === 0 ? (
           <AdminEmptyState
             title="No bookings yet"
             desc="Booking requests submitted through the site will appear here."
+          />
+        ) : visibleBookings.length === 0 ? (
+          <AdminEmptyState
+            title={`No ${activeMatcher.label.toLowerCase()} bookings`}
+            desc="Nothing matches this filter right now."
           />
         ) : (
           <div className="admin-table-wrap">
@@ -252,7 +297,7 @@ export default async function BookingsPage({
                 </tr>
               </thead>
               <tbody>
-                {bookings.map((b) => (
+                {visibleBookings.map((b) => (
                   <tr key={b.id}>
                     <td data-label="Event" className="booking-event-cell">
                       <div className="booking-event-title">{b.event_name}</div>

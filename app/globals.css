@@ -368,6 +368,53 @@ button,
 }
 .nav-drawer-book:hover { color: var(--violet-light); }
 
+/* ---- Booking FAQ accordion ------------------------------------ */
+.booking-faq-item {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  transition: border-color var(--motion-fast) var(--ease-standard);
+}
+.booking-faq-item[open] {
+  border-color: rgba(155, 93, 229, 0.45);
+}
+.booking-faq-question {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  user-select: none;
+}
+.booking-faq-question::-webkit-details-marker {
+  display: none;
+}
+.booking-faq-question::after {
+  content: '+';
+  flex-shrink: 0;
+  font-size: 16px;
+  color: var(--violet);
+  transition: transform var(--motion-fast) var(--ease-standard);
+}
+.booking-faq-item[open] .booking-faq-question::after {
+  transform: rotate(45deg);
+}
+.booking-faq-question:hover {
+  color: var(--violet-light);
+}
+.booking-faq-answer {
+  margin: 0;
+  padding: 0 18px 18px;
+  font-size: 13px;
+  line-height: 1.75;
+  color: var(--muted);
+  max-width: 56ch;
+}
+
 /* ---- Public section hover classes (Server Component safe) ----- */
 /* All hover effects live here — no onMouseEnter/onMouseLeave JS needed */
 
@@ -4500,6 +4547,44 @@ body.has-custom-cursor * { cursor: none !important; }
   transition: background var(--motion-fast) var(--ease-standard);
 }
 .admin-btn-primary:hover { background: var(--violet-light); }
+
+/* Status filter chips above admin tables */
+.admin-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.admin-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color var(--motion-fast) var(--ease-standard),
+              border-color var(--motion-fast) var(--ease-standard),
+              background var(--motion-fast) var(--ease-standard);
+}
+.admin-filter-chip:hover {
+  color: var(--white);
+  border-color: rgba(245, 245, 240, 0.3);
+}
+.admin-filter-chip-active {
+  color: var(--white);
+  border-color: var(--violet);
+  background: rgba(155, 93, 229, 0.14);
+}
+.admin-filter-chip-count {
+  font-size: 10px;
+  color: var(--violet-light);
+}
 
 /* View-all link inside admin sections */
 .admin-view-all {
