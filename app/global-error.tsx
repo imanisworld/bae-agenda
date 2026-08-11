@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { reportClientError } from '@/lib/client-error-reporting'
 
 export default function GlobalError({
   error,
@@ -10,10 +11,9 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('Global application error', {
-      message: error.message,
+    reportClientError(error, {
+      source: 'global',
       digest: error.digest,
-      stack: error.stack,
     })
   }, [error])
 

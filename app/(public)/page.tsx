@@ -20,6 +20,7 @@ import PortfolioTeaserSection   from '@/components/public/PortfolioTeaserSection
 import BookingSection           from '@/components/public/BookingSection'
 import ConnectSection           from '@/components/public/ConnectSection'
 import ReviewSection            from '@/components/public/ReviewSection'
+import HomepageSectionBoundary from '@/components/public/HomepageSectionBoundary'
 import { getContentMap }        from '@/lib/db/content'
 
 export const dynamic = 'force-dynamic'
@@ -63,27 +64,31 @@ export default async function HomePage() {
 
   return (
     <>
-      <HeroSection
-        content={{
-          hero_title:    content.hero_title,
-          hero_subtitle: content.hero_subtitle,
-        }}
-      />
-      <MixesSection />
-      <EventsSection />
-      <PhotoStrip />
-      <PortfolioTeaserSection />
-      <BookingSection
-        bookingEmail={content.booking_email}
-      />
-      <ReviewSection />
-      <ConnectSection
-        socialOverrides={{
-          instagram_url:  content.instagram_url,
-          soundcloud_url: content.soundcloud_url,
-          youtube_url:    content.youtube_url,
-        }}
-      />
+      <HomepageSectionBoundary section="hero">
+        <HeroSection
+          content={{
+            hero_title:    content.hero_title,
+            hero_subtitle: content.hero_subtitle,
+          }}
+        />
+      </HomepageSectionBoundary>
+      <HomepageSectionBoundary section="mixes"><MixesSection /></HomepageSectionBoundary>
+      <HomepageSectionBoundary section="events"><EventsSection /></HomepageSectionBoundary>
+      <HomepageSectionBoundary section="photo-strip"><PhotoStrip /></HomepageSectionBoundary>
+      <HomepageSectionBoundary section="portfolio"><PortfolioTeaserSection /></HomepageSectionBoundary>
+      <HomepageSectionBoundary section="booking">
+        <BookingSection bookingEmail={content.booking_email} />
+      </HomepageSectionBoundary>
+      <HomepageSectionBoundary section="reviews"><ReviewSection /></HomepageSectionBoundary>
+      <HomepageSectionBoundary section="connect">
+        <ConnectSection
+          socialOverrides={{
+            instagram_url:  content.instagram_url,
+            soundcloud_url: content.soundcloud_url,
+            youtube_url:    content.youtube_url,
+          }}
+        />
+      </HomepageSectionBoundary>
     </>
   )
 }

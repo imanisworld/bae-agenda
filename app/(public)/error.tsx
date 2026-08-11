@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { reportClientError } from '@/lib/client-error-reporting'
 
 export default function PublicError({
   error,
@@ -10,10 +11,9 @@ export default function PublicError({
   reset: () => void
 }) {
   useEffect(() => {
-    console.error('Public route error', {
-      message: error.message,
+    reportClientError(error, {
+      source: 'public-route',
       digest: error.digest,
-      stack: error.stack,
     })
   }, [error])
 

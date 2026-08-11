@@ -126,6 +126,8 @@ npm run build
 ## Deployment Notes
 
 - This app is set up for Vercel-style deployment
+- The reproducible homepage-debug workflow is documented in [`docs/staging-preview.md`](docs/staging-preview.md)
+- Use the long-lived `staging` target and staging-only service credentials for browser reproduction; do not debug against production writes
 - Production env vars must be added before booking, auth, invoice, or notification flows will work
 - Stripe deposit flow also requires the Stripe env vars above plus a webhook endpoint pointed at
   `https://thebaeagenda.com/api/stripe/webhook`
