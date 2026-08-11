@@ -19,8 +19,9 @@ Preferred (Vercel Pro/Enterprise):
 
 1. Create a custom environment named `staging` and map the Git branch `staging` to it.
 2. Attach a stable domain such as `staging.thebaeagenda.com` to that environment.
-3. Configure staging-only Supabase, Stripe test-mode, Resend test/sandbox, and Upstash values in that environment. Do not copy production write credentials.
-4. Set `NEXT_PUBLIC_APP_URL` to the stable staging domain. `NEXT_PUBLIC_DEPLOYMENT_ENV` is derived from `VERCEL_TARGET_ENV`, but setting it to `staging` explicitly is harmless.
+3. Configure staging-only Supabase, Stripe test-mode, Resend, and Upstash values in that environment. Do not copy production write credentials.
+4. Set `EMAIL_DELIVERY_MODE=redirect` and `EMAIL_REDIRECT_TO` to a controlled staging inbox. Staging and preview email otherwise fails closed without contacting the original recipient.
+5. Set `NEXT_PUBLIC_APP_URL` to the stable staging domain. `NEXT_PUBLIC_DEPLOYMENT_ENV` is derived from `VERCEL_TARGET_ENV`, but setting it to `staging` explicitly is harmless.
 
 Hobby fallback:
 

@@ -1,4 +1,5 @@
 import { getPaymentInstructionRows, getPaymentInstructionTextLines } from '@/lib/payment-instructions'
+import { resolveEmailDelivery } from '@/lib/email-delivery'
 
 type BookingNotificationPayload = {
   firstName: string
@@ -97,7 +98,7 @@ const OWNER_ALERT_PHONE = normalizeUsPhone(process.env.BOOKING_ALERT_PHONE ?? '7
 
 type NotificationResult =
   | { ok: true }
-  | { ok: false; reason: 'missing_config' | 'request_failed'; detail?: string }
+  | { ok: false; reason: 'delivery_disabled' | 'missing_config' | 'request_failed'; detail?: string }
 
 type BookingNotificationDispatchSummary = {
   ownerEmailSent: boolean
@@ -333,7 +334,7 @@ function buildClientBookingEmailHtml(args: {
   `
 }
 
-async function sendEmail(args: {
+export async function sendEmailNotification(args: {
   to: string
   subject: string
   text: string
@@ -344,6 +345,15 @@ async function sendEmail(args: {
     content: string
   }>
 }): Promise<NotificationResult> {
+  const delivery = resolveEmailDelivery(args)
+  if (!delivery.enabled) {
+    return {
+      ok: false,
+      reason: 'delivery_disabled',
+      detail: `Email delivery is disabled in ${delivery.environment}.`,
+    }
+  }
+
   const apiKey = process.env.RESEND_API_KEY
   const from = process.env.BOOKING_FROM_EMAIL
 
@@ -360,11 +370,11 @@ async function sendEmail(args: {
       },
       body: JSON.stringify({
         from,
-        to: [args.to],
-        subject: args.subject,
+        to: [delivery.to],
+        subject: delivery.subject,
         text: args.text,
         html: args.html,
-        reply_to: args.replyTo,
+        reply_to: delivery.replyTo,
         attachments: args.attachments,
       }),
     })
@@ -436,7 +446,7 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ')
 
   const tasks: Array<Promise<NotificationResult>> = [
-    sendEmail({
+    sendEmailNotification({
       to: OWNER_ALERT_EMAIL,
       subject: `New booking inquiry: ${payload.eventName}`,
       replyTo: payload.email,
@@ -497,7 +507,7 @@ export async function sendBookingInquiryReceipt(payload: BookingInquiryReceiptPa
   const location = payload.location?.trim()
   const locationText = location ? ` in ${location}` : ''
 
-  return sendEmail({
+  return sendEmailNotification({
     to: payload.email,
     subject: 'DJ B.A.E. inquiry received',
     text: [
@@ -539,7 +549,7 @@ export async function sendBookingConfirmedNotification(payload: BookingConfirmed
     cardUrl: hasDepositLink ? payload.payUrl : null,
   })
 
-  return sendEmail({
+  return sendEmailNotification({
     to: payload.email,
     subject: 'DJ B.A.E. booking confirmed',
     text: [
@@ -589,7 +599,7 @@ export async function sendBookingBalanceReminder(payload: BookingBalanceReminder
     cardUrl: payload.payUrl,
   })
 
-  return sendEmail({
+  return sendEmailNotification({
     to: payload.email,
     subject: 'DJ B.A.E. final payment reminder',
     text: [
@@ -623,7 +633,7 @@ export async function sendBookingPostEventFollowUp(payload: BookingPostEventFoll
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
 
-  return sendEmail({
+  return sendEmailNotification({
     to: payload.email,
     subject: 'Thank you for booking DJ B.A.E.',
     text: [
@@ -654,7 +664,7 @@ export async function sendBookingReviewRequest(payload: BookingReviewRequestPayl
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
 
-  return sendEmail({
+  return sendEmailNotification({
     to: payload.email,
     subject: 'How did DJ B.A.E. do?',
     text: [
@@ -686,7 +696,7 @@ export async function sendBookingReviewRequest(payload: BookingReviewRequestPayl
 export async function sendInvoiceNotification(payload: InvoiceNotificationPayload) {
   const greetingName = payload.clientName.trim() || 'there'
 
-  return sendEmail({
+  return sendEmailNotification({
     to: payload.to,
     subject: `Invoice from DJ B.A.E. for ${payload.eventName}`,
     text: [
@@ -798,7 +808,7 @@ export async function sendInvoiceNotification(payload: InvoiceNotificationPayloa
 export async function sendW9Notification(payload: W9NotificationPayload) {
   const greetingName = payload.clientName.trim() || 'there'
 
-  return sendEmail({
+  return sendEmailNotification({
     to: payload.to,
     subject: `W-9 from DJ B.A.E. for ${payload.eventName}`,
     text: [

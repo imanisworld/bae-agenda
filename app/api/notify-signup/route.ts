@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { z } from 'zod'
 import { limitNotifySignup } from '@/lib/ratelimit'
+import { sendEmailNotification } from '@/lib/notifications'
 
 const schema = z.object({
   email: z.string().email().max(254),
@@ -77,27 +78,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true }, { status: 200 })
   }
 
-  const apiKey = process.env.RESEND_API_KEY
-  const fromAddr = process.env.BOOKING_FROM_EMAIL
   const toAddr = process.env.BOOKING_ALERT_EMAIL ?? 'baebookings@proton.me'
 
-  if (!apiKey || !fromAddr) {
-    console.error('Notify signup misconfigured: missing env vars')
-    return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 })
-  }
-
   try {
-    const resendResponse = await fetch('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        from: fromAddr,
-        to: toAddr,
-        subject: 'New Mix Notify Signup',
-        html: `
+    const result = await sendEmailNotification({
+      to: toAddr,
+      subject: 'New Mix Notify Signup',
+      text: `New mix notify signup: ${email}`,
+      html: `
           <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
           <html dir="ltr" lang="en">
             <head>
@@ -171,13 +159,18 @@ export async function POST(request: Request) {
             </body>
           </html>
         `,
-      }),
     })
 
-    if (!resendResponse.ok) {
-      const errorText = await resendResponse.text()
-      console.error('Resend error:', resendResponse.status, errorText)
-      return NextResponse.json({ error: 'Email failed to send' }, { status: 502 })
+    if (!result.ok) {
+      if (result.reason === 'delivery_disabled') {
+        console.info('[notify-signup] email suppressed:', result.detail)
+        return NextResponse.json({ ok: true }, { status: 200 })
+      }
+      console.error('Notify signup email failed:', result.reason, result.detail ?? '')
+      return NextResponse.json(
+        { error: result.reason === 'missing_config' ? 'Server misconfigured' : 'Email failed to send' },
+        { status: result.reason === 'missing_config' ? 500 : 502 },
+      )
     }
   } catch (error) {
     console.error('Notify signup route error:', error)

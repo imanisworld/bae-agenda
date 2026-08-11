@@ -61,6 +61,10 @@ Production envs break down like this:
   `ADMIN_EMAILS`
 - Required only if you want booking and mix signup emails to send:
   `RESEND_API_KEY`, `BOOKING_FROM_EMAIL`
+- Email delivery safety:
+  production defaults to live delivery; preview/staging/local default to disabled. Set
+  `EMAIL_DELIVERY_MODE=redirect` and `EMAIL_REDIRECT_TO` in staging to exercise the full
+  Resend path without contacting real clients.
 - Optional booking alert overrides:
   `BOOKING_ALERT_EMAIL`, `BOOKING_ALERT_PHONE`, `BOOKING_ZELLE_HANDLE`, `BOOKING_CASH_APP_HANDLE`
 - Required only for Stripe payment routes and the `/pay/[id]` payment experience:
@@ -71,6 +75,8 @@ Production envs break down like this:
   `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`
 - Optional Upstash rate limiting:
   `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
+- Required for the Vercel payment-reminder cron:
+  `CRON_SECRET`
 
 Not used by this codebase:
 
