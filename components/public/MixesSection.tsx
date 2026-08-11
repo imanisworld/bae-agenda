@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import InteractiveMediaDisc from '@/components/public/InteractiveMediaDisc'
 import MixesTeaserForm from '@/components/public/MixesTeaserForm'
 import type { Mix } from '@/lib/db/mixes'
@@ -443,6 +444,27 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                         border: '1px solid rgba(255,255,255,0.08)',
                       }}
                     >
+                      {mix.cover_url ? (
+                        <div
+                          style={{
+                            position: 'relative',
+                            width: '100%',
+                            aspectRatio: '1 / 1',
+                            borderRadius: '14px',
+                            overflow: 'hidden',
+                            border: '1px solid rgba(255,255,255,0.08)',
+                          }}
+                        >
+                          <Image
+                            src={mix.cover_url}
+                            alt=""
+                            fill
+                            sizes="(max-width: 640px) 100vw, 220px"
+                            style={{ objectFit: 'cover' }}
+                          />
+                        </div>
+                      ) : null}
+
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px' }}>
                         <span style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
                           {mix === featuredMix ? 'Featured' : formatPublishedDate(mix.published_at)}
