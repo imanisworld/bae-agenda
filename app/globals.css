@@ -2215,7 +2215,6 @@ button,
   gap: 10px;
 }
 
-.review-section-cta,
 .review-card-cta {
   transition:
     background var(--motion-fast) var(--ease-standard),
@@ -2223,7 +2222,6 @@ button,
     color var(--motion-fast) var(--ease-standard);
 }
 
-.review-section-cta:hover,
 .review-card-cta:hover {
   background: rgba(155,93,229,0.16);
   border-color: rgba(155,93,229,0.38);
@@ -2363,14 +2361,6 @@ button,
     margin-top: 6px !important;
     font-size: 10px !important;
     line-height: 1.5 !important;
-  }
-
-  .review-section-cta {
-    margin-top: 10px !important;
-    width: 100%;
-    padding: 12px 14px !important;
-    font-size: 9px !important;
-    letter-spacing: 0.18em !important;
   }
 
   .review-section-chips .build-console-mini-chips span {

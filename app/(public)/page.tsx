@@ -20,6 +20,7 @@ import PortfolioTeaserSection   from '@/components/public/PortfolioTeaserSection
 import BookingSection           from '@/components/public/BookingSection'
 import ConnectSection           from '@/components/public/ConnectSection'
 import ReviewSection            from '@/components/public/ReviewSection'
+import LeaveReviewSection       from '@/components/public/LeaveReviewSection'
 import HomepageSectionBoundary from '@/components/public/HomepageSectionBoundary'
 import { getContentMap }        from '@/lib/db/content'
 
@@ -82,6 +83,10 @@ export default async function HomePage() {
       <HomepageSectionBoundary section="booking">
         <BookingSection bookingEmail={content.booking_email} />
       </HomepageSectionBoundary>
+      {/* Leave-a-review CTA lives down here, not with the proof higher up —
+          a first-time visitor hasn't booked yet, so asking them to review
+          an event doesn't make sense until this point in the page. */}
+      <HomepageSectionBoundary section="leave-review"><LeaveReviewSection /></HomepageSectionBoundary>
       <HomepageSectionBoundary section="connect">
         <ConnectSection
           socialOverrides={{

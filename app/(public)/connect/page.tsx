@@ -70,7 +70,7 @@ export default function ConnectPage() {
       </div>
 
       {/* ── Reviews ──────────────────────────────────────── */}
-      <ReviewSection hideForm />
+      <ReviewSection />
 
       {/* ── Leave a Review ───────────────────────────────── */}
       <div className="section-container connect-review-bar">

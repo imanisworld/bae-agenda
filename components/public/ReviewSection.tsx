@@ -1,10 +1,10 @@
 /**
  * REVIEW SECTION — Server Component
- * Shows approved reviews from Supabase + a form to submit a new one.
+ * Shows approved reviews from Supabase as social proof.
  * Falls back to hardcoded quotes if DB has no approved reviews yet.
+ * The submission form lives separately in LeaveReviewSection.
  */
 import { createClient } from '@/lib/supabase/server'
-import ReviewForm from '@/components/public/ReviewForm'
 
 interface Review {
   id:         string
@@ -42,7 +42,7 @@ function Stars({ n }: { n: number }) {
   )
 }
 
-export default async function ReviewSection({ hideForm = false }: { hideForm?: boolean }) {
+export default async function ReviewSection() {
   const reviews = await getApprovedReviews()
   const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
   const featuredReview = reviews[0]
@@ -98,26 +98,6 @@ export default async function ReviewSection({ hideForm = false }: { hideForm?: b
             }}>
               Real reactions from parties, venues, and live rooms.
             </p>
-            {!hideForm && <a
-              href="#leave-review"
-              className="review-section-cta"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginTop: '12px',
-                padding: '10px 14px',
-                border: '1px solid rgba(155,93,229,0.28)',
-                background: 'rgba(155,93,229,0.08)',
-                color: 'var(--white)',
-                textDecoration: 'none',
-                fontSize: '10px',
-                letterSpacing: '0.2em',
-                textTransform: 'uppercase',
-              }}
-            >
-              Leave a Review
-            </a>}
           </div>
 
           <div className="review-section-chips">
@@ -214,22 +194,6 @@ export default async function ReviewSection({ hideForm = false }: { hideForm?: b
               )}
             </div>
           </article>
-
-          {!hideForm && <div id="leave-review" className="review-form-shell" style={{
-            marginTop: '10px',
-            borderRadius: '20px',
-            padding: '16px',
-            background: 'linear-gradient(180deg, rgba(24,24,28,0.98), rgba(16,16,20,0.98))',
-            border: '1px solid rgba(255,255,255,0.07)',
-          }}>
-            <div style={{ marginBottom: '12px' }}>
-              <span className="section-label" style={{ marginBottom: '6px' }}>Leave a Review</span>
-              <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.6, margin: 0 }}>
-                Share your experience and it will stay private until approved.
-              </p>
-            </div>
-            <ReviewForm compact />
-          </div>}
         </div>
       </div>
     </section>

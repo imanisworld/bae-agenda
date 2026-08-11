@@ -12,6 +12,7 @@ const VALID_SECTIONS = new Set([
   'portfolio',
   'booking',
   'reviews',
+  'leave-review',
   'connect',
 ])
 
