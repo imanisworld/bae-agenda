@@ -9,7 +9,6 @@
 import Image         from 'next/image'
 import Link          from 'next/link'
 import HeroGlowLayer from '@/components/effects/HeroGlowLayer'
-import AddToHomeScreenPrompt from '@/components/public/AddToHomeScreenPrompt'
 import ScrollFader   from '@/components/public/ScrollFader'
 
 interface HeroContent {
@@ -148,8 +147,6 @@ export default function HeroSection({ content = {} }: Props) {
               See the Work
             </Link>
           </div>
-
-          <AddToHomeScreenPrompt />
         </div>
 
         <div aria-hidden="true" />
