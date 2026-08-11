@@ -3,6 +3,7 @@
  * Shows 3 featured portfolio entries between Events and Booking.
  * Slim editorial style — not a full section, just a surface.
  */
+import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 
@@ -13,6 +14,8 @@ interface PortfolioEntry {
   year:       number
   tags:       string[]
   featured:   boolean
+  photo_url:  string | null
+  notes:      string | null
 }
 
 function contextualLabel(entry: PortfolioEntry) {
@@ -25,7 +28,7 @@ async function getFeatured(): Promise<PortfolioEntry[]> {
     const supabase = await createClient()
     const { data } = await supabase
       .from('portfolio_entries')
-      .select('id, event_name, city, year, tags, featured')
+      .select('id, event_name, city, year, tags, featured, photo_url, notes')
       .eq('featured', true)
       .order('year', { ascending: false })
       .limit(3)
@@ -131,58 +134,82 @@ export default async function PortfolioTeaserSection() {
             {entries.map((entry) => (
               <Link
                 key={entry.id}
-                href="/portfolio"
+                href={`/portfolio#entry-${entry.id}`}
                 className="portfolio-teaser-event-card"
-                aria-label={`Explore more events like ${entry.event_name}`}
+                aria-label={`View the ${entry.event_name} case study`}
                 style={{
                   background: 'var(--off-black)',
-                  padding: '20px 22px',
                   display: 'grid',
-                  gap: '8px',
+                  gridTemplateRows: entry.photo_url ? 'auto 1fr' : '1fr',
                   textDecoration: 'none',
                 }}
               >
-                <div className="portfolio-teaser-event-meta" style={{
-                  fontSize: '9px',
-                  letterSpacing: '0.24em',
-                  textTransform: 'uppercase',
-                  color: 'var(--muted)',
-                }}>
-                  {contextualLabel(entry)}
-                </div>
-                <div style={{
-                  fontFamily: 'Conthrax, sans-serif',
-                  fontSize: 'clamp(13px, 1.8vw, 16px)',
-                  color: 'var(--white)',
-                  lineHeight: 1.2,
-                }}>
-                  {entry.event_name}
-                </div>
-                <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
-                  {entry.city}
-                </div>
-                {entry.tags.length > 0 && (
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px', flexWrap: 'wrap', marginTop: '2px' }}>
-                    {entry.tags.slice(0, 2).map((tag) => (
-                      <span
-                        key={tag}
-                        style={{
-                          fontSize: '10px',
-                          letterSpacing: '0.14em',
-                          textTransform: 'uppercase',
-                          color: 'var(--violet)',
-                          background: 'rgba(155,93,229,0.1)',
-                          border: '1px solid rgba(155,93,229,0.18)',
-                          borderRadius: '100px',
-                          padding: '2px 7px',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                {entry.photo_url && (
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 10' }}>
+                    <Image
+                      src={entry.photo_url}
+                      alt=""
+                      fill
+                      sizes="(max-width: 640px) 100vw, 33vw"
+                      style={{ objectFit: 'cover' }}
+                    />
                   </div>
                 )}
+
+                <div style={{ padding: '20px 22px', display: 'grid', gap: '8px' }}>
+                  <div className="portfolio-teaser-event-meta" style={{
+                    fontSize: '9px',
+                    letterSpacing: '0.24em',
+                    textTransform: 'uppercase',
+                    color: 'var(--muted)',
+                  }}>
+                    {contextualLabel(entry)}
+                  </div>
+                  <div style={{
+                    fontFamily: 'Conthrax, sans-serif',
+                    fontSize: 'clamp(13px, 1.8vw, 16px)',
+                    color: 'var(--white)',
+                    lineHeight: 1.2,
+                  }}>
+                    {entry.event_name}
+                  </div>
+                  <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
+                    {entry.city}
+                  </div>
+                  {entry.notes ? (
+                    <p style={{
+                      margin: '2px 0 0',
+                      fontSize: '12px',
+                      lineHeight: 1.6,
+                      color: 'rgba(250,248,243,0.7)',
+                      fontStyle: 'italic',
+                    }}>
+                      {entry.notes}
+                    </p>
+                  ) : null}
+                  {entry.tags.length > 0 && (
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px', flexWrap: 'wrap', marginTop: '2px' }}>
+                      {entry.tags.slice(0, 2).map((tag) => (
+                        <span
+                          key={tag}
+                          style={{
+                            fontSize: '10px',
+                            letterSpacing: '0.14em',
+                            textTransform: 'uppercase',
+                            color: 'var(--violet)',
+                            background: 'rgba(155,93,229,0.1)',
+                            border: '1px solid rgba(155,93,229,0.18)',
+                            borderRadius: '100px',
+                            padding: '2px 7px',
+                            whiteSpace: 'nowrap',
+                          }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </Link>
             ))}
           </div>

@@ -150,13 +150,19 @@ export default async function PortfolioPage() {
               gap: '16px',
             }}>
               {featured.map((entry) => (
-                <div key={entry.id} className="card-hover" style={{
-                  background: 'var(--off-black)',
-                  border: '1px solid var(--border)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
-                }}>
+                <div
+                  key={entry.id}
+                  id={`entry-${entry.id}`}
+                  className="card-hover portfolio-featured-card"
+                  style={{
+                    background: 'var(--off-black)',
+                    border: '1px solid var(--border)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    scrollMarginTop: 'calc(var(--nav-height) + 24px)',
+                  }}
+                >
                   {/* Photo only — no placeholder when missing */}
                   {entry.photo_url && (
                     <div style={{ position: 'relative', aspectRatio: '3/2', flexShrink: 0 }}>
@@ -199,6 +205,18 @@ export default async function PortfolioPage() {
                     <div style={{ fontSize: '13px', color: 'var(--muted)' }}>
                       {[entry.venue, entry.city].filter(Boolean).join(' · ')}
                     </div>
+
+                    {entry.notes && (
+                      <p style={{
+                        margin: 0,
+                        fontSize: '13px',
+                        lineHeight: 1.65,
+                        color: 'rgba(250,248,243,0.78)',
+                        fontStyle: 'italic',
+                      }}>
+                        {entry.notes}
+                      </p>
+                    )}
 
                     {entry.tags.length > 0 && (
                       <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
