@@ -5,6 +5,12 @@ import { logError, logEvent } from '@/lib/monitoring'
 
 export const runtime = 'nodejs'
 
+type ResendWebhookEvent = {
+  type: string
+  created_at?: string
+  data: Record<string, unknown>
+}
+
 const TRACKED_EMAIL_EVENTS = new Set([
   'email.sent',
   'email.delivered',
@@ -47,14 +53,14 @@ export async function POST(request: NextRequest) {
 
   const payload = await request.text()
 
-  let event: Awaited<ReturnType<InstanceType<typeof Resend>['webhooks']['verify']>>
+  let event: ResendWebhookEvent
   try {
     const resend = new Resend(apiKey)
     event = await resend.webhooks.verify({
       payload,
       headers: { id, timestamp, signature },
       webhookSecret,
-    })
+    }) as ResendWebhookEvent
   } catch (error) {
     logError('resend_webhook_verification_failed', error, { eventId: id })
     return NextResponse.json({ error: 'Invalid webhook signature.' }, { status: 400 })
@@ -64,7 +70,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true, ignored: true })
   }
 
-  const data = event.data as Record<string, unknown>
+  const data = event.data
   const emailId = stringValue(data.email_id)
 
   if (!emailId) {
