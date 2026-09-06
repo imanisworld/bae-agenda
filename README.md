@@ -50,7 +50,7 @@ npm run dev
 
 ## Environment Variables
 
-See [`.env.example`](../.env.example).
+See [`.env.example`](.env.example).
 
 Production envs break down like this:
 
