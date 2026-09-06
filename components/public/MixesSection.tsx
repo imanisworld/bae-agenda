@@ -190,7 +190,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
 
             <div className="mixes-teaser-copy">
               <div className="mixes-teaser-kicker">Lab Archive</div>
-              <h3 className="mixes-teaser-title">Bae&apos;s in the Lab</h3>
+              <h2 className="mixes-teaser-title">Bae&apos;s in the Lab</h2>
               <p className="mixes-teaser-subtext">
                 {isPage
                   ? 'Recent sets and old drops are all here. Follow me now and the archive will keep growing from this point forward.'
