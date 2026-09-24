@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   formatEventTimeRange,
   getLocalDateString,
+  getScheduledReminderQueryWindow,
   isCalendarDaysOut,
   isHoursAwayWithinRange,
   isValidTimeZone,
@@ -76,5 +77,30 @@ describe('date-time helpers', () => {
         new Date('2026-07-03T23:00:00.000Z')
       )
     ).toBe(false)
+  })
+
+  it('keeps review-request bookings inside the daily cron query window', () => {
+    const now = new Date('2026-07-15T15:00:00.000Z')
+    const { windowStart, windowEnd } = getScheduledReminderQueryWindow(now)
+    // Four days after a 18:30 event: inside the 72–240h review window, and
+    // after the old 3-day lookback that the next daily run would have missed.
+    const event = new Date('2026-07-11T18:30:00.000Z')
+    const hoursSince = (now.getTime() - event.getTime()) / (1000 * 60 * 60)
+    const previousLookback = new Date(now)
+    previousLookback.setUTCDate(previousLookback.getUTCDate() - 3)
+
+    expect(hoursSince).toBeGreaterThanOrEqual(72)
+    expect(hoursSince).toBeLessThan(240)
+    expect(event.getTime()).toBeLessThan(previousLookback.getTime())
+    expect(event.getTime()).toBeGreaterThanOrEqual(windowStart.getTime())
+    expect(event.getTime()).toBeLessThanOrEqual(windowEnd.getTime())
+  })
+
+  it('still includes a balance reminder seven days ahead', () => {
+    const now = new Date('2026-07-04T15:00:00.000Z')
+    const { windowEnd } = getScheduledReminderQueryWindow(now)
+    const event = new Date('2026-07-11T22:30:00.000Z')
+
+    expect(event.getTime()).toBeLessThanOrEqual(windowEnd.getTime())
   })
 })

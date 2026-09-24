@@ -193,3 +193,19 @@ export function isHoursAwayWithinRange(
   const hoursUntil = (event.getTime() - now.getTime()) / (1000 * 60 * 60)
   return hoursUntil >= minimumHoursInclusive && hoursUntil < maximumHoursExclusive
 }
+
+// Review requests send once the event is 72–240 hours old. The cron runs daily,
+// so the lookback has to cover that whole span plus a day. Three days drops the
+// booking on the next run, before a review email can go out.
+const SCHEDULED_REMINDER_LOOKAHEAD_DAYS = 8
+const SCHEDULED_REMINDER_LOOKBACK_DAYS = 11
+
+export function getScheduledReminderQueryWindow(now = new Date()) {
+  const windowEnd = new Date(now)
+  windowEnd.setUTCDate(windowEnd.getUTCDate() + SCHEDULED_REMINDER_LOOKAHEAD_DAYS)
+
+  const windowStart = new Date(now)
+  windowStart.setUTCDate(windowStart.getUTCDate() - SCHEDULED_REMINDER_LOOKBACK_DAYS)
+
+  return { windowStart, windowEnd }
+}

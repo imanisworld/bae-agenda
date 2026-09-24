@@ -5,7 +5,7 @@ import {
   getBalanceReminderPayloadFromBooking,
   type BookingBalanceReminderSource,
 } from '@/lib/booking-email-payloads'
-import { isCalendarDaysOut } from '@/lib/date-time'
+import { getScheduledReminderQueryWindow, isCalendarDaysOut } from '@/lib/date-time'
 import { sendBookingBalanceReminder } from '@/lib/notifications'
 
 function isAuthorizedCron(request: NextRequest) {
@@ -142,10 +142,7 @@ export async function GET(request: NextRequest) {
   const admin = createAdminClient()
   const now = new Date()
   const nowIso = now.toISOString()
-  const windowEnd = new Date(now)
-  windowEnd.setDate(windowEnd.getDate() + 8)
-  const windowStart = new Date(now)
-  windowStart.setDate(windowStart.getDate() - 3)
+  const { windowStart, windowEnd } = getScheduledReminderQueryWindow(now)
 
   const { data, error } = await admin
     .from('bookings')
