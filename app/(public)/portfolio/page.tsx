@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { getPortfolioEntries, getFeaturedPortfolioEntries, getPortfolioStats } from '@/app/actions/portfolio'
-import PortfolioArchive from '@/components/public/PortfolioArchive'
+import PortfolioArchive from '@/components/public/PortfolioArchive'\nimport PortfolioArchiveHero from '@/components/public/PortfolioArchiveHero'
 import { getContentMap } from '@/lib/db/content'
 import { CONTENT_DEFAULTS, DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
 
@@ -47,75 +47,17 @@ export default async function PortfolioPage() {
   return (
     <div style={{ background: 'var(--black)' }}>
 
-      {/* ── Hero ──────────────────────────────────────────────── */}
-      <section style={{
-        minHeight: '52vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        padding: 'calc(var(--nav-height) + var(--safe-top) + 48px) max(24px, calc(var(--safe-right) + 20px)) 48px max(24px, calc(var(--safe-left) + 20px))',
-        background: 'linear-gradient(180deg, var(--bg-sunken) 0%, var(--black) 100%)',
-        borderBottom: '1px solid var(--border)',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        <Image
-          src="/photos/PlexMix19-DJBAE.JPEG"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-          aria-hidden="true"
-          style={{
-            objectFit: 'cover',
-            objectPosition: 'center 38%',
-            opacity: 0.42,
-          }}
-        />
-        <div
-          aria-hidden="true"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background: 'linear-gradient(90deg, rgba(8,8,10,0.95) 0%, rgba(8,8,10,0.78) 48%, rgba(8,8,10,0.52) 100%)',
-            zIndex: 0,
-          }}
-        />
-        <div style={{
-          position: 'absolute',
-          right: 'max(24px, calc(var(--safe-right) + 20px))',
-          bottom: '18px',
-          zIndex: 1,
-          fontSize: '10px',
-          letterSpacing: '0.06em',
-          color: 'rgba(250,248,243,0.5)',
-        }}>
-          Club Plex Mix 19 · Photo: Pook
-        </div>
-        <div style={{ maxWidth: '1280px', margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
-          <span className="section-label">Portfolio</span>
-          <h1 style={{
-            fontFamily: 'Conthrax, sans-serif',
-            fontSize: 'clamp(44px, 6vw, 80px)',
-            lineHeight: 0.95,
-            color: 'var(--white)',
-            margin: '0 0 20px',
-          }}>
-            Selected<br />
-            <span style={{ color: 'var(--violet)' }}>Work</span>
-          </h1>
-          <p style={{
-            fontSize: 'clamp(13px, 1.8vw, 16px)',
-            color: 'var(--muted)',
-            lineHeight: 1.7,
-            maxWidth: '480px',
-            marginBottom: '28px',
-          }}>
-            Club nights, festivals, private events, and community rooms documented across the archive.
-          </p>
-          <Link href="/book" className="btn-primary">Booking Inquiry</Link>
-        </div>
-      </section>
+      <PortfolioArchiveHero
+        prints={featured
+          .filter((entry): entry is typeof entry & { photo_url: string } => Boolean(entry.photo_url))
+          .slice(0, 3)
+          .map((entry) => ({
+            id: entry.id,
+            event_name: entry.event_name,
+            year: entry.year,
+            photo_url: entry.photo_url,
+          }))}
+      />
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 max(24px, calc(var(--safe-right) + 20px)) 0 max(24px, calc(var(--safe-left) + 20px))' }}>
 
@@ -130,7 +72,7 @@ export default async function PortfolioPage() {
           marginBottom: '56px',
         }}>
           {[
-            { value: stats.total || '—', label: 'documented events' },
+            { value: stats.total || '—', label: 'events' },
             { value: stats.cities || '—', label: 'cities' },
             { value: stats.yearsActive, label: 'active years' },
           ].map(({ label, value }) => (
@@ -241,7 +183,7 @@ export default async function PortfolioPage() {
         )}
 
         {/* ── Full Archive — client component with filters ───────── */}
-        <PortfolioArchive entries={entries.map((e) => ({
+        <div id="archive"><PortfolioArchive entries={entries.map((e) => ({
           id:         e.id,
           event_name: e.event_name,
           venue:      e.venue ?? null,
@@ -249,7 +191,7 @@ export default async function PortfolioPage() {
           year:       e.year,
           tags:       e.tags ?? [],
           featured:   e.featured,
-        }))} />
+        }))} /></div>
 
         {/* ── Press ─────────────────────────────────────────────── */}
         <section style={{
