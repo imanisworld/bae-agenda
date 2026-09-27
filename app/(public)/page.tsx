@@ -4,12 +4,13 @@
  * Server component — fetches site_content once and passes to sections.
  *
  * Sections:
- *   HeroSection          — full viewport, brand presence (reads hero copy)
- *   LabSection           — animated coming-soon teaser for Bae's in the Lab
- *   EventsSection        — upcoming dates (live Supabase data)
- *   PortfolioTeaserSection — featured portfolio pulled from Supabase
- *   BookingSection       — packages + booking CTA (reads booking_email)
- *   ConnectSection       — social links / "stay connected" (reads social URLs)
+ *   HeroSection            — full viewport, brand presence (reads hero copy)
+ *   PhotoStrip             — real event imagery and performance proof
+ *   PortfolioTeaserSection — featured gig history from Supabase
+ *   ReviewSection          — client proof
+ *   MixesSection           — listening entry point
+ *   EventsSection          — upcoming dates
+ *   BookingSection         — packages + booking CTA (reads booking_email)
  */
 import type { Metadata }      from 'next'
 import HeroSection              from '@/components/public/HeroSection'
@@ -18,9 +19,7 @@ import EventsSection            from '@/components/public/EventsSection'
 import PhotoStrip               from '@/components/public/PhotoStrip'
 import PortfolioTeaserSection   from '@/components/public/PortfolioTeaserSection'
 import BookingSection           from '@/components/public/BookingSection'
-import ConnectSection           from '@/components/public/ConnectSection'
 import ReviewSection            from '@/components/public/ReviewSection'
-import LeaveReviewSection       from '@/components/public/LeaveReviewSection'
 import HomepageSectionBoundary from '@/components/public/HomepageSectionBoundary'
 import { getContentMap }        from '@/lib/db/content'
 
@@ -53,9 +52,6 @@ const HOME_CONTENT_KEYS = [
   'hero_title',
   'hero_subtitle',
   'booking_email',
-  'instagram_url',
-  'soundcloud_url',
-  'youtube_url',
 ] as const
 
 export default async function HomePage() {
@@ -82,19 +78,6 @@ export default async function HomePage() {
       <HomepageSectionBoundary section="events"><EventsSection /></HomepageSectionBoundary>
       <HomepageSectionBoundary section="booking">
         <BookingSection bookingEmail={content.booking_email} />
-      </HomepageSectionBoundary>
-      {/* Leave-a-review CTA lives down here, not with the proof higher up —
-          a first-time visitor hasn't booked yet, so asking them to review
-          an event doesn't make sense until this point in the page. */}
-      <HomepageSectionBoundary section="leave-review"><LeaveReviewSection /></HomepageSectionBoundary>
-      <HomepageSectionBoundary section="connect">
-        <ConnectSection
-          socialOverrides={{
-            instagram_url:  content.instagram_url,
-            soundcloud_url: content.soundcloud_url,
-            youtube_url:    content.youtube_url,
-          }}
-        />
       </HomepageSectionBoundary>
     </>
   )

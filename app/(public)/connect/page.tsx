@@ -4,6 +4,7 @@
  */
 import type { Metadata } from 'next'
 import { SOCIALS } from '@/lib/constants'
+import { getContentMap } from '@/lib/db/content'
 import ReviewSection from '@/components/public/ReviewSection'
 import ReviewDrawer from '@/components/public/ReviewDrawer'
 
@@ -29,7 +30,24 @@ const SOCIAL_HANDLES: Record<string, string> = {
   'dot.cards': 'dot.cards/djbae',
 }
 
-export default function ConnectPage() {
+const SOCIAL_CONTENT_KEYS = [
+  'instagram_url',
+  'soundcloud_url',
+  'youtube_url',
+] as const
+
+export default async function ConnectPage() {
+  const content = await getContentMap([...SOCIAL_CONTENT_KEYS])
+  const socials = SOCIALS.map((social) => {
+    const override =
+      social.label === 'Instagram' ? content.instagram_url :
+      social.label === 'SoundCloud' ? content.soundcloud_url :
+      social.label === 'YouTube' ? content.youtube_url :
+      undefined
+
+    return { ...social, url: override || social.url }
+  })
+
   return (
     <div style={{ background: 'var(--black)', paddingTop: '68px' }}>
 
@@ -50,7 +68,7 @@ export default function ConnectPage() {
       {/* ── Socials Grid ─────────────────────────────────── */}
       <div className="section-container" style={{ paddingTop: 0, paddingBottom: '56px' }}>
         <div className="connect-socials-grid">
-          {SOCIALS.map(({ label, url, icon }) => (
+          {socials.map(({ label, url, icon }) => (
             <a
               key={label}
               href={url}

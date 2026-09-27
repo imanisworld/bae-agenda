@@ -6,13 +6,11 @@
 
 // ---- Navigation --------------------------------------------
 export const PUBLIC_NAV = [
-  { label: 'Home',      href: '/'          },
   { label: 'Events',    href: '/events'    },
-  { label: 'Meet',      href: '/meet'      },
   { label: 'Portfolio', href: '/portfolio' },
+  { label: 'Lab',       href: '/lab'       },
+  { label: 'Meet',      href: '/meet'      },
   { label: 'Book',      href: '/book'      },
-  { label: 'Built',     href: '/built'     },
-  { label: 'Connect',   href: '/connect'   },
 ] as const
 
 export const ADMIN_NAV = [

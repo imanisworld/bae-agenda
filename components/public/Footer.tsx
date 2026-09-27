@@ -1,25 +1,21 @@
 /**
  * PUBLIC FOOTER — Server Component
- * Brand · Nav · Socials + bottom copyright bar.
+ * Brand · navigation + bottom copyright bar.
  */
 import Link from 'next/link'
-import { SOCIALS } from '@/lib/constants'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
 const NAV_LINKS = [
   { label: 'Events',    href: '/events'    },
-  { label: 'Meet',      href: '/meet'      },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Lab',       href: '/lab'       },
+  { label: 'Meet',      href: '/meet'      },
   { label: 'Book',      href: '/book'      },
+  { label: 'Connect',   href: '/connect'   },
   { label: 'Built',     href: '/built'     },
   { label: 'Press Kit', href: '/press-kit' },
 ]
-
-const FOOTER_SOCIALS = SOCIALS.filter(s =>
-  ['Instagram', 'TikTok', 'SoundCloud', 'YouTube'].includes(s.label)
-)
 
 export default function Footer() {
   return (
@@ -32,17 +28,16 @@ export default function Footer() {
           }
           .footer-brand { align-items: center !important; }
           .footer-body nav ul { justify-content: center !important; }
-          .footer-socials { justify-content: center !important; }
         }
       `}</style>
 
-      {/* Main: brand | nav | socials */}
+      {/* Main: brand | nav */}
       <div className="footer-body" style={{
         maxWidth: '1280px',
         margin: '0 auto',
         padding: 'clamp(40px, 5vw, 64px) max(24px, calc(var(--safe-right) + 20px)) clamp(28px, 4vw, 40px) max(24px, calc(var(--safe-left) + 20px))',
         display: 'grid',
-        gridTemplateColumns: '1fr auto 1fr',
+        gridTemplateColumns: '1fr auto',
         alignItems: 'center',
         gap: '32px',
       }}>
@@ -72,35 +67,6 @@ export default function Footer() {
           </ul>
         </nav>
 
-        {/* Socials */}
-        <div className="footer-socials" style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'flex-end' }}>
-          {FOOTER_SOCIALS.map(({ label, url, icon }) => (
-            <a
-              key={label}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`DJ B.A.E. on ${label}`}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '44px',
-                height: '44px',
-                border: '1px solid var(--border)',
-                fontFamily: 'DM Sans, sans-serif',
-                fontSize: '9px',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                color: 'var(--muted)',
-                textDecoration: 'none',
-                flexShrink: 0,
-              }}
-            >
-              {icon}
-            </a>
-          ))}
-        </div>
 
       </div>
 
