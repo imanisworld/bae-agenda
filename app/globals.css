@@ -200,12 +200,12 @@ button,
 /* Section eye-brow label (MIXES / EVENTS / etc.) */
 .section-label {
   display: block;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.24em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--eyebrow);
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 /* Section heading (Conthrax) */
@@ -213,10 +213,10 @@ button,
   font-family: 'Conthrax', sans-serif;
   font-size: clamp(26px, 3.5vw, 44px);
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.01em;
   color: var(--white);
   line-height: 1.1;
-  margin-bottom: 48px;
+  margin-bottom: 40px;
 }
 
 .hardware-heading {
@@ -228,10 +228,10 @@ button,
 
 .hardware-heading::before {
   content: '';
-  width: 22px;
+  width: 14px;
   height: 1px;
   flex-shrink: 0;
-  background: rgba(166,107,255,0.9);
+  background: rgba(166,107,255,0.52);
 }
 
 .hardware-heading .section-label {
@@ -1227,15 +1227,14 @@ button,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 36px;
+  padding: 14px 24px;
   background: var(--violet);
   color: var(--white);
   text-decoration: none;
   font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
   transition: background var(--motion-fast) var(--ease-standard);
 }
 .btn-primary:hover { background: var(--violet-light); }
@@ -1245,15 +1244,14 @@ button,
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 15px 32px;
+  padding: 13px 22px;
   background: transparent;
   color: var(--white);
   text-decoration: none;
   font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 400;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
   border: 1px solid var(--border);
   transition: border-color var(--motion-fast) var(--ease-standard),
               color var(--motion-fast) var(--ease-standard);
@@ -1264,15 +1262,14 @@ button,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 16px 40px;
+  padding: 14px 24px;
   background: var(--white);
   color: var(--black);
   text-decoration: none;
   font-family: 'DM Sans', sans-serif;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
   transition: background var(--motion-fast) var(--ease-standard),
               color var(--motion-fast) var(--ease-standard);
 }
@@ -1480,27 +1477,11 @@ button,
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  border-radius: 34px;
-  padding: 18px;
-  /* Brushed aluminum sheen top-left, dark panel base */
-  background:
-    linear-gradient(148deg, rgba(82,82,94,0.48) 0%, rgba(52,52,60,0.18) 22%, transparent 46%),
-    linear-gradient(135deg, rgba(20,20,24,0.99), rgba(34,34,40,0.99));
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow:
-    /* Top edge highlight — catches the light like a beveled panel edge */
-    inset 0 1px 0 rgba(255,255,255,0.15),
-    /* Bottom edge shadow */
-    inset 0 -1px 0 rgba(0,0,0,0.70),
-    /* Side edge shadow */
-    inset -1px 0 0 rgba(0,0,0,0.28),
-    /* Outer dark bezel ring — gives the console a raised chassis feel */
-    0 0 0 1px rgba(0,0,0,0.88),
-    /* Subtle outer rim highlight */
-    0 0 0 2px rgba(255,255,255,0.06),
-    /* Panel depth shadows */
-    0 32px 72px rgba(0,0,0,0.58),
-    0 12px 28px rgba(0,0,0,0.38);
+  border-radius: 18px;
+  padding: 14px;
+  background: linear-gradient(180deg, rgba(22,22,27,0.98), rgba(15,15,19,0.98));
+  border: 1px solid rgba(255,255,255,0.09);
+  box-shadow: 0 18px 48px rgba(0,0,0,0.28);
 }
 
 .built-console-hardware-image,
@@ -2513,10 +2494,7 @@ body.has-custom-cursor * { cursor: none !important; }
   overflow: hidden;
   padding: clamp(30px, 5vw, 56px);
   border: 1px solid rgba(255,255,255,0.08);
-  background:
-    radial-gradient(circle at 50% 0%, rgba(155,93,229,0.14), transparent 38%),
-    radial-gradient(circle at 18% 82%, rgba(155,93,229,0.08), transparent 26%),
-    linear-gradient(180deg, rgba(17,17,21,0.98), rgba(11,11,14,0.98));
+  background: linear-gradient(180deg, rgba(17,17,21,0.98), rgba(11,11,14,0.98));
   display: grid;
   justify-items: center;
   gap: 26px;
@@ -2536,31 +2514,15 @@ body.has-custom-cursor * { cursor: none !important; }
 }
 
 .mixes-teaser-shell::before {
-  content: '';
-  position: absolute;
-  inset: 1px;
-  border: 1px solid rgba(155,93,229,0.08);
-  pointer-events: none;
+  content: none;
 }
 
 .mixes-teaser-noise {
-  position: absolute;
-  inset: 0;
-  opacity: 0.1;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 18px 18px;
-  mask-image: radial-gradient(circle at center, black 45%, transparent 88%);
+  display: none;
 }
 
 .mixes-teaser-orbit {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(0.5px);
-  opacity: 0.8;
-  pointer-events: none;
+  display: none;
 }
 
 .mixes-teaser-orbit-a {
@@ -2826,27 +2788,16 @@ body.has-custom-cursor * { cursor: none !important; }
   position: relative;
   overflow: hidden;
   border: 1px solid rgba(255,255,255,0.08);
-  background:
-    radial-gradient(circle at 18% 18%, rgba(155,93,229,0.14), transparent 36%),
-    linear-gradient(180deg, rgba(16,16,20,0.98), rgba(8,8,10,0.98));
-  padding: 24px 20px;
+  background: rgba(13,13,17,0.98);
+  padding: 26px 22px;
   display: grid;
-  align-content: space-between;
-  justify-items: center;
+  align-content: center;
+  justify-items: start;
   gap: 18px;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
 }
 
 .portfolio-teaser-logo-panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-  background-size: 16px 16px;
-  opacity: 0.35;
+  content: none;
 }
 
 .portfolio-teaser-logo-copy {
@@ -2854,7 +2805,7 @@ body.has-custom-cursor * { cursor: none !important; }
   z-index: 1;
   display: grid;
   gap: 10px;
-  text-align: center;
+  text-align: left;
   align-content: center;
   min-height: 100%;
 }
@@ -2896,7 +2847,7 @@ body.has-custom-cursor * { cursor: none !important; }
 }
 
 .portfolio-teaser-link-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-2px);
   box-shadow: 0 18px 42px rgba(0,0,0,0.34), 0 0 0 1px rgba(155,93,229,0.18) inset;
 }
 
