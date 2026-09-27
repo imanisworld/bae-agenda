@@ -18,6 +18,7 @@ export default function PortfolioArchiveHero({ prints }: { prints: ArchivePrint[
         fill
         priority
         sizes="100vw"
+        quality={95}
         aria-hidden="true"
         className={styles.background}
       />
@@ -39,6 +40,7 @@ export default function PortfolioArchiveHero({ prints }: { prints: ArchivePrint[
                 alt={entry.event_name}
                 fill
                 sizes="(max-width: 760px) 44vw, 300px"
+                quality={90}
               />
             </div>
             <div className={styles.printMeta}>
