@@ -20,8 +20,8 @@ export default async function LabPage() {
   }))
 
   return (
-    <main style={{ background: '#0e0b0a', paddingTop: 'calc(var(--nav-height) + var(--safe-top))' }}>
-      <LabListeningStation mixes={listeningMixes} />
-    </main>
+    <div className="lab-experience">
+      <LabListeningStation mixes={listeningMixes} compact />
+    </div>
   )
 }
