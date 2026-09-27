@@ -5260,3 +5260,17 @@ body.has-custom-cursor * { cursor: none !important; }
     transform: none;
   }
 }
+
+
+/* Editorial set approach — simplified replacement for the animated console. */
+@media (max-width: 760px) {
+  .set-control-editorial {
+    grid-template-columns: 1fr !important;
+    gap: 24px !important;
+  }
+
+  .set-control-editorial-row {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+}
