@@ -1,14 +1,14 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Book',
+  title: 'Book & Contact',
   alternates: {
     canonical: '/book',
   },
-  description: 'Send a booking inquiry for DJ B.A.E. for private events, nightlife, branded events, and custom curations.',
+  description: 'Book DJ B.A.E. or get in touch for private events, nightlife, branded events, press, and collaborations.',
   openGraph: {
-    title: 'Book DJ B.A.E.',
-    description: 'Send a booking inquiry for DJ B.A.E.',
+    title: 'Book & Contact DJ B.A.E.',
+    description: 'Booking and contact for DJ B.A.E.',
     url: 'https://thebaeagenda.com/book',
     images: [{ url: '/photos/PlexMix19-DJBAE.JPEG', width: 1637, height: 1411, alt: 'DJ B.A.E. performing live' }],
   },
