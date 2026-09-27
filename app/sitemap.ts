@@ -5,7 +5,6 @@ const BASE_URL = 'https://thebaeagenda.com'
 const routes = [
   '',
   '/book',
-  '/connect',
   '/events',
   '/lab',
   '/meet',
