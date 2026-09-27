@@ -39,6 +39,7 @@ export default function EventPoster({ event, priority = false }: { event: Event;
         fill
         priority={priority}
         sizes="(max-width: 760px) 100vw, 1100px"
+        quality={95}
         className={styles.image}
         aria-hidden="true"
       />
