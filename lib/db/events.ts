@@ -1,32 +1,36 @@
 /**
  * EVENTS — Database helpers
  * Server-side only. All queries filter to public = true.
- * "Upcoming" is determined by event_date >= now() — no status column needed.
+ *
+ * Reviewed events (event_timezone != null) use their real UTC instant for
+ * upcoming/past checks. Legacy rows keep date-only behavior until reviewed.
  */
 import { createClient } from '@/lib/supabase/server'
+import { getEventCandidateFloorIso, isUpcomingEventRecord } from '@/lib/event-schedule'
 import type { Database } from '@/types/database'
 
 export type Event = Database['public']['Tables']['events']['Row']
 
-const SITE_SCHEDULE_TIME_ZONE = 'America/Indiana/Indianapolis'
+async function loadUpcomingCandidates(limit: number, featuredOnly = false): Promise<Event[]> {
+  const supabase = await createClient()
+  let query = supabase
+    .from('events')
+    .select('*')
+    .eq('public', true)
+    .gte('event_date', getEventCandidateFloorIso())
+    .order('event_date', { ascending: true })
 
-function getScheduleDateFloorIso(now = new Date()): string {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: SITE_SCHEDULE_TIME_ZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(now)
+  if (featuredOnly) query = query.eq('featured', true)
 
-  const year = parts.find((part) => part.type === 'year')?.value
-  const month = parts.find((part) => part.type === 'month')?.value
-  const day = parts.find((part) => part.type === 'day')?.value
+  const { data, error } = await query.limit(Math.max(limit * 4, 50))
 
-  if (!year || !month || !day) {
-    return now.toISOString().slice(0, 10) + 'T00:00:00.000Z'
+  if (error) {
+    console.error('[events] unable to load candidates:', error.message)
+    return []
   }
 
-  return `${year}-${month}-${day}T00:00:00.000Z`
+  const now = new Date()
+  return ((data ?? []) as Event[]).filter((event) => isUpcomingEventRecord(event, now)).slice(0, limit)
 }
 
 /**
@@ -35,20 +39,7 @@ function getScheduleDateFloorIso(now = new Date()): string {
  */
 export async function getUpcomingEvents(limit = 10): Promise<Event[]> {
   try {
-    const supabase = await createClient()
-    const { data, error } = await supabase
-      .from('events')
-      .select('*')
-      .eq('public', true)
-      .gte('event_date', getScheduleDateFloorIso())
-      .order('event_date', { ascending: true })
-      .limit(limit)
-
-    if (error) {
-      console.error('[getUpcomingEvents]', error.message)
-      return []
-    }
-    return data ?? []
+    return await loadUpcomingCandidates(limit)
   } catch (err) {
     console.error('[getUpcomingEvents] unexpected error:', err)
     return []
@@ -61,41 +52,11 @@ export async function getUpcomingEvents(limit = 10): Promise<Event[]> {
  */
 export async function getFeaturedEvents(): Promise<Event[]> {
   try {
-    const supabase = await createClient()
-
-    const { data: featured, error } = await supabase
-      .from('events')
-      .select('*')
-      .eq('public', true)
-      .eq('featured', true)
-      .gte('event_date', getScheduleDateFloorIso())
-      .order('event_date', { ascending: true })
-      .limit(3)
-
-    if (error) {
-      console.error('[getFeaturedEvents]', error.message)
-      return []
-    }
-
-    if (featured && featured.length > 0) return featured
-
-    // Fallback: next 3 upcoming public events
-    const { data: upcoming, error: fallbackError } = await supabase
-      .from('events')
-      .select('*')
-      .eq('public', true)
-      .gte('event_date', getScheduleDateFloorIso())
-      .order('event_date', { ascending: true })
-      .limit(3)
-
-    if (fallbackError) {
-      console.error('[getFeaturedEvents:fallback]', fallbackError.message)
-      return []
-    }
-    return upcoming ?? []
+    const featured = await loadUpcomingCandidates(3, true)
+    if (featured.length > 0) return featured
+    return await loadUpcomingCandidates(3)
   } catch (err) {
     console.error('[getFeaturedEvents] unexpected error:', err)
     return []
   }
-  
 }
