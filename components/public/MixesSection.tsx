@@ -236,13 +236,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                 <span className="section-label">Archive</span>
               </div>
 
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'minmax(0, 1.4fr) minmax(280px, 0.9fr)',
-                  gap: '18px',
-                }}
-              >
+              <div className="mixes-archive-grid">
                 <div
                   className="build-console"
                   style={{
