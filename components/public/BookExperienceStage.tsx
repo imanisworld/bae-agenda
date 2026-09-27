@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function BookExperienceStage({
   form,
@@ -10,6 +10,15 @@ export default function BookExperienceStage({
   rail: React.ReactNode
 }) {
   const [panel, setPanel] = useState<'inquiry' | 'contact'>('inquiry')
+
+  useEffect(() => {
+    const syncHash = () => {
+      if (window.location.hash === '#contact') setPanel('contact')
+    }
+    syncHash()
+    window.addEventListener('hashchange', syncHash)
+    return () => window.removeEventListener('hashchange', syncHash)
+  }, [])
 
   return (
     <div className={`book-experience book-experience--${panel}`}>
