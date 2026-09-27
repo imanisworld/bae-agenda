@@ -48,7 +48,7 @@ export default function CustomCursor() {
 
     const onLeave = () => {
       ring.style.transform   = 'translate(-50%, -50%) scale(1)'
-      ring.style.borderColor = 'rgba(155,93,229,0.55)'
+      ring.style.borderColor = 'rgba(143,45,60,0.55)'
       dot.style.transform    = 'translate(-50%, -50%) scale(1)'
     }
 
@@ -101,7 +101,7 @@ export default function CustomCursor() {
           opacity: 0,
           willChange: 'left, top',
           transition: 'transform 200ms ease',
-          boxShadow: '0 0 10px rgba(155,93,229,0.7)',
+          boxShadow: '0 0 10px rgba(143,45,60,0.7)',
         }}
       />
       {/* Ring — lags behind cursor */}
@@ -112,7 +112,7 @@ export default function CustomCursor() {
           position: 'fixed',
           left: 0, top: 0,
           width: '34px', height: '34px',
-          border: '1.5px solid rgba(155,93,229,0.55)',
+          border: '1.5px solid rgba(143,45,60,0.55)',
           borderRadius: '50%',
           transform: 'translate(-50%, -50%) scale(1)',
           pointerEvents: 'none',

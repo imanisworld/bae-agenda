@@ -52,10 +52,10 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
   if (status === 'success') {
     return (
       <div style={{
-        border:   '1px solid rgba(155,93,229,0.24)',
+        border:   '1px solid rgba(143,45,60,0.24)',
         padding:  compact ? '24px 20px' : '32px 28px',
         textAlign: 'center',
-        background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(8,8,12,0.72))',
+        background: 'linear-gradient(180deg, rgba(143,45,60,0.08), rgba(8,8,12,0.72))',
       }}>
         <div style={{ fontSize: '22px', marginBottom: '12px', color: 'var(--violet)' }}>◈</div>
         <div style={{
@@ -221,7 +221,7 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
         disabled={status === 'loading'}
         style={{
           padding:       compact ? '14px 18px' : '16px',
-          background:    status === 'loading' ? 'rgba(155,93,229,0.5)' : 'var(--violet)',
+          background:    status === 'loading' ? 'rgba(143,45,60,0.5)' : 'var(--violet)',
           color:         'var(--black)',
           border:        'none',
           fontFamily:    'DM Sans, sans-serif',
@@ -233,7 +233,7 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
           alignSelf:     'start',
           paddingLeft:   compact ? '22px' : '32px',
           paddingRight:  compact ? '22px' : '32px',
-          boxShadow:     status === 'loading' ? 'none' : '0 10px 30px rgba(155,93,229,0.18)',
+          boxShadow:     status === 'loading' ? 'none' : '0 10px 30px rgba(143,45,60,0.18)',
         }}
       >
         {status === 'loading' ? 'Submitting…' : 'Submit Review'}

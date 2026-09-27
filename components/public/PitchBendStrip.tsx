@@ -90,7 +90,7 @@ export default function PitchBendStrip() {
         fontSize: '8px',
         letterSpacing: '0.2em',
         textTransform: 'uppercase',
-        color: isUp && intensity > 0.05 ? `rgba(155,93,229,${0.6 + intensity * 0.4})` : 'var(--muted)',
+        color: isUp && intensity > 0.05 ? `rgba(143,45,60,${0.6 + intensity * 0.4})` : 'var(--muted)',
         transition: 'color 80ms ease',
         fontFamily: 'DM Sans, sans-serif',
       }}>
@@ -124,7 +124,7 @@ export default function PitchBendStrip() {
           left:       '20%',
           right:      '20%',
           height:     '1px',
-          background: 'rgba(155,93,229,0.3)',
+          background: 'rgba(143,45,60,0.3)',
           transform:  'translateY(-50%)',
         }} />
 
@@ -135,7 +135,7 @@ export default function PitchBendStrip() {
           right:      '20%',
           top:        display < 0 ? `${thumbPct}%` : '50%',
           bottom:     display > 0 ? `${100 - thumbPct}%` : '50%',
-          background: `rgba(155,93,229,${0.15 + intensity * 0.4})`,
+          background: `rgba(143,45,60,${0.15 + intensity * 0.4})`,
           transition: 'background 60ms ease',
         }} />
 
@@ -154,7 +154,7 @@ export default function PitchBendStrip() {
             inset 0 -1px 0 rgba(0,0,0,0.72),
             0 0 0 1px rgba(0,0,0,0.65),
             0 2px 6px rgba(0,0,0,0.75)
-            ${intensity > 0.05 ? `, 0 0 ${8 + Math.round(intensity * 16)}px rgba(155,93,229,${(0.35 + intensity * 0.45).toFixed(2)})` : ''}`,
+            ${intensity > 0.05 ? `, 0 0 ${8 + Math.round(intensity * 16)}px rgba(143,45,60,${(0.35 + intensity * 0.45).toFixed(2)})` : ''}`,
           transition:    'background 60ms ease, box-shadow 60ms ease',
           /* Grip rib texture via repeating background */
           backgroundImage: `
@@ -174,7 +174,7 @@ export default function PitchBendStrip() {
         fontSize: '8px',
         letterSpacing: '0.2em',
         textTransform: 'uppercase',
-        color: !isUp && intensity > 0.05 ? `rgba(155,93,229,${0.6 + intensity * 0.4})` : 'var(--muted)',
+        color: !isUp && intensity > 0.05 ? `rgba(143,45,60,${0.6 + intensity * 0.4})` : 'var(--muted)',
         transition: 'color 80ms ease',
         fontFamily: 'DM Sans, sans-serif',
       }}>

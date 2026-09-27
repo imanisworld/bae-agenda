@@ -82,10 +82,7 @@ export default function BookingSection({ bookingEmail }: Props) {
         <div className="build-console">
           {/* Grid: copy panel left, packages right */}
           <div className="build-console-grid">
-            <div
-              className="build-console-copy"
-              style={{ background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(18,18,22,0.96))' }}
-            >
+            <div className="build-console-copy">
               <h2 style={{
                 fontFamily: 'Conthrax, sans-serif',
                 fontSize: 'clamp(22px, 4vw, 44px)', fontWeight: 600,
@@ -124,11 +121,9 @@ export default function BookingSection({ bookingEmail }: Props) {
                 ))}
               </div>
 
-              <div style={{ marginTop: '16px' }}>
-                <Link href="/book" className="btn-ghost" style={{ justifyContent: 'center' }}>
-                  View Booking Details
-                </Link>
-              </div>
+              <p style={{ marginTop: '18px', fontSize: '14px' }}>
+                <Link href="/book" className="inline-link">View booking details</Link>
+              </p>
             </div>
           </div>
         </div>

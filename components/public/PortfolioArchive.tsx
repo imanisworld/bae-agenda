@@ -19,8 +19,8 @@ function TagChip({ label }: { label: string }) {
       letterSpacing: '0.16em',
       textTransform: 'uppercase',
       color: 'var(--violet)',
-      background: 'rgba(155,93,229,0.1)',
-      border: '1px solid rgba(155,93,229,0.2)',
+      background: 'rgba(143,45,60,0.1)',
+      border: '1px solid rgba(143,45,60,0.2)',
       borderRadius: '100px',
       padding: '3px 8px',
       whiteSpace: 'nowrap',
@@ -50,7 +50,7 @@ const filterBtnActive: React.CSSProperties = {
   ...filterBtnBase,
   borderColor: 'var(--violet)',
   color: 'var(--white)',
-  background: 'rgba(155,93,229,0.1)',
+  background: 'rgba(143,45,60,0.1)',
 }
 
 const COLLAPSED_YEARS = 3
@@ -285,7 +285,7 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = 'var(--white)'
-                  e.currentTarget.style.borderColor = 'rgba(155,93,229,0.5)'
+                  e.currentTarget.style.borderColor = 'rgba(143,45,60,0.5)'
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.color = 'var(--muted)'

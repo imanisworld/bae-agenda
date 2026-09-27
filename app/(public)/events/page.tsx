@@ -166,7 +166,7 @@ export default async function EventsPage() {
                         <span style={{
                           marginLeft: '12px',
                           color: 'var(--violet)',
-                          border: '1px solid rgba(155,93,229,0.3)',
+                          border: '1px solid rgba(143,45,60,0.3)',
                           padding: '2px 7px',
                           fontSize: '10px',
                         }}>

@@ -89,8 +89,8 @@ export default function Nav() {
           zIndex:      100,
           paddingTop:  navTopPadding,
           background:  scrolled || menuOpen || forceSolidNav
-            ? 'rgba(8,8,8,0.95)'
-            : 'linear-gradient(180deg, rgba(8,8,10,0.82) 0%, rgba(8,8,10,0.0) 100%)',
+            ? 'rgba(22,18,16,0.94)'
+            : 'linear-gradient(180deg, rgba(14,11,10,0.88) 0%, rgba(14,11,10,0.0) 100%)',
           backdropFilter: scrolled || menuOpen || forceSolidNav ? 'blur(14px)' : 'blur(4px)',
           borderBottom: scrolled || menuOpen || forceSolidNav ? '1px solid var(--border)' : '1px solid transparent',
           transition: `background var(--motion-medium) var(--ease-standard),
@@ -125,7 +125,7 @@ export default function Nav() {
               }}
             >
               DJ{' '}
-              <span style={{ color: 'var(--violet)' }}>B.A.E.</span>
+              <span style={{ color: 'var(--gold)' }}>B.A.E.</span>
             </span>
           </Link>
 
@@ -219,7 +219,7 @@ export default function Nav() {
           right:      0,
           bottom:     0,
           zIndex:     99,
-          background: 'rgba(8,8,8,0.98)',
+          background: 'rgba(14,11,10,0.985)',
           backdropFilter: 'blur(20px)',
           display:    'flex',
           flexDirection: 'column',

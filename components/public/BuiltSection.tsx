@@ -64,7 +64,7 @@ export default function BuiltSection({ aboutQuote }: Props) {
       className="built-section-surface"
       aria-label="Under The Hood"
       style={{
-        background: 'radial-gradient(ellipse at 80% 50%, rgba(155,93,229,0.06) 0%, transparent 55%), var(--black)',
+        background: 'radial-gradient(ellipse at 80% 50%, rgba(143,45,60,0.06) 0%, transparent 55%), var(--black)',
         borderTop: '1px solid var(--border)',
       }}
     >

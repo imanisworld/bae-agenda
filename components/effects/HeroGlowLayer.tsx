@@ -65,7 +65,7 @@ export default function HeroGlowLayer() {
         style={{
           position: 'absolute',
           width: '78vw', height: '78vw',
-          background: 'radial-gradient(circle, rgba(155,93,229,0.20) 0%, transparent 62%)',
+          background: 'radial-gradient(circle, rgba(143,45,60,0.22) 0%, transparent 62%)',
           bottom: '-20%', right: '-18%',
           pointerEvents: 'none', zIndex: 0,
           willChange: 'transform',
@@ -78,7 +78,7 @@ export default function HeroGlowLayer() {
         style={{
           position: 'absolute',
           width: '55vw', height: '55vw',
-          background: 'radial-gradient(circle, rgba(201,168,76,0.09) 0%, transparent 68%)',
+          background: 'radial-gradient(circle, rgba(196,165,116,0.12) 0%, transparent 68%)',
           top: '-10%', left: '-15%',
           pointerEvents: 'none', zIndex: 0,
           willChange: 'transform',
@@ -90,7 +90,7 @@ export default function HeroGlowLayer() {
         style={{
           position: 'absolute',
           width: '65vw', height: '65vw',
-          background: 'radial-gradient(circle, rgba(155,93,229,0.07) 0%, transparent 60%)',
+          background: 'radial-gradient(circle, rgba(143,45,60,0.08) 0%, transparent 60%)',
           top: '50%', left: '50%',
           transform: 'translate(-50%, -50%)',
           pointerEvents: 'none', zIndex: 0,

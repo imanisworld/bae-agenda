@@ -56,7 +56,7 @@ export default async function EventsSection() {
       {/* Subtle background glow layer */}
       <div aria-hidden="true" style={{
         position: 'absolute', inset: 0, pointerEvents: 'none',
-        background: `radial-gradient(ellipse at 30% 50%, rgba(155,93,229,0.06) 0%, transparent 55%),
+        background: `radial-gradient(ellipse at 30% 50%, rgba(143,45,60,0.06) 0%, transparent 55%),
                      radial-gradient(ellipse at 70% 50%, rgba(201,168,76,0.04) 0%, transparent 50%)`,
       }} />
       <div className="section-container" style={{

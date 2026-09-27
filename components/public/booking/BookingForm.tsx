@@ -622,7 +622,7 @@ export default function BookingForm() {
             lineHeight: 1.1,
             margin: '12px 0 0',
           }}>
-            Book DJ B.A.E.<span style={{ color: 'var(--gold)' }}>.</span>
+            Book DJ B.A.E<span style={{ color: 'var(--gold)' }}>.</span>
           </h1>
         </div>
 
@@ -635,8 +635,8 @@ export default function BookingForm() {
             flexWrap: 'wrap',
             marginBottom: '20px',
             padding: '12px 16px',
-            border: '1px solid rgba(155,93,229,0.28)',
-            background: 'rgba(155,93,229,0.08)',
+            border: '1px solid rgba(143,45,60,0.28)',
+            background: 'rgba(143,45,60,0.08)',
           }}>
             <span style={{ fontSize: '13px', color: 'var(--white)', lineHeight: 1.5 }}>
               Picked up where you left off.
@@ -880,9 +880,9 @@ function BookingProgress({ step }: { step: Step }) {
             fontSize: '11px',
             fontWeight: 600,
             fontFamily: 'DM Sans, sans-serif',
-            background: value === step ? 'var(--violet)' : value < step ? 'rgba(155,93,229,0.2)' : 'var(--surface)',
+            background: value === step ? 'var(--violet)' : value < step ? 'rgba(143,45,60,0.2)' : 'var(--surface)',
             color: value === step ? 'var(--black)' : value < step ? 'var(--violet)' : 'var(--muted)',
-            border: `1px solid ${value === step ? 'var(--violet)' : value < step ? 'rgba(155,93,229,0.3)' : 'var(--border)'}`,
+            border: `1px solid ${value === step ? 'var(--violet)' : value < step ? 'rgba(143,45,60,0.3)' : 'var(--border)'}`,
             transition: 'background 200ms ease, border-color 200ms ease, color 200ms ease',
           }}>
             {value < step ? '✓' : value}
@@ -954,7 +954,7 @@ function EventStep({
                 fontSize: '11px',
                 letterSpacing: '0.08em',
                 textAlign: 'left',
-                background: form.eventType === type ? 'rgba(155,93,229,0.15)' : 'var(--off-black)',
+                background: form.eventType === type ? 'rgba(143,45,60,0.15)' : 'var(--off-black)',
                 border: `1px solid ${form.eventType === type ? 'var(--violet)' : 'var(--border)'}`,
                 color: form.eventType === type ? 'var(--white)' : 'var(--muted)',
                 cursor: 'pointer',
@@ -1510,7 +1510,7 @@ function calendarDayStyle({
       isSelected ? 'var(--violet)' : isBlocked ? 'rgba(232, 93, 117, 0.4)' : 'var(--border)'
     }`,
     background: isSelected
-      ? 'rgba(155,93,229,0.18)'
+      ? 'rgba(143,45,60,0.18)'
       : isBlocked
         ? 'rgba(232, 93, 117, 0.08)'
         : 'var(--surface)',
