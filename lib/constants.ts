@@ -7,8 +7,8 @@
 // ---- Navigation --------------------------------------------
 export const PUBLIC_NAV = [
   { label: 'Events',    href: '/events'    },
-  { label: 'Portfolio', href: '/portfolio' },
   { label: 'Lab',       href: '/lab'       },
+  { label: 'Portfolio', href: '/portfolio' },
   { label: 'Meet',      href: '/meet'      },
   { label: 'Book',      href: '/book'      },
 ] as const
