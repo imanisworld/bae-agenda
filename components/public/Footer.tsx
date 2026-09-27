@@ -1,6 +1,6 @@
 /**
  * PUBLIC FOOTER — Server Component
- * Brand · Nav · Socials + bottom copyright bar.
+ * Brand · navigation + bottom copyright bar.
  */
 import Link from 'next/link'
 
@@ -31,7 +31,7 @@ export default function Footer() {
         }
       `}</style>
 
-      {/* Main: brand | nav | socials */}
+      {/* Main: brand | nav */}
       <div className="footer-body" style={{
         maxWidth: '1280px',
         margin: '0 auto',
@@ -66,7 +66,6 @@ export default function Footer() {
             ))}
           </ul>
         </nav>
-
 
 
       </div>
