@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import PortfolioArchive from '@/components/public/PortfolioArchive'
 import PortfolioArchiveHero, { type ArchivePrint } from '@/components/public/PortfolioArchiveHero'
 
@@ -30,9 +30,12 @@ export default function PortfolioExperienceStage({
   stats: PortfolioStats
 }) {
   const [archiveOpen, setArchiveOpen] = useState(false)
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
     if (!archiveOpen) return
+    closeButtonRef.current?.focus()
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setArchiveOpen(false)
     }
@@ -53,13 +56,16 @@ export default function PortfolioExperienceStage({
       <div
         className={archiveOpen ? 'experience-drawer experience-drawer--open' : 'experience-drawer'}
         aria-hidden={!archiveOpen}
+        role="dialog"
+        aria-modal="false"
+        aria-label="Full portfolio archive"
       >
         <div className="experience-drawer-bar">
           <div>
             <span>Past Work</span>
             <strong>Full Archive</strong>
           </div>
-          <button type="button" onClick={() => setArchiveOpen(false)} aria-label="Close archive">Close ×</button>
+          <button ref={closeButtonRef} type="button" onClick={() => setArchiveOpen(false)} aria-label="Close archive">Close ×</button>
         </div>
         <div className="experience-drawer-scroll">
           <PortfolioArchive entries={entries} />
