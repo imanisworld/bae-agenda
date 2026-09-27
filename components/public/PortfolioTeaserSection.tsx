@@ -60,7 +60,7 @@ export default async function PortfolioTeaserSection() {
 
   return (
     <section
-      aria-label="Selected Gigs"
+      aria-label="Selected work"
       style={{
         background: 'var(--bg-sunken, #08080a)',
         borderTop: '1px solid var(--border)',
@@ -78,7 +78,7 @@ export default async function PortfolioTeaserSection() {
         }}>
           <div>
             <div className="hardware-heading">
-              <span className="section-label">Experience</span>
+              <span className="section-label">Portfolio</span>
             </div>
             <h2 style={{
               fontFamily: 'Conthrax, sans-serif',
@@ -87,7 +87,7 @@ export default async function PortfolioTeaserSection() {
               lineHeight: 1.1,
               margin: 0,
             }}>
-              On The Record
+              Selected Work
             </h2>
             <p style={{
               marginTop: '12px',
@@ -96,11 +96,11 @@ export default async function PortfolioTeaserSection() {
               lineHeight: 1.75,
               color: 'var(--muted)',
             }}>
-              A quick proof strip of the rooms, audiences, and formats already in motion.
+              Recent rooms, recurring dates, and larger-format appearances.
             </p>
           </div>
           <Link href="/portfolio" className="btn-ghost" style={{ whiteSpace: 'nowrap' }}>
-            Explore All Events →
+            View Portfolio
           </Link>
         </div>
 
@@ -111,8 +111,8 @@ export default async function PortfolioTeaserSection() {
             aria-label="Explore DJ B.A.E. event archive"
           >
             <div className="portfolio-teaser-logo-copy">
-              <div className="portfolio-teaser-meta">Experience</div>
-              <h3 className="portfolio-teaser-title">Played Across</h3>
+              <div className="portfolio-teaser-meta">Track Record</div>
+              <h3 className="portfolio-teaser-title">Documented Work</h3>
               {hasVerifiedStats ? (
                 <>
                   <p className="portfolio-teaser-desc">
@@ -121,21 +121,6 @@ export default async function PortfolioTeaserSection() {
                   <p className="portfolio-teaser-proof">{stats.total} documented events</p>
                 </>
               ) : null}
-              <p className="portfolio-teaser-footnote"> </p>
-              <div style={{
-                marginTop: '8px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                fontSize: '10px',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                color: 'rgba(250,248,243,0.52)',
-              }}>
-                <span style={{ width: '16px', height: '1px', background: 'rgba(155,93,229,0.42)', display: 'block' }} />
-                <span></span>
-              </div>
             </div>
           </Link>
 
@@ -151,7 +136,7 @@ export default async function PortfolioTeaserSection() {
                 key={entry.id}
                 href={`/portfolio#entry-${entry.id}`}
                 className="portfolio-teaser-event-card"
-                aria-label={`View the ${entry.event_name} case study`}
+                aria-label={`View ${entry.event_name} in the portfolio`}
                 style={{
                   background: 'var(--off-black)',
                   display: 'grid',
@@ -203,25 +188,14 @@ export default async function PortfolioTeaserSection() {
                     </p>
                   ) : null}
                   {entry.tags.length > 0 && (
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '5px', flexWrap: 'wrap', marginTop: '2px' }}>
-                      {entry.tags.slice(0, 2).map((tag) => (
-                        <span
-                          key={tag}
-                          style={{
-                            fontSize: '10px',
-                            letterSpacing: '0.14em',
-                            textTransform: 'uppercase',
-                            color: 'var(--violet)',
-                            background: 'rgba(155,93,229,0.1)',
-                            border: '1px solid rgba(155,93,229,0.18)',
-                            borderRadius: '100px',
-                            padding: '2px 7px',
-                            whiteSpace: 'nowrap',
-                          }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
+                    <div style={{
+                      marginTop: '2px',
+                      fontSize: '10px',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      color: 'rgba(250,248,243,0.48)',
+                    }}>
+                      {entry.tags.slice(0, 2).join(' · ')}
                     </div>
                   )}
                 </div>
