@@ -45,6 +45,11 @@ export default async function PortfolioTeaserSection() {
     getPortfolioStats(),
   ])
 
+  const hasVerifiedStats =
+    stats.total > 0 &&
+    stats.cities > 0 &&
+    stats.yearsActive !== '—'
+
   const entries = featuredEntries.sort((a, b) => {
     const aPriority = /wnba/i.test(a.event_name) ? 0 : 1
     const bPriority = /wnba/i.test(b.event_name) ? 0 : 1
@@ -108,10 +113,14 @@ export default async function PortfolioTeaserSection() {
             <div className="portfolio-teaser-logo-copy">
               <div className="portfolio-teaser-meta">Experience</div>
               <h3 className="portfolio-teaser-title">Played Across</h3>
-              <p className="portfolio-teaser-desc">
-                {stats.cities} cities • {stats.yearsActive}
-              </p>
-              <p className="portfolio-teaser-proof">{stats.total} documented events</p>
+              {hasVerifiedStats ? (
+                <>
+                  <p className="portfolio-teaser-desc">
+                    {stats.cities} cities • {stats.yearsActive}
+                  </p>
+                  <p className="portfolio-teaser-proof">{stats.total} documented events</p>
+                </>
+              ) : null}
               <p className="portfolio-teaser-footnote"> </p>
               <div style={{
                 marginTop: '8px',
