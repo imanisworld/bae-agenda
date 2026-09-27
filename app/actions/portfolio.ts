@@ -23,7 +23,7 @@ export interface PortfolioEntry {
   updated_at: string
 }
 
-function redirectWithError(path: string, message: string) {
+function redirectWithError(path: string, message: string): never {
   const params = new URLSearchParams({ error: message })
   redirect(`${path}?${params.toString()}`)
 }
