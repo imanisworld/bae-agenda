@@ -84,3 +84,6 @@ next-env.d.ts
 /public/videos/*
 !/public/videos/e67f0964-8763-4658-bbba-4cc322727d68.mp4
 !/public/videos/phone video.mp4
+
+# local Claude credential file
+.claude/claude api
