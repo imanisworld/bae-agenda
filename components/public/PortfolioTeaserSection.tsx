@@ -145,6 +145,7 @@ export default async function PortfolioTeaserSection() {
                       alt=""
                       fill
                       sizes="(max-width: 640px) 100vw, 33vw"
+                      quality={90}
                       style={{ objectFit: 'cover' }}
                     />
                   </div>
