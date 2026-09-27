@@ -11,26 +11,37 @@ import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import AdminNotice     from '@/components/admin/AdminNotice'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { toggleEventFeaturedAction, toggleEventPublicAction } from '@/app/actions/events'
+import { isValidTimeZone } from '@/lib/date-time'
 
 interface EventRow {
   id:         string
   title:      string
   event_date: string
+  event_timezone: string | null
   venue:      string | null
   city:       string | null
   public:     boolean
   featured:   boolean
 }
 
-function fmtDate(iso: string) {
+function fmtDate(iso: string, eventTimeZone: string | null) {
+  const timeZone = eventTimeZone && isValidTimeZone(eventTimeZone) ? eventTimeZone : 'UTC'
   return new Date(iso).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
-    timeZone: 'America/Chicago',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone,
   })
 }
 
-function isPast(iso: string) {
-  return new Date(iso) < new Date()
+function isPast(iso: string, eventTimeZone: string | null) {
+  const now = new Date()
+  if (eventTimeZone) return new Date(iso) < now
+
+  const today = now.toLocaleDateString('en-CA', {
+    timeZone: 'America/Indiana/Indianapolis',
+  })
+  return iso.slice(0, 10) < today
 }
 
 async function getEvents(): Promise<EventRow[]> {
@@ -38,7 +49,7 @@ async function getEvents(): Promise<EventRow[]> {
     const supabase = createClient()
     const { data } = await supabase
       .from('events')
-      .select('id, title, event_date, venue, city, public, featured')
+      .select('id, title, event_date, event_timezone, venue, city, public, featured')
       .order('event_date', { ascending: false })
     return (data ?? []) as EventRow[]
   } catch {
@@ -87,6 +98,7 @@ export default async function EventsPage({
                 <tr>
                   <th>Title</th>
                   <th>Date</th>
+                  <th>Time Zone</th>
                   <th>Venue</th>
                   <th>City</th>
                   <th>Visibility</th>
@@ -99,11 +111,14 @@ export default async function EventsPage({
                   <tr key={ev.id}>
                     <td data-label="Title" style={{
                       fontWeight: 400,
-                      color: isPast(ev.event_date) ? 'var(--muted)' : 'var(--white)',
+                      color: isPast(ev.event_date, ev.event_timezone) ? 'var(--muted)' : 'var(--white)',
                     }}>
                       {ev.title}
                     </td>
-                    <td data-label="Date" className="muted">{fmtDate(ev.event_date)}</td>
+                    <td data-label="Date" className="muted">{fmtDate(ev.event_date, ev.event_timezone)}</td>
+                    <td data-label="Time Zone" className="muted">
+                      {ev.event_timezone ?? <span style={{ color: 'var(--gold)' }}>Review required</span>}
+                    </td>
                     <td data-label="Venue" className="muted">{ev.venue ?? '—'}</td>
                     <td data-label="City" className="muted">{ev.city  ?? '—'}</td>
                     <td data-label="Visibility">
