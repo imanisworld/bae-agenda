@@ -7,10 +7,18 @@
  * never requires reopening the navigation drawer.
  */
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function StickyBookingCTA() {
+  const pathname = usePathname()
   const [visible, setVisible] = useState(false)
+
+  const suppress =
+    pathname === '/book' ||
+    pathname === '/built' ||
+    pathname.startsWith('/pay') ||
+    pathname.startsWith('/portal')
 
   useEffect(() => {
     const check = () => {
@@ -37,6 +45,8 @@ export default function StickyBookingCTA() {
       window.removeEventListener('resize', check)
     }
   }, [])
+
+  if (suppress) return null
 
   return (
     <div
