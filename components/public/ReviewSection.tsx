@@ -2,7 +2,7 @@
  * REVIEW SECTION — Server Component
  * Shows approved reviews from Supabase as social proof.
  * Falls back to hardcoded quotes if DB has no approved reviews yet.
- * The submission form lives separately in LeaveReviewSection.
+ * Review submission lives on /connect through ReviewDrawer.
  */
 import { createClient } from '@/lib/supabase/server'
 
