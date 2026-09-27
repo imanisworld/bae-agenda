@@ -112,13 +112,13 @@ export default async function PortfolioTeaserSection() {
           >
             <div className="portfolio-teaser-logo-copy">
               <div className="portfolio-teaser-meta">Track Record</div>
-              <h3 className="portfolio-teaser-title">Documented Work</h3>
+              <h3 className="portfolio-teaser-title">The Work</h3>
               {hasVerifiedStats ? (
                 <>
                   <p className="portfolio-teaser-desc">
                     {stats.cities} cities • {stats.yearsActive}
                   </p>
-                  <p className="portfolio-teaser-proof">{stats.total} documented events</p>
+                  <p className="portfolio-teaser-proof">{stats.total} events</p>
                 </>
               ) : null}
             </div>
