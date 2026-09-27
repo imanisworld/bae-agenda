@@ -39,22 +39,6 @@ const techItems = [
   },
 ]
 
-// Artist profile notes.
-const profileModules = [
-  {
-    label: 'Sound',
-    value: 'Full genre range without losing the thread. The selection is shaped by the room — not locked into a single lane.',
-  },
-  {
-    label: 'Pacing',
-    value: 'The room determines when to push, reset, or hold back.',
-  },
-  {
-    label: 'Structure',
-    value: 'The set develops over time instead of chasing a peak from the first track.',
-  },
-] as const
-
 // Common room contexts.
 const operatingRange = [
   {
@@ -69,13 +53,6 @@ const operatingRange = [
     label: 'Travel',
     value: 'Indianapolis-based with travel-ready logistics. Available beyond the local market when the event is the right fit.',
   },
-] as const
-
-// Quick profile facts.
-const meetSignals = [
-  { label: 'Base',   value: 'Indianapolis · travel-ready' },
-  { label: 'Format', value: 'Open-format · hip-hop, R&B, house, Afrobeats' },
-  { label: 'Rooms',  value: 'Clubs · private events · weddings · rooftops' },
 ] as const
 
 function sectionLabel(text: string) {
