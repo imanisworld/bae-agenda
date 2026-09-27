@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Book DJ B.A.E.',
-    description: 'Send a booking inquiry for DJ B.A.E.',
+    title: 'Book & Contact DJ B.A.E.',
+    description: 'Booking and contact for DJ B.A.E.',
     images: ['/photos/PlexMix19-DJBAE.JPEG'],
   },
 }
