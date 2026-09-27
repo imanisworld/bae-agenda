@@ -178,3 +178,29 @@
   .photoImage { transition: none; }
   .hero:hover .photoImage { transform: none; }
 }
+
+
+/* Readability pass — preserve the editorial composition, strengthen small copy. */
+.eyebrow {
+  color: #d2b17d;
+  font-weight: 500;
+}
+
+.meta {
+  color: rgba(246,241,232,.76);
+}
+
+@media (max-width: 560px) {
+  .eyebrow {
+    font-size: 10px;
+    letter-spacing: .16em;
+    text-shadow: 0 2px 14px rgba(0,0,0,.55);
+  }
+
+  .meta {
+    color: rgba(246,241,232,.84);
+    font-size: 14px;
+    line-height: 1.45;
+    text-shadow: 0 2px 14px rgba(0,0,0,.58);
+  }
+}
