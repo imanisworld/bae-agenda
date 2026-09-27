@@ -175,16 +175,24 @@ export function ListeningStation({ mixes, reduced }: { mixes: ApprovedMix[]; red
                   onClick={() => load(mix, index)}
                   onKeyDown={(event) => onSleeveKey(event, index)}
                 >
-                  <span className={styles.cover}>
-                    {mix.coverUrl && coverHostOk(mix.coverUrl) ? (
-                      <Image src={mix.coverUrl} alt="" fill sizes="180px" />
-                    ) : mix.coverUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={mix.coverUrl} alt="" />
-                    ) : (
-                      <span>{mix.title}</span>
-                    )}
-                    <span className={styles.spine} aria-hidden="true" />
+                  <span className={styles.sleeveVisual}>
+                    <span className={styles.sleeveDisc} aria-hidden="true" />
+                    <span className={styles.sleeveStack} aria-hidden="true">
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span className={styles.cover}>
+                      {mix.coverUrl && coverHostOk(mix.coverUrl) ? (
+                        <Image src={mix.coverUrl} alt="" fill sizes="180px" />
+                      ) : mix.coverUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={mix.coverUrl} alt="" />
+                      ) : (
+                        <span>{mix.title}</span>
+                      )}
+                      <span className={styles.spine} aria-hidden="true" />
+                    </span>
                   </span>
                   <strong>{mix.title}</strong>
                   {mix.genre ? <em>{mix.genre}</em> : null}
@@ -202,6 +210,12 @@ export function ListeningStation({ mixes, reduced }: { mixes: ApprovedMix[]; red
             <li key={item.id}>
               <span className={styles.blank} aria-hidden="true">
                 <span className={styles.blankDisc} />
+                <span className={styles.blankStack}>
+                  <i />
+                  <i />
+                  <i />
+                </span>
+                <span className={styles.blankJacket} />
               </span>
               <strong>{item.label}</strong>
             </li>
