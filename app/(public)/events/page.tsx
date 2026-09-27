@@ -33,11 +33,10 @@ export const metadata: Metadata = {
 function formatEventDate(isoDate: string) {
   const d = new Date(isoDate)
   return {
-    day:      d.toLocaleString('en-US', { day: '2-digit',    timeZone: 'America/Chicago' }),
-    month:    d.toLocaleString('en-US', { month: 'short',    timeZone: 'America/Chicago' }).toUpperCase(),
-    weekday:  d.toLocaleString('en-US', { weekday: 'long',   timeZone: 'America/Chicago' }),
-    year:     d.toLocaleString('en-US', { year:    'numeric',timeZone: 'America/Chicago' }),
-    time:     d.toLocaleString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'America/Chicago' }),
+    day:      d.toLocaleString('en-US', { day: '2-digit',    timeZone: 'UTC' }),
+    month:    d.toLocaleString('en-US', { month: 'short',    timeZone: 'UTC' }).toUpperCase(),
+    weekday:  d.toLocaleString('en-US', { weekday: 'long',   timeZone: 'UTC' }),
+    year:     d.toLocaleString('en-US', { year:    'numeric',timeZone: 'UTC' }),
   }
 }
 
