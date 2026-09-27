@@ -13,6 +13,7 @@ import { useEffect, useState } from 'react'
 export default function StickyBookingCTA() {
   const pathname = usePathname()
   const [visible, setVisible] = useState(false)
+  const [trackedPathname, setTrackedPathname] = useState(pathname)
 
   const suppress =
     pathname === '/book' ||
@@ -20,11 +21,13 @@ export default function StickyBookingCTA() {
     pathname.startsWith('/pay') ||
     pathname.startsWith('/portal')
 
+  if (trackedPathname !== pathname) {
+    setTrackedPathname(pathname)
+    setVisible(false)
+  }
+
   useEffect(() => {
-    if (suppress) {
-      setVisible(false)
-      return
-    }
+    if (suppress) return
 
     const check = () => {
       const threshold = window.innerHeight * 0.72
@@ -43,9 +46,10 @@ export default function StickyBookingCTA() {
 
     window.addEventListener('scroll', check, { passive: true })
     window.addEventListener('resize', check, { passive: true })
-    check()
+    const frame = window.requestAnimationFrame(check)
 
     return () => {
+      window.cancelAnimationFrame(frame)
       window.removeEventListener('scroll', check)
       window.removeEventListener('resize', check)
     }
