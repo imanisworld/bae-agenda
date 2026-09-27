@@ -48,8 +48,6 @@ export default function PortfolioExperienceStage({
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  // closeArchive only closes the current drawer and restores focus to its trigger.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [archiveOpen])
 
   return (
