@@ -1,14 +1,17 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
+import EventLocationFields from '@/components/admin/EventLocationFields'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deleteEventAction, updateEventAction } from '@/app/actions/events'
-import { EVENT_CITY_OPTIONS, EVENT_TIME_OPTIONS } from '@/lib/event-form-options'
+import { getEventInputDateTime } from '@/lib/date-time'
+import { suggestEventTimeZone } from '@/lib/event-form-options'
 
 interface EventRow {
   id: string
   title: string
   event_date: string
+  event_timezone: string | null
   venue: string | null
   city: string | null
   description: string | null
@@ -29,26 +32,11 @@ function inputStyle(): React.CSSProperties {
   }
 }
 
-function toDateTimeLocal(iso: string): string {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  const offsetMs = d.getTimezoneOffset() * 60_000
-  return new Date(d.getTime() - offsetMs).toISOString().slice(0, 16)
-}
-
-function toDateInputValue(iso: string): string {
-  return toDateTimeLocal(iso).slice(0, 10)
-}
-
-function toTimeInputValue(iso: string): string {
-  return toDateTimeLocal(iso).slice(11, 16)
-}
-
 async function getEvent(id: string): Promise<EventRow | null> {
   const supabase = createClient()
   const { data } = await supabase
     .from('events')
-    .select('id, title, event_date, venue, city, description, public, featured, show_description')
+    .select('id, title, event_date, event_timezone, venue, city, description, public, featured, show_description')
     .eq('id', id)
     .maybeSingle()
 
@@ -63,6 +51,10 @@ export default async function EditEventPage({
   const { id } = await params
   const event = await getEvent(id)
   if (!event) notFound()
+
+  const legacyTimeZone = !event.event_timezone
+  const inputDateTime = getEventInputDateTime(event.event_date, event.event_timezone)
+  const suggestedTimeZone = event.event_timezone ?? suggestEventTimeZone(event.city) ?? ''
 
   return (
     <div className="admin-page admin-page--narrow">
@@ -87,48 +79,34 @@ export default async function EditEventPage({
                 name="event_date"
                 type="date"
                 required
-                defaultValue={toDateInputValue(event.event_date)}
+                defaultValue={inputDateTime?.date ?? ''}
                 style={inputStyle()}
               />
             </label>
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Start Time *</span>
-              <select
+              <input
                 name="event_time"
+                type="time"
+                step={1800}
                 required
-                defaultValue={toTimeInputValue(event.event_date)}
+                defaultValue={legacyTimeZone ? '' : inputDateTime?.time ?? ''}
                 style={inputStyle()}
-              >
-                {EVENT_TIME_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>{option.label}</option>
-                ))}
-              </select>
+              />
+              {legacyTimeZone && (
+                <span style={{ color: 'var(--gold)', fontSize: '11px', lineHeight: 1.5 }}>
+                  Start time must be reviewed before this legacy event can be saved.
+                </span>
+              )}
             </label>
           </div>
 
-          <div className="admin-form-grid-two">
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">Venue / Address</span>
-              <input
-                name="venue"
-                defaultValue={event.venue ?? ''}
-                placeholder="Venue name or street address"
-                autoComplete="street-address"
-                style={inputStyle()}
-              />
-            </label>
-            <label style={{ display: 'grid', gap: '7px' }}>
-              <span className="admin-section-title">City</span>
-              <input
-                name="city"
-                list="event-city-options"
-                defaultValue={event.city ?? ''}
-                placeholder="Choose or type any city"
-                autoComplete="address-level2"
-                style={inputStyle()}
-              />
-            </label>
-          </div>
+          <EventLocationFields
+            initialVenue={event.venue ?? ''}
+            initialCity={event.city ?? ''}
+            initialTimeZone={suggestedTimeZone}
+            legacyTimeZone={legacyTimeZone}
+          />
 
           <label style={{ display: 'grid', gap: '7px' }}>
             <span className="admin-section-title">Description</span>
@@ -159,10 +137,6 @@ export default async function EditEventPage({
             </Link>
           </div>
         </div>
-
-        <datalist id="event-city-options">
-          {EVENT_CITY_OPTIONS.map((city) => <option key={city} value={city} />)}
-        </datalist>
       </form>
 
       <form action={deleteEventAction}>
