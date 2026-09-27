@@ -432,3 +432,274 @@
   .phoneObject { animation: none; }
   .collageStage figure { transition: none; }
 }
+
+
+/* Style Lab 002 — live direction picker */
+
+.pickerShell {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 10px 0 120px;
+}
+
+.picker {
+  position: sticky;
+  top: 86px;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: rgba(14, 11, 10, .82);
+  border: 1px solid rgba(196, 165, 116, .15);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, .22);
+}
+
+.pickerButton,
+.pickerButtonActive {
+  appearance: none;
+  border: 0;
+  border-right: 1px solid rgba(196, 165, 116, .14);
+  background: transparent;
+  color: rgba(246, 241, 232, .54);
+  min-height: 86px;
+  padding: 16px 18px;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  align-content: center;
+  gap: 7px;
+  transition: background 220ms ease, color 220ms ease, transform 220ms ease;
+}
+
+.pickerButton:last-child,
+.pickerButtonActive:last-child {
+  border-right: 0;
+}
+
+.pickerButton span,
+.pickerButtonActive span {
+  color: #c4a574;
+  font-size: 9px;
+  letter-spacing: .15em;
+}
+
+.pickerButton strong,
+.pickerButtonActive strong {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -.01em;
+}
+
+.pickerButton:hover {
+  color: #f6f1e8;
+  background: rgba(143, 45, 60, .08);
+}
+
+.pickerButtonActive {
+  color: #f6f1e8;
+  background:
+    linear-gradient(135deg, rgba(143, 45, 60, .34), rgba(196, 132, 74, .08)),
+    rgba(246, 241, 232, .025);
+}
+
+.activeMeta {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  margin: 24px 0 12px;
+  padding: 0 2px;
+}
+
+.activeMeta > span {
+  color: #c4a574;
+  font-size: 11px;
+  letter-spacing: .16em;
+}
+
+.activeMeta strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.activeMeta p {
+  margin: 4px 0 0;
+  color: rgba(246, 241, 232, .46);
+  font-size: 13px;
+}
+
+.stageWrap {
+  min-height: 760px;
+  animation: stageIn 300ms ease both;
+}
+
+.afterDarkStage {
+  position: relative;
+  min-height: 780px;
+  overflow: hidden;
+  isolation: isolate;
+  background: #090706;
+}
+
+.afterDarkPhoto {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.afterDarkPhoto img {
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(.82) contrast(1.06) brightness(.76);
+  transform: scale(1.015);
+}
+
+.afterDarkShade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(9, 7, 6, .93) 0%, rgba(9, 7, 6, .58) 38%, rgba(9, 7, 6, .14) 70%),
+    linear-gradient(0deg, rgba(9, 7, 6, .82) 0%, transparent 48%);
+}
+
+.afterDarkTopline,
+.afterDarkFooter,
+.afterDarkCopy {
+  position: absolute;
+  z-index: 3;
+}
+
+.afterDarkTopline {
+  top: 26px;
+  left: 28px;
+  right: 28px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  color: rgba(246, 241, 232, .62);
+  font-size: 9px;
+  letter-spacing: .18em;
+}
+
+.afterDarkCopy {
+  left: 5%;
+  bottom: 15%;
+  width: min(650px, 58%);
+}
+
+.afterDarkCopy p {
+  margin: 0 0 12px;
+  color: #c4a574;
+  font-size: 10px;
+  letter-spacing: .18em;
+}
+
+.afterDarkCopy h2 {
+  margin: 0;
+  font-size: clamp(64px, 8vw, 112px);
+  line-height: .86;
+  letter-spacing: -.055em;
+  font-weight: 500;
+}
+
+.afterDarkCopy > span {
+  display: block;
+  max-width: 470px;
+  margin-top: 24px;
+  color: rgba(246, 241, 232, .58);
+  line-height: 1.55;
+  font-size: 15px;
+}
+
+.afterDarkFooter {
+  right: 28px;
+  bottom: 26px;
+  display: flex;
+  gap: 24px;
+  color: rgba(246, 241, 232, .4);
+  font-size: 9px;
+  letter-spacing: .15em;
+}
+
+@keyframes stageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 800px) {
+  .pickerShell {
+    width: min(100% - 24px, 1180px);
+    padding-bottom: 90px;
+  }
+
+  .picker {
+    position: relative;
+    top: auto;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pickerButton,
+  .pickerButtonActive {
+    min-height: 76px;
+    border-bottom: 1px solid rgba(196, 165, 116, .14);
+  }
+
+  .stageWrap {
+    min-height: 720px;
+  }
+
+  .afterDarkStage {
+    min-height: 760px;
+  }
+
+  .afterDarkShade {
+    background:
+      linear-gradient(0deg, rgba(9, 7, 6, .92) 0%, rgba(9, 7, 6, .45) 62%, rgba(9, 7, 6, .15) 100%);
+  }
+
+  .afterDarkCopy {
+    left: 6%;
+    right: 6%;
+    width: auto;
+    bottom: 13%;
+  }
+
+  .afterDarkCopy h2 {
+    font-size: clamp(56px, 15vw, 88px);
+  }
+
+  .afterDarkFooter {
+    left: 6%;
+    right: 6%;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .picker {
+    grid-template-columns: 1fr;
+  }
+
+  .pickerButton,
+  .pickerButtonActive {
+    min-height: 62px;
+    border-right: 0;
+  }
+
+  .afterDarkTopline {
+    left: 18px;
+    right: 18px;
+  }
+
+  .afterDarkTopline span:last-child {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stageWrap { animation: none; }
+  .pickerButton,
+  .pickerButtonActive { transition: none; }
+}
