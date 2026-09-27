@@ -1,0 +1,58 @@
+import Image from 'next/image'
+import Link from 'next/link'
+import styles from './PortfolioArchiveHero.module.css'
+
+export type ArchivePrint = {
+  id: string
+  event_name: string
+  year: number
+  photo_url: string
+}
+
+export default function PortfolioArchiveHero({ prints }: { prints: ArchivePrint[] }) {
+  return (
+    <section className={styles.hero} aria-labelledby="portfolio-title">
+      <Image
+        src="/photos/outdoor-night-set-pook.png"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        aria-hidden="true"
+        className={styles.background}
+      />
+      <div className={styles.shade} aria-hidden="true" />
+
+      <div className={styles.copy}>
+        <span>Portfolio</span>
+        <h1 id="portfolio-title">Past<br />work.</h1>
+        <p>Rooms, crowds, and moments collected across the archive.</p>
+        <Link href="#archive" className="btn-ghost">Explore the archive</Link>
+      </div>
+
+      <div className={styles.printField} aria-label="Selected past work">
+        {prints.slice(0, 3).map((entry, index) => (
+          <article key={entry.id} className={styles.print} data-index={index + 1}>
+            <div className={styles.printImage}>
+              <Image
+                src={entry.photo_url}
+                alt={entry.event_name}
+                fill
+                sizes="(max-width: 760px) 44vw, 300px"
+              />
+            </div>
+            <div className={styles.printMeta}>
+              <small>{String(index + 1).padStart(3, '0')} · {entry.year}</small>
+              <strong>{entry.event_name}</strong>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <div className={styles.footerLine}>
+        <span>THE BAE AGENDA</span>
+        <span>PAST WORK · ARCHIVE</span>
+      </div>
+    </section>
+  )
+}
