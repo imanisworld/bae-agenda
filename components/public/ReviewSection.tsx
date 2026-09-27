@@ -1,7 +1,7 @@
 /**
  * REVIEW SECTION — Server Component
  * Shows approved reviews from Supabase as social proof.
- * Falls back to hardcoded quotes if DB has no approved reviews yet.
+ * Renders nothing until at least one approved review exists.
  * Review submission lives on /connect through ReviewDrawer.
  */
 import { createClient } from '@/lib/supabase/server'
@@ -14,12 +14,6 @@ interface Review {
   message:    string
 }
 
-const FALLBACK_REVIEWS: Review[] = [
-  { id: 'f1', name: 'Auboni H.',   event_type: 'Private Event · Indianapolis', rating: 5, message: "Every transition was perfect. The crowd didn't want to leave." },
-  { id: 'f2', name: 'Marcus T.',   event_type: 'Club Night · Chicago',         rating: 5, message: "BAE read the room all night. Best DJ we've had at this venue." },
-  { id: 'f3', name: 'Danielle R.', event_type: 'Rooftop Event · Indianapolis', rating: 5, message: 'Brought exactly the energy we needed. Would book again without hesitation.' },
-]
-
 async function getApprovedReviews(): Promise<Review[]> {
   try {
     const supabase = await createClient()
@@ -29,9 +23,10 @@ async function getApprovedReviews(): Promise<Review[]> {
       .eq('approved', true)
       .order('created_at', { ascending: false })
       .limit(6)
-    if (data && data.length > 0) return data as Review[]
-  } catch { /* fall through */ }
-  return FALLBACK_REVIEWS
+    return (data ?? []) as Review[]
+  } catch {
+    return []
+  }
 }
 
 function Stars({ n }: { n: number }) {
@@ -44,6 +39,8 @@ function Stars({ n }: { n: number }) {
 
 export default async function ReviewSection() {
   const reviews = await getApprovedReviews()
+  if (reviews.length === 0) return null
+
   const averageRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length
   const featuredReview = reviews[0]
 
@@ -149,7 +146,7 @@ export default async function ReviewSection() {
                 flexWrap: 'wrap',
               }}>
                 <Stars n={featuredReview.rating} />
-                {!featuredReview.id.startsWith('f') && featuredReview.event_type && (
+                {featuredReview.event_type && (
                   <span className="review-card-badge" style={{
                     fontSize: '9px',
                     letterSpacing: '0.18em',
