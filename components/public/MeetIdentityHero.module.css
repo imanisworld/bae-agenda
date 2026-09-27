@@ -227,3 +227,43 @@
     display: none;
   }
 }
+
+
+/* Readability pass — keep text legible where it crosses the portrait. */
+.summary {
+  color: rgba(246,241,232,.76);
+}
+
+.signals span {
+  color: rgba(246,241,232,.76);
+  border-color: rgba(196,165,116,.28);
+  background: rgba(14,11,10,.22);
+}
+
+@media (max-width: 560px) {
+  .copy {
+    padding: 12px 12px 14px 0;
+    background: linear-gradient(90deg, rgba(14,11,10,.86) 0%, rgba(14,11,10,.67) 68%, rgba(14,11,10,.18) 100%);
+    text-shadow: 0 2px 18px rgba(0,0,0,.68);
+  }
+
+  .copy > p {
+    color: #d8ba88;
+    font-size: 11px;
+  }
+
+  .summary {
+    max-width: 34ch;
+    margin-top: 20px;
+    color: rgba(246,241,232,.88);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .signals span {
+    color: rgba(246,241,232,.84);
+    border-color: rgba(196,165,116,.34);
+    background: rgba(14,11,10,.45);
+    font-size: 9px;
+  }
+}
