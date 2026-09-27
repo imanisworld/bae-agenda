@@ -4,6 +4,7 @@
  */
 import Link from 'next/link'
 import { SOCIALS } from '@/lib/constants'
+import { getContentMap } from '@/lib/db/content'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
@@ -22,7 +23,24 @@ const FOOTER_SOCIALS = SOCIALS.filter(s =>
   ['Instagram', 'TikTok', 'SoundCloud', 'YouTube'].includes(s.label)
 )
 
-export default function Footer() {
+const SOCIAL_CONTENT_KEYS = [
+  'instagram_url',
+  'soundcloud_url',
+  'youtube_url',
+] as const
+
+export default async function Footer() {
+  const content = await getContentMap([...SOCIAL_CONTENT_KEYS])
+  const footerSocials = FOOTER_SOCIALS.map((social) => {
+    const override =
+      social.label === 'Instagram' ? content.instagram_url :
+      social.label === 'SoundCloud' ? content.soundcloud_url :
+      social.label === 'YouTube' ? content.youtube_url :
+      undefined
+
+    return { ...social, url: override || social.url }
+  })
+
   return (
     <footer aria-label="Site footer" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
       <style>{`
@@ -75,7 +93,7 @@ export default function Footer() {
 
         {/* Socials */}
         <div className="footer-socials" style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'flex-end' }}>
-          {FOOTER_SOCIALS.map(({ label, url, icon }) => (
+          {footerSocials.map(({ label, url, icon }) => (
             <a
               key={label}
               href={url}
