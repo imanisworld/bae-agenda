@@ -41,6 +41,7 @@ export default function MeetIdentityHero() {
             fill
             priority
             sizes="(max-width: 760px) 82vw, 44vw"
+            quality={95}
           />
         </div>
         <span className={styles.portraitLabel}>DJ B.A.E.</span>
