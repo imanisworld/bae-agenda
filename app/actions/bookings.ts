@@ -41,7 +41,7 @@ import type { BookingStatus, PaymentMethod, PaymentStatus, PaymentType } from '@
 
 type PortalRequestStatus = 'new' | 'reviewed' | 'resolved'
 
-function redirectWithError(path: string, message: string) {
+function redirectWithError(path: string, message: string): never {
   const params = new URLSearchParams({ error: message })
   redirect(`${path}?${params.toString()}`)
 }
