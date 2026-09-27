@@ -21,6 +21,11 @@ export default function StickyBookingCTA() {
     pathname.startsWith('/portal')
 
   useEffect(() => {
+    if (suppress) {
+      setVisible(false)
+      return
+    }
+
     const check = () => {
       const threshold = window.innerHeight * 0.72
 
@@ -44,7 +49,7 @@ export default function StickyBookingCTA() {
       window.removeEventListener('scroll', check)
       window.removeEventListener('resize', check)
     }
-  }, [])
+  }, [pathname, suppress])
 
   if (suppress) return null
 
