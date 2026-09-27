@@ -1,8 +1,7 @@
 import BookingForm from '@/components/public/booking/BookingForm'
-import BookingFaq, { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
-import BookContactSection from '@/components/public/BookContactSection'
+import { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
+import BookExperienceRail from '@/components/public/BookExperienceRail'
 
-// FAQPage structured data so the questions can surface in search results.
 const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -20,9 +19,14 @@ export default function BookPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
       />
-      <BookingForm />
-      <BookingFaq />
-      <BookContactSection />
+      <div className="book-experience">
+        <section className="book-experience-form" aria-label="Booking inquiry">
+          <BookingForm embedded />
+        </section>
+        <aside className="book-experience-rail" aria-label="Contact and booking information">
+          <BookExperienceRail />
+        </aside>
+      </div>
     </>
   )
 }
