@@ -1,27 +1,16 @@
 /**
- * HOMEPAGE — The Bae Agenda
- * Assembles the public homepage from section components.
- * Server component — fetches site_content once and passes to sections.
- *
- * Sections:
- *   HeroSection            — full viewport, brand presence (reads hero copy)
- *   PhotoStrip             — real event imagery and performance proof
- *   PortfolioTeaserSection — featured gig history from Supabase
- *   ReviewSection          — client proof
- *   MixesSection           — listening entry point
- *   EventsSection          — upcoming dates
- *   BookingSection         — packages + booking CTA (reads booking_email)
+ * HOMEPAGE — approved editorial sequence.
+ * Hero → Upcoming Events → Lab → Portfolio → Reviews → Booking.
  */
-import type { Metadata }      from 'next'
-import HeroSection              from '@/components/public/HeroSection'
-import MixesSection             from '@/components/public/MixesSection'
-import EventsSection            from '@/components/public/EventsSection'
-import PhotoStrip               from '@/components/public/PhotoStrip'
-import PortfolioTeaserSection   from '@/components/public/PortfolioTeaserSection'
-import BookingSection           from '@/components/public/BookingSection'
-import ReviewSection            from '@/components/public/ReviewSection'
+import type { Metadata } from 'next'
+import HeroSection from '@/components/public/HeroSection'
+import MixesSection from '@/components/public/MixesSection'
+import EventsSection from '@/components/public/EventsSection'
+import PortfolioTeaserSection from '@/components/public/PortfolioTeaserSection'
+import BookingSection from '@/components/public/BookingSection'
+import ReviewSection from '@/components/public/ReviewSection'
 import HomepageSectionBoundary from '@/components/public/HomepageSectionBoundary'
-import { getContentMap }        from '@/lib/db/content'
+import { getContentMap } from '@/lib/db/content'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,9 +18,7 @@ const HOME_OG_IMAGE = '/photos/images/outside.jpg'
 
 export const metadata: Metadata = {
   title: { absolute: 'DJ B.A.E. | The Bae Agenda' },
-  alternates: {
-    canonical: '/',
-  },
+  alternates: { canonical: '/' },
   description: 'Official DJ B.A.E. site for booking, live dates, artist info, and Bae’s in the Lab based in Indianapolis with roots in Chicago.',
   openGraph: {
     title: 'DJ B.A.E. | The Bae Agenda',
@@ -47,38 +34,21 @@ export const metadata: Metadata = {
   },
 }
 
-// All keys needed on the homepage — fetched in a single Supabase query.
-const HOME_CONTENT_KEYS = [
-  'hero_title',
-  'hero_subtitle',
-  'booking_email',
-] as const
+const HOME_CONTENT_KEYS = ['hero_title', 'hero_subtitle', 'booking_email'] as const
 
 export default async function HomePage() {
-  // Single Supabase call for all homepage content.
-  // Falls back to {} on any error — components use CONTENT_DEFAULTS as fallback.
   const content = await getContentMap([...HOME_CONTENT_KEYS])
 
   return (
     <>
       <HomepageSectionBoundary section="hero">
-        <HeroSection
-          content={{
-            hero_title:    content.hero_title,
-            hero_subtitle: content.hero_subtitle,
-          }}
-        />
+        <HeroSection content={{ hero_title: content.hero_title, hero_subtitle: content.hero_subtitle }} />
       </HomepageSectionBoundary>
-      {/* Proof comes right after the hero: photos, gig history, and reviews
-          give someone deciding whether to book a reason before anything else. */}
-      <HomepageSectionBoundary section="photo-strip"><PhotoStrip /></HomepageSectionBoundary>
+      <HomepageSectionBoundary section="events"><EventsSection /></HomepageSectionBoundary>
+      <HomepageSectionBoundary section="mixes"><MixesSection /></HomepageSectionBoundary>
       <HomepageSectionBoundary section="portfolio"><PortfolioTeaserSection /></HomepageSectionBoundary>
       <HomepageSectionBoundary section="reviews"><ReviewSection /></HomepageSectionBoundary>
-      <HomepageSectionBoundary section="mixes"><MixesSection /></HomepageSectionBoundary>
-      <HomepageSectionBoundary section="events"><EventsSection /></HomepageSectionBoundary>
-      <HomepageSectionBoundary section="booking">
-        <BookingSection bookingEmail={content.booking_email} />
-      </HomepageSectionBoundary>
+      <HomepageSectionBoundary section="booking"><BookingSection bookingEmail={content.booking_email} /></HomepageSectionBoundary>
     </>
   )
 }
