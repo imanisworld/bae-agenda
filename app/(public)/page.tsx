@@ -4,11 +4,13 @@
  * Server component — fetches site_content once and passes to sections.
  *
  * Sections:
- *   HeroSection          — full viewport, brand presence (reads hero copy)
- *   LabSection           — animated coming-soon teaser for Bae's in the Lab
- *   EventsSection        — upcoming dates (live Supabase data)
- *   PortfolioTeaserSection — featured portfolio pulled from Supabase
- *   BookingSection       — packages + booking CTA (reads booking_email)
+ *   HeroSection            — full viewport, brand presence (reads hero copy)
+ *   PhotoStrip             — real event imagery and performance proof
+ *   PortfolioTeaserSection — featured gig history from Supabase
+ *   ReviewSection          — client proof
+ *   MixesSection           — listening entry point
+ *   EventsSection          — upcoming dates
+ *   BookingSection         — packages + booking CTA (reads booking_email)
  */
 import type { Metadata }      from 'next'
 import HeroSection              from '@/components/public/HeroSection'
