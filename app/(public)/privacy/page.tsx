@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
 
 export const metadata: Metadata = {
   title: 'Privacy',
@@ -61,7 +62,7 @@ export default function PrivacyPage() {
             <h2 style={{ fontSize: '15px', color: 'var(--white)', marginBottom: '8px' }}>Contact</h2>
             <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.8, margin: 0 }}>
               For privacy questions or requests related to your submitted information, email{' '}
-              <a href="mailto:bookings@thebaeagenda.com" className="inline-link">bookings@thebaeagenda.com</a>.
+              <a href={`mailto:${DEFAULT_BOOKING_EMAIL}`} className="inline-link">{DEFAULT_BOOKING_EMAIL}</a>.
             </p>
           </div>
         </section>
