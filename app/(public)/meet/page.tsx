@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import SetControlSection from '@/components/public/SetControlSection'
+import MeetIdentityHero from '@/components/public/MeetIdentityHero'
 
 export const metadata: Metadata = {
   title: 'Meet DJ B.A.E.',
@@ -100,120 +100,7 @@ export default function MeetPage() {
           paddingBottom: '32px',
         }}
       >
-        <section
-          className="meet-hero-grid meet-hero-grid--intro"
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(320px, 100%), 1fr))',
-            gap: '32px',
-            alignItems: 'stretch',
-          }}
-        >
-          <div
-            className="meet-hero-photo-shell"
-            style={{
-              minHeight: 'clamp(340px, 72vw, 520px)',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            <Image
-              className="meet-hero-photo"
-              src="/photos/PlexMix19-DJBAE.JPEG"
-              alt="DJ B.A.E. performing live"
-              fill
-              sizes="(max-width: 900px) 100vw, 420px"
-              style={{ objectFit: 'cover', objectPosition: 'center 18%' }}
-            />
-            <div
-              className="meet-hero-photo-overlay"
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background:
-                  'linear-gradient(180deg, rgba(8,8,8,0.08), rgba(8,8,8,0.28) 55%, rgba(8,8,8,0.7) 100%)',
-              }}
-            />
-            {/* Mobile-only name overlay — visible when photo stacks above copy */}
-            <div className="meet-hero-mobile-name" aria-hidden="true">
-              <div className="meet-hero-mobile-name-label">
-                Artist Profile
-              </div>
-              <div className="meet-hero-mobile-name-title">
-                Meet<br />DJ B.A.E.
-              </div>
-              <p className="meet-hero-mobile-name-copy">
-                Club sets, private events, branded experiences, and community nights shaped around the room.
-              </p>
-            </div>
-          </div>
-
-          <div className="meet-hero-copy-panel">
-            <div className="meet-hero-copy-main">
-              {sectionLabel('Artist Profile')}
-              <h1
-                className="meet-hero-copy-title"
-                style={{
-                  fontFamily: 'Conthrax, sans-serif',
-                  fontSize: 'clamp(38px, 6vw, 78px)',
-                  fontWeight: 600,
-                  lineHeight: 0.95,
-                  color: 'var(--white)',
-                  margin: '0 0 18px',
-                }}
-              >
-                Meet
-                <br />
-                DJ B.A.E.
-              </h1>
-              <p className="meet-hero-copy-summary">
-                DJ B.A.E. moves between club sets, private events, branded experiences, and community nights without flattening the personality of the room.
-                The through line is selection, pacing, and a set structure that knows when to push and when to hold back.
-              </p>
-
-              <div className="meet-hero-copy-rail">
-                <div className="meet-hero-copy-rail-label">Approach</div>
-                <div className="meet-hero-copy-rail-value">Open-format, room-aware, and flexible across different event settings.</div>
-              </div>
-            </div>
-
-            <div className="meet-hero-actions" style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
-              <Link href="/book" className="btn-primary">
-                Book DJ B.A.E.
-              </Link>
-              <Link href="/press-kit" className="inline-link">
-                Open Press Kit
-              </Link>
-            </div>
-
-            <div style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '10px 24px',
-              paddingTop: '18px',
-              borderTop: '1px solid var(--border)',
-            }}>
-              {meetSignals.map((item) => (
-                <div key={item.label} style={{ fontSize: '13px', color: 'var(--muted)' }}>
-                  <strong style={{ color: 'var(--white)', fontWeight: 500 }}>{item.label}:</strong>{' '}
-                  {item.value}
-                </div>
-              ))}
-            </div>
-
-            <div className="meet-hero-module-grid">
-              {profileModules.map((item) => (
-                <div key={item.label} className="meet-hero-module">
-                  <div className="meet-hero-module-top">
-                    <span className="meet-hero-module-label">{item.label}</span>
-                  </div>
-                  <div className="meet-hero-module-value">{item.value}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <MeetIdentityHero />
 
         <section className="meet-operating-range">
           <div style={{ marginBottom: '20px' }}>
