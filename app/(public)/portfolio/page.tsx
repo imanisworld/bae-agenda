@@ -63,7 +63,40 @@ export default async function PortfolioPage() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Ambient background — video removed (file not available) */}
+        <Image
+          src="/photos/PlexMix19-DJBAE.JPEG"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          aria-hidden="true"
+          style={{
+            objectFit: 'cover',
+            objectPosition: 'center 38%',
+            opacity: 0.34,
+          }}
+        />
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(90deg, rgba(8,8,10,0.96) 0%, rgba(8,8,10,0.8) 44%, rgba(8,8,10,0.48) 100%)',
+            zIndex: 0,
+          }}
+        />
+        <div style={{
+          position: 'absolute',
+          right: 'max(24px, calc(var(--safe-right) + 20px))',
+          bottom: '18px',
+          zIndex: 1,
+          fontSize: '9px',
+          letterSpacing: '0.16em',
+          textTransform: 'uppercase',
+          color: 'rgba(250,248,243,0.52)',
+        }}>
+          Club Plex Mix 19 · Shot by Pook
+        </div>
         <div style={{ maxWidth: '1280px', margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
           <div className="hardware-heading">
             <span className="section-label">Chicago · Indianapolis · ATL</span>
