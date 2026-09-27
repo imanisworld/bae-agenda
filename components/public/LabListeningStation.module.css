@@ -692,3 +692,277 @@
     grid-template-columns: repeat(2,minmax(0,1fr));
   }
 }
+
+
+/* Single-screen Lab: keep the deck fixed and let the physical objects overlap. */
+.compact {
+  padding: 46px 0 104px;
+  overflow: hidden;
+}
+
+.compact .header {
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+}
+
+.compact .header h1 {
+  font-size: clamp(36px, 4.7vw, 64px);
+}
+
+.compact .deck {
+  position: relative;
+  display: block;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.compact .platterColumn {
+  position: absolute;
+  inset: 0;
+  padding: 16px 20px;
+  border: 0;
+}
+
+.compact .deckLabel {
+  position: relative;
+  z-index: 6;
+}
+
+.compact .platter {
+  width: min(292px, 34vh, 32vw);
+  margin: 10px auto 0;
+}
+
+.compact .readout {
+  position: absolute;
+  z-index: 6;
+  left: 22px;
+  top: 58px;
+  width: min(250px, 24%);
+  padding-top: 0;
+  border-top: 0;
+}
+
+.compact .readout h2 {
+  font-size: clamp(22px, 2.2vw, 32px);
+}
+
+.compact .readout p {
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.compact .sleeveColumn {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  min-height: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
+.compact .sleeveHeading {
+  position: absolute;
+  left: 24px;
+  bottom: 220px;
+  width: min(760px, 82%);
+  margin: 0;
+}
+
+.compact .sleeves {
+  position: absolute;
+  left: 50%;
+  bottom: 10px;
+  width: min(760px, 82%);
+  transform: translateX(-50%);
+  grid-template-columns: repeat(3, minmax(0,1fr));
+  gap: 8px;
+  padding: 0;
+  pointer-events: auto;
+}
+
+.compact .sleeveVisual {
+  aspect-ratio: 1.08;
+}
+
+.compact .sleeveArt {
+  top: 10%;
+  left: 13%;
+  width: 74%;
+}
+
+.compact .sleeveDisc {
+  left: 0;
+  top: 27%;
+  width: 52%;
+}
+
+.compact .sleeveStack {
+  top: 17%;
+  right: 3%;
+  width: 31%;
+  height: 60%;
+}
+
+.compact .sleeveMeta {
+  padding-left: 13%;
+}
+
+.compact .comingSoon {
+  position: absolute;
+  z-index: 8;
+  top: 54px;
+  right: 20px;
+  width: 190px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.compact .comingSoonIntro p {
+  display: none;
+}
+
+.compact .futureSleeves {
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 7px;
+  margin-top: 6px;
+  padding: 0;
+}
+
+.compact .futureLabel {
+  padding-left: 8%;
+  font-size: 7px;
+}
+
+@media (max-width: 900px) {
+  .compact {
+    width: min(100% - 18px,1240px);
+    padding: 44px 0 96px;
+    overflow: hidden;
+  }
+
+  .compact .header {
+    gap: 4px;
+    margin-bottom: 8px;
+  }
+
+  .compact .header h1 {
+    font-size: clamp(34px, 8vw, 54px);
+  }
+
+  .compact .deck {
+    display: block;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .compact .platterColumn {
+    position: absolute;
+    inset: 0;
+    padding: 14px 16px;
+    border: 0;
+  }
+
+  .compact .platter {
+    width: min(250px, 31vh, 40vw);
+    margin-top: 8px;
+  }
+
+  .compact .readout {
+    left: 16px;
+    top: 52px;
+    width: 190px;
+  }
+
+  .compact .readout p {
+    display: none;
+  }
+
+  .compact .sleeveColumn {
+    position: absolute;
+    inset: 0;
+    padding: 0;
+  }
+
+  .compact .sleeveHeading {
+    left: 16px;
+    bottom: 180px;
+    width: calc(100% - 32px);
+  }
+
+  .compact .sleeves {
+    bottom: 8px;
+    width: min(680px, 92%);
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 6px;
+  }
+
+  .compact .comingSoon {
+    top: 48px;
+    right: 14px;
+    width: 150px;
+  }
+}
+
+@media (max-width: 560px) {
+  .compact {
+    padding-top: 42px;
+    padding-bottom: 86px;
+  }
+
+  .compact .header > span {
+    display: none;
+  }
+
+  .compact .header h1 {
+    font-size: clamp(32px, 11vw, 48px);
+  }
+
+  .compact .platter {
+    width: min(205px, 29vh, 54vw);
+  }
+
+  .compact .readout {
+    top: 48px;
+    width: 132px;
+  }
+
+  .compact .readout h2 {
+    font-size: 18px;
+  }
+
+  .compact .comingSoon {
+    top: 46px;
+    right: 10px;
+    width: 112px;
+  }
+
+  .compact .futureLabel {
+    font-size: 6px;
+    letter-spacing: .08em;
+  }
+
+  .compact .sleeveHeading {
+    left: 10px;
+    bottom: 142px;
+    width: calc(100% - 20px);
+  }
+
+  .compact .sleeves {
+    width: 96%;
+    bottom: 5px;
+    grid-template-columns: repeat(3,minmax(0,1fr));
+    gap: 4px;
+  }
+
+  .compact .sleeveMeta small {
+    display: none;
+  }
+
+  .compact .sleeveMeta strong {
+    font-size: 9px;
+    line-height: 1.2;
+  }
+}
