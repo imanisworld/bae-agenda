@@ -1146,18 +1146,7 @@ button,
   .hero-turntable-arm-head {
     transition: none !important;
   }
-
-  .scroll-fader-thumb {
-    transition: none;
-  }
 }
-
-@media (max-width: 1180px), (pointer: coarse) {
-  .scroll-fader {
-    display: none;
-  }
-}
-
 @media (max-width: 800px) {
   .hero-turntable {
     width: min(300px, 86vw);
@@ -2023,12 +2012,6 @@ button,
     flex-direction: column;
     align-items: flex-start;
   }
-
-  .patch-bay-jacks {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    padding: 18px 8px 22px;
-  }
-
   .review-section-shell {
     padding-top: 28px !important;
     padding-bottom: 24px !important;
