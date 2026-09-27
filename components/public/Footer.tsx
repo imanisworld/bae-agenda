@@ -9,10 +9,11 @@ const CURRENT_YEAR = new Date().getFullYear()
 
 const NAV_LINKS = [
   { label: 'Events',    href: '/events'    },
-  { label: 'Meet',      href: '/meet'      },
   { label: 'Portfolio', href: '/portfolio' },
   { label: 'Lab',       href: '/lab'       },
+  { label: 'Meet',      href: '/meet'      },
   { label: 'Book',      href: '/book'      },
+  { label: 'Connect',   href: '/connect'   },
   { label: 'Built',     href: '/built'     },
   { label: 'Press Kit', href: '/press-kit' },
 ]
