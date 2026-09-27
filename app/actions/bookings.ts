@@ -843,6 +843,7 @@ interface BookingEventSource {
   id: string
   event_name: string
   event_date: string
+  event_timezone: string | null
   venue: string | null
   city: string | null
   notes: string | null
@@ -861,7 +862,7 @@ export async function createEventFromBookingAction(formData: FormData) {
 
   const { data: booking, error: bookingError } = await admin
     .from('bookings')
-    .select('id, event_name, event_date, venue, city, notes, status')
+    .select('id, event_name, event_date, event_timezone, venue, city, notes, status')
     .eq('id', bookingId)
     .maybeSingle()
 
@@ -896,6 +897,7 @@ export async function createEventFromBookingAction(formData: FormData) {
     .insert({
       title: source.event_name,
       event_date: source.event_date,
+      event_timezone: source.event_timezone,
       venue: source.venue,
       city: source.city,
       description: source.notes,

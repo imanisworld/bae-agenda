@@ -6,22 +6,31 @@ export const EVENT_CITY_OPTIONS = [
   'Schaumburg, IL',
   'Milwaukee, WI',
   'Indianapolis, IN',
+  'Atlanta, GA',
 ] as const
 
-export const EVENT_TIME_OPTIONS = buildTimeOptions()
+export const EVENT_TIMEZONE_OPTIONS = [
+  { value: 'America/Indiana/Indianapolis', label: 'Eastern — Indianapolis' },
+  { value: 'America/New_York', label: 'Eastern — New York / Atlanta' },
+  { value: 'America/Chicago', label: 'Central — Chicago / Milwaukee' },
+  { value: 'America/Denver', label: 'Mountain — Denver' },
+  { value: 'America/Phoenix', label: 'Mountain — Arizona (no DST)' },
+  { value: 'America/Los_Angeles', label: 'Pacific — Los Angeles' },
+] as const
 
-function buildTimeOptions() {
-  const options: Array<{ value: string; label: string }> = []
-
-  for (let hour = 10; hour <= 23; hour++) {
-    options.push({ value: `${String(hour).padStart(2, '0')}:00`, label: formatTimeLabel(hour, 0) })
-    options.push({ value: `${String(hour).padStart(2, '0')}:30`, label: formatTimeLabel(hour, 30) })
-  }
-
-  return options
+const CITY_TIME_ZONES: Record<string, string> = {
+  'chicago, il': 'America/Chicago',
+  'oak park, il': 'America/Chicago',
+  'evanston, il': 'America/Chicago',
+  'naperville, il': 'America/Chicago',
+  'schaumburg, il': 'America/Chicago',
+  'milwaukee, wi': 'America/Chicago',
+  'indianapolis, in': 'America/Indiana/Indianapolis',
+  'atlanta, ga': 'America/New_York',
 }
 
-function formatTimeLabel(hour: number, minute: number) {
-  const h = hour % 12 || 12
-  return `${h}:${String(minute).padStart(2, '0')} ${hour >= 12 ? 'PM' : 'AM'}`
+export function suggestEventTimeZone(city: string | null | undefined): string | null {
+  const normalized = city?.trim().toLowerCase()
+  if (!normalized) return null
+  return CITY_TIME_ZONES[normalized] ?? null
 }

@@ -7,6 +7,7 @@
 import type { Metadata } from 'next'
 import Link              from 'next/link'
 import { getUpcomingEvents } from '@/lib/db/events'
+import { isValidTimeZone } from '@/lib/date-time'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,13 +31,14 @@ export const metadata: Metadata = {
   },
 }
 
-function formatEventDate(isoDate: string) {
+function formatEventDate(isoDate: string, eventTimeZone: string | null) {
   const d = new Date(isoDate)
+  const timeZone = eventTimeZone && isValidTimeZone(eventTimeZone) ? eventTimeZone : 'UTC'
   return {
-    day:      d.toLocaleString('en-US', { day: '2-digit',    timeZone: 'UTC' }),
-    month:    d.toLocaleString('en-US', { month: 'short',    timeZone: 'UTC' }).toUpperCase(),
-    weekday:  d.toLocaleString('en-US', { weekday: 'long',   timeZone: 'UTC' }),
-    year:     d.toLocaleString('en-US', { year:    'numeric',timeZone: 'UTC' }),
+    day:      d.toLocaleString('en-US', { day: '2-digit',     timeZone }),
+    month:    d.toLocaleString('en-US', { month: 'short',     timeZone }).toUpperCase(),
+    weekday:  d.toLocaleString('en-US', { weekday: 'long',    timeZone }),
+    year:     d.toLocaleString('en-US', { year: 'numeric',    timeZone }),
   }
 }
 
@@ -121,7 +123,7 @@ export default async function EventsPage() {
         ) : (
           <div role="list">
             {events.map((event) => {
-              const { day, month, weekday, year } = formatEventDate(event.event_date)
+              const { day, month, weekday, year } = formatEventDate(event.event_date, event.event_timezone)
               const location = [event.venue, event.city].filter(Boolean).join(' · ')
 
               return (

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   formatEventTimeRange,
+  getEventInputDateTime,
   getLocalDateString,
   getScheduledReminderQueryWindow,
   isCalendarDaysOut,
@@ -19,6 +20,33 @@ describe('date-time helpers', () => {
     expect(
       toEventISO('2026-07-04', 'America/Indiana/Indianapolis', '18:30')
     ).toBe('2026-07-04T22:30:00.000Z')
+  })
+
+  it('converts Chicago summer time using the event timezone', () => {
+    expect(
+      toEventISO('2026-07-04', 'America/Chicago', '18:30')
+    ).toBe('2026-07-04T23:30:00.000Z')
+  })
+
+  it('converts Chicago winter time using the DST-aware offset', () => {
+    expect(
+      toEventISO('2026-12-04', 'America/Chicago', '18:30')
+    ).toBe('2026-12-05T00:30:00.000Z')
+  })
+
+  it('round-trips a stored instant back to event-local form values', () => {
+    expect(
+      getEventInputDateTime(
+        '2026-07-04T23:30:00.000Z',
+        'America/Chicago'
+      )
+    ).toEqual({ date: '2026-07-04', time: '18:30' })
+  })
+
+  it('uses UTC form values for legacy events without a saved timezone', () => {
+    expect(
+      getEventInputDateTime('2026-10-03T00:00:00.000Z', null)
+    ).toEqual({ date: '2026-10-03', time: '00:00' })
   })
 
   it('returns null for invalid local times that do not exist in the zone', () => {

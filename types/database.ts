@@ -27,11 +27,13 @@ export type Database = {
           title:       string
           slug:        string        // used for /events/[slug] routing
           event_date:  string        // ISO timestamptz — determines upcoming vs past
+          event_timezone: string | null // IANA zone; null means legacy/unreviewed
           venue:       string | null
           city:        string | null
           description: string | null
           public:      boolean       // false = admin-only draft, hidden from public site
           featured:    boolean       // true = shown on homepage events section
+          show_description: boolean
           created_at:  string
           updated_at:  string
         }

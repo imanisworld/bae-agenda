@@ -4,21 +4,26 @@
  */
 import Link from 'next/link'
 import { getFeaturedEvents, type Event } from '@/lib/db/events'
+import { isValidTimeZone } from '@/lib/date-time'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function formatEventDate(isoDate: string): { day: string; month: string } {
+function formatEventDate(
+  isoDate: string,
+  eventTimeZone: string | null
+): { day: string; month: string } {
   const d = new Date(isoDate)
+  const timeZone = eventTimeZone && isValidTimeZone(eventTimeZone) ? eventTimeZone : 'UTC'
   return {
-    day:   d.toLocaleString('en-US', { day: '2-digit',   timeZone: 'UTC' }),
-    month: d.toLocaleString('en-US', { month: 'short',   timeZone: 'UTC' }).toUpperCase(),
+    day:   d.toLocaleString('en-US', { day: '2-digit', timeZone }),
+    month: d.toLocaleString('en-US', { month: 'short', timeZone }).toUpperCase(),
   }
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
 
-function EventRow({ title, event_date, venue, city, featured }: Event) {
-  const { day, month } = formatEventDate(event_date)
+function EventRow({ title, event_date, event_timezone, venue, city, featured }: Event) {
+  const { day, month } = formatEventDate(event_date, event_timezone)
   const location       = [venue, city].filter(Boolean).join(', ')
 
   return (
