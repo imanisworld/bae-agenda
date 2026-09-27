@@ -140,7 +140,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                 <span className={styles.grooveTwo} />
                 <span className={styles.label}>
                   {active.cover_url ? (
-                    <Image src={active.cover_url} alt="" fill sizes="120px" />
+                    <Image src={active.cover_url} alt="" fill sizes="120px" quality={90} />
                   ) : (
                     <span>BAE</span>
                   )}
@@ -197,7 +197,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                       </span>
                       <span className={styles.sleeveArt}>
                         {mix.cover_url ? (
-                          <Image src={mix.cover_url} alt="" fill sizes="260px" />
+                          <Image src={mix.cover_url} alt="" fill sizes="260px" quality={90} />
                         ) : (
                           <span className={styles.sleeveFallback}>DJ B.A.E.</span>
                         )}
