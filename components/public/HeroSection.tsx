@@ -9,7 +9,6 @@
 import Image         from 'next/image'
 import Link          from 'next/link'
 import HeroGlowLayer from '@/components/effects/HeroGlowLayer'
-import ScrollFader   from '@/components/public/ScrollFader'
 
 interface HeroContent {
   hero_title?:    string
@@ -78,7 +77,6 @@ export default function HeroSection({ content = {} }: Props) {
       {/* ── Effects ──────────────────────────────────────── */}
       <div className="noise-overlay" aria-hidden="true" />
       <HeroGlowLayer />
-      <ScrollFader />
 
       {/* ── Top bar ──────────────────────────────────────── */}
       <div className="hero-topbar">
