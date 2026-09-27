@@ -229,7 +229,7 @@ function clearDraft() {
   }
 }
 
-export default function BookingForm() {
+export default function BookingForm({ embedded = false }: { embedded?: boolean }) {
   const formRef = useRef<HTMLFormElement | null>(null)
   const [step, setStep] = useState<Step>(1)
   const [form, setForm] = useState<FormState>(() => ({
@@ -606,12 +606,12 @@ export default function BookingForm() {
   }
 
   if (success) {
-    return <BookingSuccess summary={successState} />
+    return <BookingSuccess summary={successState} embedded={embedded} />
   }
 
   return (
-    <div style={{ background: 'var(--off-black)', paddingTop: '68px' }}>
-      <div className="section-container" style={{ maxWidth: '680px', paddingTop: 0, paddingBottom: '64px' }}>
+    <div className={embedded ? 'booking-form-embedded' : undefined} style={{ background: 'var(--off-black)', paddingTop: embedded ? 0 : '68px' }}>
+      <div className="section-container" style={{ maxWidth: '680px', paddingTop: embedded ? '24px' : 0, paddingBottom: embedded ? '36px' : '64px' }}>
         <div style={{ marginBottom: '36px' }}>
           <span className="section-label">Booking Inquiry</span>
           <h1 style={{
@@ -785,13 +785,13 @@ export default function BookingForm() {
   )
 }
 
-function BookingSuccess({ summary }: { summary: BookingSuccessState | null }) {
+function BookingSuccess({ summary, embedded = false }: { summary: BookingSuccessState | null; embedded?: boolean }) {
   const submittedDate = summary?.eventDate
     ? format(parseISO(`${summary.eventDate}T00:00:00`), 'MMMM d, yyyy')
     : null
 
   return (
-    <div style={{ background: 'var(--off-black)', paddingTop: '68px', minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ background: 'var(--off-black)', paddingTop: embedded ? 0 : '68px', minHeight: embedded ? '100%' : '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ width: 'min(100%, 640px)', padding: '48px 24px' }}>
         <div
           style={{
