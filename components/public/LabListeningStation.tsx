@@ -39,7 +39,7 @@ function playerUrl(url: string | null) {
   return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%238f2d3c&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`
 }
 
-export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }) {
+export default function LabListeningStation({ mixes, compact = false }: { mixes: ListeningMix[]; compact?: boolean }) {
   const [activeIndex, setActiveIndex] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [coasting, setCoasting] = useState(false)
@@ -92,7 +92,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
   }
 
   return (
-    <section className={styles.station} aria-label="B.A.E. listening station">
+    <section className={compact ? `${styles.station} ${styles.compact}` : styles.station} aria-label="B.A.E. listening station">
       <Script
         src="https://w.soundcloud.com/player/api.js"
         strategy="afterInteractive"
