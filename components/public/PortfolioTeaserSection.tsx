@@ -124,13 +124,7 @@ export default async function PortfolioTeaserSection() {
             </div>
           </Link>
 
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-            gap: '1px',
-            background: 'var(--border)',
-            border: '1px solid var(--border)',
-          }}>
+          <div className="portfolio-teaser-archive">
             {entries.map((entry) => (
               <Link
                 key={entry.id}
@@ -138,14 +132,14 @@ export default async function PortfolioTeaserSection() {
                 className="portfolio-teaser-event-card"
                 aria-label={`View ${entry.event_name} in the portfolio`}
                 style={{
-                  background: 'var(--off-black)',
+                  background: 'transparent',
                   display: 'grid',
                   gridTemplateRows: entry.photo_url ? 'auto 1fr' : '1fr',
                   textDecoration: 'none',
                 }}
               >
                 {entry.photo_url && (
-                  <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 10' }}>
+                  <div style={{ position: 'relative', width: '100%', aspectRatio: '4 / 5' }}>
                     <Image
                       src={entry.photo_url}
                       alt=""
@@ -167,7 +161,7 @@ export default async function PortfolioTeaserSection() {
                   </div>
                   <div style={{
                     fontFamily: 'Conthrax, sans-serif',
-                    fontSize: 'clamp(13px, 1.8vw, 16px)',
+                    fontSize: 'clamp(16px, 2vw, 22px)',
                     color: 'var(--white)',
                     lineHeight: 1.2,
                   }}>

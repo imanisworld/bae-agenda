@@ -37,7 +37,7 @@ function EQKnob({ band }: { band: string }) {
           userSelect: 'none',
           transition: dragging ? 'none' : 'box-shadow 120ms ease',
           boxShadow: dragging
-            ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(155,93,229,0.5), 0 0 14px rgba(155,93,229,0.2)'
+            ? 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(143,45,60,0.5), 0 0 14px rgba(143,45,60,0.2)'
             : 'inset 0 1px 0 rgba(255,255,255,0.14), 0 0 0 1px rgba(255,255,255,0.05)',
         }}
       />

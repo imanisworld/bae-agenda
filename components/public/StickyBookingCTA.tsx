@@ -96,7 +96,7 @@ export default function StickyBookingCTA() {
           borderRadius: '100px',
           whiteSpace: 'nowrap',
           boxShadow:
-            '0 0 0 1px rgba(155,93,229,0.55), 0 6px 24px rgba(155,93,229,0.34), 0 2px 8px rgba(0,0,0,0.45)',
+            '0 0 0 1px rgba(143,45,60,0.55), 0 6px 24px rgba(143,45,60,0.34), 0 2px 8px rgba(0,0,0,0.45)',
         }}
       >
         Book DJ B.A.E. →

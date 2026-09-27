@@ -50,7 +50,7 @@ export default async function ReviewSection() {
       style={{
         borderTop: '1px solid var(--border)',
         background:
-          'radial-gradient(ellipse at 18% 28%, rgba(155,93,229,0.08) 0%, transparent 48%), var(--bg-sunken, #08080a)',
+          'radial-gradient(ellipse at 18% 28%, rgba(143,45,60,0.08) 0%, transparent 48%), var(--bg-sunken, #08080a)',
         position: 'relative',
         overflow: 'hidden',
       }}
@@ -62,8 +62,8 @@ export default async function ReviewSection() {
           inset: 0,
           pointerEvents: 'none',
           background: `
-            linear-gradient(180deg, transparent 0%, rgba(155,93,229,0.04) 56%, transparent 100%),
-            radial-gradient(circle at 50% 100%, rgba(155,93,229,0.1), transparent 34%)
+            linear-gradient(180deg, transparent 0%, rgba(143,45,60,0.04) 56%, transparent 100%),
+            radial-gradient(circle at 50% 100%, rgba(143,45,60,0.1), transparent 34%)
           `,
         }}
       />
@@ -115,7 +115,7 @@ export default async function ReviewSection() {
               minHeight: '152px',
               padding: '16px 18px',
               borderRadius: '20px',
-              background: 'linear-gradient(180deg, rgba(155,93,229,0.16), rgba(24,24,28,0.98) 58%)',
+              background: 'linear-gradient(180deg, rgba(143,45,60,0.16), rgba(24,24,28,0.98) 58%)',
               border: '1px solid rgba(255,255,255,0.08)',
               display: 'grid',
               gap: '12px',
@@ -131,7 +131,7 @@ export default async function ReviewSection() {
                 fontFamily: 'Conthrax, sans-serif',
                 fontSize: '56px',
                 lineHeight: 1,
-                color: 'rgba(155,93,229,0.14)',
+                color: 'rgba(143,45,60,0.14)',
               }}
             >
               &ldquo;

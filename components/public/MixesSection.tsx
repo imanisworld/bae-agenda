@@ -133,41 +133,33 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
 
         {isPage && (
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-            gap: '12px',
-            marginBottom: '32px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '28px 48px',
+            marginBottom: '40px',
+            alignItems: 'baseline',
           }}>
             {[
-              { label: 'Mixes', value: hasPublishedMixes ? String(mixes.length) : '—' },
-              { label: 'Runtime', value: totalRuntimeHours > 0 ? `${totalRuntimeHours}h+` : '—' },
-              { label: 'Genres', value: uniqueGenres > 0 ? String(uniqueGenres) : '—' },
+              { label: 'mixes', value: hasPublishedMixes ? String(mixes.length) : '—' },
+              { label: 'runtime', value: totalRuntimeHours > 0 ? `${totalRuntimeHours}h+` : '—' },
+              { label: 'genres', value: uniqueGenres > 0 ? String(uniqueGenres) : '—' },
             ].map((item) => (
-              <div
-                key={item.label}
-                style={{
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  background: 'rgba(12,12,16,0.54)',
-                  padding: '14px 16px',
-                  display: 'grid',
-                  gap: '6px',
-                }}
-              >
-                <div style={{
-                  fontSize: '10px',
-                  letterSpacing: '0.22em',
-                  textTransform: 'uppercase',
-                  color: 'var(--muted)',
-                }}>
-                  {item.label}
-                </div>
+              <div key={item.label} style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
                 <div style={{
                   fontFamily: 'Conthrax, sans-serif',
-                  fontSize: 'clamp(16px, 2vw, 22px)',
-                  lineHeight: 1.1,
+                  fontSize: 'clamp(28px, 4vw, 48px)',
+                  lineHeight: 0.95,
                   color: 'var(--white)',
                 }}>
                   {item.value}
+                </div>
+                <div style={{
+                  fontSize: '13px',
+                  letterSpacing: '0.08em',
+                  textTransform: 'lowercase',
+                  color: 'var(--muted)',
+                }}>
+                  {item.label}
                 </div>
               </div>
             ))}
@@ -256,7 +248,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                   style={{
                     padding: '18px',
                     borderRadius: '28px',
-                    background: 'linear-gradient(180deg, rgba(155,93,229,0.08), rgba(12,12,16,0.96))',
+                    background: 'linear-gradient(180deg, rgba(143,45,60,0.08), rgba(12,12,16,0.96))',
                   }}
                 >
                   <div style={{ display: 'grid', gap: '14px' }}>
@@ -445,7 +437,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                         <span style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
                           {mix === featuredMix ? 'Featured' : formatPublishedDate(mix.published_at)}
                         </span>
-                        <span style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(155,93,229,0.9)' }}>
+                        <span style={{ fontSize: '10px', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(143,45,60,0.9)' }}>
                           {getPlatformLabel(mix.embed_url)}
                         </span>
                       </div>
@@ -471,8 +463,8 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                           style={{
                             justifySelf: 'start',
                             padding: '11px 14px',
-                            border: '1px solid rgba(155,93,229,0.32)',
-                            background: 'rgba(155,93,229,0.12)',
+                            border: '1px solid rgba(143,45,60,0.32)',
+                            background: 'rgba(143,45,60,0.12)',
                             color: 'var(--white)',
                             textDecoration: 'none',
                             fontSize: '10px',
@@ -495,7 +487,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                 marginTop: '28px',
                 padding: '18px',
                 borderRadius: '24px',
-                background: 'linear-gradient(180deg, rgba(155,93,229,0.06), rgba(12,12,16,0.96))',
+                background: 'linear-gradient(180deg, rgba(143,45,60,0.06), rgba(12,12,16,0.96))',
               }}
             >
               <div style={{ display: 'grid', gap: '10px', maxWidth: '620px' }}>
