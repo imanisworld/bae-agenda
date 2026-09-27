@@ -162,6 +162,8 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                 title={`${active.title} SoundCloud player`}
                 src={activePlayer}
                 allow="autoplay"
+                tabIndex={-1}
+                aria-hidden="true"
                 className={styles.audioFrame}
               />
             ) : (
