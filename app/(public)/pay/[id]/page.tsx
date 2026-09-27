@@ -7,6 +7,7 @@ import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt, get
 import { getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-finance'
 import { getStripePublishableKey } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
 
 export const metadata: Metadata = {
   title: 'Pay Deposit',
@@ -254,8 +255,8 @@ export default async function PayBookingPage({
                 <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '18px' }}>Manual Zelle / Cash App</div>
                 <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7 }}>
                   If you were given a manual payment option, include your booking ID in the memo and send proof of payment to{' '}
-                  <a href={`mailto:${process.env.BOOKING_ALERT_EMAIL ?? 'bookings@thebaeagenda.com'}`} style={{ color: 'var(--white)' }}>
-                    {process.env.BOOKING_ALERT_EMAIL ?? 'bookings@thebaeagenda.com'}
+                  <a href={`mailto:${process.env.BOOKING_ALERT_EMAIL ?? DEFAULT_BOOKING_EMAIL}`} style={{ color: 'var(--white)' }}>
+                    {process.env.BOOKING_ALERT_EMAIL ?? DEFAULT_BOOKING_EMAIL}
                   </a>.
                 </p>
                 <div style={{ border: '1px dashed rgba(255,255,255,0.18)', padding: '12px 14px', fontSize: '13px', lineHeight: 1.7, overflowWrap: 'anywhere' }}>
