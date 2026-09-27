@@ -1,12 +1,14 @@
 import ReviewDrawer from '@/components/public/ReviewDrawer'
 import { SOCIALS } from '@/lib/constants'
+import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
 import { getContentMap } from '@/lib/db/content'
 import styles from './BookContactSection.module.css'
 
-const SOCIAL_CONTENT_KEYS = ['instagram_url', 'soundcloud_url', 'youtube_url'] as const
+const CONTACT_CONTENT_KEYS = ['booking_email', 'instagram_url', 'soundcloud_url', 'youtube_url'] as const
 
 export default async function BookContactSection() {
-  const content = await getContentMap([...SOCIAL_CONTENT_KEYS])
+  const content = await getContentMap([...CONTACT_CONTENT_KEYS])
+  const bookingEmail = content.booking_email || DEFAULT_BOOKING_EMAIL
 
   const socials = SOCIALS.map((social) => ({
     ...social,
@@ -29,7 +31,7 @@ export default async function BookContactSection() {
         <div className={styles.contactRows}>
           <div>
             <small>Bookings</small>
-            <a href="mailto:baebookings@proton.me">baebookings@proton.me</a>
+            <a href={`mailto:${bookingEmail}`}>{bookingEmail}</a>
           </div>
           <div>
             <small>Web / general</small>
