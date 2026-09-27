@@ -6050,3 +6050,58 @@ body.has-custom-cursor * { cursor: none !important; }
     transition: none;
   }
 }
+
+
+/* Keep route content visibly clear of the fixed dock. */
+.home-experience > section {
+  padding-bottom: 108px;
+}
+
+.events-experience {
+  padding-bottom: 108px;
+}
+
+.portfolio-experience-stats {
+  bottom: 116px;
+}
+
+.book-experience {
+  padding-bottom: 108px;
+}
+
+.book-experience-form,
+.book-experience-rail {
+  scroll-padding-bottom: 112px;
+}
+
+@media (max-width: 900px) {
+  .events-experience {
+    padding-bottom: 100px;
+  }
+
+  .portfolio-experience-stats {
+    bottom: 106px;
+  }
+
+  .book-experience {
+    padding-bottom: 98px;
+  }
+}
+
+@media (max-width: 620px) {
+  .home-experience > section {
+    padding-bottom: 96px;
+  }
+
+  .events-experience {
+    padding-bottom: 92px;
+  }
+
+  .portfolio-experience-stats {
+    bottom: 96px;
+  }
+
+  .book-experience {
+    padding-bottom: 92px;
+  }
+}
