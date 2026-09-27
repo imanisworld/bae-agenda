@@ -31,7 +31,7 @@ export default function PortfolioArchiveHero({ prints, onExplore }: { prints: Ar
         <h1 id="portfolio-title">Past<br />work.</h1>
         <p>Rooms, crowds, and moments collected across the archive.</p>
         {onExplore ? (
-          <button type="button" className="btn-ghost" onClick={onExplore}>Explore the archive</button>
+          <button id="portfolio-explore-archive" type="button" className="btn-ghost" onClick={onExplore}>Explore the archive</button>
         ) : (
           <Link href="#archive" className="btn-ghost">Explore the archive</Link>
         )}
