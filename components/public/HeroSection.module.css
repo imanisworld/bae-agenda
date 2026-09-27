@@ -1,0 +1,180 @@
+.hero {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(143,45,60,.18), transparent 34%),
+    radial-gradient(circle at 72% 64%, rgba(196,132,74,.08), transparent 34%),
+    #0e0b0a;
+  color: #f6f1e8;
+}
+
+.wordmark {
+  position: absolute;
+  z-index: 0;
+  left: clamp(18px, 3.5vw, 64px);
+  top: clamp(108px, 13vh, 160px);
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(152px, 29vw, 440px);
+  line-height: .72;
+  letter-spacing: -.095em;
+  font-weight: 600;
+  color: #8f2d3c;
+  opacity: .96;
+}
+
+.photo {
+  position: absolute;
+  z-index: 2;
+  top: clamp(96px, 11vh, 138px);
+  left: 31%;
+  width: min(43vw, 620px);
+  height: min(72vh, 760px);
+  min-height: 540px;
+  overflow: hidden;
+  clip-path: polygon(7% 0, 100% 5%, 94% 100%, 0 94%);
+  transform: rotate(1.8deg);
+  box-shadow: 0 38px 90px rgba(0,0,0,.38);
+}
+
+.photoImage {
+  object-fit: cover;
+  object-position: center 46%;
+  filter: saturate(.9) contrast(1.04);
+  transition: transform 900ms cubic-bezier(.2,.7,.2,1), filter 900ms ease;
+}
+
+.copy {
+  position: absolute;
+  z-index: 4;
+  right: max(4vw, 34px);
+  top: 31%;
+  width: min(40vw, 620px);
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  color: #c4a574;
+  font-size: 10px;
+  letter-spacing: .19em;
+  text-transform: uppercase;
+}
+
+.copy h1 {
+  margin: 0;
+  font-family: DM Sans, sans-serif;
+  font-size: clamp(66px, 8.4vw, 128px);
+  font-weight: 400;
+  line-height: .84;
+  letter-spacing: -.065em;
+  text-shadow: 0 8px 36px rgba(0,0,0,.34);
+}
+
+.meta {
+  margin: 24px 0 0;
+  color: rgba(246,241,232,.52);
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.rule {
+  position: absolute;
+  z-index: 3;
+  left: max(24px, 4vw);
+  right: max(24px, 4vw);
+  bottom: 34px;
+  height: 1px;
+  background: rgba(196,165,116,.14);
+}
+
+@media (hover: hover) {
+  .hero:hover .photoImage {
+    transform: scale(1.018);
+    filter: saturate(.98) contrast(1.04);
+  }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    min-height: 920px;
+  }
+
+  .wordmark {
+    top: 104px;
+    font-size: 43vw;
+  }
+
+  .photo {
+    top: 190px;
+    left: 9%;
+    width: 72%;
+    height: 570px;
+    min-height: 0;
+  }
+
+  .copy {
+    top: auto;
+    left: 26%;
+    right: 5%;
+    bottom: 92px;
+    width: auto;
+  }
+
+  .copy h1 {
+    font-size: clamp(58px, 15vw, 104px);
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    min-height: 830px;
+  }
+
+  .wordmark {
+    left: 12px;
+    top: 102px;
+    font-size: 46vw;
+  }
+
+  .photo {
+    top: 170px;
+    left: 8%;
+    width: 83%;
+    height: 455px;
+    transform: rotate(1deg);
+  }
+
+  .copy {
+    left: 18%;
+    right: 16px;
+    bottom: 78px;
+  }
+
+  .eyebrow {
+    font-size: 9px;
+  }
+
+  .copy h1 {
+    font-size: clamp(54px, 17vw, 86px);
+  }
+
+  .meta {
+    margin-top: 16px;
+  }
+
+  .actions {
+    margin-top: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photoImage { transition: none; }
+  .hero:hover .photoImage { transform: none; }
+}
