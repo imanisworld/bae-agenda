@@ -5788,6 +5788,10 @@ body.has-custom-cursor * { cursor: none !important; }
   background: rgba(196,165,116,.12);
 }
 
+.book-experience-switch {
+  display: none;
+}
+
 .book-experience-form,
 .book-experience-rail {
   min-height: 0;
@@ -5951,12 +5955,51 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 
   .book-experience {
+    position: relative;
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(0,1fr);
-    padding: 48px 10px 78px;
+    grid-template-rows: auto minmax(0,1fr);
+    padding: 52px 10px 78px;
+    background: var(--off-black);
   }
 
+  .book-experience-switch {
+    display: flex;
+    gap: 6px;
+    padding: 0 8px 10px;
+  }
+
+  .book-experience-switch button {
+    flex: 1;
+    min-height: 38px;
+    border: 1px solid rgba(246,241,232,.12);
+    border-radius: 999px;
+    background: transparent;
+    color: rgba(246,241,232,.56);
+    font-size: 9px;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .book-experience-switch button[aria-selected='true'] {
+    border-color: rgba(196,165,116,.5);
+    background: rgba(143,45,60,.14);
+    color: var(--white);
+  }
+
+  .book-experience-form,
   .book-experience-rail {
+    grid-row: 2;
+    grid-column: 1;
+  }
+
+  .book-experience--inquiry .book-experience-form,
+  .book-experience--contact .book-experience-rail {
+    display: block;
+  }
+
+  .book-experience--inquiry .book-experience-rail,
+  .book-experience--contact .book-experience-form {
     display: none;
   }
 }
