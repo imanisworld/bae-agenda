@@ -1,0 +1,434 @@
+.page {
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(143,45,60,.18), transparent 28%),
+    radial-gradient(circle at 88% 54%, rgba(196,132,74,.11), transparent 30%),
+    #0e0b0a;
+  color: #f6f1e8;
+}
+
+.intro,
+.experiment,
+.direction {
+  width: min(1180px, calc(100% - 40px));
+  margin-inline: auto;
+}
+
+.intro {
+  padding: 150px 0 100px;
+}
+
+.kicker,
+.labelRow,
+.editorialCopy p,
+.dimensionCopy > p {
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+.kicker { color: #c4a574; }
+
+.intro h1 {
+  max-width: 900px;
+  margin: 18px 0 24px;
+  font-size: clamp(54px, 9vw, 126px);
+  line-height: .86;
+  letter-spacing: -.055em;
+  font-weight: 600;
+}
+
+.lede {
+  max-width: 660px;
+  color: rgba(246,241,232,.64);
+  font-size: clamp(18px, 2.1vw, 25px);
+  line-height: 1.45;
+}
+
+.experiment {
+  padding: 40px 0 130px;
+}
+
+.labelRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-bottom: 20px;
+  color: rgba(246,241,232,.56);
+  border-bottom: 1px solid rgba(196,165,116,.16);
+}
+
+.labelRow span { color: #c4a574; }
+
+.editorialStage {
+  position: relative;
+  min-height: 780px;
+  margin-top: 30px;
+  isolation: isolate;
+}
+
+.editorialWord {
+  position: absolute;
+  z-index: 0;
+  left: -1vw;
+  top: 90px;
+  font-size: clamp(160px, 29vw, 420px);
+  line-height: .7;
+  letter-spacing: -.09em;
+  font-weight: 800;
+  color: #8f2d3c;
+  opacity: .92;
+}
+
+.editorialPhoto {
+  position: absolute;
+  z-index: 2;
+  top: 28px;
+  left: 28%;
+  width: 43%;
+  height: 690px;
+  overflow: hidden;
+  clip-path: polygon(12% 0, 100% 8%, 91% 100%, 0 91%);
+  filter: saturate(.9) contrast(1.04);
+  box-shadow: 0 40px 90px rgba(0,0,0,.38);
+  transform: rotate(-2deg);
+}
+
+.editorialPhoto img {
+  object-fit: cover;
+  object-position: center 32%;
+}
+
+.editorialCopy {
+  position: absolute;
+  z-index: 3;
+  right: 0;
+  top: 170px;
+  width: 37%;
+}
+
+.editorialCopy p { color: #c4a574; }
+
+.editorialCopy h2 {
+  margin: 12px 0 26px;
+  font-size: clamp(62px, 8vw, 112px);
+  line-height: .84;
+  letter-spacing: -.055em;
+  font-weight: 500;
+}
+
+.editorialCopy span {
+  color: rgba(246,241,232,.56);
+  font-size: 14px;
+}
+
+.editorialStamp {
+  position: absolute;
+  z-index: 4;
+  left: 21%;
+  bottom: 65px;
+  width: 108px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  border: 1px solid #c4844a;
+  border-radius: 50%;
+  color: #c4844a;
+  font-size: 12px;
+  letter-spacing: .12em;
+  transform: rotate(12deg);
+  background: rgba(14,11,10,.82);
+  backdrop-filter: blur(8px);
+}
+
+.collageStage {
+  position: relative;
+  min-height: 900px;
+  margin-top: 34px;
+  background:
+    linear-gradient(110deg, rgba(28,22,20,.86), rgba(14,11,10,.2)),
+    repeating-linear-gradient(90deg, transparent 0 79px, rgba(196,165,116,.045) 80px);
+}
+
+.collageHeadline {
+  position: absolute;
+  z-index: 6;
+  top: 70px;
+  left: 6%;
+}
+
+.collageHeadline span {
+  color: #c4a574;
+  font-size: 11px;
+  letter-spacing: .18em;
+}
+
+.collageHeadline h2 {
+  margin: 14px 0 0;
+  font-size: clamp(66px, 10vw, 138px);
+  line-height: .77;
+  letter-spacing: -.055em;
+  font-weight: 500;
+}
+
+.collageStage figure {
+  position: absolute;
+  overflow: hidden;
+  margin: 0;
+  box-shadow: 0 28px 60px rgba(0,0,0,.38);
+  transition: transform 600ms cubic-bezier(.2,.7,.2,1);
+}
+
+.collageStage figure img { object-fit: cover; }
+
+.collageOne {
+  z-index: 3;
+  width: 34%;
+  height: 520px;
+  right: 7%;
+  top: 40px;
+  transform: rotate(3deg);
+}
+
+.collageTwo {
+  z-index: 4;
+  width: 39%;
+  height: 450px;
+  left: 23%;
+  bottom: 38px;
+  transform: rotate(-4deg);
+}
+
+.collageThree {
+  z-index: 2;
+  width: 25%;
+  height: 360px;
+  right: 4%;
+  bottom: 14px;
+  transform: rotate(6deg);
+}
+
+.collageOne img { object-position: center; }
+.collageTwo img { object-position: center; }
+.collageThree img { object-position: center; }
+
+.ticket {
+  position: absolute;
+  z-index: 7;
+  left: 4%;
+  bottom: 100px;
+  width: 230px;
+  padding: 23px;
+  display: grid;
+  gap: 7px;
+  background: #f6f1e8;
+  color: #0e0b0a;
+  transform: rotate(-3deg);
+  box-shadow: 0 20px 45px rgba(0,0,0,.3);
+}
+
+.ticket span,
+.ticket small {
+  font-size: 10px;
+  letter-spacing: .15em;
+}
+
+.ticket strong {
+  font-size: 31px;
+  letter-spacing: -.03em;
+}
+
+.sideNote {
+  position: absolute;
+  right: 1%;
+  top: 55%;
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+  letter-spacing: .15em;
+  font-size: 10px;
+  color: rgba(246,241,232,.45);
+}
+
+.dimensionStage {
+  position: relative;
+  min-height: 760px;
+  margin-top: 34px;
+  border-top: 1px solid rgba(196,165,116,.13);
+  border-bottom: 1px solid rgba(196,165,116,.13);
+}
+
+.glow {
+  position: absolute;
+  inset: 10% 8% 6%;
+  background:
+    radial-gradient(circle at 35% 45%, rgba(143,45,60,.42), transparent 34%),
+    radial-gradient(circle at 65% 55%, rgba(196,132,74,.2), transparent 28%);
+  filter: blur(45px);
+  opacity: .8;
+}
+
+.logoObject {
+  position: absolute;
+  z-index: 2;
+  left: 4%;
+  top: 13%;
+  width: 38%;
+  aspect-ratio: 1.12;
+  overflow: hidden;
+  border-radius: 24px;
+  transform: perspective(900px) rotateY(9deg) rotateZ(-4deg);
+  box-shadow: 0 40px 90px rgba(0,0,0,.4);
+  animation: drift 7s ease-in-out infinite alternate;
+}
+
+.logoObject img {
+  object-fit: cover;
+}
+
+.phoneObject {
+  position: absolute;
+  z-index: 4;
+  left: 33%;
+  bottom: 5%;
+  width: min(220px, 23vw);
+  transform: rotate(8deg);
+  filter: drop-shadow(0 28px 32px rgba(0,0,0,.42));
+  animation: float 5s ease-in-out infinite alternate;
+}
+
+.phoneObject img { width: 100%; height: auto; display: block; }
+
+.dimensionCopy {
+  position: absolute;
+  z-index: 5;
+  right: 2%;
+  top: 21%;
+  width: 48%;
+}
+
+.dimensionCopy > p { color: #c4a574; }
+
+.dimensionCopy h2 {
+  margin: 14px 0 25px;
+  font-size: clamp(52px, 7vw, 96px);
+  line-height: .88;
+  letter-spacing: -.05em;
+  font-weight: 500;
+}
+
+.dimensionCopy span {
+  display: block;
+  max-width: 520px;
+  color: rgba(246,241,232,.58);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.direction {
+  padding: 40px 0 150px;
+}
+
+.directionGrid {
+  margin-top: 28px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border-top: 1px solid rgba(196,165,116,.14);
+  border-left: 1px solid rgba(196,165,116,.14);
+}
+
+.directionGrid article {
+  min-height: 210px;
+  padding: 30px;
+  border-right: 1px solid rgba(196,165,116,.14);
+  border-bottom: 1px solid rgba(196,165,116,.14);
+}
+
+.directionGrid span {
+  color: #c4a574;
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.directionGrid h3 {
+  margin: 14px 0 10px;
+  font-size: clamp(30px, 4vw, 50px);
+  line-height: .95;
+  letter-spacing: -.04em;
+  font-weight: 500;
+}
+
+.directionGrid p {
+  max-width: 420px;
+  color: rgba(246,241,232,.5);
+  line-height: 1.5;
+}
+
+@keyframes drift {
+  from { transform: perspective(900px) rotateY(9deg) rotateZ(-4deg) translateY(0); }
+  to { transform: perspective(900px) rotateY(4deg) rotateZ(-2deg) translateY(-12px); }
+}
+
+@keyframes float {
+  from { transform: rotate(8deg) translateY(0); }
+  to { transform: rotate(5deg) translateY(-16px); }
+}
+
+@media (hover: hover) {
+  .collageOne:hover { transform: rotate(1deg) scale(1.025); }
+  .collageTwo:hover { transform: rotate(-2deg) scale(1.025); }
+  .collageThree:hover { transform: rotate(3deg) scale(1.025); }
+}
+
+@media (max-width: 800px) {
+  .intro { padding: 120px 0 80px; }
+  .experiment { padding-bottom: 90px; }
+
+  .editorialStage { min-height: 760px; }
+  .editorialWord { top: 70px; font-size: 47vw; }
+  .editorialPhoto { left: 7%; top: 110px; width: 72%; height: 480px; }
+  .editorialCopy { right: 0; top: 430px; width: 72%; }
+  .editorialCopy h2 { font-size: clamp(58px, 18vw, 90px); }
+  .editorialStamp { left: 3%; bottom: 25px; }
+
+  .collageStage { min-height: 1040px; }
+  .collageHeadline { left: 4%; top: 45px; }
+  .collageOne { width: 58%; height: 400px; right: 3%; top: 310px; }
+  .collageTwo { width: 62%; height: 350px; left: 5%; bottom: 36px; }
+  .collageThree { width: 38%; height: 300px; right: 3%; bottom: 120px; }
+  .ticket { left: 4%; bottom: 370px; width: 190px; }
+  .sideNote { display: none; }
+
+  .dimensionStage { min-height: 940px; }
+  .logoObject { left: 4%; top: 6%; width: 70%; }
+  .phoneObject { left: auto; right: 8%; top: 33%; bottom: auto; width: 150px; }
+  .dimensionCopy { left: 4%; right: auto; top: 56%; width: 92%; }
+
+  .directionGrid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+  .intro,
+  .experiment,
+  .direction { width: min(100% - 24px, 1180px); }
+
+  .editorialPhoto { width: 82%; height: 430px; }
+  .editorialCopy { width: 86%; top: 410px; }
+  .editorialStamp { width: 86px; }
+
+  .collageStage { min-height: 980px; }
+  .collageOne { width: 67%; height: 350px; }
+  .collageTwo { width: 68%; height: 320px; }
+  .collageThree { width: 42%; height: 250px; }
+
+  .dimensionStage { min-height: 850px; }
+  .logoObject { width: 78%; }
+  .dimensionCopy { top: 53%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logoObject,
+  .phoneObject { animation: none; }
+  .collageStage figure { transition: none; }
+}
