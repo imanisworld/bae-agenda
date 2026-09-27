@@ -447,7 +447,7 @@
   top: 86px;
   z-index: 20;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   background: rgba(14, 11, 10, .82);
   border: 1px solid rgba(196, 165, 116, .15);
   backdrop-filter: blur(18px);
