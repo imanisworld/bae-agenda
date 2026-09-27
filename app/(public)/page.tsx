@@ -1,15 +1,5 @@
-/**
- * HOMEPAGE — approved editorial sequence.
- * Hero → Upcoming Events → Lab → Portfolio → Reviews → Booking.
- */
 import type { Metadata } from 'next'
 import HeroSection from '@/components/public/HeroSection'
-import MixesSection from '@/components/public/MixesSection'
-import EventsSection from '@/components/public/EventsSection'
-import PortfolioTeaserSection from '@/components/public/PortfolioTeaserSection'
-import BookingSection from '@/components/public/BookingSection'
-import ReviewSection from '@/components/public/ReviewSection'
-import HomepageSectionBoundary from '@/components/public/HomepageSectionBoundary'
 import { getContentMap } from '@/lib/db/content'
 
 export const dynamic = 'force-dynamic'
@@ -34,21 +24,12 @@ export const metadata: Metadata = {
   },
 }
 
-const HOME_CONTENT_KEYS = ['hero_title', 'hero_subtitle', 'booking_email'] as const
-
 export default async function HomePage() {
-  const content = await getContentMap([...HOME_CONTENT_KEYS])
+  const content = await getContentMap(['hero_title', 'hero_subtitle'])
 
   return (
-    <>
-      <HomepageSectionBoundary section="hero">
-        <HeroSection content={{ hero_title: content.hero_title, hero_subtitle: content.hero_subtitle }} />
-      </HomepageSectionBoundary>
-      <HomepageSectionBoundary section="events"><EventsSection /></HomepageSectionBoundary>
-      <HomepageSectionBoundary section="mixes"><MixesSection /></HomepageSectionBoundary>
-      <HomepageSectionBoundary section="portfolio"><PortfolioTeaserSection /></HomepageSectionBoundary>
-      <HomepageSectionBoundary section="reviews"><ReviewSection /></HomepageSectionBoundary>
-      <HomepageSectionBoundary section="booking"><BookingSection bookingEmail={content.booking_email} /></HomepageSectionBoundary>
-    </>
+    <div className="home-experience">
+      <HeroSection content={{ hero_title: content.hero_title, hero_subtitle: content.hero_subtitle }} />
+    </div>
   )
 }
