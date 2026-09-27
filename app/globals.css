@@ -6105,3 +6105,48 @@ body.has-custom-cursor * { cursor: none !important; }
     padding-bottom: 92px;
   }
 }
+
+
+/* ================================================================
+   READABILITY PASS — public single-screen experience
+   ================================================================ */
+
+.book-experience .section-label {
+  color: #d4b47f;
+  font-weight: 500;
+}
+
+.book-experience-form input::placeholder,
+.book-experience-form textarea::placeholder {
+  color: rgba(246,241,232,.55);
+}
+
+.portfolio-experience-stats {
+  color: rgba(246,241,232,.62);
+  text-shadow: 0 2px 14px rgba(0,0,0,.62);
+}
+
+.portfolio-experience-stats strong {
+  color: #f6f1e8;
+}
+
+@media (max-width: 620px) {
+  .book-experience .section-label {
+    font-size: 11px;
+    letter-spacing: .15em;
+  }
+
+  .book-experience-form {
+    color: rgba(246,241,232,.9);
+  }
+
+  .portfolio-experience-stats {
+    color: rgba(246,241,232,.72);
+    font-size: 10px;
+    letter-spacing: .1em;
+  }
+
+  .portfolio-experience-stats strong {
+    font-size: 15px;
+  }
+}
