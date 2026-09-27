@@ -20,23 +20,40 @@ export default function BookExperienceStage({
     return () => window.removeEventListener('hashchange', syncHash)
   }, [])
 
-  function choosePanel(next: 'inquiry' | 'contact') {
+  function choosePanel(next: 'inquiry' | 'contact', moveFocus = false) {
     setPanel(next)
     const url = next === 'contact'
       ? `${window.location.pathname}${window.location.search}#contact`
       : `${window.location.pathname}${window.location.search}`
     window.history.replaceState(null, '', url)
+    if (moveFocus) {
+      window.requestAnimationFrame(() => {
+        document.getElementById(`book-tab-${next}`)?.focus()
+      })
+    }
+  }
+
+  function onTabKeyDown(event: React.KeyboardEvent<HTMLDivElement>) {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+    event.preventDefault()
+    choosePanel(panel === 'inquiry' ? 'contact' : 'inquiry', true)
   }
 
   return (
     <div className={`book-experience book-experience--${panel}`}>
-      <div className="book-experience-switch" role="tablist" aria-label="Book and contact">
+      <div
+        className="book-experience-switch"
+        role="tablist"
+        aria-label="Book and contact"
+        onKeyDown={onTabKeyDown}
+      >
         <button
           type="button"
           role="tab"
           id="book-tab-inquiry"
           aria-controls="book-panel-inquiry"
           aria-selected={panel === 'inquiry'}
+          tabIndex={panel === 'inquiry' ? 0 : -1}
           onClick={() => choosePanel('inquiry')}
         >
           Inquiry
@@ -47,6 +64,7 @@ export default function BookExperienceStage({
           id="book-tab-contact"
           aria-controls="book-panel-contact"
           aria-selected={panel === 'contact'}
+          tabIndex={panel === 'contact' ? 0 : -1}
           onClick={() => choosePanel('contact')}
         >
           Contact + FAQ
