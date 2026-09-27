@@ -1,5 +1,6 @@
 import BookingForm from '@/components/public/booking/BookingForm'
 import BookingFaq, { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
+import BookContactSection from '@/components/public/BookContactSection'
 
 // FAQPage structured data so the questions can surface in search results.
 const faqJsonLd = {
@@ -21,6 +22,7 @@ export default function BookPage() {
       />
       <BookingForm />
       <BookingFaq />
+      <BookContactSection />
     </>
   )
 }
