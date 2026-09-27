@@ -54,6 +54,12 @@ export default function MeetIdentityHero() {
           Open-format selection, room-aware pacing, and sets built around the people actually in front of the booth.
         </div>
 
+        <div className={styles.signals} aria-label="DJ B.A.E. profile highlights">
+          <span>Open format</span>
+          <span>Room-aware pacing</span>
+          <span>Travel-ready</span>
+        </div>
+
         <div className={styles.actions}>
           <Link href="/book" className="btn-primary">Book DJ B.A.E.</Link>
           <Link href="/press-kit" className="btn-ghost">Open Press Kit</Link>
