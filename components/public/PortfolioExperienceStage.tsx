@@ -62,24 +62,25 @@ export default function PortfolioExperienceStage({
         <span><strong>{stats.yearsActive}</strong> active years</span>
       </div>
 
-      <div
-        className={archiveOpen ? 'experience-drawer experience-drawer--open' : 'experience-drawer'}
-        aria-hidden={!archiveOpen}
-        role="dialog"
-        aria-modal="false"
-        aria-label="Full portfolio archive"
-      >
-        <div className="experience-drawer-bar">
-          <div>
-            <span>Past Work</span>
-            <strong>Full Archive</strong>
+      {archiveOpen ? (
+        <div
+          className="experience-drawer experience-drawer--open"
+          role="dialog"
+          aria-modal="false"
+          aria-label="Full portfolio archive"
+        >
+          <div className="experience-drawer-bar">
+            <div>
+              <span>Past Work</span>
+              <strong>Full Archive</strong>
+            </div>
+            <button ref={closeButtonRef} type="button" onClick={closeArchive} aria-label="Close archive">Close ×</button>
           </div>
-          <button ref={closeButtonRef} type="button" onClick={closeArchive} aria-label="Close archive">Close ×</button>
+          <div className="experience-drawer-scroll">
+            <PortfolioArchive entries={entries} />
+          </div>
         </div>
-        <div className="experience-drawer-scroll">
-          <PortfolioArchive entries={entries} />
-        </div>
-      </div>
+      ) : null}
     </section>
   )
 }
