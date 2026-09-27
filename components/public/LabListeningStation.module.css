@@ -373,18 +373,48 @@
 }
 
 .futureSleeves div {
-  min-height: 120px;
+  position: relative;
+  min-height: 142px;
   padding: 14px;
   display: flex;
   align-items: end;
+  overflow: hidden;
   border: 1px solid rgba(196,165,116,.14);
   background:
     linear-gradient(145deg,rgba(143,45,60,.16),rgba(14,11,10,.7)),
     repeating-linear-gradient(90deg,transparent 0 24px,rgba(246,241,232,.02) 25px);
 }
 
+.futureSleeves div::before {
+  content: '';
+  position: absolute;
+  width: 118px;
+  aspect-ratio: 1;
+  right: -34px;
+  top: 10px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, #c4a574 0 5px, #8f2d3c 6px 22px, transparent 23px),
+    repeating-radial-gradient(circle, #0c0b0a 0 3px, #171411 4px 5px, #080706 6px 7px);
+  box-shadow: -10px 14px 28px rgba(0,0,0,.38);
+  opacity: .82;
+}
+
+.futureSleeves div::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 7px;
+  background: #8f2d3c;
+}
+
 .futureSleeves span {
-  color: rgba(246,241,232,.58);
+  position: relative;
+  z-index: 2;
+  max-width: 70%;
+  color: rgba(246,241,232,.68);
   font-size: 9px;
   letter-spacing: .16em;
 }
