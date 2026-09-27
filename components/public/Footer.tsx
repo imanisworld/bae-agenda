@@ -3,8 +3,6 @@
  * Brand · Nav · Socials + bottom copyright bar.
  */
 import Link from 'next/link'
-import { SOCIALS } from '@/lib/constants'
-import { getContentMap } from '@/lib/db/content'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
@@ -19,28 +17,7 @@ const NAV_LINKS = [
   { label: 'Press Kit', href: '/press-kit' },
 ]
 
-const FOOTER_SOCIALS = SOCIALS.filter(s =>
-  ['Instagram', 'TikTok', 'SoundCloud', 'YouTube'].includes(s.label)
-)
-
-const SOCIAL_CONTENT_KEYS = [
-  'instagram_url',
-  'soundcloud_url',
-  'youtube_url',
-] as const
-
-export default async function Footer() {
-  const content = await getContentMap([...SOCIAL_CONTENT_KEYS])
-  const footerSocials = FOOTER_SOCIALS.map((social) => {
-    const override =
-      social.label === 'Instagram' ? content.instagram_url :
-      social.label === 'SoundCloud' ? content.soundcloud_url :
-      social.label === 'YouTube' ? content.youtube_url :
-      undefined
-
-    return { ...social, url: override || social.url }
-  })
-
+export default function Footer() {
   return (
     <footer aria-label="Site footer" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
       <style>{`
@@ -51,7 +28,6 @@ export default async function Footer() {
           }
           .footer-brand { align-items: center !important; }
           .footer-body nav ul { justify-content: center !important; }
-          .footer-socials { justify-content: center !important; }
         }
       `}</style>
 
@@ -61,7 +37,7 @@ export default async function Footer() {
         margin: '0 auto',
         padding: 'clamp(40px, 5vw, 64px) max(24px, calc(var(--safe-right) + 20px)) clamp(28px, 4vw, 40px) max(24px, calc(var(--safe-left) + 20px))',
         display: 'grid',
-        gridTemplateColumns: '1fr auto 1fr',
+        gridTemplateColumns: '1fr auto',
         alignItems: 'center',
         gap: '32px',
       }}>
@@ -91,35 +67,7 @@ export default async function Footer() {
           </ul>
         </nav>
 
-        {/* Socials */}
-        <div className="footer-socials" style={{ display: 'flex', gap: '10px', alignItems: 'center', justifyContent: 'flex-end' }}>
-          {footerSocials.map(({ label, url, icon }) => (
-            <a
-              key={label}
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={`DJ B.A.E. on ${label}`}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '44px',
-                height: '44px',
-                border: '1px solid var(--border)',
-                fontFamily: 'DM Sans, sans-serif',
-                fontSize: '9px',
-                fontWeight: 700,
-                letterSpacing: '0.1em',
-                color: 'var(--muted)',
-                textDecoration: 'none',
-                flexShrink: 0,
-              }}
-            >
-              {icon}
-            </a>
-          ))}
-        </div>
+
 
       </div>
 
