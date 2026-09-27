@@ -4,13 +4,14 @@ import Image from 'next/image'
 import { useState } from 'react'
 import styles from './page.module.css'
 
-type Direction = 'editorial' | 'archive' | 'dimensional' | 'afterdark'
+type Direction = 'editorial' | 'archive' | 'dimensional' | 'afterdark' | 'deck'
 
 const directions: Array<{ id: Direction; number: string; label: string; note: string }> = [
   { id: 'editorial', number: '01', label: 'Editorial Cutout', note: 'Type and photography physically interact.' },
   { id: 'archive', number: '02', label: 'Nightlife Archive', note: 'The work feels collected, not carded.' },
   { id: 'dimensional', number: '03', label: 'Dimensional Identity', note: 'One memorable moving object carries the motion.' },
   { id: 'afterdark', number: '04', label: 'After Dark', note: 'A quieter luxury direction with photography doing the work.' },
+  { id: 'deck', number: '05', label: 'B.A.E. Control Deck', note: 'Music hardware becomes the interaction language.' },
 ]
 
 const collage = [
@@ -66,6 +67,7 @@ export default function StyleLabPage() {
           {active === 'archive' && <ArchiveStage />}
           {active === 'dimensional' && <DimensionalStage />}
           {active === 'afterdark' && <AfterDarkStage />}
+          {active === 'deck' && <ControlDeckStage />}
         </div>
       </section>
 
@@ -178,6 +180,174 @@ function AfterDarkStage() {
         <span>SELECTOR</span>
         <span>GENRE BENDER</span>
         <span>SOUND ARCHITECT</span>
+      </div>
+    </div>
+  )
+}
+
+
+function ControlDeckStage() {
+  const [mode, setMode] = useState<'mixes' | 'events' | 'archive'>('mixes')
+  const [playing, setPlaying] = useState(true)
+  const [energy, setEnergy] = useState(68)
+  const [tone, setTone] = useState(42)
+
+  const modeCopy = {
+    mixes: {
+      eyebrow: 'NOW SPINNING',
+      title: 'BAE IN THE LAB',
+      detail: 'Open format · live mix',
+    },
+    events: {
+      eyebrow: 'NEXT SIGNAL',
+      title: 'LIVE ROOMS',
+      detail: 'Upcoming dates · real energy',
+    },
+    archive: {
+      eyebrow: 'MEMORY BANK',
+      title: 'THE ARCHIVE',
+      detail: '70 events · 2018—2026',
+    },
+  }[mode]
+
+  return (
+    <div className={styles.deckStage}>
+      <div className={styles.deckTopbar}>
+        <div>
+          <span className={styles.deckLed} />
+          <strong>B.A.E. CONTROL DECK</strong>
+        </div>
+        <span>SYS 05 · ONLINE</span>
+      </div>
+
+      <div className={styles.deckGrid}>
+        <section className={styles.deckPlatterModule} aria-label="Interactive vinyl player">
+          <div className={styles.moduleHeader}>
+            <span>PLATTER</span>
+            <span>{playing ? '33⅓ RPM' : 'PAUSED'}</span>
+          </div>
+
+          <button
+            type="button"
+            className={styles.platterButton}
+            aria-label={playing ? 'Pause record' : 'Play record'}
+            onClick={() => setPlaying((value) => !value)}
+          >
+            <span className={playing ? styles.vinylSpinning : styles.vinyl}>
+              <span className={styles.vinylGrooveOne} />
+              <span className={styles.vinylGrooveTwo} />
+              <span className={styles.vinylLabel}>
+                <Image src="/photos/images/logo.JPG" alt="" fill sizes="120px" />
+              </span>
+              <span className={styles.vinylHole} />
+            </span>
+          </button>
+
+          <div className={styles.trackReadout}>
+            <p>{modeCopy.eyebrow}</p>
+            <strong>{modeCopy.title}</strong>
+            <span>{modeCopy.detail}</span>
+          </div>
+        </section>
+
+        <section className={styles.deckControlsModule} aria-label="Control deck">
+          <div className={styles.moduleHeader}>
+            <span>CONTROL</span>
+            <span>INPUT 01</span>
+          </div>
+
+          <div className={styles.knobBlock}>
+            <label htmlFor="bae-tone">TONE</label>
+            <div
+              className={styles.knob}
+              style={{ '--knob-turn': `${-135 + tone * 2.7}deg` } as React.CSSProperties}
+            >
+              <span />
+            </div>
+            <input
+              id="bae-tone"
+              type="range"
+              min="0"
+              max="100"
+              value={tone}
+              onChange={(event) => setTone(Number(event.target.value))}
+              className={styles.hiddenRange}
+            />
+            <small>{tone.toString().padStart(2, '0')}</small>
+          </div>
+
+          <label className={styles.deckSlider}>
+            <span>ENERGY</span>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={energy}
+              onChange={(event) => setEnergy(Number(event.target.value))}
+              style={{ '--range-value': `${energy}%` } as React.CSSProperties}
+            />
+            <strong>{energy}</strong>
+          </label>
+
+          <div className={styles.deckButtons}>
+            {(['mixes', 'events', 'archive'] as const).map((item) => (
+              <button
+                type="button"
+                key={item}
+                className={mode === item ? styles.hardwareButtonActive : styles.hardwareButton}
+                onClick={() => setMode(item)}
+              >
+                <span>{item === 'mixes' ? 'A' : item === 'events' ? 'B' : 'C'}</span>
+                {item}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <section className={styles.deckCarouselModule}>
+          <div className={styles.moduleHeader}>
+            <span>RELEASE BANK</span>
+            <span>03 ITEMS</span>
+          </div>
+
+          <div className={styles.releaseRail}>
+            <article className={styles.releaseCard}>
+              <Image src="/photos/PlexMix19-DJBAE.JPEG" alt="DJ B.A.E. live set" fill sizes="240px" />
+              <div><span>001</span><strong>LIVE SET</strong></div>
+            </article>
+            <article className={styles.releaseCard}>
+              <Image src="/photos/outdoor-night-set-pook.png" alt="DJ B.A.E. outdoor performance" fill sizes="240px" />
+              <div><span>002</span><strong>AFTER DARK</strong></div>
+            </article>
+            <article className={styles.releaseCard}>
+              <Image src="/photos/IMG_1120.JPG.jpeg" alt="DJ B.A.E. event" fill sizes="240px" />
+              <div><span>003</span><strong>ARCHIVE</strong></div>
+            </article>
+          </div>
+        </section>
+
+        <section className={styles.deckScannerModule}>
+          <div className={styles.moduleHeader}>
+            <span>EVENT CARTRIDGE</span>
+            <span>READY</span>
+          </div>
+
+          <div className={styles.cartridge}>
+            <div className={styles.cartridgeNotch} />
+            <p>THE BAE AGENDA</p>
+            <strong>{mode === 'events' ? 'NEXT EVENT' : mode === 'archive' ? 'ARCHIVE 070' : 'MIX BANK'}</strong>
+            <div className={styles.scanCode} aria-hidden="true" />
+            <span>INSERT / SELECT / PLAY</span>
+          </div>
+
+          <div className={styles.scannerLine} aria-hidden="true" />
+        </section>
+      </div>
+
+      <div className={styles.deckFooter}>
+        <span>TACTILE UI</span>
+        <span>VINYL · KNOBS · FADERS · CARTRIDGES</span>
+        <span>NO MASCOT REQUIRED</span>
       </div>
     </div>
   )
