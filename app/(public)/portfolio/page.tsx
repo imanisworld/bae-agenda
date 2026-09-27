@@ -24,13 +24,9 @@ function TagChip({ label }: { label: string }) {
   return (
     <span style={{
       fontSize: '10px',
-      letterSpacing: '0.16em',
+      letterSpacing: '0.08em',
       textTransform: 'uppercase',
-      color: 'var(--violet)',
-      background: 'rgba(155,93,229,0.1)',
-      border: '1px solid rgba(155,93,229,0.2)',
-      borderRadius: '100px',
-      padding: '3px 8px',
+      color: 'rgba(250,248,243,0.5)',
       whiteSpace: 'normal',
       overflowWrap: 'anywhere',
     }}>
@@ -63,11 +59,41 @@ export default async function PortfolioPage() {
         position: 'relative',
         overflow: 'hidden',
       }}>
-        {/* Ambient background — video removed (file not available) */}
+        <Image
+          src="/photos/PlexMix19-DJBAE.JPEG"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          aria-hidden="true"
+          style={{
+            objectFit: 'cover',
+            objectPosition: 'center 38%',
+            opacity: 0.42,
+          }}
+        />
+        <div
+          aria-hidden="true"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: 'linear-gradient(90deg, rgba(8,8,10,0.95) 0%, rgba(8,8,10,0.78) 48%, rgba(8,8,10,0.52) 100%)',
+            zIndex: 0,
+          }}
+        />
+        <div style={{
+          position: 'absolute',
+          right: 'max(24px, calc(var(--safe-right) + 20px))',
+          bottom: '18px',
+          zIndex: 1,
+          fontSize: '10px',
+          letterSpacing: '0.06em',
+          color: 'rgba(250,248,243,0.5)',
+        }}>
+          Club Plex Mix 19 · Photo: Pook
+        </div>
         <div style={{ maxWidth: '1280px', margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
-          <div className="hardware-heading">
-            <span className="section-label">Chicago · Indianapolis · ATL</span>
-          </div>
+          <span className="section-label">Portfolio</span>
           <h1 style={{
             fontFamily: 'Conthrax, sans-serif',
             fontSize: 'clamp(44px, 6vw, 80px)',
@@ -75,8 +101,8 @@ export default async function PortfolioPage() {
             color: 'var(--white)',
             margin: '0 0 20px',
           }}>
-            The<br />
-            <span style={{ color: 'var(--violet)' }}>Resume.</span>
+            Selected<br />
+            <span style={{ color: 'var(--violet)' }}>Work</span>
           </h1>
           <p style={{
             fontSize: 'clamp(13px, 1.8vw, 16px)',
@@ -85,55 +111,39 @@ export default async function PortfolioPage() {
             maxWidth: '480px',
             marginBottom: '28px',
           }}>
-            From basements to festivals. Every room, every crowd.
+            Club nights, festivals, private events, and community rooms documented across the archive.
           </p>
-          <Link href="/book" className="btn-primary">Book DJ B.A.E. →</Link>
+          <Link href="/book" className="btn-primary">Booking Inquiry</Link>
         </div>
       </section>
 
       <div style={{ maxWidth: '1280px', margin: '0 auto', padding: '0 max(24px, calc(var(--safe-right) + 20px)) 0 max(24px, calc(var(--safe-left) + 20px))' }}>
 
-        {/* ── Stats ─────────────────────────────────────────────── */}
-        <section className="portfolio-stats-grid" style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-          gap: '1px',
-          background: 'var(--border)',
-          border: '1px solid var(--border)',
-          margin: '48px 0',
+        {/* ── Portfolio summary ───────────────────────────────── */}
+        <section style={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '12px 28px',
+          alignItems: 'baseline',
+          padding: '28px 0',
+          borderBottom: '1px solid var(--border)',
+          marginBottom: '56px',
         }}>
           {[
-            { label: 'Total Events',    value: stats.total   || '—' },
-            { label: 'Cities',          value: stats.cities  || '—' },
-            { label: 'Years Active',    value: stats.yearsActive    },
-            { label: 'Featured Events', value: stats.featured || '—' },
+            { value: stats.total || '—', label: 'documented events' },
+            { value: stats.cities || '—', label: 'cities' },
+            { value: stats.yearsActive, label: 'active years' },
           ].map(({ label, value }) => (
-            <div key={label} style={{
-              background: 'var(--off-black)',
-              padding: '28px 24px',
-              display: 'grid',
-              gap: '8px',
-              minWidth: 0,
-            }}>
-              <div style={{
-                fontSize: '10px',
-                letterSpacing: '0.28em',
-                textTransform: 'uppercase',
-                color: 'var(--muted)',
-              }}>
-                {label}
-              </div>
-              <div style={{
+            <div key={label} style={{ display: 'flex', gap: '8px', alignItems: 'baseline' }}>
+              <strong style={{
                 fontFamily: 'Conthrax, sans-serif',
-                fontSize: typeof value === 'string' && value.length > 6
-                  ? 'clamp(14px, 2vw, 20px)'
-                  : 'clamp(22px, 3vw, 32px)',
+                fontSize: 'clamp(18px, 2.4vw, 28px)',
                 color: 'var(--white)',
-                lineHeight: 1.1,
-                wordBreak: 'break-word',
+                fontWeight: 600,
               }}>
                 {value}
-              </div>
+              </strong>
+              <span style={{ fontSize: '13px', color: 'var(--muted)' }}>{label}</span>
             </div>
           ))}
         </section>
@@ -141,9 +151,7 @@ export default async function PortfolioPage() {
         {/* ── Featured ──────────────────────────────────────────── */}
         {featured.length > 0 && (
           <section style={{ marginBottom: '64px' }}>
-            <div className="hardware-heading">
-              <span className="section-label" style={{ color: 'var(--violet)' }}>Featured</span>
-            </div>
+            <span className="section-label">Selected Events</span>
             <div style={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fit, minmax(min(280px, 100%), 1fr))',
@@ -301,14 +309,14 @@ export default async function PortfolioPage() {
             color: 'var(--white)',
             marginBottom: '8px',
           }}>
-            Let&apos;s add your event to this list.
+            Planning an event?
           </p>
           <p style={{ fontSize: '15px', color: 'var(--muted)', marginBottom: '24px' }}>
-            Open to club nights, festivals, private events, and everything in between.
+            Share the date, room, and format you have in mind.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link href="/book" className="btn-primary">Start a Booking →</Link>
-            {bookingEmail && <a href={`mailto:${bookingEmail}`} className="btn-ghost">Email Us</a>}
+            <Link href="/book" className="btn-primary">Booking Inquiry</Link>
+            {bookingEmail && <a href={`mailto:${bookingEmail}`} className="btn-ghost">Email</a>}
           </div>
         </section>
 

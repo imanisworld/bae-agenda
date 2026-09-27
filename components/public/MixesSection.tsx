@@ -83,9 +83,9 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
   return (
     <section
       id={sectionId}
-      aria-label="Bae's in the Lab"
+      aria-label="Mixes and sets"
       style={{
-        background: 'radial-gradient(ellipse at 50% 0%, rgba(155,93,229,0.07) 0%, transparent 60%), var(--off-black)',
+        background: 'var(--off-black)',
         position:   'relative',
         borderTop:  '1px solid var(--border)',
       }}
@@ -113,7 +113,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                   </span>
                 </div>
                 <h1 className="section-heading" style={{ marginBottom: 0 }}>
-                  Bae&apos;s in the Lab
+                  Mixes &amp; Sets
                 </h1>
                 <p style={{
                   marginTop: '16px',
@@ -122,7 +122,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                   lineHeight: 1.75,
                   color: 'var(--muted)',
                 }}>
-                  The lab is where mixes, live recordings, and fresh drops start collecting. Tap in here for what is playing now and what lands next.
+                  Mixes, live recordings, and archive sets in one place.
                 </p>
               </div>
             </div>
@@ -139,9 +139,9 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
             marginBottom: '32px',
           }}>
             {[
-              { label: 'Published Mixes', value: hasPublishedMixes ? String(mixes.length) : '0' },
-              { label: 'Runtime Logged', value: totalRuntimeHours > 0 ? `${totalRuntimeHours}h+` : 'Fresh Drops Soon' },
-              { label: 'Genres In Rotation', value: uniqueGenres > 0 ? String(uniqueGenres) : 'Building' },
+              { label: 'Mixes', value: hasPublishedMixes ? String(mixes.length) : '—' },
+              { label: 'Runtime', value: totalRuntimeHours > 0 ? `${totalRuntimeHours}h+` : '—' },
+              { label: 'Genres', value: uniqueGenres > 0 ? String(uniqueGenres) : '—' },
             ].map((item) => (
               <div
                 key={item.label}
@@ -179,28 +179,24 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
             className={`mixes-teaser-shell${isPage ? ' is-page' : ' is-teaser'}`}
             style={{ gridColumn: '1 / -1' }}
           >
-            <div aria-hidden="true" className="mixes-teaser-noise" />
-            <div aria-hidden="true" className="mixes-teaser-orbit mixes-teaser-orbit-a" />
-            <div aria-hidden="true" className="mixes-teaser-orbit mixes-teaser-orbit-b" />
-
             <InteractiveMediaDisc
               className="mixes-teaser-disc-button"
               imageSrc="/photos/images/logo.JPG"
             />
 
             <div className="mixes-teaser-copy">
-              <div className="mixes-teaser-kicker">Lab Archive</div>
-              <h2 className="mixes-teaser-title">Bae&apos;s in the Lab</h2>
+              <div className="mixes-teaser-kicker">{isPage ? 'Updates' : 'Latest'}</div>
+              <h2 className="mixes-teaser-title">{isPage ? 'Latest from DJ B.A.E.' : 'Mixes & Sets'}</h2>
               <p className="mixes-teaser-subtext">
                 {isPage
-                  ? 'Recent sets and old drops are all here. Follow me now and the archive will keep growing from this point forward.'
-                  : 'Recent sets and new drops land here first.'}
+                  ? 'Live recordings, mixes, and archive sets, with new uploads added as they are published.'
+                  : 'Recent mixes and live recordings.'}
               </p>
 
               <MixesTeaserForm />
 
               <div className="mixes-teaser-follow">
-                <div className="mixes-teaser-follow-label">{isPage ? 'Tap In Here' : 'Tap In Now'}</div>
+                <div className="mixes-teaser-follow-label">Listen on</div>
                 <div className="mixes-teaser-follow-grid">
                   <a
                     href={SOUNDCLOUD_PROFILE_URL}
@@ -233,31 +229,10 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                   lineHeight: 1.7,
                   color: 'var(--muted)',
                 }}>
-                  SoundCloud and YouTube are the fastest way to catch new uploads, live edits, and whatever gets added to the rotation next.
+                  New uploads are published to SoundCloud and YouTube.
                 </div>
               )}
 
-              {!isPage && (
-                <div style={{
-                  width: 'min(100%, 520px)',
-                  marginTop: '0',
-                  paddingTop: '12px',
-                  borderTop: '1px solid rgba(255,255,255,0.08)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '10px',
-                  flexWrap: 'wrap',
-                  fontSize: '10px',
-                  letterSpacing: '0.22em',
-                  textTransform: 'uppercase',
-                  color: 'rgba(250,248,243,0.44)',
-                }}>
-                  <span>Up Next</span>
-                  <span style={{ width: '18px', height: '1px', background: 'rgba(155,93,229,0.4)', display: 'block' }} />
-                  <span>Upcoming Dates</span>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -266,7 +241,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
           hasPublishedMixes && featuredMix ? (
             <div style={{ display: 'grid', gap: '24px', marginTop: '28px' }}>
               <div className="hardware-heading">
-                <span className="section-label">Published Archive</span>
+                <span className="section-label">Archive</span>
               </div>
 
               <div
@@ -288,7 +263,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap' }}>
                       <div>
                         <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                          Featured Drop
+                          Featured Mix
                         </div>
                         <h3
                           style={{
@@ -375,10 +350,10 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                     }}
                   >
                     <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                      Archive Notes
+                      About
                     </div>
                     <div style={{ fontSize: '14px', lineHeight: 1.75, color: 'var(--white)' }}>
-                      Fresh uploads live here first. Expect live edits, room-tested blends, and archive drops that stay in rotation.
+                      Live recordings, mixes, and edits from the current archive.
                     </div>
                   </div>
 
@@ -392,7 +367,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                     }}
                   >
                     <div style={{ fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                      Where To Tap In
+                      Listen on
                     </div>
                     <div className="mixes-teaser-follow-grid">
                       <a href={SOUNDCLOUD_PROFILE_URL} target="_blank" rel="noopener noreferrer" className="mixes-teaser-platform">
@@ -418,10 +393,10 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                       color: 'var(--white)',
                     }}
                   >
-                    Full Rotation
+                    More Mixes
                   </h3>
                   <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                    {archiveMixes.length > 0 ? `${archiveMixes.length} more in archive` : 'First drop live now'}
+                    {archiveMixes.length > 0 ? `${archiveMixes.length} more` : 'Latest mix'}
                   </div>
                 </div>
 
@@ -505,7 +480,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                             textTransform: 'uppercase',
                           }}
                         >
-                          Open Mix
+                          Listen
                         </a>
                       ) : null}
                     </article>
@@ -525,7 +500,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
             >
               <div style={{ display: 'grid', gap: '10px', maxWidth: '620px' }}>
                 <div style={{ fontSize: '10px', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-                  Archive Loading
+                  Archive
                 </div>
                 <h3
                   style={{
@@ -536,10 +511,10 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
                     color: 'var(--white)',
                   }}
                 >
-                  The lab is live. The published archive is next.
+                  New mixes will appear here.
                 </h3>
                 <p style={{ margin: 0, fontSize: '14px', lineHeight: 1.8, color: 'rgba(250,248,243,0.74)' }}>
-                  New drops will land here as soon as they are published from the admin. Until then, follow the channels above and join the notify list to catch the first release.
+                  Follow the channels above or join the notify list for new uploads.
                 </p>
               </div>
             </div>

@@ -30,11 +30,11 @@ export const SELECTED_WORK: SelectedWorkItem[] = [
   {
     id: 'work-1',
     title: 'Club Plex',
-    category: 'Ongoing Dates',
+    category: 'Nightlife',
     year: '2024–2025',
     location: 'Indianapolis, IN',
-    summary: 'Recurring DJ dates at Club Plex — an invite-based nightlife community in Indianapolis. Open format sets built around the room and the crowd, not a set list.',
-    highlights: ['Ongoing dates', 'Open format', 'Community venue'],
+    summary: 'DJ appearances at Club Plex in Indianapolis, with open-format sets built around the room and the crowd.',
+    highlights: ['Nightlife', 'Open format', 'Indianapolis'],
   },
 ]
 
@@ -79,7 +79,7 @@ export const GIG_HISTORY: GigItem[] = [
     city:     'Indianapolis, IN',
     date:     '2024 — 2025',
     year:     '2024',
-    tags:     ['Ongoing Dates', 'Open Format', 'Nightlife'],
+    tags:     ['Open Format', 'Nightlife'],
     featured: false,
   },
 ]

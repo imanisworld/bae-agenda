@@ -14,7 +14,7 @@ export const BOOKING_FAQ = [
   {
     question: 'What happens after I send the inquiry?',
     answer:
-      'You get a personal reply with availability and a custom quote for your event. Submitting the form does not charge you anything and does not lock you into anything — it starts the conversation.',
+      'You get a personal reply with availability and a custom quote for your event. Submitting the form does not charge you or reserve the date; it starts the conversation.',
   },
   {
     question: 'How does payment work?',
@@ -34,7 +34,7 @@ export const BOOKING_FAQ = [
   {
     question: 'Can you play my must-have songs?',
     answer:
-      'Yes — the whole point is a set built for your room. Open format across house, hip hop, R&B, Latin, soca, jungle, juke, ballroom, and more, with your must-plays and do-not-plays baked in.',
+      'Yes — the whole point is a set built for your room. Open format across house, hip hop, R&B, Latin, soca, jungle, juke, ballroom, and more, with room for your must-plays and do-not-plays.',
   },
 ] as const
 
@@ -43,7 +43,7 @@ export default function BookingFaq() {
     <section aria-label="Booking questions" style={{ background: 'var(--off-black)' }}>
       <div className="section-container" style={{ maxWidth: '680px', paddingTop: 0, paddingBottom: '96px' }}>
         <div style={{ marginBottom: '28px' }}>
-          <span className="section-label">Before You Ask</span>
+          <span className="section-label">Booking FAQ</span>
           <h2
             style={{
               fontFamily: 'Conthrax, sans-serif',
@@ -54,7 +54,7 @@ export default function BookingFaq() {
               margin: '12px 0 0',
             }}
           >
-            The Short Answers<span style={{ color: 'var(--gold)' }}>.</span>
+            Common Questions
           </h2>
         </div>
 
