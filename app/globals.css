@@ -5520,3 +5520,490 @@ body.has-custom-cursor * { cursor: none !important; }
     transform: none;
   }
 }
+
+
+/* ================================================================
+   SINGLE-SCREEN PUBLIC EXPERIENCE
+   Inspired by desktop/app navigation: one fixed stage, route content
+   swaps in place while direct URLs stay intact.
+   ================================================================ */
+
+.public-experience-shell {
+  position: relative;
+  width: 100%;
+  height: 100svh;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--black);
+}
+
+.public-experience-main,
+.public-page-stage--experience,
+.public-page-stage--experience .public-page-stage-inner {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.public-page-stage--experience .public-page-stage-inner {
+  animation: public-experience-enter 460ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+@keyframes public-experience-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(.992);
+    filter: blur(3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.home-experience,
+.lab-experience,
+.meet-experience,
+.portfolio-experience,
+.events-experience,
+.book-experience {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.home-experience > section {
+  min-height: 100%;
+  height: 100%;
+  padding-bottom: 82px;
+}
+
+.events-experience {
+  display: grid;
+  grid-template-rows: auto minmax(0,1fr);
+  gap: 14px;
+  padding: 54px max(20px, 4vw) 82px;
+}
+
+.events-experience-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 24px;
+}
+
+.events-experience-head .section-label {
+  margin-bottom: 7px;
+}
+
+.events-experience-head h1 {
+  margin: 0;
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(38px, 5.4vw, 72px);
+  font-weight: 400;
+  line-height: .9;
+  letter-spacing: -.055em;
+}
+
+.events-experience-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  color: rgba(246,241,232,.48);
+  font-size: 9px;
+  letter-spacing: .14em;
+}
+
+.experience-arrow {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(246,241,232,.14);
+  border-radius: 50%;
+  background: rgba(22,18,16,.72);
+  color: var(--white);
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+
+.experience-arrow:hover {
+  border-color: rgba(196,165,116,.54);
+  transform: translateY(-2px);
+}
+
+.events-experience-stage {
+  min-height: 0;
+  height: 100%;
+}
+
+.events-experience-stage > article {
+  height: 100%;
+  min-height: 0;
+}
+
+.events-experience-empty {
+  height: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: start;
+  gap: 16px;
+  padding: clamp(28px,5vw,64px);
+  border: 1px solid rgba(196,165,116,.16);
+  background:
+    radial-gradient(circle at 20% 18%, rgba(143,45,60,.18), transparent 36%),
+    #14110f;
+}
+
+.events-experience-empty h2 {
+  margin: 0;
+  font-size: clamp(42px,7vw,96px);
+  font-weight: 400;
+  letter-spacing: -.05em;
+}
+
+.portfolio-experience {
+  position: relative;
+}
+
+.portfolio-experience > section:first-child {
+  height: 100%;
+  min-height: 0;
+  border-bottom: 0;
+}
+
+.portfolio-experience-stats {
+  position: absolute;
+  z-index: 7;
+  left: max(5vw, 38px);
+  bottom: 80px;
+  display: flex;
+  gap: 22px;
+  color: rgba(246,241,232,.48);
+  font-size: 9px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.portfolio-experience-stats strong {
+  color: #f6f1e8;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.experience-drawer {
+  position: absolute;
+  z-index: 80;
+  inset: 54px 18px 80px auto;
+  width: min(760px, calc(100% - 36px));
+  display: grid;
+  grid-template-rows: auto minmax(0,1fr);
+  border: 1px solid rgba(246,241,232,.14);
+  border-radius: 20px;
+  background: rgba(22,18,16,.97);
+  backdrop-filter: blur(24px);
+  box-shadow: 0 30px 80px rgba(0,0,0,.48);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(32px) scale(.985);
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 260ms cubic-bezier(.2,.8,.2,1), visibility 220ms ease;
+}
+
+.experience-drawer--open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
+}
+
+.experience-drawer-bar {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 12px 16px 12px 20px;
+  border-bottom: 1px solid rgba(246,241,232,.1);
+}
+
+.experience-drawer-bar > div {
+  display: grid;
+  gap: 3px;
+}
+
+.experience-drawer-bar span {
+  color: var(--gold);
+  font-size: 8px;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+}
+
+.experience-drawer-bar strong {
+  color: var(--white);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.experience-drawer-bar button {
+  min-height: 38px;
+  padding: 0 13px;
+  border: 1px solid rgba(246,241,232,.14);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+}
+
+.experience-drawer-scroll {
+  overflow-y: auto;
+  padding: 24px 24px 0;
+  overscroll-behavior: contain;
+}
+
+.experience-drawer-scroll > section {
+  margin-bottom: 28px !important;
+}
+
+.meet-experience > section {
+  height: 100%;
+  min-height: 0;
+  border-bottom: 0;
+}
+
+.lab-experience {
+  background: #0e0b0a;
+}
+
+.book-experience {
+  display: grid;
+  grid-template-columns: minmax(0,1.2fr) minmax(340px,.8fr);
+  padding: 48px 18px 80px;
+  gap: 1px;
+  background: rgba(196,165,116,.12);
+}
+
+.book-experience-form,
+.book-experience-rail {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--off-black);
+}
+
+.booking-form-embedded {
+  min-height: 100%;
+}
+
+.booking-form-embedded > .section-container {
+  width: min(100%, 680px);
+  padding-left: clamp(18px,3vw,34px);
+  padding-right: clamp(18px,3vw,34px);
+}
+
+.book-experience-rail {
+  background:
+    radial-gradient(circle at 18% 12%, rgba(143,45,60,.16), transparent 34%),
+    #14110f;
+}
+
+.book-experience-rail-inner {
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 32px clamp(20px,4vw,38px) 42px;
+}
+
+.book-experience-rail-inner header > span,
+.book-experience-faq > span,
+.book-experience-contact small,
+.book-experience-review small {
+  color: var(--gold);
+  font-size: 8px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.book-experience-rail-inner header h2 {
+  margin: 9px 0 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(36px,4.8vw,66px);
+  font-weight: 400;
+  line-height: .88;
+  letter-spacing: -.05em;
+}
+
+.book-experience-rail-inner header p {
+  margin: 0;
+  color: rgba(246,241,232,.54);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.book-experience-contact {
+  display: grid;
+  gap: 1px;
+  margin-top: 24px;
+  background: rgba(246,241,232,.1);
+}
+
+.book-experience-contact > div {
+  display: grid;
+  gap: 7px;
+  padding: 15px;
+  background: #171311;
+}
+
+.book-experience-contact a {
+  color: var(--white);
+  text-decoration: none;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.book-experience-socials {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 16px;
+}
+
+.book-experience-socials a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid rgba(246,241,232,.11);
+  border-radius: 999px;
+  color: rgba(246,241,232,.7);
+  text-decoration: none;
+  font-size: 9px;
+  letter-spacing: .08em;
+}
+
+.book-experience-socials span {
+  color: var(--gold);
+  font-size: 8px;
+}
+
+.book-experience-faq {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(246,241,232,.1);
+}
+
+.book-experience-faq details {
+  border-bottom: 1px solid rgba(246,241,232,.08);
+}
+
+.book-experience-faq summary {
+  padding: 13px 0;
+  cursor: pointer;
+  color: var(--white);
+  font-size: 12px;
+  list-style: none;
+}
+
+.book-experience-faq summary::-webkit-details-marker { display:none; }
+
+.book-experience-faq p {
+  margin: 0;
+  padding: 0 0 14px;
+  color: rgba(246,241,232,.55);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.book-experience-review {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(246,241,232,.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.book-experience-review p {
+  margin: 5px 0 0;
+  color: rgba(246,241,232,.64);
+  font-size: 12px;
+}
+
+@media (max-width: 900px) {
+  .events-experience {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .events-experience-head {
+    align-items: flex-start;
+  }
+
+  .portfolio-experience-stats {
+    bottom: 78px;
+    left: 6%;
+  }
+
+  .book-experience {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0,1fr);
+    padding: 48px 10px 78px;
+  }
+
+  .book-experience-rail {
+    display: none;
+  }
+}
+
+@media (max-width: 620px) {
+  .events-experience {
+    padding-top: 52px;
+    padding-bottom: 74px;
+    gap: 10px;
+  }
+
+  .events-experience-head h1 {
+    font-size: clamp(34px,11vw,54px);
+  }
+
+  .events-experience-tools .btn-ghost {
+    display: none;
+  }
+
+  .events-experience-stage > article {
+    min-height: 0;
+  }
+
+  .portfolio-experience-stats {
+    gap: 12px;
+    flex-wrap: wrap;
+    right: 20px;
+  }
+
+  .experience-drawer {
+    inset: 48px 8px 72px;
+    width: auto;
+    border-radius: 16px;
+  }
+
+  .book-experience {
+    padding-left: 6px;
+    padding-right: 6px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-page-stage--experience .public-page-stage-inner {
+    animation: none;
+  }
+
+  .experience-drawer {
+    transition: none;
+  }
+}
