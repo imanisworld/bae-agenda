@@ -85,6 +85,19 @@ function getTimeZoneParts(date: Date, timeZone: string) {
   }
 }
 
+export function getEventInputDateTime(iso: string, timeZone: string | null) {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return null
+
+  const zone = timeZone && isValidTimeZone(timeZone) ? timeZone : 'UTC'
+  const parts = getTimeZoneParts(date, zone)
+
+  return {
+    date: `${parts.year}-${String(parts.month).padStart(2, '0')}-${String(parts.day).padStart(2, '0')}`,
+    time: `${String(parts.hour).padStart(2, '0')}:${String(parts.minute).padStart(2, '0')}`,
+  }
+}
+
 export function toEventISO(dateValue: string, timeZone: string, timeValue?: string): string | null {
   const dateParts = parseDateParts(dateValue)
   const timeParts = parseTimeParts(timeValue)
