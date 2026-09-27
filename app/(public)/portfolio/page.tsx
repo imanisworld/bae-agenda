@@ -122,6 +122,7 @@ export default async function PortfolioPage() {
                         alt={entry.event_name}
                         fill
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        quality={90}
                         style={{ objectFit: 'cover' }}
                       />
                     </div>
