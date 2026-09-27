@@ -185,12 +185,20 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                     aria-pressed={selected}
                     onClick={() => choose(index)}
                   >
-                    <span className={styles.sleeveArt}>
-                      {mix.cover_url ? (
-                        <Image src={mix.cover_url} alt="" fill sizes="260px" />
-                      ) : (
-                        <span className={styles.sleeveFallback}>DJ B.A.E.</span>
-                      )}
+                    <span className={styles.sleeveVisual}>
+                      <span className={styles.sleeveDisc} aria-hidden="true" />
+                      <span className={styles.sleeveStack} aria-hidden="true">
+                        <i />
+                        <i />
+                        <i />
+                      </span>
+                      <span className={styles.sleeveArt}>
+                        {mix.cover_url ? (
+                          <Image src={mix.cover_url} alt="" fill sizes="260px" />
+                        ) : (
+                          <span className={styles.sleeveFallback}>DJ B.A.E.</span>
+                        )}
+                      </span>
                     </span>
                     <span className={styles.sleeveMeta}>
                       <small>{String(index + 1).padStart(3, '0')}</small>
@@ -207,8 +215,30 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                 <p>Unreleased work stays visibly separate from published SoundCloud mixes.</p>
               </div>
               <div className={styles.futureSleeves}>
-                <div><span>COMING SOON</span></div>
-                <div><span>WORK IN PROGRESS</span></div>
+                <div className={styles.futureSleeve}>
+                  <span className={styles.futureVisual} aria-hidden="true">
+                    <span className={styles.futureDisc} />
+                    <span className={styles.futureStack}>
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span className={styles.futureJacket} />
+                  </span>
+                  <span className={styles.futureLabel}>COMING SOON</span>
+                </div>
+                <div className={styles.futureSleeve}>
+                  <span className={styles.futureVisual} aria-hidden="true">
+                    <span className={styles.futureDisc} />
+                    <span className={styles.futureStack}>
+                      <i />
+                      <i />
+                      <i />
+                    </span>
+                    <span className={styles.futureJacket} />
+                  </span>
+                  <span className={styles.futureLabel}>WORK IN PROGRESS</span>
+                </div>
               </div>
             </div>
           </div>
