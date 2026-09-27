@@ -11,6 +11,8 @@
 
 export type FieldType = 'text' | 'textarea' | 'url' | 'email'
 
+export const DEFAULT_BOOKING_EMAIL = 'baebookings@proton.me'
+
 export interface ContentField {
   key:     string
   label:   string
@@ -87,7 +89,7 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         label:   'Booking Email',
         hint:    'Email address for booking inquiries',
         type:    'email',
-        default: '',
+        default: DEFAULT_BOOKING_EMAIL,
       },
     ],
   },
