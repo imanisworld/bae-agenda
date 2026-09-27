@@ -10,8 +10,8 @@ import { getFeaturedEvents, type Event } from '@/lib/db/events'
 function formatEventDate(isoDate: string): { day: string; month: string } {
   const d = new Date(isoDate)
   return {
-    day:   d.toLocaleString('en-US', { day: '2-digit',   timeZone: 'America/Chicago' }),
-    month: d.toLocaleString('en-US', { month: 'short',   timeZone: 'America/Chicago' }).toUpperCase(),
+    day:   d.toLocaleString('en-US', { day: '2-digit',   timeZone: 'UTC' }),
+    month: d.toLocaleString('en-US', { month: 'short',   timeZone: 'UTC' }).toUpperCase(),
   }
 }
 
