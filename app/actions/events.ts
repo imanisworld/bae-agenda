@@ -7,7 +7,7 @@ import { requireAdminUser } from '@/lib/admin-auth'
 import { isValidTimeZone, toEventISO } from '@/lib/date-time'
 import { suggestEventTimeZone } from '@/lib/event-form-options'
 
-function redirectWithError(path: string, message: string) {
+function redirectWithError(path: string, message: string): never {
   const params = new URLSearchParams({ error: message })
   redirect(`${path}?${params.toString()}`)
 }

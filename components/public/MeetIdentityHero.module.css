@@ -1,0 +1,229 @@
+.hero {
+  position: relative;
+  min-height: clamp(680px, 76vw, 900px);
+  overflow: hidden;
+  isolation: isolate;
+  border-bottom: 1px solid rgba(196,165,116,.14);
+  background:
+    radial-gradient(circle at 48% 48%, rgba(143,45,60,.16), transparent 36%),
+    #0e0b0a;
+}
+
+.glow {
+  position: absolute;
+  inset: 12% 10%;
+  background:
+    radial-gradient(circle at 36% 44%, rgba(143,45,60,.28), transparent 30%),
+    radial-gradient(circle at 64% 56%, rgba(196,132,74,.12), transparent 28%);
+  filter: blur(44px);
+}
+
+.portraitWrap {
+  position: absolute;
+  z-index: 3;
+  left: 7%;
+  top: 17%;
+  width: min(42vw, 540px);
+  perspective: 1100px;
+}
+
+.portrait {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.03 / 1;
+  overflow: hidden;
+  border-radius: 26px;
+  transform:
+    rotateX(var(--tilt-y))
+    rotateY(var(--tilt-x))
+    rotateZ(-1.6deg);
+  transform-style: preserve-3d;
+  transition: transform 420ms cubic-bezier(.2,.7,.2,1), box-shadow 420ms ease;
+  box-shadow:
+    12px 16px 0 rgba(45,35,31,.82),
+    0 38px 72px rgba(0,0,0,.38);
+}
+
+.portrait::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(110deg, rgba(255,255,255,.08), transparent 26%, transparent 72%, rgba(196,132,74,.08));
+  mix-blend-mode: screen;
+}
+
+.portrait img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.portraitLabel {
+  display: block;
+  margin-top: 52px;
+  text-align: center;
+  color: rgba(246,241,232,.42);
+  font-size: 10px;
+  letter-spacing: .18em;
+}
+
+.copy {
+  position: absolute;
+  z-index: 4;
+  right: 7%;
+  top: 25%;
+  width: min(44vw, 650px);
+}
+
+.copy > p {
+  margin: 0 0 14px;
+  color: #c4a574;
+  font-size: 10px;
+  letter-spacing: .19em;
+  text-transform: uppercase;
+}
+
+.copy h1 {
+  margin: 0;
+  font-family: DM Sans, sans-serif;
+  font-size: clamp(68px, 8.6vw, 132px);
+  font-weight: 400;
+  line-height: .82;
+  letter-spacing: -.065em;
+  color: #f6f1e8;
+}
+
+.summary {
+  max-width: 600px;
+  margin-top: 26px;
+  color: rgba(246,241,232,.58);
+  font-size: clamp(15px, 1.6vw, 18px);
+  line-height: 1.65;
+}
+
+.signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 18px;
+}
+
+.signals span {
+  padding: 7px 9px;
+  border: 1px solid rgba(196,165,116,.16);
+  border-radius: 999px;
+  color: rgba(246,241,232,.6);
+  font-size: 9px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.phone {
+  position: absolute;
+  z-index: 5;
+  left: 42%;
+  bottom: 11%;
+  width: min(150px, 13vw);
+  transform: rotate(7deg);
+  filter: drop-shadow(0 24px 24px rgba(0,0,0,.4));
+}
+
+.phone img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.rule {
+  position: absolute;
+  left: 5%;
+  right: 5%;
+  bottom: 34px;
+  height: 1px;
+  background: rgba(196,165,116,.14);
+}
+
+@media (max-width: 860px) {
+  .hero {
+    min-height: 940px;
+  }
+
+  .portraitWrap {
+    left: 7%;
+    top: 10%;
+    width: 70%;
+  }
+
+  .copy {
+    left: 26%;
+    right: 6%;
+    top: auto;
+    bottom: 98px;
+    width: auto;
+  }
+
+  .copy h1 {
+    font-size: clamp(62px, 16vw, 110px);
+  }
+
+  .phone {
+    left: auto;
+    right: 8%;
+    top: 38%;
+    bottom: auto;
+    width: 118px;
+  }
+}
+
+@media (max-width: 560px) {
+  .hero { min-height: 880px; }
+
+  .portraitWrap {
+    left: 6%;
+    top: 8%;
+    width: 82%;
+  }
+
+  .portrait {
+    border-radius: 20px;
+  }
+
+  .portraitLabel {
+    margin-top: 28px;
+  }
+
+  .copy {
+    left: 12%;
+    right: 14px;
+    bottom: 104px;
+  }
+
+  .copy h1 {
+    font-size: clamp(58px, 18vw, 88px);
+  }
+
+  .phone {
+    top: 39%;
+    right: 4%;
+    width: 92px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portrait {
+    transform: rotateZ(-1deg);
+    transition: none;
+  }
+
+  .phone {
+    display: none;
+  }
+}

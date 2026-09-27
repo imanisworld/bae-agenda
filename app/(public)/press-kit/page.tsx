@@ -100,6 +100,7 @@ export default async function PressKitPage() {
               alt="DJ B.A.E. press photo"
               fill
               sizes="(max-width: 900px) 100vw, 420px"
+              quality={95}
               style={{ objectFit: 'cover', objectPosition: 'center 18%' }}
             />
             <div

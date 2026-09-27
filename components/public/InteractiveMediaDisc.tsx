@@ -243,7 +243,7 @@ export default function InteractiveMediaDisc({
                 className="interactive-disc-center-video"
               />
             ) : imageSrc ? (
-              <Image src={imageSrc} alt="" fill sizes="160px" className="interactive-disc-center-image" />
+              <Image src={imageSrc} alt="" fill sizes="160px" quality={90} className="interactive-disc-center-image" />
             ) : (
               <span className="interactive-disc-center-label">{label}</span>
             )}

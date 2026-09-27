@@ -72,7 +72,7 @@ export default async function PortalLoginPage({
 
         <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.7 }}>
           If that number matches a booking, we&apos;ll send a code. Need help instead?{' '}
-          <Link href="/connect" className="inline-link">Contact the team</Link>.
+          <Link href="/book#contact" className="inline-link">Contact the team</Link>.
         </p>
       </div>
     </section>

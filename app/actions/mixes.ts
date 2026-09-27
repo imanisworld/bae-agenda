@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
 
-function redirectWithError(path: string, message: string) {
+function redirectWithError(path: string, message: string): never {
   const params = new URLSearchParams({ error: message })
   redirect(`${path}?${params.toString()}`)
 }

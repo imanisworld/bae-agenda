@@ -1,0 +1,193 @@
+.hero {
+  position: relative;
+  min-height: clamp(720px, 78vw, 980px);
+  overflow: hidden;
+  isolation: isolate;
+  background: #0e0b0a;
+  border-bottom: 1px solid rgba(196,165,116,.14);
+}
+
+.background {
+  object-fit: cover;
+  object-position: center 44%;
+  filter: brightness(.58) saturate(.78) contrast(1.05);
+  transform: scale(1.02);
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(90deg, rgba(14,11,10,.96) 0%, rgba(14,11,10,.76) 28%, rgba(14,11,10,.18) 68%),
+    linear-gradient(0deg, rgba(14,11,10,.88) 0%, transparent 42%),
+    radial-gradient(circle at 20% 18%, rgba(143,45,60,.24), transparent 34%);
+}
+
+.copy {
+  position: absolute;
+  z-index: 4;
+  left: max(5vw, 38px);
+  top: 19%;
+  width: min(420px, 34vw);
+}
+
+.copy > span {
+  color: #c4a574;
+  font-size: 10px;
+  letter-spacing: .19em;
+  text-transform: uppercase;
+}
+
+.copy h1 {
+  margin: 14px 0 18px;
+  color: #f6f1e8;
+  font-family: DM Sans, sans-serif;
+  font-size: clamp(70px, 10vw, 150px);
+  font-weight: 400;
+  line-height: .78;
+  letter-spacing: -.065em;
+}
+
+.copy p {
+  max-width: 340px;
+  margin: 0 0 26px;
+  color: rgba(246,241,232,.62);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.printField {
+  position: absolute;
+  z-index: 3;
+  left: 38%;
+  right: 4%;
+  top: 18%;
+  bottom: 11%;
+}
+
+.print {
+  position: absolute;
+  width: min(31%, 310px);
+  margin: 0;
+  background: #f6f1e8;
+  color: #171210;
+  box-shadow: 0 28px 60px rgba(0,0,0,.4);
+  transform-origin: center;
+}
+
+.print:nth-child(1) {
+  left: 7%;
+  top: 20%;
+  transform: rotate(-5deg);
+}
+
+.print:nth-child(2) {
+  left: 35%;
+  top: 10%;
+  transform: rotate(2deg);
+}
+
+.print:nth-child(3) {
+  right: 2%;
+  top: 27%;
+  transform: rotate(6deg);
+}
+
+.printImage {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  background: #1c1614;
+}
+
+.printImage img {
+  object-fit: cover;
+  transition: transform 600ms cubic-bezier(.2,.7,.2,1);
+}
+
+.printMeta {
+  display: grid;
+  gap: 5px;
+  padding: 12px 13px 15px;
+}
+
+.printMeta small {
+  font-size: 8px;
+  letter-spacing: .14em;
+  color: rgba(23,18,16,.58);
+}
+
+.printMeta strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.footerLine {
+  position: absolute;
+  z-index: 4;
+  left: max(5vw,38px);
+  right: max(5vw,38px);
+  bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(196,165,116,.16);
+  color: rgba(246,241,232,.38);
+  font-size: 9px;
+  letter-spacing: .16em;
+}
+
+@media (hover:hover) {
+  .print:hover .printImage img { transform: scale(1.04); }
+  .print:hover { z-index: 6; }
+}
+
+@media (max-width: 900px) {
+  .hero {
+    min-height: 980px;
+  }
+
+  .copy {
+    left: 6%;
+    top: 12%;
+    width: 88%;
+  }
+
+  .copy h1 {
+    font-size: clamp(72px, 18vw, 124px);
+  }
+
+  .printField {
+    left: 6%;
+    right: 6%;
+    top: 46%;
+    bottom: 9%;
+  }
+
+  .print {
+    width: 38%;
+  }
+
+  .print:nth-child(1) { left: 0; top: 10%; }
+  .print:nth-child(2) { left: 31%; top: 0; }
+  .print:nth-child(3) { right: 0; top: 14%; }
+}
+
+@media (max-width: 560px) {
+  .hero { min-height: 900px; }
+  .copy { top: 10%; }
+  .printField { top: 48%; }
+  .print { width: 46%; }
+  .print:nth-child(1) { left: 0; top: 8%; }
+  .print:nth-child(2) { left: 28%; top: 0; }
+  .print:nth-child(3) { right: 0; top: 18%; }
+  .printMeta { padding: 9px; }
+  .printMeta strong { font-size: 10px; }
+  .footerLine span:last-child { display:none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .printImage img { transition:none; }
+}

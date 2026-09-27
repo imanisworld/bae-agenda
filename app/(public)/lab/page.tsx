@@ -1,33 +1,27 @@
 import type { Metadata } from 'next'
-import MixesSection from '@/components/public/MixesSection'
+import LabListeningStation, { type ListeningMix } from '@/components/public/LabListeningStation'
 import { getPublishedMixes } from '@/lib/db/mixes'
 
 export const metadata: Metadata = {
   title: 'Lab',
-  alternates: {
-    canonical: '/lab',
-  },
-  description: 'Bae’s in the Lab. A live archive for mixes, recent sets, and new drops from DJ B.A.E.',
-  openGraph: {
-    title: 'Lab | DJ B.A.E.',
-    description: 'Bae’s in the Lab. A live archive for mixes, recent sets, and new drops from DJ B.A.E.',
-    url: 'https://thebaeagenda.com/lab',
-    images: [{ url: '/photos/images/logo.JPG', alt: 'DJ B.A.E. logo artwork' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Lab | DJ B.A.E.',
-    description: 'Bae’s in the Lab. A live archive for mixes, recent sets, and new drops from DJ B.A.E.',
-    images: ['/photos/images/logo.JPG'],
-  },
+  alternates: { canonical: '/lab' },
+  description: 'Bae’s in the Lab — published SoundCloud mixes, physical listening-station interaction, and work in progress from DJ B.A.E.',
 }
 
 export default async function LabPage() {
   const mixes = await getPublishedMixes()
+  const listeningMixes: ListeningMix[] = mixes.map((mix) => ({
+    id: mix.id,
+    title: mix.title,
+    description: mix.description,
+    genre: mix.genre,
+    embed_url: mix.embed_url,
+    cover_url: mix.cover_url,
+  }))
 
   return (
-    <div style={{ background: 'var(--off-black)', paddingTop: '68px' }}>
-      <MixesSection sectionId={undefined} variant="page" mixes={mixes} />
+    <div className="lab-experience">
+      <LabListeningStation mixes={listeningMixes} compact />
     </div>
   )
 }
