@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, type CSSProperties } from 'react'
 import styles from './page.module.css'
 
 type Direction = 'editorial' | 'archive' | 'dimensional' | 'afterdark' | 'deck'
@@ -27,10 +27,10 @@ export default function StyleLabPage() {
   return (
     <main className={styles.page}>
       <header className={styles.intro}>
-        <p className={styles.kicker}>THE BAE AGENDA · STYLE LAB 002</p>
+        <p className={styles.kicker}>THE BAE AGENDA · STYLE LAB 003</p>
         <h1>Same brand.<br />Different worlds.</h1>
         <p className={styles.lede}>
-          Flip through four art directions using the same B.A.E. identity and real photography. We are choosing a visual language, not redesigning production yet.
+          Flip through five art directions using the same B.A.E. identity and real photography. We are choosing a visual language, not redesigning production yet.
         </p>
       </header>
 
@@ -260,7 +260,7 @@ function ControlDeckStage() {
             <label htmlFor="bae-tone">TONE</label>
             <div
               className={styles.knob}
-              style={{ '--knob-turn': `${-135 + tone * 2.7}deg` } as React.CSSProperties}
+              style={{ '--knob-turn': `${-135 + tone * 2.7}deg` } as CSSProperties}
             >
               <span />
             </div>
@@ -284,7 +284,7 @@ function ControlDeckStage() {
               max="100"
               value={energy}
               onChange={(event) => setEnergy(Number(event.target.value))}
-              style={{ '--range-value': `${energy}%` } as React.CSSProperties}
+              style={{ '--range-value': `${energy}%` } as CSSProperties}
             />
             <strong>{energy}</strong>
           </label>
