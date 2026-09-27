@@ -120,7 +120,7 @@ export default async function PayBookingPage({
       style={{
         minHeight: '100svh',
         background:
-          'radial-gradient(circle at top, rgba(143,45,60,0.28), transparent 36%), linear-gradient(180deg, #0d0d0f 0%, #151518 100%)',
+          'radial-gradient(circle at top, rgba(143,45,60,0.28), transparent 36%), linear-gradient(180deg, #0e0b0a 0%, #161210 100%)',
         color: 'var(--white)',
         padding: 'max(48px, calc(var(--safe-top) + 32px)) max(20px, var(--safe-right)) calc(80px + var(--safe-bottom)) max(20px, var(--safe-left))',
       }}
@@ -230,7 +230,7 @@ export default async function PayBookingPage({
                     alignItems: 'center',
                     justifyContent: 'center',
                     border: '1px solid rgba(143,45,60,0.4)',
-                    background: !stripeReady || outstandingDeposit <= 0 ? 'rgba(143,45,60,0.16)' : 'linear-gradient(135deg, #8f2d3c, #6d28d9)',
+                    background: !stripeReady || outstandingDeposit <= 0 ? 'rgba(143,45,60,0.16)' : 'linear-gradient(135deg, #8f2d3c, #c4844a)',
                     color: 'var(--white)',
                     padding: '14px 18px',
                     minHeight: '48px',
