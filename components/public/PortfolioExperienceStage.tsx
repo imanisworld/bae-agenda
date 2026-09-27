@@ -32,15 +32,24 @@ export default function PortfolioExperienceStage({
   const [archiveOpen, setArchiveOpen] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
 
+  function closeArchive() {
+    setArchiveOpen(false)
+    window.requestAnimationFrame(() => {
+      document.getElementById('portfolio-explore-archive')?.focus()
+    })
+  }
+
   useEffect(() => {
     if (!archiveOpen) return
     closeButtonRef.current?.focus()
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setArchiveOpen(false)
+      if (event.key === 'Escape') closeArchive()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
+  // closeArchive only closes the current drawer and restores focus to its trigger.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [archiveOpen])
 
   return (
@@ -65,7 +74,7 @@ export default function PortfolioExperienceStage({
             <span>Past Work</span>
             <strong>Full Archive</strong>
           </div>
-          <button ref={closeButtonRef} type="button" onClick={() => setArchiveOpen(false)} aria-label="Close archive">Close ×</button>
+          <button ref={closeButtonRef} type="button" onClick={closeArchive} aria-label="Close archive">Close ×</button>
         </div>
         <div className="experience-drawer-scroll">
           <PortfolioArchive entries={entries} />
