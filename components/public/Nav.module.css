@@ -136,8 +136,7 @@
 }
 
 .item:hover .tip,
-.item:focus-visible .tip,
-.active .tip {
+.item:focus-visible .tip {
   opacity: 1;
   transform: translate(-50%, 0);
 }
