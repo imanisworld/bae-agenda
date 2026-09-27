@@ -23,8 +23,7 @@ export const metadata: Metadata = {
   },
 }
 
-// Passed to SetControlSection — shown in console topbar + module cards.
-// Angle: technical execution (what actually happens in a set).
+// Passed to the approach section.
 const techItems = [
   {
     label: 'Selection',
@@ -40,27 +39,27 @@ const techItems = [
   },
 ]
 
-// Hero panel modules — angle: artist philosophy (how B.A.E. thinks about music and crowds).
+// Artist profile notes.
 const profileModules = [
   {
     label: 'Sound',
     value: 'Full genre range without losing the thread. The selection is shaped by the room — not locked into a single lane.',
   },
   {
-    label: 'Read',
-    value: 'The floor tells you when to push. Energy compounds across the set — the peak lands where the crowd earns it.',
+    label: 'Pacing',
+    value: 'The room determines when to push, reset, or hold back.',
   },
   {
-    label: 'Build',
-    value: 'Pressure through pacing, not volume. The set structure knows when to hold back as much as when to open up.',
+    label: 'Structure',
+    value: 'The set develops over time instead of chasing a peak from the first track.',
   },
 ] as const
 
-// "Operating Range" section — angle: room contexts (what kinds of events and environments).
+// Common room contexts.
 const operatingRange = [
   {
-    label: 'Clubs & Residencies',
-    value: 'Full-night sets, warm-up slots, and resident rotations. Room energy and crowd age dictate pace — no template.',
+    label: 'Clubs & Nightlife',
+    value: 'Full-night sets, warm-up slots, and nightlife rooms where pacing follows the crowd instead of a fixed template.',
   },
   {
     label: 'Private Events',
@@ -72,7 +71,7 @@ const operatingRange = [
   },
 ] as const
 
-// Hero quick-facts signal strip — angle: raw at-a-glance data points.
+// Quick profile facts.
 const meetSignals = [
   { label: 'Base',   value: 'Indianapolis · travel-ready' },
   { label: 'Format', value: 'Open-format · hip-hop, R&B, house, Afrobeats' },
@@ -118,11 +117,6 @@ export default function MeetPage() {
               overflow: 'hidden',
             }}
           >
-            <div className="meet-hero-status-row" aria-hidden="true">
-              <span>Live</span>
-              <span>Club / Private</span>
-              <span>Travel Ready</span>
-            </div>
             <Image
               className="meet-hero-photo"
               src="/photos/PlexMix19-DJBAE.JPEG"
@@ -141,20 +135,6 @@ export default function MeetPage() {
                   'linear-gradient(180deg, rgba(8,8,8,0.08), rgba(8,8,8,0.28) 55%, rgba(8,8,8,0.7) 100%)',
               }}
             />
-            <div
-              className="meet-hero-photo-frame"
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                inset: '18px',
-                border: '1px solid rgba(255,255,255,0.12)',
-              }}
-            />
-            <div className="meet-hero-photo-scan" aria-hidden="true" />
-            <div className="meet-hero-photo-readout" aria-hidden="true">
-              <div className="meet-hero-photo-readout-label">Artist Profile</div>
-              <div className="meet-hero-photo-readout-value">Selection / Timing / Room Read</div>
-            </div>
             {/* Mobile-only name overlay — visible when photo stacks above copy */}
             <div className="meet-hero-mobile-name" aria-hidden="true">
               <div className="meet-hero-mobile-name-label">
@@ -164,7 +144,7 @@ export default function MeetPage() {
                 Meet<br />DJ B.A.E.
               </div>
               <p className="meet-hero-mobile-name-copy">
-                Club sets, private events, branded experiences, and community nights with pressure, pacing, and payoff.
+                Club sets, private events, branded experiences, and community nights shaped around the room.
               </p>
             </div>
           </div>
@@ -193,8 +173,8 @@ export default function MeetPage() {
               </p>
 
               <div className="meet-hero-copy-rail">
-                <div className="meet-hero-copy-rail-label">Operating Style</div>
-                <div className="meet-hero-copy-rail-value">Process-driven, but never mechanical. The setup serves the room.</div>
+                <div className="meet-hero-copy-rail-label">Approach</div>
+                <div className="meet-hero-copy-rail-value">Open-format, room-aware, and flexible across different event settings.</div>
               </div>
             </div>
 
@@ -207,21 +187,26 @@ export default function MeetPage() {
               </Link>
             </div>
 
-            <div className="meet-signal-grid">
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '10px 24px',
+              paddingTop: '18px',
+              borderTop: '1px solid var(--border)',
+            }}>
               {meetSignals.map((item) => (
-                <div key={item.label} className="meet-signal-card">
-                  <div className="meet-signal-label">{item.label}</div>
-                  <div className="meet-signal-value">{item.value}</div>
+                <div key={item.label} style={{ fontSize: '13px', color: 'var(--muted)' }}>
+                  <strong style={{ color: 'var(--white)', fontWeight: 500 }}>{item.label}:</strong>{' '}
+                  {item.value}
                 </div>
               ))}
             </div>
 
             <div className="meet-hero-module-grid">
-              {profileModules.map((item, index) => (
+              {profileModules.map((item) => (
                 <div key={item.label} className="meet-hero-module">
                   <div className="meet-hero-module-top">
                     <span className="meet-hero-module-label">{item.label}</span>
-                    <span className="meet-hero-module-index">0{index + 1}</span>
                   </div>
                   <div className="meet-hero-module-value">{item.value}</div>
                 </div>
@@ -240,9 +225,7 @@ export default function MeetPage() {
               color: 'var(--white)',
               margin: 0,
             }}>
-              Built for different rooms,
-              <br />
-              consistent in execution.
+              Different rooms, one adaptable approach.
             </h2>
           </div>
 
@@ -296,11 +279,11 @@ export default function MeetPage() {
               Booking
             </div>
             <div style={{ fontSize: '15px', color: 'var(--white)', lineHeight: 1.7, maxWidth: '620px' }}>
-              Need a DJ who can move between curation, crowd reading, and clean execution without flattening the night into a template?
+              Planning a club night, private event, wedding, or branded room?
             </div>
           </div>
           <Link href="/book" className="btn-primary">
-            Start A Booking Request
+            Booking Inquiry
           </Link>
         </section>
       </div>
