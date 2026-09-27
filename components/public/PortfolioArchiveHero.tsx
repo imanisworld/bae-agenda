@@ -1,3 +1,5 @@
+'use client'
+
 import Image from 'next/image'
 import Link from 'next/link'
 import styles from './PortfolioArchiveHero.module.css'
@@ -9,7 +11,7 @@ export type ArchivePrint = {
   photo_url: string
 }
 
-export default function PortfolioArchiveHero({ prints }: { prints: ArchivePrint[] }) {
+export default function PortfolioArchiveHero({ prints, onExplore }: { prints: ArchivePrint[]; onExplore?: () => void }) {
   return (
     <section className={styles.hero} aria-labelledby="portfolio-title">
       <Image
@@ -28,7 +30,11 @@ export default function PortfolioArchiveHero({ prints }: { prints: ArchivePrint[
         <span>Portfolio</span>
         <h1 id="portfolio-title">Past<br />work.</h1>
         <p>Rooms, crowds, and moments collected across the archive.</p>
-        <Link href="#archive" className="btn-ghost">Explore the archive</Link>
+        {onExplore ? (
+          <button type="button" className="btn-ghost" onClick={onExplore}>Explore the archive</button>
+        ) : (
+          <Link href="#archive" className="btn-ghost">Explore the archive</Link>
+        )}
       </div>
 
       <div className={styles.printField} aria-label="Selected past work">
