@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { getPortfolioEntries, getFeaturedPortfolioEntries, getPortfolioStats } from '@/app/actions/portfolio'
 import PortfolioArchive from '@/components/public/PortfolioArchive'
 import { getContentMap } from '@/lib/db/content'
-import { CONTENT_DEFAULTS } from '@/lib/content-schema'
+import { CONTENT_DEFAULTS, DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
 
 export const metadata: Metadata = {
   title: 'Portfolio | DJ BAE Gig History — Indianapolis & Chicago',
@@ -46,7 +46,7 @@ export default async function PortfolioPage() {
     getPortfolioStats(),
     getContentMap(['booking_email']),
   ])
-  const bookingEmail = content.booking_email ?? CONTENT_DEFAULTS.booking_email ?? 'bookings@thebaeagenda.com'
+  const bookingEmail = content.booking_email || CONTENT_DEFAULTS.booking_email || DEFAULT_BOOKING_EMAIL
 
   return (
     <div style={{ background: 'var(--black)' }}>
