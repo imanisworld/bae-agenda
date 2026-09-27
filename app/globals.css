@@ -2422,7 +2422,7 @@ body.has-custom-cursor * { cursor: none !important; }
   place-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.24), rgba(162,102,236,0.95) 38%, rgba(92,46,147,0.98) 100%);
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.24), rgba(184,90,102,0.95) 38%, rgba(111,35,48,0.98) 100%);
   box-shadow:
     inset 0 0 0 1px rgba(255,255,255,0.12),
     0 0 30px rgba(143,45,60,0.24);
@@ -2545,7 +2545,7 @@ body.has-custom-cursor * { cursor: none !important; }
   bottom: 22%;
   width: 6px;
   height: 6px;
-  background: rgba(212,187,255,0.9);
+  background: rgba(246,241,232,0.9);
   box-shadow: 0 0 14px rgba(143,45,60,0.45);
   animation: mixes-orbit-float 4.8s ease-in-out infinite reverse;
 }
@@ -3094,7 +3094,7 @@ body.has-custom-cursor * { cursor: none !important; }
   width: min(110px, 22vw);
   aspect-ratio: 1 / 1;
   border-radius: 50%;
-  background: #0d0d0f;
+  background: var(--black);
   display: flex;
   align-items: center;
   justify-content: center;
