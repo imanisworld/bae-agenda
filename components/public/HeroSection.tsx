@@ -33,6 +33,7 @@ export default function HeroSection({ content = {} }: Props) {
           fill
           priority
           sizes="(max-width: 760px) 82vw, 46vw"
+          quality={95}
           className={styles.photoImage}
         />
       </div>
