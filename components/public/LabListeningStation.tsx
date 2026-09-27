@@ -97,6 +97,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
         src="https://w.soundcloud.com/player/api.js"
         strategy="afterInteractive"
         onLoad={() => setApiReady(true)}
+        onReady={() => setApiReady(true)}
       />
 
       <header className={styles.header}>
