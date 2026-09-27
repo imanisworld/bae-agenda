@@ -20,17 +20,21 @@ export default async function PortfolioPage() {
     getPortfolioStats(),
   ])
 
+  const featuredWithPhotos = featured.filter((entry) => Boolean(entry.photo_url))
+  const featuredIds = new Set(featuredWithPhotos.map((entry) => entry.id))
+  const printEntries = [
+    ...featuredWithPhotos,
+    ...entries.filter((entry) => Boolean(entry.photo_url) && !featuredIds.has(entry.id)),
+  ].slice(0, 3)
+
   return (
     <PortfolioExperienceStage
-      prints={featured
-        .filter((entry) => Boolean(entry.photo_url))
-        .slice(0, 3)
-        .map((entry) => ({
-          id: entry.id,
-          event_name: entry.event_name,
-          year: entry.year,
-          photo_url: entry.photo_url as string,
-        }))}
+      prints={printEntries.map((entry) => ({
+        id: entry.id,
+        event_name: entry.event_name,
+        year: entry.year,
+        photo_url: entry.photo_url as string,
+      }))}
       entries={entries.map((entry) => ({
         id: entry.id,
         event_name: entry.event_name,
