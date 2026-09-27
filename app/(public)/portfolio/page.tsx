@@ -49,13 +49,13 @@ export default async function PortfolioPage() {
 
       <PortfolioArchiveHero
         prints={featured
-          .filter((entry): entry is typeof entry & { photo_url: string } => Boolean(entry.photo_url))
+          .filter((entry) => Boolean(entry.photo_url))
           .slice(0, 3)
           .map((entry) => ({
             id: entry.id,
             event_name: entry.event_name,
             year: entry.year,
-            photo_url: entry.photo_url,
+            photo_url: entry.photo_url as string,
           }))}
       />
 
