@@ -6,6 +6,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { getPortfolioStats } from '@/app/actions/portfolio'
 
 interface PortfolioEntry {
   id:         string
@@ -39,7 +40,12 @@ async function getFeatured(): Promise<PortfolioEntry[]> {
 }
 
 export default async function PortfolioTeaserSection() {
-  const entries = (await getFeatured()).sort((a, b) => {
+  const [featuredEntries, stats] = await Promise.all([
+    getFeatured(),
+    getPortfolioStats(),
+  ])
+
+  const entries = featuredEntries.sort((a, b) => {
     const aPriority = /wnba/i.test(a.event_name) ? 0 : 1
     const bPriority = /wnba/i.test(b.event_name) ? 0 : 1
     if (aPriority !== bPriority) return aPriority - bPriority
@@ -103,9 +109,9 @@ export default async function PortfolioTeaserSection() {
               <div className="portfolio-teaser-meta">Experience</div>
               <h3 className="portfolio-teaser-title">Played Across</h3>
               <p className="portfolio-teaser-desc">
-                Indianapolis • Chicago • Atlanta • Boston
+                {stats.cities} cities • {stats.yearsActive}
               </p>
-              <p className="portfolio-teaser-proof">100+ events played</p>
+              <p className="portfolio-teaser-proof">{stats.total} documented events</p>
               <p className="portfolio-teaser-footnote"> </p>
               <div style={{
                 marginTop: '8px',
