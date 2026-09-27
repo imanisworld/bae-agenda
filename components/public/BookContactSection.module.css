@@ -1,0 +1,124 @@
+.section {
+  border-top: 1px solid rgba(196,165,116,.14);
+  background:
+    radial-gradient(circle at 18% 20%, rgba(143,45,60,.12), transparent 32%),
+    #0e0b0a;
+  color: #f6f1e8;
+}
+
+.inner {
+  width: min(1120px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 72px 0 88px;
+}
+
+.header span,
+.contactRows small,
+.review small {
+  color: #c4a574;
+  font-size: 9px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.header h2 {
+  margin: 10px 0 14px;
+  font-family: DM Sans, sans-serif;
+  font-size: clamp(48px, 7vw, 92px);
+  font-weight: 400;
+  line-height: .9;
+  letter-spacing: -.055em;
+}
+
+.header p {
+  margin: 0;
+  color: rgba(246,241,232,.54);
+  line-height: 1.7;
+}
+
+.contactRows {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  margin-top: 38px;
+  border-top: 1px solid rgba(196,165,116,.14);
+  border-left: 1px solid rgba(196,165,116,.14);
+}
+
+.contactRows > div {
+  min-height: 132px;
+  padding: 22px;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  border-right: 1px solid rgba(196,165,116,.14);
+  border-bottom: 1px solid rgba(196,165,116,.14);
+}
+
+.contactRows a {
+  color: #f6f1e8;
+  text-decoration: none;
+  font-size: clamp(18px,2.3vw,28px);
+  overflow-wrap: anywhere;
+}
+
+.socials {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 1px;
+  margin-top: 28px;
+  background: rgba(196,165,116,.12);
+}
+
+.socials a {
+  min-height: 82px;
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #161210;
+  color: #f6f1e8;
+  text-decoration: none;
+  transition: background 180ms ease;
+}
+
+.socials a:hover {
+  background: #1c1614;
+}
+
+.socials a > span {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+}
+
+.socials strong {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.review {
+  margin-top: 32px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(196,165,116,.14);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+}
+
+.review p {
+  margin: 7px 0 0;
+  color: rgba(246,241,232,.68);
+}
+
+@media (max-width:700px) {
+  .inner { width:min(100% - 24px,1120px); padding:56px 0 72px; }
+  .contactRows { grid-template-columns:1fr; }
+  .socials { grid-template-columns:1fr 1fr; }
+  .review { align-items:flex-start; flex-direction:column; }
+}
+
+@media (max-width:440px) {
+  .socials { grid-template-columns:1fr; }
+}
