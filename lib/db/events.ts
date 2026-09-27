@@ -8,6 +8,11 @@ import type { Database } from '@/types/database'
 
 export type Event = Database['public']['Tables']['events']['Row']
 
+function getScheduleDateFloorIso(): string {
+  const todayUtc = new Date().toISOString().slice(0, 10)
+  return `${todayUtc}T00:00:00.000Z`
+}
+
 /**
  * All upcoming public events, soonest first.
  * Used for the /events listing page.
@@ -19,7 +24,7 @@ export async function getUpcomingEvents(limit = 10): Promise<Event[]> {
       .from('events')
       .select('*')
       .eq('public', true)
-      .gte('event_date', new Date().toISOString())
+      .gte('event_date', getScheduleDateFloorIso())
       .order('event_date', { ascending: true })
       .limit(limit)
 
@@ -47,7 +52,7 @@ export async function getFeaturedEvents(): Promise<Event[]> {
       .select('*')
       .eq('public', true)
       .eq('featured', true)
-      .gte('event_date', new Date().toISOString())
+      .gte('event_date', getScheduleDateFloorIso())
       .order('event_date', { ascending: true })
       .limit(3)
 
@@ -63,7 +68,7 @@ export async function getFeaturedEvents(): Promise<Event[]> {
       .from('events')
       .select('*')
       .eq('public', true)
-      .gte('event_date', new Date().toISOString())
+      .gte('event_date', getScheduleDateFloorIso())
       .order('event_date', { ascending: true })
       .limit(3)
 
