@@ -11,11 +11,11 @@ export const metadata: Metadata = {
     canonical: '/built',
   },
   description:
-    'Custom full-stack websites for DJs, artists, promoters, and creative businesses. Real code — not Wix, not Squarespace. Booking platforms, admin dashboards, and brand presence built from scratch.',
+    'Custom websites and booking platforms for DJs, artists, promoters, and creative businesses.',
   openGraph: {
     title: 'Built from Scratch — DJ B.A.E.',
     description:
-      'No templates. No builders. Custom sites for artists and brands — with booking flows, admin panels, and real infrastructure. Limited availability.',
+      'Custom sites for artists and brands, including booking flows, admin tools, and content management.',
   },
 }
 
@@ -101,16 +101,14 @@ export default async function BuiltPage() {
               <span style={{ color: 'var(--amber)' }}>Scratch.</span>
             </h1>
             <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '8px' }}>
-              Designed, engineered, and deployed by <strong style={{ color: 'var(--white)' }}>DJ B.A.E.</strong> —
-              not a template, not Wix, not Squarespace, not a drag-and-drop builder.
-              Every page, every component, every flow written from scratch in real code.
+              Designed and engineered for artists, DJs, promoters, and creative businesses that need more than a basic brochure site.
             </p>
             <p style={{ fontSize: '15px', color: 'var(--amber)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '28px', fontWeight: 500 }}>
-              This stack is available for your brand.
+              Projects can include public pages, booking flows, content management, and admin tools.
             </p>
             <div className="built-page-hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <a href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`} className="btn-primary">
-                Start a Project →
+                Project Inquiry
               </a>
             </div>
           </div>
@@ -122,10 +120,9 @@ export default async function BuiltPage() {
           className="build-console-module-grid"
           style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}
         >
-          {statCard('Build Time', '~3 Months', 'Plan for 3 months depending on the scope.')}
-          {statCard('Clients Available', '2', 'Currently taking limited new projects.')}
-          {statCard('System Layers', '4', 'Public site, admin panel, CMS, and booking flow.')}
-          {statCard('Templates Used', '0', 'Every page, component, and layout is custom.')}
+          {statCard('Typical Timeline', '~3 Months', 'Timing varies with scope and content readiness.')}
+          {statCard('Core Layers', '4', 'Public site, admin tools, content management, and booking flow.')}
+          {statCard('Ownership', 'Your Code', 'Source, content, and deployment stay under your control.')}
         </section>
 
         {/* ── What Was Built ───────────────────────────────────── */}
@@ -134,11 +131,7 @@ export default async function BuiltPage() {
           style={{ padding: '26px', display: 'grid', gap: '16px' }}
         >
           <div className="build-console-fx-header">
-            <span>What Was Built — For This Site</span>
-            <div className="build-console-mini-chips">
-              <span>Full-Stack</span>
-              <span>Custom</span>
-            </div>
+            <span>What This Site Includes</span>
           </div>
           <BuildPads />
         </section>
@@ -159,8 +152,7 @@ export default async function BuiltPage() {
             <span style={{ color: 'var(--amber)' }}>Promoters & Venues.</span>
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '32px' }}>
-            If you&apos;re on GoDaddy, Wix, or Squarespace and outgrowing it — or if you have no site at all —
-            this is the alternative. You own everything. No monthly platform fees. No limits.
+            The goal is a site that fits the business instead of forcing the business into a preset layout. Hosting and third-party services may still have their own costs.
           </p>
 
           <div style={{
@@ -261,7 +253,7 @@ export default async function BuiltPage() {
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <a href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`} className="btn-primary">
-              Start a Project →
+              Project Inquiry
             </a>
           </div>
         </section>
@@ -377,15 +369,15 @@ export default async function BuiltPage() {
             lineHeight: 1.1,
             margin: '0 0 12px',
           }}>
-            Ready to replace your<br />
-            <span style={{ color: 'var(--amber)' }}>GoDaddy site?</span>
+            Have a web project<br />
+            <span style={{ color: 'var(--amber)' }}>in mind?</span>
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--muted)', marginBottom: '28px', lineHeight: 1.7 }}>
-            Limited availability. Currently taking 2 new projects.
+            Share the scope, timeline, and what you need the site to do.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`} className="btn-primary">
-              Start a Project →
+              Project Inquiry
             </a>
           </div>
         </section>
