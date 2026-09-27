@@ -87,3 +87,9 @@ next-env.d.ts
 
 # local Claude credential file
 .claude/claude api
+
+# logo video workbench — source media and generated artifacts stay local
+/tools/logo-video/input/
+/tools/logo-video/masks/
+/tools/logo-video/previews/
+/tools/logo-video/output/
