@@ -17,10 +17,14 @@ export default function PrivacyPage() {
       title="Privacy & Cookies"
       currentPath="/privacy"
       intro={
-        <p>
-          The Bae Agenda collects only the information needed to run the site, respond to booking inquiries,
-          manage client records, send booking communications, track invoices and payments, and operate the client portal.
-        </p>
+        <>
+          <p>
+            The Bae Agenda collects only the information needed to run the site, respond to booking inquiries,
+            manage client records, send booking communications, track invoices and payments, operate the client portal,
+            and honor mix-notification requests.
+          </p>
+          <p><strong>Effective September 28, 2026.</strong></p>
+        </>
       }
     >
       <UtilitySection title="Information you provide">
@@ -68,23 +72,40 @@ export default function PrivacyPage() {
 
       <UtilitySection title="Cookies, browser storage, and analytics">
         <p>
-          Essential cookies or browser storage may be used for sessions and site behavior. The site may use privacy-focused
-          traffic analytics to understand aggregate page visits, browser or device patterns, and site performance.
+          Essential cookies or browser storage may be used for sessions and site behavior. The booking form stores an unfinished
+          booking draft in your browser for up to 14 days so an accidental reload does not erase it. The Lab may also cache public
+          mix data in browser storage to reduce repeated requests. These browser-stored items stay on the device unless the browser
+          or user clears them.
         </p>
         <p>
-          Embedded third-party media, including services such as SoundCloud or YouTube when present, may set their own cookies
+          The site uses Vercel Analytics and Speed Insights to understand aggregate traffic, browser or device patterns,
+          performance, and site reliability.
+        </p>
+        <p>
+          Embedded or linked third-party media, including SoundCloud or YouTube when present, may set their own cookies
           or collect information under their own privacy practices.
         </p>
       </UtilitySection>
 
       <UtilitySection title="Service providers">
         <p>
-          The site relies on third-party providers for functions such as hosting, database services, authentication,
-          email or text delivery, payment processing, analytics, and embedded media. Information is shared with those providers
-          only as needed to operate the relevant service.
+          Current providers include Vercel for hosting, analytics, and performance monitoring; Supabase for database, authentication,
+          and storage; Resend for email delivery; Stripe for card-payment processing; Upstash for rate limiting; and SoundCloud or
+          YouTube for media features. Twilio may be used for text-message delivery when SMS features are enabled.
+        </p>
+        <p>
+          Information is shared with those providers only as needed to operate the relevant service. Full payment-card numbers are
+          handled by the payment processor and are not stored by this site.
         </p>
         <p>
           Personal information is not sold to advertisers.
+        </p>
+      </UtilitySection>
+
+      <UtilitySection title="Mix notification requests">
+        <p>
+          If you use a “Notify Me” form for new mixes, the submitted email address is sent to The Bae Agenda&apos;s business inbox
+          so the requested notification can be managed. That submission does not create a site account.
         </p>
       </UtilitySection>
 
