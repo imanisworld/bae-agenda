@@ -283,7 +283,6 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
       <div className={styles.headerIdentity}>
         <p>Bae&apos;s in the Lab · Listening Room</p>
         <h1><HangFrom finish="chrome">O</HangFrom>n wax.</h1>
-        <span className={styles.headerNote}>Pick a sleeve. Drop the needle. Drag the record.</span>
       </div>
       {crates.length > 1 ? (
         <div className={styles.crateSwitch} role="group" aria-label="Choose a crate">
@@ -389,11 +388,6 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                     <span className={styles.coverFallback}>DJ B.A.E.</span>
                   )}
                 </span>
-                {offset === 0 ? (
-                  <span className={styles.coverBadge} aria-hidden="true">
-                    {isLoaded && playing ? <PauseIcon /> : <PlayIcon />}
-                  </span>
-                ) : null}
               </button>
             )
           })}
