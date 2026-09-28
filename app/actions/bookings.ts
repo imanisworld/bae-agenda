@@ -350,15 +350,26 @@ async function getBookingW9Recipient(admin: ReturnType<typeof createAdminClient>
 }
 
 async function syncInvoicePaymentState(admin: ReturnType<typeof createAdminClient>, bookingId: string) {
-  const { data: booking, error: bookingError } = await admin
-    .from('bookings')
-    .select('quote, payments(amount, status)')
-    .eq('id', bookingId)
-    .maybeSingle()
+  const [{ data: booking, error: bookingError }, { data: invoice, error: invoiceLookupError }] = await Promise.all([
+    admin
+      .from('bookings')
+      .select('quote, payments(amount, status)')
+      .eq('id', bookingId)
+      .maybeSingle(),
+    admin
+      .from('invoices')
+      .select('status, sent_at')
+      .eq('booking_id', bookingId)
+      .maybeSingle(),
+  ])
 
   if (bookingError || !booking) {
     console.error('[invoice-payment-sync] unable to load booking payments:', bookingError)
     return { paymentStatus: 'unpaid' as const, updatedInvoice: false }
+  }
+
+  if (invoiceLookupError) {
+    console.error('[invoice-payment-sync] unable to load invoice state:', invoiceLookupError)
   }
 
   const paymentStatus = getBookingPaymentStatus(
@@ -366,14 +377,26 @@ async function syncInvoicePaymentState(admin: ReturnType<typeof createAdminClien
     (booking.payments as Array<{ amount: number; status: 'pending' | 'received' | 'refunded' }> | null) ?? null
   )
 
-  const nextInvoiceStatus = paymentStatus === 'paid' ? 'paid' : 'draft'
-  const payload = nextInvoiceStatus === 'paid'
-    ? { status: nextInvoiceStatus, sent_at: new Date().toISOString() }
-    : { status: nextInvoiceStatus, sent_at: null }
+  if (!invoice) {
+    return { paymentStatus, updatedInvoice: false }
+  }
+
+  const currentStatus = invoice.status as 'draft' | 'sent' | 'paid' | 'void'
+  const nextStatus =
+    currentStatus === 'void'
+      ? 'void'
+      : paymentStatus === 'paid'
+        ? 'paid'
+        : currentStatus === 'sent'
+          ? 'sent'
+          : 'draft'
 
   const { error: invoiceError } = await admin
     .from('invoices')
-    .update(payload)
+    .update({
+      status: nextStatus,
+      sent_at: invoice.sent_at ?? null,
+    })
     .eq('booking_id', bookingId)
 
   if (invoiceError) {
