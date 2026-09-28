@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { requireAdminUser } from '@/lib/admin-auth'
+import { logError } from '@/lib/monitoring'
 
 export interface PortfolioEntry {
   id:         string
@@ -47,13 +48,18 @@ function parseTags(value: FormDataEntryValue | null): string[] {
 export async function getPortfolioEntries(): Promise<PortfolioEntry[]> {
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('portfolio_entries')
       .select('*')
       .order('year', { ascending: false })
       .order('event_name', { ascending: true })
+    if (error) {
+      logError('Portfolio entries query failed', error, { operation: 'getPortfolioEntries' })
+      return []
+    }
     return (data ?? []) as PortfolioEntry[]
-  } catch {
+  } catch (error) {
+    logError('Portfolio entries load failed', error, { operation: 'getPortfolioEntries' })
     return []
   }
 }
@@ -61,14 +67,19 @@ export async function getPortfolioEntries(): Promise<PortfolioEntry[]> {
 export async function getFeaturedPortfolioEntries(): Promise<PortfolioEntry[]> {
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('portfolio_entries')
       .select('*')
       .eq('featured', true)
       .order('year', { ascending: false })
       .limit(6)
+    if (error) {
+      logError('Featured portfolio query failed', error, { operation: 'getFeaturedPortfolioEntries' })
+      return []
+    }
     return (data ?? []) as PortfolioEntry[]
-  } catch {
+  } catch (error) {
+    logError('Featured portfolio load failed', error, { operation: 'getFeaturedPortfolioEntries' })
     return []
   }
 }
@@ -76,9 +87,13 @@ export async function getFeaturedPortfolioEntries(): Promise<PortfolioEntry[]> {
 export async function getPortfolioStats() {
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('portfolio_entries')
       .select('year, city, featured')
+    if (error) {
+      logError('Portfolio stats query failed', error, { operation: 'getPortfolioStats' })
+      return { total: 0, cities: 0, yearsActive: '—', featured: 0 }
+    }
     if (!data) return { total: 0, cities: 0, yearsActive: '—', featured: 0 }
 
     const rows    = data as { year: number; city: string; featured: boolean }[]
@@ -89,7 +104,8 @@ export async function getPortfolioStats() {
     const yearsActive = `${minYear}–${new Date().getFullYear()}`
 
     return { total: rows.length, cities, yearsActive, featured }
-  } catch {
+  } catch (error) {
+    logError('Portfolio stats load failed', error, { operation: 'getPortfolioStats' })
     return { total: 0, cities: 0, yearsActive: '—', featured: 0 }
   }
 }
