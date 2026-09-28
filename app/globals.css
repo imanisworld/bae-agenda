@@ -111,7 +111,7 @@ html {
   scroll-behavior: smooth;
   /* Reserve space for the fixed nav so anchors land below it */
   scroll-padding-top: calc(var(--nav-height) + var(--safe-top));
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: auto;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -124,7 +124,7 @@ body {
   font-family: 'DM Sans', sans-serif;
   font-weight: 300;
   overflow-x: hidden;
-  overscroll-behavior-y: none;
+  overscroll-behavior-y: auto;
   min-height: 100svh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -6106,6 +6106,22 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 }
 
+
+/* Mobile experience: preserve the one-screen design while leaving a tiny
+   root scroll runway so browser pull-to-refresh still works naturally. */
+@media (max-width: 900px) and (pointer: coarse) {
+  .public-experience-shell {
+    height: auto;
+    min-height: calc(100dvh + 24px);
+    overflow: visible;
+  }
+
+  .public-experience-main {
+    height: 100dvh;
+    min-height: 100dvh;
+    overflow: hidden;
+  }
+}
 
 /* ================================================================
    READABILITY PASS — public single-screen experience
