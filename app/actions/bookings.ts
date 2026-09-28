@@ -1255,6 +1255,87 @@ export async function createBookingPaymentAction(formData: FormData) {
   redirect(returnTo)
 }
 
+export async function updateBookingPaymentAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+  const paymentId = optionalString(formData.get('payment_id'))
+  const bookingId = optionalString(formData.get('booking_id'))
+  const amount = parseOptionalNumber(formData.get('amount'))
+  const typeRaw = optionalString(formData.get('type'))
+  const methodRaw = optionalString(formData.get('method'))
+  const statusRaw = optionalString(formData.get('status'))
+  const paidAt = parseOptionalDate(formData.get('paid_at'))
+  const notes = optionalString(formData.get('notes'))
+
+  if (!paymentId || !bookingId || amount === null || amount <= 0 || !typeRaw || !statusRaw) {
+    redirectWithError(bookingId ? `/admin/bookings/${bookingId}` : '/admin/payments', 'Payment id, booking, amount, type, and status are required.')
+  }
+
+  if (!isPaymentType(typeRaw) || !isPaymentStatus(statusRaw)) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Invalid payment correction details.')
+  }
+
+  if (methodRaw && !isPaymentMethod(methodRaw)) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Invalid payment method.')
+  }
+
+  if (statusRaw === 'received' && !paidAt) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Received payments need a paid date.')
+  }
+
+  const { data: current, error: lookupError } = await admin
+    .from('payments')
+    .select('id, booking_id, amount, type, method, status, paid_at')
+    .eq('id', paymentId)
+    .eq('booking_id', bookingId)
+    .maybeSingle()
+
+  if (lookupError || !current) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Could not find that payment record.')
+  }
+
+  const finalMethod = methodRaw as PaymentMethod | null
+  const finalStatus = statusRaw as PaymentStatus
+  const finalType = typeRaw as PaymentType
+
+  const { error } = await admin
+    .from('payments')
+    .update({
+      amount,
+      type: finalType,
+      method: finalMethod,
+      status: finalStatus,
+      paid_at: finalStatus === 'pending' ? null : paidAt,
+      notes,
+    })
+    .eq('id', paymentId)
+    .eq('booking_id', bookingId)
+
+  if (error) {
+    redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to correct payment record.')
+  }
+
+  await syncInvoicePaymentState(admin, bookingId)
+  await syncBookingDepositState(admin, bookingId)
+  await syncBookingWorkflowState(admin, bookingId)
+
+  await appendBookingTimelineNote(
+    admin,
+    bookingId,
+    `Payment ${paymentId.slice(0, 8).toUpperCase()} corrected: ${formatCurrency(amount)} ${finalType}, ${finalStatus}.`
+  )
+
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/payments')
+  revalidatePath('/admin/dashboard')
+  revalidatePath(`/admin/bookings/${bookingId}/invoice`)
+  revalidatePath('/admin/invoices')
+  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Payment record corrected.')}`)
+}
+
+
 // ─── WORKFLOW TRANSITION ACTIONS ─────────────────────────────────────────────
 
 export async function markBookingContactedAction(formData: FormData) {
