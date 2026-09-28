@@ -24,6 +24,7 @@ interface BookingRow {
   venue:       string | null
   city:        string | null
   client_name: string | null
+  client_email: string | null
   package:     string | null
   status:      BookingLifecycleStatus
   payment_status: BookingWorkflowPaymentStatus
@@ -132,6 +133,7 @@ async function getBookings(): Promise<BookingRow[]> {
         client_name: client
           ? `${client.first_name ?? ''} ${client.last_name ?? ''}`.trim() || null
           : null,
+        client_email: client?.email ?? null,
         package:    b.package,
         status:     lifecycleStatus,
         payment_status: getBookingWorkflowPaymentStatus({
@@ -155,6 +157,10 @@ function getErrorMessage(errorParam: string | string[] | undefined) {
   return Array.isArray(errorParam) ? errorParam[0] ?? null : errorParam
 }
 
+function singleParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? ''
+}
+
 // Status filter chips — "in_progress" groups the two mid-pipeline statuses.
 const BOOKING_FILTERS = [
   { key: 'all',         label: 'All',         matches: () => true },
@@ -170,6 +176,31 @@ type BookingFilterKey = (typeof BOOKING_FILTERS)[number]['key']
 function resolveFilter(filterParam: string | string[] | undefined): BookingFilterKey {
   const value = Array.isArray(filterParam) ? filterParam[0] : filterParam
   return BOOKING_FILTERS.some((f) => f.key === value) ? (value as BookingFilterKey) : 'all'
+}
+
+function bookingMatchesSearch(booking: BookingRow, query: string) {
+  if (!query) return true
+  const haystack = [
+    booking.event_name,
+    booking.client_name,
+    booking.client_email,
+    booking.venue,
+    booking.city,
+    booking.package,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+
+  return haystack.includes(query.toLowerCase())
+}
+
+function bookingListHref(filter: BookingFilterKey, query = '') {
+  const params = new URLSearchParams()
+  if (filter !== 'all') params.set('filter', filter)
+  if (query) params.set('q', query)
+  const suffix = params.toString()
+  return `/admin/bookings${suffix ? `?${suffix}` : ''}`
 }
 
 function getBookingActions(status: BookingLifecycleStatus) {
@@ -205,14 +236,21 @@ function canCreateEvent(status: BookingLifecycleStatus) {
 export default async function BookingsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ error?: string | string[]; filter?: string | string[] }>
+  searchParams?: Promise<{
+    error?: string | string[]
+    filter?: string | string[]
+    q?: string | string[]
+  }>
 }) {
   const bookings = await getBookings()
   const resolvedSearchParams = searchParams ? await searchParams : undefined
   const errorMessage = getErrorMessage(resolvedSearchParams?.error)
   const activeFilter = resolveFilter(resolvedSearchParams?.filter)
+  const query = singleParam(resolvedSearchParams?.q).trim()
   const activeMatcher = BOOKING_FILTERS.find((f) => f.key === activeFilter) ?? BOOKING_FILTERS[0]
-  const visibleBookings = bookings.filter((b) => activeMatcher.matches(b.status))
+  const searchedBookings = bookings.filter((booking) => bookingMatchesSearch(booking, query))
+  const visibleBookings = searchedBookings.filter((booking) => activeMatcher.matches(booking.status))
+
   const newInquiryCount = bookings.filter((booking) => booking.status === 'new').length
   const activeFollowUpCount = bookings.filter((booking) => booking.status === 'contacted' || booking.status === 'negotiating').length
   const paymentAttentionCount = bookings.filter(
@@ -253,27 +291,50 @@ export default async function BookingsPage({
 
       <div className="admin-section" style={{ marginBottom: 0 }}>
         <div className="admin-section-header">
-          <span className="admin-section-title">All Bookings</span>
+          <span className="admin-section-title">
+            {query ? `All Bookings · ${visibleBookings.length} matching` : 'All Bookings'}
+          </span>
         </div>
 
         {bookings.length > 0 && (
-          <nav aria-label="Filter bookings by status" className="admin-filter-chips">
-            {BOOKING_FILTERS.map((f) => {
-              const count = bookings.filter((b) => f.matches(b.status)).length
-              const isCurrent = f.key === activeFilter
-              return (
-                <Link
-                  key={f.key}
-                  href={f.key === 'all' ? '/admin/bookings' : `/admin/bookings?filter=${f.key}`}
-                  className={isCurrent ? 'admin-filter-chip admin-filter-chip-active' : 'admin-filter-chip'}
-                  aria-current={isCurrent ? 'true' : undefined}
-                >
-                  {f.label}
-                  <span className="admin-filter-chip-count">{count}</span>
+          <div className="admin-list-tools">
+            <form method="GET" action="/admin/bookings" className="admin-search-form">
+              {activeFilter !== 'all' ? <input type="hidden" name="filter" value={activeFilter} /> : null}
+              <input
+                id="booking-search"
+                type="search"
+                aria-label="Search bookings"
+                name="q"
+                defaultValue={query}
+                className="admin-search-input"
+                placeholder="Search event, client, email, venue, city, or package…"
+              />
+              <button type="submit" className="admin-search-submit">Search</button>
+              {query ? (
+                <Link href={bookingListHref(activeFilter)} className="admin-search-clear">
+                  Clear
                 </Link>
-              )
-            })}
-          </nav>
+              ) : null}
+            </form>
+
+            <nav aria-label="Filter bookings by status" className="admin-filter-chips">
+              {BOOKING_FILTERS.map((f) => {
+                const count = searchedBookings.filter((booking) => f.matches(booking.status)).length
+                const isCurrent = f.key === activeFilter
+                return (
+                  <Link
+                    key={f.key}
+                    href={bookingListHref(f.key, query)}
+                    className={isCurrent ? 'admin-filter-chip admin-filter-chip-active' : 'admin-filter-chip'}
+                    aria-current={isCurrent ? 'true' : undefined}
+                  >
+                    {f.label}
+                    <span className="admin-filter-chip-count">{count}</span>
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
         )}
 
         {bookings.length === 0 ? (
@@ -284,8 +345,8 @@ export default async function BookingsPage({
           />
         ) : visibleBookings.length === 0 ? (
           <AdminEmptyState
-            title={`No ${activeMatcher.label.toLowerCase()} bookings`}
-            desc="Nothing matches this filter right now."
+            title={query ? 'No matching bookings' : `No ${activeMatcher.label.toLowerCase()} bookings`}
+            desc={query ? `Nothing matches “${query}” in this view.` : 'Nothing matches this filter right now.'}
           />
         ) : (
           <div className="admin-table-wrap">
