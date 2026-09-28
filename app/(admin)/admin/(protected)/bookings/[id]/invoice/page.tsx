@@ -6,7 +6,13 @@ import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import { createInvoiceFromBookingAction, restoreInvoiceDraftAction, voidInvoiceAction } from '@/app/actions/invoices'
 import { createBookingPaymentAction } from '@/app/actions/bookings'
 import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
-import { applyInvoiceSnapshot, type InvoiceSnapshotData } from '@/lib/invoices'
+import {
+  DEFAULT_INVOICE_PAYMENT_TERMS,
+  applyInvoiceSnapshot,
+  formatInvoiceDueDate,
+  normalizeInvoiceLineItems,
+  type InvoiceSnapshotData,
+} from '@/lib/invoices'
 import { PAYMENT_METHODS } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
@@ -57,7 +63,7 @@ async function getInvoiceState(id: string): Promise<InvoiceState | null> {
   const supabase = createClient()
   const { data } = await supabase
     .from('invoices')
-    .select('status, invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, sent_at, created_at')
+    .select('status, invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, due_date, payment_terms, line_items, sent_at, created_at')
     .eq('booking_id', id)
     .maybeSingle()
 
@@ -110,6 +116,14 @@ export default async function InvoicePage({
   const total = effectiveBooking.quote ?? 0
   const deposit = effectiveBooking.deposit_amount ?? 0
   const balance = invoiceState ? Number(invoiceState.balance_due ?? total - deposit) : total - deposit
+  const lineItems = normalizeInvoiceLineItems(
+    invoiceState?.line_items,
+    effectiveBooking.event_name ?? 'DJ Services',
+    total
+  )
+  const dueDate = formatInvoiceDueDate(invoiceState?.due_date)
+  const paymentTerms =
+    invoiceState?.payment_terms?.trim() || DEFAULT_INVOICE_PAYMENT_TERMS
 
   const fmt = (n: number) =>
     n.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
@@ -148,6 +162,10 @@ export default async function InvoicePage({
               ? new Date(invoiceState.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
               : '—'}
           </strong>
+        </div>
+        <div>
+          <span className="admin-section-title">Due</span>
+          <strong>{dueDate ?? '—'}</strong>
         </div>
       </div>
 
@@ -226,6 +244,24 @@ export default async function InvoicePage({
           {effectiveBooking.hours   && <Row label="Hours"   value={`${effectiveBooking.hours} hr${effectiveBooking.hours !== 1 ? 's' : ''}`} />}
         </div>
 
+        {/* Line items */}
+        <div className="invoice-preview-lines">
+          <div className="invoice-preview-lines-head">
+            <span>Description</span>
+            <span>Qty</span>
+            <span>Rate</span>
+            <span>Amount</span>
+          </div>
+          {lineItems.map((item, index) => (
+            <div key={`${item.description}-${index}`} className="invoice-preview-line">
+              <strong>{item.description}</strong>
+              <span>{item.quantity}</span>
+              <span>{fmt(item.unit_amount)}</span>
+              <span>{fmt(item.quantity * item.unit_amount)}</span>
+            </div>
+          ))}
+        </div>
+
         {/* Totals */}
         <div style={{
           borderTop: '1px solid var(--border)',
@@ -271,14 +307,10 @@ export default async function InvoicePage({
           </div>
         )}
 
-        <div style={{
-          marginTop: '24px',
-          fontSize: '11px',
-          color: 'rgba(250,248,243,0.3)',
-          borderTop: '1px solid var(--border)',
-          paddingTop: '14px',
-        }}>
-          Balance due on or before the event date. All sales final.
+        <div className="invoice-preview-terms">
+          <span>Payment Terms</span>
+          <p>{paymentTerms}</p>
+          {dueDate && <strong>Due {dueDate}</strong>}
         </div>
       </div>
 
