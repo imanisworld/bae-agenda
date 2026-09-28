@@ -10,7 +10,7 @@ const ClientUpdateSchema = z.object({
   id: z.string().uuid(),
   first_name: z.string().trim().min(1, 'First name is required.').max(120),
   last_name: z.string().trim().max(120).optional().default(''),
-  email: z.string().trim().email('Enter a valid email address.'),
+  email: z.string().trim().email('Enter a valid email address.').or(z.literal('')),
   phone: z.string().trim().max(40).optional().default(''),
   notes: z.string().trim().max(5000).optional().default(''),
 })
@@ -44,7 +44,7 @@ export async function updateClientAction(formData: FormData) {
     .update({
       first_name,
       last_name: last_name || null,
-      email,
+      email: email || null,
       phone: phone || null,
       notes: notes || null,
     })
