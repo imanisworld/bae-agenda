@@ -177,7 +177,7 @@
 
 /* Past events read as archive: desaturated photo. */
 .past .image {
-  filter: brightness(.62) saturate(.35) contrast(1.02);
+  filter: brightness(.72) saturate(.58) contrast(1.06);
 }
 
 
