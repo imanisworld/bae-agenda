@@ -113,6 +113,7 @@ export type Database = {
           fully_paid_email_sent_at: string | null
           post_event_follow_up_sent_at: string | null
           review_request_sent_at: string | null
+          submission_key: string | null
           balance_paid_at: string | null
           payment_method: 'cash' | 'venmo' | 'zelle' | 'cash_app' | 'stripe' | 'check' | 'ach' | 'other' | null
           payment_status: 'unpaid' | 'deposit_requested' | 'deposit_paid' | 'balance_requested' | 'paid'
