@@ -24,8 +24,7 @@ export default async function BookContactSection() {
       <div className={styles.inner}>
         <header className={styles.header}>
           <span>Contact</span>
-          <h2 id="contact-title">Keep it moving.</h2>
-          <p>Booking, collaboration, press, and general contact in one place.</p>
+          <h2 id="contact-title">Contact DJ B.A.E.</h2>
         </header>
 
         <div className={styles.contactRows}>

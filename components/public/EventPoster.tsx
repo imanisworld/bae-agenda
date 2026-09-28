@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { HangingLogo } from '@/components/public/brand/HangingLogo'
 import type { Event } from '@/lib/db/events'
 import { isValidTimeZone } from '@/lib/date-time'
 import styles from './EventPoster.module.css'
@@ -36,6 +37,7 @@ export default function EventPoster({
   headingLevel = 'h3',
   onArchiveClick,
   mediaCount = 0,
+  showHangingLogo = false,
 }: {
   event: Event
   priority?: boolean
@@ -44,6 +46,7 @@ export default function EventPoster({
   headingLevel?: 'h1' | 'h3'
   onArchiveClick?: () => void
   mediaCount?: number
+  showHangingLogo?: boolean
 }) {
   const { dateLabel, timeLabel } = parts(event)
   const Heading = headingLevel
@@ -65,6 +68,9 @@ export default function EventPoster({
         aria-hidden="true"
       />
       <div className={styles.shade} aria-hidden="true" />
+      {showHangingLogo ? (
+        <HangingLogo finish="silver" className={styles.posterTag} />
+      ) : null}
       {onArchiveClick ? (
         <button
           type="button"
