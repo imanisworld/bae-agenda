@@ -1,7 +1,6 @@
 /**
  * ADMIN SIDEBAR
- * Fixed left navigation for all /admin/* routes.
- * Client component — needs usePathname for active link detection.
+ * Branded control-room navigation for protected admin routes.
  */
 'use client'
 
@@ -16,59 +15,44 @@ interface SidebarProps {
   onClose?: () => void
 }
 
+const GLYPHS: Record<string, string> = {
+  Dashboard: 'DB',
+  Bookings: 'BK',
+  Events: 'EV',
+  Mixes: 'LAB',
+  Portfolio: 'WK',
+  Clients: 'CL',
+  Payments: 'PAY',
+  Reviews: 'RV',
+  Content: 'TXT',
+  'W-9': 'W9',
+}
+
 export default function Sidebar({ userEmail, isOpen, onClose }: SidebarProps) {
   const pathname = usePathname()
 
   return (
-    <aside
-      className={`admin-sidebar${isOpen ? ' admin-sidebar--open' : ''}`}
-      style={{
-        width: '240px',
-        background: 'var(--surface)',
-        borderRight: '1px solid var(--border)',
-        display: 'flex',
-        flexDirection: 'column',
-        zIndex: 50,
-        overflowY: 'auto',
-        paddingTop: 'var(--safe-top)',
-        paddingBottom: 'var(--safe-bottom)',
-      }}
-    >
-      <div style={{ padding: '28px 24px 24px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+    <aside className={`admin-sidebar${isOpen ? ' admin-sidebar--open' : ''}`}>
+      <div className="admin-sidebar-brand">
         <div>
-          <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '13px', fontWeight: 600, letterSpacing: '0.2em', color: 'var(--white)', marginBottom: '4px' }}>
-            DJ <span style={{ color: 'var(--violet)' }}>B.A.E.</span>
-          </div>
-          <div style={{ fontSize: '9px', letterSpacing: '0.3em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-            Admin Panel
-          </div>
+          <Link href="/admin/dashboard" className="admin-sidebar-wordmark" onClick={onClose}>
+            DJ <span>B.A.E.</span>
+          </Link>
+          <div className="admin-sidebar-kicker">Control Room</div>
         </div>
         {onClose && (
-          <button
-            onClick={onClose}
-            aria-label="Close navigation"
-            className="admin-sidebar-close"
-            style={{
-              display: 'none',
-              background: 'transparent',
-              border: '1px solid var(--border)',
-              color: 'var(--muted)',
-              width: '32px',
-              height: '32px',
-              cursor: 'pointer',
-              fontSize: '16px',
-              lineHeight: 1,
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-            }}
-          >
-            ✕
+          <button onClick={onClose} aria-label="Close navigation" className="admin-sidebar-close">
+            ×
           </button>
         )}
       </div>
 
-      <nav aria-label="Admin navigation" style={{ flex: 1, padding: '12px 0' }}>
+      <div className="admin-sidebar-status">
+        <span className="admin-sidebar-status-dot" aria-hidden="true" />
+        Private workspace
+      </div>
+
+      <nav aria-label="Admin navigation" className="admin-sidebar-nav">
         {ADMIN_NAV.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -79,68 +63,27 @@ export default function Sidebar({ userEmail, isOpen, onClose }: SidebarProps) {
               key={item.href}
               href={item.href}
               onClick={onClose}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                padding: '11px 24px',
-                fontSize: '12px',
-                letterSpacing: '0.08em',
-                textTransform: 'uppercase',
-                textDecoration: 'none',
-                color: isActive ? 'var(--violet)' : 'var(--muted)',
-                background: isActive ? 'var(--violet-dim)' : 'transparent',
-                borderLeft: isActive ? '2px solid var(--violet)' : '2px solid transparent',
-                transition: 'color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard)',
-                fontWeight: isActive ? 500 : 300,
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--white)'
-                  ;(e.currentTarget as HTMLAnchorElement).style.background = 'rgba(255,255,255,0.03)'
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--muted)'
-                  ;(e.currentTarget as HTMLAnchorElement).style.background = 'transparent'
-                }
-              }}
+              className={`admin-sidebar-link${isActive ? ' admin-sidebar-link--active' : ''}`}
+              aria-current={isActive ? 'page' : undefined}
             >
-              <span aria-hidden="true" style={{ fontSize: '14px', lineHeight: 1 }}>{item.icon}</span>
-              {item.label}
+              <span className="admin-sidebar-glyph" aria-hidden="true">
+                {GLYPHS[item.label] ?? item.label.slice(0, 2).toUpperCase()}
+              </span>
+              <span>{item.label}</span>
             </Link>
           )
         })}
       </nav>
 
-      <div style={{ padding: '16px 24px 24px', borderTop: '1px solid var(--border)' }}>
-        <div
-          style={{ fontSize: '10px', color: 'var(--muted)', letterSpacing: '0.04em', marginBottom: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}
-          title={userEmail}
-        >
+      <div className="admin-sidebar-footer">
+        <Link href="/" className="admin-sidebar-public-link" onClick={onClose}>
+          View public site ↗
+        </Link>
+        <div className="admin-sidebar-email" title={userEmail}>
           {userEmail ?? 'Admin'}
         </div>
         <form action={signOut}>
-          <button
-            type="submit"
-            style={{
-              width: '100%', padding: '9px 12px', background: 'transparent',
-              border: '1px solid var(--border)', color: 'var(--muted)',
-              fontFamily: 'DM Sans, sans-serif', fontSize: '10px',
-              letterSpacing: '0.2em', textTransform: 'uppercase',
-              cursor: 'pointer', textAlign: 'center',
-              transition: 'color var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard)',
-            }}
-            onMouseEnter={(e) => {
-              ;(e.currentTarget as HTMLButtonElement).style.color = '#e85d75'
-              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(232,93,117,0.4)'
-            }}
-            onMouseLeave={(e) => {
-              ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--muted)'
-              ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border)'
-            }}
-          >
+          <button type="submit" className="admin-sidebar-signout">
             Sign Out
           </button>
         </form>
