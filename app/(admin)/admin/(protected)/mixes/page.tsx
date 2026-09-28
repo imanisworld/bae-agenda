@@ -26,7 +26,7 @@ function formatDate(iso: string | null): string {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-    timeZone: 'America/Chicago',
+    timeZone: 'America/Indiana/Indianapolis',
   })
 }
 
@@ -76,7 +76,7 @@ export default async function MixesAdminPage({
         {mixes.length === 0 ? (
           <AdminEmptyState
             title="No mixes yet"
-            desc="Mixes you create here can be published to the Lab page at /lab."
+            desc="Published mixes here provide Lab metadata and a fallback when SoundCloud is unavailable."
             action={{ label: 'Create First Mix', href: '/admin/mixes/new' }}
           />
         ) : (
