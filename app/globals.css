@@ -6,6 +6,8 @@
 
 @import "tailwindcss";
 
+/* Production deployment sync marker — no visual effect. */
+
 /* ---- Local Fonts ----------------------------------------- */
 @font-face {
   font-family: 'Conthrax';
