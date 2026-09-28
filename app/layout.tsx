@@ -19,6 +19,10 @@ export const metadata: Metadata = {
     template: '%s | DJ B.A.E.',
   },
   manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [{ url: '/icon', type: 'image/png', sizes: '512x512' }],
+    apple: [{ url: '/apple-icon', type: 'image/png', sizes: '180x180' }],
+  },
   alternates: {
     canonical: '/',
   },
@@ -40,7 +44,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'THE BAE',
+    title: 'The Bae Agenda',
   },
   metadataBase: new URL('https://thebaeagenda.com'),
 }
