@@ -1,5 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { sendEmailNotification } from './notifications'
+import {
+  sendBookingConfirmedNotification,
+  sendBookingInquiryReceipt,
+  sendEmailNotification,
+} from './notifications'
 
 const message = {
   to: 'real-client@example.com',
@@ -64,6 +68,38 @@ describe('email notification transport', () => {
     const request = fetchMock.mock.calls[0]
     expect(request?.[1]?.headers).toMatchObject({
       'Idempotency-Key': 'invoice-invoice-booking-1-attempt-1',
+    })
+  })
+
+  it('passes manual inquiry and confirmation idempotency keys to Resend', async () => {
+    vi.stubEnv('NEXT_PUBLIC_DEPLOYMENT_ENV', 'production')
+    vi.stubEnv('EMAIL_DELIVERY_MODE', '')
+    vi.stubEnv('RESEND_API_KEY', 'test-key')
+    vi.stubEnv('BOOKING_FROM_EMAIL', 'DJ B.A.E. <bookings@example.com>')
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const basePayload = {
+      firstName: 'Imani',
+      lastName: 'Crumble',
+      email: 'client@example.com',
+      eventName: 'Birthday Party',
+      eventDate: '2026-10-03T23:00:00.000Z',
+      eventTimeZone: 'America/Indiana/Indianapolis',
+    }
+
+    await sendBookingInquiryReceipt(basePayload, {
+      idempotencyKey: 'email-inquiry-receipt-booking-1-attempt-1',
+    })
+    await sendBookingConfirmedNotification(basePayload, {
+      idempotencyKey: 'email-confirmation-booking-1-attempt-2',
+    })
+
+    expect(fetchMock.mock.calls[0]?.[1]?.headers).toMatchObject({
+      'Idempotency-Key': 'email-inquiry-receipt-booking-1-attempt-1',
+    })
+    expect(fetchMock.mock.calls[1]?.[1]?.headers).toMatchObject({
+      'Idempotency-Key': 'email-confirmation-booking-1-attempt-2',
     })
   })
 
