@@ -110,7 +110,7 @@
   top: 25%;
 }
 
-.title > p {
+.location {
   margin: 0 0 14px;
   color: #c4a574;
   font-size: 10px;
@@ -294,7 +294,7 @@
     margin: 0 16px 18px 6%;
   }
 
-  .title > p {
+  .location {
     margin-bottom: 8px;
   }
 
@@ -385,7 +385,7 @@
     text-shadow: 0 2px 18px rgba(0,0,0,.68);
   }
 
-  .title > p {
+  .location {
     color: #d8ba88;
     font-size: 11px;
   }
