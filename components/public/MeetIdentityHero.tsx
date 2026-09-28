@@ -92,7 +92,7 @@ export default function MeetIdentityHero() {
 
         <div className={styles.details}>
           <div className={styles.summary}>
-            Open-format, not random. I move across genres with intention, read the room, and build the set around the people in front of me.
+            I move across genres with intention, read the room, and build the set around the people in front of me.
           </div>
 
           <div className={styles.signals} aria-label="DJ B.A.E. profile highlights">
