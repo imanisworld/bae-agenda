@@ -19,6 +19,17 @@ export type ListeningMix = CrateMix
 const SOUNDCLOUD_PROFILE = 'https://soundcloud.com/deejaybae'
 const SWIPE_THRESHOLD = 40
 
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value))
+}
+
+function shortestAngleDelta(next: number, prev: number) {
+  let delta = next - prev
+  if (delta > 180) delta -= 360
+  if (delta < -180) delta += 360
+  return delta
+}
+
 function formatTime(ms: number) {
   if (!Number.isFinite(ms) || ms <= 0) return '0:00'
   const total = Math.floor(ms / 1000)
@@ -58,8 +69,14 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
   const [crateKey, setCrateKey] = useState<string | null>(null)
   const [focus, setFocus] = useState(0)
   const [shareNote, setShareNote] = useState('')
-  const drag = useRef<{ x: number; moved: boolean } | null>(null)
+  const [draggingCovers, setDraggingCovers] = useState(false)
+  const [scratching, setScratching] = useState(false)
+  const drag = useRef<{ x: number; moved: boolean; pointerId: number } | null>(null)
+  const scratch = useRef<{ pointerId: number; lastAngle: number; moved: boolean } | null>(null)
+  const scratchAngle = useRef(0)
+  const suppressDeckClick = useRef(false)
   const wheelLock = useRef(0)
+  const turntableRef = useRef<HTMLButtonElement | null>(null)
 
   const crate = crates.find((item) => item.key === crateKey) ?? crates[0] ?? null
   const list = crate?.mixes ?? []
@@ -132,22 +149,96 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
     else setFocus(index)
   }
 
-  function onPointerDown(event: React.PointerEvent) {
-    drag.current = { x: event.clientX, moved: false }
+  function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    drag.current = { x: event.clientX, moved: false, pointerId: event.pointerId }
+    setDraggingCovers(true)
+    event.currentTarget.setPointerCapture(event.pointerId)
+    event.currentTarget.style.setProperty('--drag-px', '0px')
   }
 
-  function onPointerMove(event: React.PointerEvent) {
-    if (drag.current && Math.abs(event.clientX - drag.current.x) > 8) drag.current.moved = true
-  }
-
-  function onPointerUp(event: React.PointerEvent) {
+  function onPointerMove(event: React.PointerEvent<HTMLDivElement>) {
     const start = drag.current
-    if (!start) return
+    if (!start || start.pointerId !== event.pointerId) return
     const dx = event.clientX - start.x
-    if (dx > SWIPE_THRESHOLD) move(-1)
-    else if (dx < -SWIPE_THRESHOLD) move(1)
-    // Let the click handler see `moved`, then reset.
+    if (Math.abs(dx) > 8) start.moved = true
+    event.currentTarget.style.setProperty('--drag-px', `${clamp(dx * .55, -86, 86)}px`)
+  }
+
+  function finishCoverDrag(event: React.PointerEvent<HTMLDivElement>, cancelled = false) {
+    const start = drag.current
+    if (!start || start.pointerId !== event.pointerId) return
+    const dx = event.clientX - start.x
+
+    event.currentTarget.style.setProperty('--drag-px', '0px')
+    setDraggingCovers(false)
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+
+    if (!cancelled) {
+      if (dx > SWIPE_THRESHOLD) move(-1)
+      else if (dx < -SWIPE_THRESHOLD) move(1)
+    }
+
     window.setTimeout(() => { drag.current = null }, 0)
+  }
+
+  function recordPointerAngle(event: React.PointerEvent<HTMLSpanElement>) {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const cx = rect.left + rect.width / 2
+    const cy = rect.top + rect.height / 2
+    return Math.atan2(event.clientY - cy, event.clientX - cx) * 180 / Math.PI
+  }
+
+  function onRecordPointerDown(event: React.PointerEvent<HTMLSpanElement>) {
+    event.stopPropagation()
+    scratchAngle.current = 0
+    scratch.current = {
+      pointerId: event.pointerId,
+      lastAngle: recordPointerAngle(event),
+      moved: false,
+    }
+    setScratching(true)
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  function onRecordPointerMove(event: React.PointerEvent<HTMLSpanElement>) {
+    const current = scratch.current
+    if (!current || current.pointerId !== event.pointerId) return
+
+    const angle = recordPointerAngle(event)
+    const delta = shortestAngleDelta(angle, current.lastAngle) * .82
+    current.lastAngle = angle
+    if (Math.abs(delta) > .7) current.moved = true
+
+    scratchAngle.current += delta
+    event.currentTarget.style.setProperty('--scratch-angle', `${scratchAngle.current}deg`)
+    turntableRef.current?.style.setProperty('--scratch-react', `${clamp(delta * .16, -3, 3)}deg`)
+  }
+
+  function finishRecordDrag(event: React.PointerEvent<HTMLSpanElement>) {
+    const current = scratch.current
+    if (!current || current.pointerId !== event.pointerId) return
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+
+    if (current.moved) suppressDeckClick.current = true
+    scratch.current = null
+    scratchAngle.current = 0
+    setScratching(false)
+    event.currentTarget.style.setProperty('--scratch-angle', '0deg')
+    turntableRef.current?.style.setProperty('--scratch-react', '0deg')
+  }
+
+  function onTurntableClick() {
+    if (suppressDeckClick.current) {
+      suppressDeckClick.current = false
+      return
+    }
+    deckToggle()
   }
 
   function onWheel(event: React.WheelEvent) {
@@ -257,7 +348,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
       <div className={styles.crate}>
         <div
           key={crate?.key}
-          className={styles.coverflow}
+          className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}`}
           role="listbox"
           aria-label={`${crate?.label ?? 'Mixes'} — use arrow keys or swipe to browse`}
           aria-activedescendant={focused ? `lab-cover-${focused.id}` : undefined}
@@ -265,8 +356,8 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
           onKeyDown={onCrateKeyDown}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={() => { drag.current = null }}
+          onPointerUp={(event) => finishCoverDrag(event)}
+          onPointerCancel={(event) => finishCoverDrag(event, true)}
           onWheel={onWheel}
         >
           {list.map((mix, index) => {
@@ -315,24 +406,32 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
       </div>
 
       {/* ── Deck: picture-disc turntable + transport ── */}
-      <div className={styles.deck}>
+      <div className={`${styles.deck}${playing ? ` ${styles.deckPlaying}` : ''}`}>
         <button
+          ref={turntableRef}
           type="button"
-          className={styles.turntable}
-          onClick={deckToggle}
+          className={`${styles.turntable}${scratching ? ` ${styles.turntableScratching}` : ''}`}
+          onClick={onTurntableClick}
           disabled={!canPlay}
           aria-label={playing ? `Pause ${loaded.title}` : `Play ${loaded.title}`}
         >
           <span className={styles.platter}>
             <span
               key={loaded.id}
-              className={`${styles.record}${playing ? ` ${styles.spinning}` : ''}`}
+              className={styles.recordGrip}
+              onPointerDown={onRecordPointerDown}
+              onPointerMove={onRecordPointerMove}
+              onPointerUp={finishRecordDrag}
+              onPointerCancel={finishRecordDrag}
+              aria-hidden="true"
             >
-              {loaded.cover_url ? (
-                <Image src={loaded.cover_url} alt="" fill sizes="(max-width: 620px) 40vw, 320px" quality={90} />
-              ) : null}
-              <span className={styles.grooves} aria-hidden="true" />
-              <span className={styles.hole} aria-hidden="true" />
+              <span className={`${styles.record}${playing ? ` ${styles.spinning}` : ''}`}>
+                {loaded.cover_url ? (
+                  <Image src={loaded.cover_url} alt="" fill sizes="(max-width: 620px) 40vw, 320px" quality={90} draggable={false} />
+                ) : null}
+                <span className={styles.grooves} aria-hidden="true" />
+                <span className={styles.hole} aria-hidden="true" />
+              </span>
             </span>
           </span>
           <span className={`${styles.tonearm}${onPlatter ? ` ${styles.tonearmOn}` : ''}`} aria-hidden="true">
