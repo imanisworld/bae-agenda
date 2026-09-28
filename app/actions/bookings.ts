@@ -73,6 +73,16 @@ function parseDateTimeLocal(value: FormDataEntryValue | null) {
   }
 }
 
+function addCalendarDay(dateValue: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateValue)
+  if (!match) return null
+
+  const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])))
+  if (Number.isNaN(date.getTime())) return null
+  date.setUTCDate(date.getUTCDate() + 1)
+  return date.toISOString().slice(0, 10)
+}
+
 function parseOptionalNumber(value: FormDataEntryValue | null): number | null {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -790,7 +800,7 @@ export async function createAdminBookingAction(formData: FormData) {
     redirectWithError(returnPath, 'Enter a valid event date and start time.')
   }
 
-  const eventEndIso = eventEndTime
+  let eventEndIso = eventEndTime
     ? toEventISO(eventDate, eventTimeZone, eventEndTime)
     : null
 
@@ -798,8 +808,13 @@ export async function createAdminBookingAction(formData: FormData) {
     redirectWithError(returnPath, 'Enter a valid event end time.')
   }
 
-  if (eventEndIso && new Date(eventEndIso).getTime() <= new Date(eventDateIso).getTime()) {
-    redirectWithError(returnPath, 'Event end time must be after the start time.')
+  if (eventEndTime && eventEndIso && new Date(eventEndIso).getTime() <= new Date(eventDateIso).getTime()) {
+    const nextDate = addCalendarDay(eventDate)
+    eventEndIso = nextDate ? toEventISO(nextDate, eventTimeZone, eventEndTime) : null
+  }
+
+  if (eventEndTime && !eventEndIso) {
+    redirectWithError(returnPath, 'Enter a valid event end time.')
   }
 
   if (hours !== null && hours <= 0) {
@@ -1070,31 +1085,47 @@ export async function createEventFromBookingAction(formData: FormData) {
     redirectWithError('/admin/bookings', 'Only confirmed bookings can be turned into events.')
   }
 
-  const { data: existingEvent, error: existingEventError } = await admin
+  const { data: linkedEvent, error: linkedEventError } = await admin
     .from('events')
-    .select('id, booking_id')
+    .select('id')
+    .eq('booking_id', source.id)
+    .maybeSingle()
+
+  if (linkedEventError) {
+    redirectWithError('/admin/bookings', 'Could not verify whether this booking already has a linked event.')
+  }
+
+  if (linkedEvent?.id) {
+    redirect(`/admin/events/${linkedEvent.id}`)
+  }
+
+  // Legacy fallback: only adopt an older event when it is currently unlinked.
+  // Once booking_id exists, that relationship is authoritative.
+  const { data: legacyEvent, error: legacyEventError } = await admin
+    .from('events')
+    .select('id')
+    .is('booking_id', null)
     .eq('title', source.event_name)
     .eq('event_date', source.event_date)
     .limit(1)
     .maybeSingle()
 
-  if (existingEventError) {
-    redirectWithError('/admin/bookings', 'Could not verify whether this booking already has an event.')
+  if (legacyEventError) {
+    redirectWithError('/admin/bookings', 'Could not verify whether an older matching event can be linked.')
   }
 
-  if (existingEvent?.id) {
-    if (!existingEvent.booking_id) {
-      const { error: linkError } = await admin
-        .from('events')
-        .update({ booking_id: source.id })
-        .eq('id', existingEvent.id)
+  if (legacyEvent?.id) {
+    const { error: linkError } = await admin
+      .from('events')
+      .update({ booking_id: source.id })
+      .eq('id', legacyEvent.id)
+      .is('booking_id', null)
 
-      if (linkError) {
-        redirectWithError('/admin/bookings', linkError.message || 'Unable to link the existing event to this booking.')
-      }
+    if (linkError) {
+      redirectWithError('/admin/bookings', linkError.message || 'Unable to link the existing event to this booking.')
     }
 
-    redirect(`/admin/events/${existingEvent.id}`)
+    redirect(`/admin/events/${legacyEvent.id}`)
   }
 
   const { data: createdEvent, error: createError } = await admin
