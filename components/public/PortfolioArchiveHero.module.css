@@ -109,7 +109,12 @@
   top: 50%;
   width: min(42vw, 560px);
   transform: translateY(-58%);
-  pointer-events: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  appearance: none;
 }
 
 .logoBounce {
@@ -138,6 +143,29 @@
 @keyframes logo-bounce-shadow {
   from { scale: 1; opacity: 1; }
   to   { scale: .72; opacity: .55; }
+}
+
+.logoKicked .logoBounce {
+  animation: logo-kick .9s cubic-bezier(.18,.8,.22,1) both;
+}
+
+.logoKicked .logoShadow {
+  animation: logo-kick-shadow .9s cubic-bezier(.18,.8,.22,1) both;
+}
+
+@keyframes logo-kick {
+  0% { transform: translateY(0) rotate(0deg) scale(1); }
+  25% { transform: translateY(-34px) rotate(8deg) scale(1.04,.96); }
+  50% { transform: translateY(7px) rotate(-5deg) scale(.96,1.04); }
+  72% { transform: translateY(-12px) rotate(3deg) scale(1.02,.98); }
+  100% { transform: translateY(0) rotate(0deg) scale(1); }
+}
+
+@keyframes logo-kick-shadow {
+  0%, 100% { scale: 1; opacity: 1; }
+  25% { scale: .58; opacity: .38; }
+  50% { scale: 1.08; opacity: .9; }
+  72% { scale: .78; opacity: .62; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -333,6 +361,8 @@
 
 
 .printOpen {
+  --print-rx: 0deg;
+  --print-ry: 0deg;
   display: block;
   width: 100%;
   padding: 0;
@@ -341,6 +371,17 @@
   color: inherit;
   text-align: left;
   cursor: pointer;
+  transform:
+    perspective(900px)
+    rotateX(var(--print-rx))
+    rotateY(var(--print-ry));
+  transform-style: preserve-3d;
+  transition: transform 220ms cubic-bezier(.2,.7,.2,1);
+}
+
+.printOpen:active {
+  scale: .975;
+  translate: 0 4px;
 }
 
 .printOpen:disabled {
@@ -350,4 +391,30 @@
 .printOpen:focus-visible {
   outline: 2px solid rgba(196,165,116,.82);
   outline-offset: 4px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .print:hover {
+    z-index: 6;
+  }
+
+  .printOpen:hover {
+    translate: 0 -5px;
+  }
+
+  .logoSpin:hover .logoBounce {
+    filter: drop-shadow(0 18px 22px rgba(0,0,0,.42));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logoKicked .logoBounce,
+  .logoKicked .logoShadow {
+    animation: none;
+  }
+
+  .printOpen {
+    transform: none;
+    transition: none;
+  }
 }
