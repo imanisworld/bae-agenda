@@ -211,6 +211,15 @@ export default async function InvoicesPage({
                               className="admin-btn-ghost"
                               label={invoice.sent_at ? 'Resend' : 'Send'}
                             />
+                            {invoice.status === 'sent' && Number(invoice.balance_due ?? 0) > 0 && (
+                              <SendInvoiceButton
+                                bookingId={invoice.booking_id}
+                                clientEmail={invoice.client_email}
+                                className="admin-btn-ghost"
+                                label="Reminder"
+                                mode="reminder"
+                              />
+                            )}
                             <form action={voidInvoiceAction}>
                               <input type="hidden" name="booking_id" value={invoice.booking_id} />
                               <button type="submit" className="admin-btn-danger">
