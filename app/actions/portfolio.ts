@@ -6,6 +6,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { createClient } from '@/lib/supabase/server'
 import { requireAdminUser } from '@/lib/admin-auth'
 
+const MEDIA_BUCKET = 'site-media'
+
 export interface PortfolioEntry {
   id:         string
   event_name: string
@@ -244,9 +246,22 @@ export async function deletePortfolioEntryAction(formData: FormData) {
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/portfolio', 'Missing entry id.')
 
+  const { data: storedMedia } = await admin
+    .from('portfolio_media')
+    .select('storage_path')
+    .eq('portfolio_entry_id', id)
+
   const { error } = await admin.from('portfolio_entries').delete().eq('id', id)
   if (error) {
     redirectWithError('/admin/portfolio', error.message || 'Unable to delete entry.')
+  }
+
+  const storagePaths = (storedMedia ?? [])
+    .map((item: { storage_path: string | null }) => item.storage_path)
+    .filter((path): path is string => Boolean(path))
+
+  if (storagePaths.length) {
+    await admin.storage.from(MEDIA_BUCKET).remove(storagePaths)
   }
 
   revalidatePath('/admin/portfolio')
@@ -380,6 +395,13 @@ export async function deletePortfolioMediaAction(formData: FormData) {
     redirectWithError('/admin/portfolio', 'Missing portfolio media id.')
   }
 
+  const { data: mediaRow } = await admin
+    .from('portfolio_media')
+    .select('storage_path')
+    .eq('id', mediaId)
+    .eq('portfolio_entry_id', entryId)
+    .maybeSingle()
+
   const { error } = await admin
     .from('portfolio_media')
     .delete()
@@ -388,6 +410,10 @@ export async function deletePortfolioMediaAction(formData: FormData) {
 
   if (error) {
     redirectWithError(`/admin/portfolio/${entryId}`, error.message || 'Unable to remove portfolio media.')
+  }
+
+  if (mediaRow?.storage_path) {
+    await admin.storage.from(MEDIA_BUCKET).remove([mediaRow.storage_path])
   }
 
   revalidatePath(`/admin/portfolio/${entryId}`)
