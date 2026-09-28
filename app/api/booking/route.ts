@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { checkBookingAvailability } from "@/lib/booking-availability";
@@ -116,6 +117,25 @@ const BookingSchema = z.object({
 function optionalString(value?: string) {
   const trimmed = value?.trim();
   return trimmed ? trimmed : null;
+}
+
+function bookingSubmissionKey(data: {
+  email: string;
+  eventName: string;
+  eventDate: string;
+  startedAt?: string;
+}) {
+  const startedAt = data.startedAt?.trim();
+  if (!startedAt) return null;
+
+  return createHash("sha256")
+    .update([
+      data.email.trim().toLowerCase(),
+      data.eventName.trim().toLowerCase(),
+      data.eventDate.trim(),
+      startedAt,
+    ].join("|"))
+    .digest("hex");
 }
 
 function flattenFieldErrors(fieldErrors: Record<string, string[] | undefined>) {
@@ -245,6 +265,8 @@ export async function POST(req: NextRequest) {
       ? toEventISO(data.eventDate, data.timeZone, data.eventEndTime.trim())
       : null;
 
+    const submissionKey = bookingSubmissionKey(data);
+
     const { data: booking, error: bookingError } = await admin
       .from("bookings")
       .insert({
@@ -261,11 +283,27 @@ export async function POST(req: NextRequest) {
         status: "inquiry",
         terms_accepted_at: new Date().toISOString(),
         terms_version: "2026-09-28",
+        submission_key: submissionKey,
       })
       .select("id")
       .single();
 
     if (bookingError || !booking?.id) {
+      if (bookingError?.code === "23505" && submissionKey) {
+        const { data: existing } = await admin
+          .from("bookings")
+          .select("id")
+          .eq("submission_key", submissionKey)
+          .maybeSingle();
+
+        if (existing?.id) {
+          return NextResponse.json(
+            { success: true, message: "Booking request received! You'll hear back within 24–48 hours." },
+            { status: 200 }
+          );
+        }
+      }
+
       console.error("[booking] booking insert error:", bookingError);
       return NextResponse.json({ error: "Unable to save your booking request. Please try again." }, { status: 500 });
     }
