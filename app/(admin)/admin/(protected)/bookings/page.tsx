@@ -6,6 +6,7 @@ import PageHeader      from '@/components/admin/PageHeader'
 import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import AdminNotice     from '@/components/admin/AdminNotice'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { createEventFromBookingAction, updateBookingStatusAction } from '@/app/actions/bookings'
 import { getPrimaryBookingClient } from '@/lib/booking-client'
 import { getDepositStatus } from '@/lib/booking-deposit'
@@ -340,23 +341,48 @@ export default async function BookingsPage({
                         <details className="booking-actions-menu">
                           <summary className="booking-actions-trigger" aria-label="More actions">•••</summary>
                           <div className="booking-actions-popover">
-                            {getBookingActions(b.status).map((action) => (
-                              <form key={action.nextStatus} action={updateBookingStatusAction}>
-                                <input type="hidden" name="id" value={b.id} />
-                                <input type="hidden" name="next_status" value={action.nextStatus} />
-                                <button
-                                  type="submit"
-                                  className="booking-actions-item"
-                                  style={
-                                    action.tone === 'danger'
-                                      ? { color: '#e85d75' }
-                                      : undefined
-                                  }
-                                >
-                                  {action.label}
-                                </button>
-                              </form>
-                            ))}
+                            {getBookingActions(b.status).map((action) => {
+                              const confirmationMessage =
+                                action.nextStatus === 'confirmed'
+                                  ? 'Confirm this booking? This can send the confirmation email and prepare the invoice draft.'
+                                  : action.nextStatus === 'completed'
+                                    ? 'Mark this booking complete? This can trigger the post-event follow-up.'
+                                    : action.nextStatus === 'cancelled'
+                                      ? 'Cancel this booking?'
+                                      : null
+
+                              return (
+                                <form key={action.nextStatus} action={updateBookingStatusAction}>
+                                  <input type="hidden" name="id" value={b.id} />
+                                  <input type="hidden" name="next_status" value={action.nextStatus} />
+                                  {confirmationMessage ? (
+                                    <ConfirmSubmitButton
+                                      message={confirmationMessage}
+                                      className="booking-actions-item"
+                                      style={
+                                        action.tone === 'danger'
+                                          ? { color: '#e85d75' }
+                                          : undefined
+                                      }
+                                    >
+                                      {action.label}
+                                    </ConfirmSubmitButton>
+                                  ) : (
+                                    <button
+                                      type="submit"
+                                      className="booking-actions-item"
+                                      style={
+                                        action.tone === 'danger'
+                                          ? { color: '#e85d75' }
+                                          : undefined
+                                      }
+                                    >
+                                      {action.label}
+                                    </button>
+                                  )}
+                                </form>
+                              )
+                            })}
                             {b.linked_event_id ? (
                               <Link href={`/admin/events/${b.linked_event_id}`} className="booking-actions-item">
                                 View Event
