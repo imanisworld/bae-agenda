@@ -57,7 +57,7 @@ export default function Nav() {
         {/* The logo now hangs from each page's own art (see brand/HangingLogo). */}
         <span aria-hidden="true" />
         <span className={styles.route}>{routeLabel}</span>
-        <NowPlayingPill fallback={<span className={styles.status}>Indianapolis</span>} />
+        <NowPlayingPill fallback={null} />
       </div>
 
       <div className={styles.dockWrap}>
