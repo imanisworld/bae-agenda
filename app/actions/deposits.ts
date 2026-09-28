@@ -17,11 +17,11 @@ function optionalString(value: FormDataEntryValue | null) {
   return trimmed.length ? trimmed : null
 }
 
-function redirectToPay(bookingId: string, message: string, key: 'error' | 'success' = 'error') {
+function redirectToPay(bookingId: string, message: string, key: 'error' | 'success' = 'error'): never {
   redirect(`/pay/${bookingId}?${key}=${encodeURIComponent(message)}`)
 }
 
-function redirectToAdmin(bookingId: string, message: string, key: 'error' | 'success' = 'error') {
+function redirectToAdmin(bookingId: string, message: string, key: 'error' | 'success' = 'error'): never {
   redirect(`/admin/bookings/${bookingId}?${key}=${encodeURIComponent(message)}`)
 }
 
@@ -66,8 +66,13 @@ async function getBookingDepositCheckoutSource(bookingId: string) {
 
 export async function startStripeDepositCheckoutAction(formData: FormData) {
   const bookingId = optionalString(formData.get('booking_id'))
+  const checkoutAttemptId = optionalString(formData.get('checkout_attempt_id'))
   if (!bookingId) {
     redirect('/book')
+  }
+
+  if (!checkoutAttemptId || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(checkoutAttemptId)) {
+    redirectToPay(bookingId as string, 'Refresh the page and try Stripe Checkout again.')
   }
 
   const loaded = await getBookingDepositCheckoutSource(bookingId as string)
@@ -88,6 +93,8 @@ export async function startStripeDepositCheckoutAction(formData: FormData) {
   if (outstandingDeposit <= 0) {
     redirectToPay(bookingId as string, 'This deposit is already covered.', 'success')
   }
+
+  let checkoutUrl: string
 
   try {
     const stripe = getStripeClient()
@@ -120,16 +127,19 @@ export async function startStripeDepositCheckoutAction(formData: FormData) {
           },
         },
       ],
+    }, {
+      idempotencyKey: `deposit-checkout:${bookingId}:${checkoutAttemptId}`,
     })
 
     await updateBookingDepositCheckoutSnapshot(admin, bookingId as string, session.id)
-
     revalidatePath(`/pay/${bookingId}`)
-    redirect(session.url ?? `/pay/${bookingId}`)
+    checkoutUrl = session.url ?? `/pay/${bookingId}`
   } catch (error) {
     console.error('[deposit-checkout] unable to create session:', error)
     redirectToPay(bookingId as string, 'Stripe checkout is not ready yet. Please try again shortly or use the manual payment option.')
   }
+
+  redirect(checkoutUrl)
 }
 
 const MANUAL_METHODS: PaymentMethod[] = ['zelle', 'cash_app']
@@ -141,6 +151,7 @@ export async function confirmManualDepositAction(formData: FormData) {
   const bookingId = optionalString(formData.get('booking_id'))
   const method = optionalString(formData.get('method'))
   const notes = optionalString(formData.get('notes'))
+  const confirmationId = optionalString(formData.get('confirmation_id'))
 
   if (!bookingId) {
     redirect('/admin/bookings')
@@ -149,6 +160,12 @@ export async function confirmManualDepositAction(formData: FormData) {
   if (!method || !MANUAL_METHODS.includes(method as PaymentMethod)) {
     redirectToAdmin(bookingId as string, 'Choose Zelle or Cash App before confirming the deposit.')
   }
+
+  if (!confirmationId || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(confirmationId)) {
+    redirectToAdmin(bookingId as string, 'Refresh the page and try confirming the deposit again.')
+  }
+
+  const externalReference = `manual-deposit:${bookingId}:${confirmationId}`
 
   const { data: booking, error } = await admin
     .from('bookings')
@@ -180,10 +197,36 @@ export async function confirmManualDepositAction(formData: FormData) {
       method,
       status: 'received',
       paid_at: new Date().toISOString(),
+      external_reference: externalReference,
       notes: notes ?? `Manual ${methodLabel} deposit confirmation.`,
     })
 
   if (paymentError) {
+    if (paymentError.code === '23505') {
+      const { data: existingPayment } = await admin
+        .from('payments')
+        .select('id')
+        .eq('external_reference', externalReference)
+        .maybeSingle()
+
+      if (existingPayment?.id) {
+        await syncBookingDepositState(admin, bookingId as string)
+        await syncComputedBookingPaymentState(admin, bookingId as string)
+
+        await admin
+          .from('bookings')
+          .update({ payment_method: method })
+          .eq('id', bookingId as string)
+
+        revalidatePath(`/admin/bookings/${bookingId}`)
+        revalidatePath('/admin/bookings')
+        revalidatePath('/admin/payments')
+        revalidatePath('/admin/dashboard')
+        revalidatePath(`/pay/${bookingId}`)
+        redirectToAdmin(bookingId as string, `${methodLabel} deposit was already confirmed.`, 'success')
+      }
+    }
+
     redirectToAdmin(bookingId as string, paymentError.message || 'Unable to confirm the manual deposit.')
   }
 

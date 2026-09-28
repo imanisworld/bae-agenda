@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
@@ -230,6 +231,16 @@ export default async function EditBookingPage({
 
   const errorMessage = getMessage(resolvedSearchParams?.error)
   const successMessage = getMessage(resolvedSearchParams?.success)
+  const manualDepositConfirmationId = randomUUID()
+  const paymentLogAttemptId = randomUUID()
+  const markDepositAttemptId = randomUUID()
+  const markFullyPaidAttemptId = randomUUID()
+  const inquiryReceiptEmailAttemptId = randomUUID()
+  const confirmationEmailAttemptId = randomUUID()
+  const balanceReminderEmailAttemptId = randomUUID()
+  const finalPaymentEmailAttemptId = randomUUID()
+  const postEventEmailAttemptId = randomUUID()
+  const reviewRequestEmailAttemptId = randomUUID()
 
   const clientName = booking.clients
     ? `${booking.clients.first_name ?? ''} ${booking.clients.last_name ?? ''}`.trim()
@@ -361,6 +372,7 @@ export default async function EditBookingPage({
             {lifecycleStatus === 'confirmed' && paymentStatus === 'deposit_requested' && (
               <form action={markDepositReceivedAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
+                <input type="hidden" name="payment_attempt_id" value={markDepositAttemptId} />
                 <ConfirmSubmitButton
                   message="Record the outstanding deposit as received?"
                   className="admin-btn-primary"
@@ -373,6 +385,7 @@ export default async function EditBookingPage({
             {lifecycleStatus === 'confirmed' && paymentStatus === 'deposit_paid' && (
               <form action={requestFinalPaymentAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
+                <input type="hidden" name="email_attempt_id" value={finalPaymentEmailAttemptId} />
                 <ConfirmSubmitButton
                   message="Send the final payment reminder to the client now?"
                   className="admin-btn-primary"
@@ -385,6 +398,7 @@ export default async function EditBookingPage({
             {lifecycleStatus === 'confirmed' && paymentStatus === 'balance_requested' && (
               <form action={markFullyPaidAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
+                <input type="hidden" name="payment_attempt_id" value={markFullyPaidAttemptId} />
                 <ConfirmSubmitButton
                   message="Record the remaining balance as received and mark this booking fully paid?"
                   className="admin-btn-primary"
@@ -651,6 +665,7 @@ export default async function EditBookingPage({
 
           <form action={confirmManualDepositAction} style={{ border: '1px solid var(--border)', background: 'var(--bg-sunken)', padding: '16px', display: 'grid', gap: '12px' }}>
             <input type="hidden" name="booking_id" value={booking.id} />
+            <input type="hidden" name="confirmation_id" value={manualDepositConfirmationId} />
             <div className="admin-section-title">Manual Deposit Confirm</div>
             <div className="admin-form-grid-two">
               <label style={{ display: 'grid', gap: '7px' }}>
@@ -803,6 +818,7 @@ export default async function EditBookingPage({
 
         <form action={createBookingPaymentAction} style={{ marginTop: '20px', display: 'grid', gap: '14px' }}>
           <input type="hidden" name="booking_id" value={booking.id} />
+          <input type="hidden" name="payment_attempt_id" value={paymentLogAttemptId} />
           <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Amount *</span>
@@ -872,6 +888,7 @@ export default async function EditBookingPage({
           <div className="admin-form-actions">
             <form action={resendBookingInquiryReceiptAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
+              <input type="hidden" name="email_attempt_id" value={inquiryReceiptEmailAttemptId} />
               <button
                 type="submit"
                 className="admin-btn-ghost"
@@ -884,6 +901,7 @@ export default async function EditBookingPage({
             </form>
             <form action={resendBookingConfirmationAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
+              <input type="hidden" name="email_attempt_id" value={confirmationEmailAttemptId} />
               <button
                 type="submit"
                 className="admin-btn-ghost"
@@ -906,6 +924,7 @@ export default async function EditBookingPage({
             </form>
             <form action={sendBookingBalanceReminderAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
+              <input type="hidden" name="email_attempt_id" value={balanceReminderEmailAttemptId} />
               <button
                 type="submit"
                 className="admin-btn-ghost"
@@ -928,6 +947,7 @@ export default async function EditBookingPage({
             </form>
             <form action={resendBookingPostEventFollowUpAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
+              <input type="hidden" name="email_attempt_id" value={postEventEmailAttemptId} />
               <button
                 type="submit"
                 className="admin-btn-ghost"
@@ -950,6 +970,7 @@ export default async function EditBookingPage({
             </form>
             <form action={sendBookingReviewRequestAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
+              <input type="hidden" name="email_attempt_id" value={reviewRequestEmailAttemptId} />
               <button
                 type="submit"
                 className="admin-btn-ghost"

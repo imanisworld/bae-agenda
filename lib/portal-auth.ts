@@ -133,27 +133,36 @@ export async function verifyPortalCode(phone: string, code: string) {
     return null
   }
 
-  const token = generatePortalToken()
-  const tokenHash = hashValue(token)
-
-  const [{ error: consumeError }, { error: sessionError }] = await Promise.all([
-    admin
-      .from('client_portal_codes')
-      .update({ consumed_at: new Date().toISOString() })
-      .eq('id', data.id),
-    admin
-      .from('client_portal_sessions')
-      .insert({
-        client_id: client.id,
-        token_hash: tokenHash,
-        expires_at: nowPlusDays(PORTAL_SESSION_TTL_DAYS).toISOString(),
-        last_seen_at: new Date().toISOString(),
-      }),
-  ])
+  const consumedAt = new Date().toISOString()
+  const { data: consumedCode, error: consumeError } = await admin
+    .from('client_portal_codes')
+    .update({ consumed_at: consumedAt })
+    .eq('id', data.id)
+    .is('consumed_at', null)
+    .select('id')
+    .maybeSingle()
 
   if (consumeError) {
     throw new Error(consumeError.message || 'Unable to consume portal code.')
   }
+
+  // A concurrent verification may have consumed the code after we read it.
+  // Only the request that successfully claims the unconsumed row may create a session.
+  if (!consumedCode?.id) {
+    return null
+  }
+
+  const token = generatePortalToken()
+  const tokenHash = hashValue(token)
+
+  const { error: sessionError } = await admin
+    .from('client_portal_sessions')
+    .insert({
+      client_id: client.id,
+      token_hash: tokenHash,
+      expires_at: nowPlusDays(PORTAL_SESSION_TTL_DAYS).toISOString(),
+      last_seen_at: new Date().toISOString(),
+    })
 
   if (sessionError) {
     throw new Error(sessionError.message || 'Unable to create portal session.')

@@ -1,11 +1,15 @@
 /**
- * DATABASE TYPES — Canonical schema definition
+ * DATABASE TYPES — Application-facing Supabase types
  *
- * This file is the source of truth until the Supabase project is live.
- * Once the database is set up and migrations are run, REPLACE this file with:
- *   npx supabase gen types typescript --project-id YOUR_PROJECT_ID > types/database.ts
+ * Production Supabase is live. Database migrations are the schema source of truth;
+ * this file mirrors the fields the application reads and writes.
  *
- * ⚠️  Keep this file in sync with supabase/migrations/
+ * When schema changes land:
+ * 1. add/apply the matching migration
+ * 2. update or regenerate these types in the same change
+ * 3. keep legacy/nullable fields compatible where migrations are intentionally additive
+ *
+ * Do not treat this file alone as a database migration.
  */
 
 export type Json =

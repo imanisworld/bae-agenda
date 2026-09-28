@@ -39,25 +39,29 @@ export async function POST(request: NextRequest) {
     if (bookingId) {
       const admin = createAdminClient()
       const amountTotal = typeof session.amount_total === 'number' ? session.amount_total / 100 : 0
-      const paidAt = new Date().toISOString()
+      const paidAt = typeof event.created === 'number'
+        ? new Date(event.created * 1000).toISOString()
+        : new Date().toISOString()
       const reference = session.id
 
       const { data: existingPayment, error: existingPaymentError } = await admin
         .from('payments')
-        .select('id')
+        .select('id, status, paid_at')
         .eq('external_reference', reference)
         .maybeSingle()
 
       const canUseExternalReference = !(existingPaymentError?.message ?? '').includes('column payments.external_reference does not exist')
+
+      const alreadyReceived = existingPayment?.status === 'received'
 
       if (existingPayment?.id) {
         await admin
           .from('payments')
           .update({
             status: 'received',
-            paid_at: paidAt,
             amount: amountTotal,
             method: 'stripe',
+            ...(existingPayment.paid_at ? {} : { paid_at: paidAt }),
           })
           .eq('id', existingPayment.id)
       } else {
@@ -75,12 +79,14 @@ export async function POST(request: NextRequest) {
           })
       }
 
-      await admin
-        .from('notes')
-        .insert({
-          booking_id: bookingId,
-          body: `Stripe deposit confirmed via webhook for $${amountTotal.toFixed(2)}.`,
-        })
+      if (!alreadyReceived) {
+        await admin
+          .from('notes')
+          .insert({
+            booking_id: bookingId,
+            body: `Stripe deposit confirmed via webhook for ${amountTotal.toFixed(2)}.`,
+          })
+      }
 
       await syncBookingDepositState(admin, bookingId)
       await syncComputedBookingPaymentState(admin, bookingId)
