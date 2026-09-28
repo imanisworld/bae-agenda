@@ -35,11 +35,25 @@ function readCache(): { crates: Crate[]; fresh: boolean } | null {
     if (!raw) return null
     const parsed = JSON.parse(raw) as { at: number; crates: Crate[] }
     const age = Date.now() - parsed.at
-    if (!Array.isArray(parsed.crates) || age > CACHE_MAX_AGE_MS) return null
     const expected = LAB_CRATES.map((crate) => crate.url).join('|')
-    if (parsed.crates.map((crate) => crate.url).join('|') !== expected) return null
+    const valid =
+      Array.isArray(parsed.crates) &&
+      Number.isFinite(parsed.at) &&
+      age <= CACHE_MAX_AGE_MS &&
+      parsed.crates.map((crate) => crate.url).join('|') === expected
+
+    if (!valid) {
+      window.localStorage.removeItem(CACHE_KEY)
+      return null
+    }
+
     return { crates: parsed.crates, fresh: age <= CACHE_FRESH_MS }
   } catch {
+    try {
+      window.localStorage.removeItem(CACHE_KEY)
+    } catch {
+      // Ignore storage access failures.
+    }
     return null
   }
 }

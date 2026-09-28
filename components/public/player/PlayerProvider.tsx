@@ -225,15 +225,26 @@ export default function PlayerProvider({ children }: { children: React.ReactNode
   useEffect(() => {
     if (!frameSrc || widgetRef.current) return
     let cancelled = false
+    let boundWidget: SoundCloudWidget | null = null
+    const boundEvents: string[] = []
 
     loadSoundCloudApi().then((SC) => {
       if (cancelled || !iframeRef.current || widgetRef.current) return
       const widget = SC.Widget(iframeRef.current)
       widgetRef.current = widget
+      boundWidget = widget
       const events = SC.Widget.Events ?? {}
+      const bind = (
+        eventName: string | undefined,
+        listener: (event?: { currentPosition?: number }) => void,
+      ) => {
+        if (!eventName) return
+        widget.bind(eventName, listener)
+        boundEvents.push(eventName)
+      }
 
       if (events.READY) {
-        widget.bind(events.READY, () => {
+        bind(events.READY, () => {
           readyRef.current = true
           refreshSoundInfo()
           const pending = pendingPlayRef.current
@@ -244,14 +255,14 @@ export default function PlayerProvider({ children }: { children: React.ReactNode
         })
       }
       if (events.PLAY) {
-        widget.bind(events.PLAY, () => {
+        bind(events.PLAY, () => {
           setStatus('playing')
           refreshSoundInfo()
         })
       }
-      if (events.PAUSE) widget.bind(events.PAUSE, () => setStatus('paused'))
+      if (events.PAUSE) bind(events.PAUSE, () => setStatus('paused'))
       if (events.FINISH) {
-        widget.bind(events.FINISH, () => {
+        bind(events.FINISH, () => {
           setStatus('paused')
           if (queueRef.current.length > 1) nextRef.current()
         })
@@ -260,7 +271,7 @@ export default function PlayerProvider({ children }: { children: React.ReactNode
         // SoundCloud reports progress many times a second; a clock only needs
         // ~4 updates a second, and each update re-renders every player consumer.
         let lastTick = 0
-        widget.bind(events.PLAY_PROGRESS, (event) => {
+        bind(events.PLAY_PROGRESS, (event) => {
           const now = performance.now()
           if (now - lastTick < 250 || typeof event?.currentPosition !== 'number') return
           lastTick = now
@@ -271,7 +282,14 @@ export default function PlayerProvider({ children }: { children: React.ReactNode
       // Audio simply stays unavailable; the Lab shows its SoundCloud link.
     })
 
-    return () => { cancelled = true }
+    return () => {
+      cancelled = true
+      if (boundWidget) {
+        for (const eventName of boundEvents) boundWidget.unbind(eventName)
+        if (widgetRef.current === boundWidget) widgetRef.current = null
+      }
+      readyRef.current = false
+    }
   }, [frameSrc, refreshSoundInfo, loadAndPlay])
 
   const permalink = soundPermalink || permalinkFor(current?.embed_url ?? null)
