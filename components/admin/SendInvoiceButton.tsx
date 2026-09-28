@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 
 type Props = {
@@ -20,6 +20,7 @@ export default function SendInvoiceButton({
 }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const sendAttemptRef = useRef<string | null>(null)
   const [status, setStatus] = useState<{ tone: 'idle' | 'success' | 'error'; message: string }>({
     tone: 'idle',
     message: '',
@@ -31,18 +32,23 @@ export default function SendInvoiceButton({
     if (!clientEmail || isPending) return
 
     setStatus({ tone: 'idle', message: '' })
+    const attemptId = sendAttemptRef.current ?? crypto.randomUUID()
+    sendAttemptRef.current = attemptId
 
     startTransition(async () => {
       try {
         const response = await fetch(`/api/invoice/${bookingId}/send`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ mode }),
+          body: JSON.stringify({ mode, attemptId }),
         })
 
         const data = (await response.json().catch(() => null)) as { error?: string } | null
 
         if (!response.ok) {
+          if (response.status < 500 && response.status !== 429) {
+            sendAttemptRef.current = null
+          }
           setStatus({
             tone: 'error',
             message: data?.error ?? (mode === 'reminder' ? 'Unable to send invoice reminder.' : 'Unable to send invoice email.'),
@@ -50,6 +56,7 @@ export default function SendInvoiceButton({
           return
         }
 
+        sendAttemptRef.current = null
         setStatus({
           tone: 'success',
           message: mode === 'reminder'
