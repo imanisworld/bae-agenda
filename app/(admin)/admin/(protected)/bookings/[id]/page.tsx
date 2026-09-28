@@ -5,13 +5,15 @@ import Badge from '@/components/admin/Badge'
 import AdminNotice from '@/components/admin/AdminNotice'
 import BookingPricingFields from '@/components/admin/BookingPricingFields'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { getBookingFinancialSnapshot } from '@/lib/booking-finance'
 import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } from '@/lib/booking-deposit'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
+import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, createEventFromBookingAction, updateBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { createInvoiceFromBookingAction } from '@/app/actions/invoices'
+import { getEventInputDateTime } from '@/lib/date-time'
 import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingLifecycleStatus, BookingStatus, BookingWorkflowPaymentStatus } from '@/types/index'
 
@@ -78,6 +80,12 @@ interface BookingInvoiceState {
   sent_at: string | null
 }
 
+interface LinkedEventState {
+  id: string
+  title: string
+  public: boolean
+}
+
 function inputStyle(): React.CSSProperties {
   return {
     width: '100%',
@@ -90,11 +98,9 @@ function inputStyle(): React.CSSProperties {
   }
 }
 
-function toDateTimeLocal(iso: string): string {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  const offsetMs = d.getTimezoneOffset() * 60_000
-  return new Date(d.getTime() - offsetMs).toISOString().slice(0, 16)
+function toEventDateTimeLocal(iso: string, timeZone: string): string {
+  const parts = getEventInputDateTime(iso, timeZone)
+  return parts ? `${parts.date}T${parts.time}` : ''
 }
 
 function formatCurrency(value: number | null): string {
@@ -114,6 +120,7 @@ function formatDateTime(iso: string) {
     year: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
+    timeZone: 'America/Indiana/Indianapolis',
   })
 }
 
@@ -128,7 +135,7 @@ function toDateInputValue(iso: string | null) {
 
 async function getBooking(id: string): Promise<BookingDetailRow | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('bookings')
     .select(`
       id,
@@ -161,18 +168,32 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
     .eq('id', id)
     .maybeSingle()
 
+  if (error) throw new Error(error.message || 'Unable to load booking.')
   return (data as BookingDetailRow | null) ?? null
 }
 
 async function getBookingInvoiceState(id: string): Promise<BookingInvoiceState | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('invoices')
     .select('status, invoice_number, sent_at')
     .eq('booking_id', id)
     .maybeSingle()
 
+  if (error) throw new Error(error.message || 'Unable to load booking invoice state.')
   return (data as BookingInvoiceState | null) ?? null
+}
+
+async function getLinkedEventState(id: string): Promise<LinkedEventState | null> {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('events')
+    .select('id, title, public')
+    .eq('booking_id', id)
+    .maybeSingle()
+
+  if (error) throw new Error(error.message || 'Unable to load linked event state.')
+  return (data as LinkedEventState | null) ?? null
 }
 
 function getMessage(param: string | string[] | undefined) {
@@ -200,9 +221,10 @@ export default async function EditBookingPage({
 }) {
   const { id } = await params
   const resolvedSearchParams = searchParams ? await searchParams : undefined
-  const [booking, invoiceState] = await Promise.all([
+  const [booking, invoiceState, linkedEvent] = await Promise.all([
     getBooking(id),
     getBookingInvoiceState(id),
+    getLinkedEventState(id),
   ])
   if (!booking) notFound()
 
@@ -279,6 +301,36 @@ export default async function EditBookingPage({
           {clientName && <span style={{ color: 'var(--white)', fontSize: '14px' }}>{clientName}</span>}
           {booking.clients?.email && <span className="muted">{booking.clients.email}</span>}
           {booking.clients?.phone && <span className="muted">{booking.clients.phone}</span>}
+          {booking.clients?.id && (
+            <Link href={`/admin/clients/${booking.clients.id}`} className="admin-view-all">
+              Edit Client →
+            </Link>
+          )}
+        </div>
+      </div>
+
+      <div className="admin-section" style={{ padding: '20px 24px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div>
+            <div className="admin-section-title" style={{ marginBottom: '6px' }}>Event Record</div>
+            <div className="muted" style={{ fontSize: '12px', lineHeight: 1.6 }}>
+              {linkedEvent
+                ? `Linked to ${linkedEvent.title}${linkedEvent.public ? ' · Public' : ' · Draft'}`
+                : lifecycleStatus === 'confirmed' || lifecycleStatus === 'completed'
+                  ? 'No event record is linked yet.'
+                  : 'Confirm the booking before creating an event record.'}
+            </div>
+          </div>
+          {linkedEvent ? (
+            <Link href={`/admin/events/${linkedEvent.id}`} className="admin-btn-ghost">
+              View Event
+            </Link>
+          ) : (lifecycleStatus === 'confirmed' || lifecycleStatus === 'completed') ? (
+            <form action={createEventFromBookingAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button type="submit" className="admin-btn-ghost">Create Event</button>
+            </form>
+          ) : null}
         </div>
       </div>
 
@@ -297,41 +349,72 @@ export default async function EditBookingPage({
             {lifecycleStatus === 'negotiating' && (
               <form action={confirmBookingAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
-                <button type="submit" className="admin-btn-primary">Confirm Booking</button>
+                <ConfirmSubmitButton
+                  message="Confirm this booking? This sends the client confirmation/deposit email and prepares the invoice draft."
+                  className="admin-btn-primary"
+                >
+                  Confirm Booking
+                </ConfirmSubmitButton>
               </form>
             )}
 
             {lifecycleStatus === 'confirmed' && paymentStatus === 'deposit_requested' && (
               <form action={markDepositReceivedAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
-                <button type="submit" className="admin-btn-primary">Mark Deposit Received</button>
+                <ConfirmSubmitButton
+                  message="Record the outstanding deposit as received?"
+                  className="admin-btn-primary"
+                >
+                  Mark Deposit Received
+                </ConfirmSubmitButton>
               </form>
             )}
 
             {lifecycleStatus === 'confirmed' && paymentStatus === 'deposit_paid' && (
               <form action={requestFinalPaymentAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
-                <button type="submit" className="admin-btn-primary">Request Final Payment</button>
+                <ConfirmSubmitButton
+                  message="Send the final payment reminder to the client now?"
+                  className="admin-btn-primary"
+                >
+                  Request Final Payment
+                </ConfirmSubmitButton>
               </form>
             )}
 
             {lifecycleStatus === 'confirmed' && paymentStatus === 'balance_requested' && (
               <form action={markFullyPaidAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
-                <button type="submit" className="admin-btn-primary">Mark Fully Paid</button>
+                <ConfirmSubmitButton
+                  message="Record the remaining balance as received and mark this booking fully paid?"
+                  className="admin-btn-primary"
+                >
+                  Mark Fully Paid
+                </ConfirmSubmitButton>
               </form>
             )}
 
             {lifecycleStatus === 'confirmed' && paymentStatus === 'paid' && (
               <form action={markBookingCompleteAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
-                <button type="submit" className="admin-btn-primary">Mark Complete</button>
+                <ConfirmSubmitButton
+                  message="Mark this booking complete? This may send the post-event follow-up email."
+                  className="admin-btn-primary"
+                >
+                  Mark Complete
+                </ConfirmSubmitButton>
               </form>
             )}
 
             <form action={markBookingLostAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
-              <button type="submit" className="admin-btn-ghost" style={{ color: '#e85d75' }}>Mark Lost</button>
+              <ConfirmSubmitButton
+                message="Mark this booking lost/cancelled?"
+                className="admin-btn-ghost"
+                style={{ color: '#e85d75' }}
+              >
+                Mark Lost
+              </ConfirmSubmitButton>
             </form>
           </div>
         </div>
@@ -388,7 +471,7 @@ export default async function EditBookingPage({
                 name="event_date"
                 type="datetime-local"
                 required
-                defaultValue={toDateTimeLocal(booking.event_date)}
+                defaultValue={toEventDateTimeLocal(booking.event_date, booking.event_timezone)}
                 style={inputStyle()}
               />
             </label>
@@ -403,7 +486,7 @@ export default async function EditBookingPage({
             <input
               name="event_end_time"
               type="datetime-local"
-              defaultValue={booking.event_end_time ? toDateTimeLocal(booking.event_end_time) : ''}
+              defaultValue={booking.event_end_time ? toEventDateTimeLocal(booking.event_end_time, booking.event_timezone) : ''}
               style={inputStyle()}
             />
           </label>
@@ -649,6 +732,70 @@ export default async function EditBookingPage({
                     {payment.notes}
                   </div>
                 )}
+                <details style={{ marginTop: '4px' }}>
+                  <summary className="admin-view-all" style={{ cursor: 'pointer', width: 'fit-content' }}>
+                    Correct Record
+                  </summary>
+                  <form action={updateBookingPaymentAction} style={{ marginTop: '14px', display: 'grid', gap: '12px' }}>
+                    <input type="hidden" name="payment_id" value={payment.id} />
+                    <input type="hidden" name="booking_id" value={booking.id} />
+
+                    <div className="admin-form-grid-two">
+                      <label style={{ display: 'grid', gap: '7px' }}>
+                        <span className="muted" style={{ fontSize: '12px' }}>Amount</span>
+                        <input name="amount" type="number" min={0.01} step="0.01" required defaultValue={payment.amount} style={inputStyle()} />
+                      </label>
+                      <label style={{ display: 'grid', gap: '7px' }}>
+                        <span className="muted" style={{ fontSize: '12px' }}>Type</span>
+                        <select name="type" defaultValue={payment.type} style={inputStyle()}>
+                          {PAYMENT_TYPES.map((type) => (
+                            <option key={type} value={type}>
+                              {type.charAt(0).toUpperCase() + type.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="admin-form-grid-two">
+                      <label style={{ display: 'grid', gap: '7px' }}>
+                        <span className="muted" style={{ fontSize: '12px' }}>Method</span>
+                        <select name="method" defaultValue={payment.method ?? ''} style={inputStyle()}>
+                          <option value="">Select method</option>
+                          {PAYMENT_METHODS.map((method) => (
+                            <option key={method} value={method}>
+                              {formatPaymentMethodLabel(method)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label style={{ display: 'grid', gap: '7px' }}>
+                        <span className="muted" style={{ fontSize: '12px' }}>Status</span>
+                        <select name="status" defaultValue={payment.status} style={inputStyle()}>
+                          <option value="received">Received</option>
+                          <option value="pending">Pending</option>
+                          <option value="refunded">Refunded</option>
+                        </select>
+                      </label>
+                    </div>
+
+                    <label style={{ display: 'grid', gap: '7px' }}>
+                      <span className="muted" style={{ fontSize: '12px' }}>
+                        Paid Date {payment.status === 'received' && !payment.paid_at ? '— required to complete this record' : ''}
+                      </span>
+                      <input name="paid_at" type="date" defaultValue={toDateInputValue(payment.paid_at)} style={inputStyle()} />
+                    </label>
+
+                    <label style={{ display: 'grid', gap: '7px' }}>
+                      <span className="muted" style={{ fontSize: '12px' }}>Note</span>
+                      <textarea name="notes" rows={2} defaultValue={payment.notes ?? ''} style={inputStyle()} />
+                    </label>
+
+                    <div className="admin-form-actions">
+                      <button type="submit" className="admin-btn-ghost">Save Correction</button>
+                    </div>
+                  </form>
+                </details>
               </div>
             ))}
           </div>
@@ -659,7 +806,7 @@ export default async function EditBookingPage({
           <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Amount *</span>
-              <input name="amount" type="number" min={0} step="1" required style={inputStyle()} />
+              <input name="amount" type="number" min={0.01} step="0.01" required style={inputStyle()} />
             </label>
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Type *</span>

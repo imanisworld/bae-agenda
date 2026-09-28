@@ -26,21 +26,22 @@ function formatDate(iso: string | null): string {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-    timeZone: 'America/Chicago',
+    timeZone: 'America/Indiana/Indianapolis',
   })
 }
 
 async function getMixes(): Promise<MixRow[]> {
   try {
     const supabase = createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('mixes')
       .select('id, title, genre, duration, is_featured, sort_order, published_at')
       .order('published_at', { ascending: false })
       .order('sort_order', { ascending: true })
+    if (error) throw new Error(error.message || 'Unable to load mixes.')
     return (data ?? []) as MixRow[]
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load mixes.')
   }
 }
 
@@ -76,7 +77,7 @@ export default async function MixesAdminPage({
         {mixes.length === 0 ? (
           <AdminEmptyState
             title="No mixes yet"
-            desc="Mixes you create here can be published to the Lab page at /lab."
+            desc="Published mixes here provide Lab metadata and a fallback when SoundCloud is unavailable."
             action={{ label: 'Create First Mix', href: '/admin/mixes/new' }}
           />
         ) : (

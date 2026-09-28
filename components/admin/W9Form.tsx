@@ -82,7 +82,7 @@ export default function W9Form({ saved }: Props) {
 
             <p className="admin-sensitive-note">
               <span aria-hidden="true">●</span>
-              Your tax ID is stored securely and masked in the form. It is only used to generate your W-9 PDF.
+              Your tax ID is masked in this form and excluded from public site reads. It is used only to generate your W-9 PDF.
             </p>
           </div>
         </div>

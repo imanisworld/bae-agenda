@@ -6,6 +6,7 @@ import PageHeader      from '@/components/admin/PageHeader'
 import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import AdminNotice     from '@/components/admin/AdminNotice'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { createEventFromBookingAction, updateBookingStatusAction } from '@/app/actions/bookings'
 import { getPrimaryBookingClient } from '@/lib/booking-client'
 import { getDepositStatus } from '@/lib/booking-deposit'
@@ -27,7 +28,13 @@ interface BookingRow {
   status:      BookingLifecycleStatus
   payment_status: BookingWorkflowPaymentStatus
   deposit_status: 'unpaid' | 'pending' | 'paid'
+  linked_event_id: string | null
   created_at:  string
+}
+
+interface EventLinkRow {
+  id: string
+  booking_id: string | null
 }
 
 interface BookingQueryRow {
@@ -91,11 +98,27 @@ function getCompactDepositLabel(status: 'unpaid' | 'pending' | 'paid') {
 async function getBookings(): Promise<BookingRow[]> {
   try {
     const supabase = createClient()
-    const { data } = await supabase
-      .from('bookings')
-      .select('id, event_name, event_date, event_timezone, venue, city, package, quote, deposit_amount, status, lifecycle_status, payment_status, created_at, clients(first_name, last_name, email), payments(amount, type, status)')
-      .order('created_at', { ascending: false })
+    const [{ data, error: bookingsError }, { data: eventRows, error: eventsError }] = await Promise.all([
+      supabase
+        .from('bookings')
+        .select('id, event_name, event_date, event_timezone, venue, city, package, quote, deposit_amount, status, lifecycle_status, payment_status, created_at, clients(first_name, last_name, email), payments(amount, type, status)')
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('events')
+        .select('id, booking_id')
+        .not('booking_id', 'is', null),
+    ])
+    if (bookingsError || eventsError) {
+      throw new Error(bookingsError?.message || eventsError?.message || 'Unable to load bookings.')
+    }
+
     const rows = (data ?? []) as BookingQueryRow[]
+    const linkedEventByBooking = new Map(
+      ((eventRows ?? []) as EventLinkRow[])
+        .filter((event) => event.booking_id)
+        .map((event) => [event.booking_id as string, event.id] as const)
+    )
+
     return rows.map((b) => {
       const client = getPrimaryBookingClient(b.clients)
       const lifecycleStatus = getBookingLifecycleStatus(b.lifecycle_status, b.status)
@@ -118,11 +141,12 @@ async function getBookings(): Promise<BookingRow[]> {
           payments: b.payments as Array<{ amount: number; type: string; status: 'pending' | 'received' | 'refunded' }> | null,
         }),
         deposit_status: getDepositStatus(b.deposit_amount, b.payments as Array<{ amount: number; type: string; status: 'pending' | 'received' | 'refunded' }> | null),
+        linked_event_id: linkedEventByBooking.get(b.id) ?? null,
         created_at: b.created_at,
       }
     })
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load bookings.')
   }
 }
 
@@ -195,7 +219,9 @@ export default async function BookingsPage({
     (booking) => booking.status === 'confirmed' && booking.payment_status !== 'paid'
   ).length
   const readyToScheduleCount = bookings.filter(
-    (booking) => booking.status === 'confirmed' || booking.status === 'completed'
+    (booking) =>
+      (booking.status === 'confirmed' || booking.status === 'completed') &&
+      !booking.linked_event_id
   ).length
 
   return (
@@ -288,6 +314,13 @@ export default async function BookingsPage({
                           {[b.venue, b.city].filter(Boolean).join(' · ')}
                         </div>
                       )}
+                      <div className="booking-event-meta">
+                        {b.linked_event_id
+                          ? 'Event record linked'
+                          : canCreateEvent(b.status)
+                            ? 'No event record linked'
+                            : 'Event record available after confirmation'}
+                      </div>
                       <div className="booking-event-meta booking-event-meta--mobile">
                         Submitted {fmtSubmittedDate(b.created_at)}
                       </div>
@@ -312,31 +345,60 @@ export default async function BookingsPage({
                         <details className="booking-actions-menu">
                           <summary className="booking-actions-trigger" aria-label="More actions">•••</summary>
                           <div className="booking-actions-popover">
-                            {getBookingActions(b.status).map((action) => (
-                              <form key={action.nextStatus} action={updateBookingStatusAction}>
-                                <input type="hidden" name="id" value={b.id} />
-                                <input type="hidden" name="next_status" value={action.nextStatus} />
-                                <button
-                                  type="submit"
-                                  className="booking-actions-item"
-                                  style={
-                                    action.tone === 'danger'
-                                      ? { color: '#e85d75' }
-                                      : undefined
-                                  }
-                                >
-                                  {action.label}
-                                </button>
-                              </form>
-                            ))}
-                            {canCreateEvent(b.status) && (
+                            {getBookingActions(b.status).map((action) => {
+                              const confirmationMessage =
+                                action.nextStatus === 'confirmed'
+                                  ? 'Confirm this booking? This can send the confirmation email and prepare the invoice draft.'
+                                  : action.nextStatus === 'completed'
+                                    ? 'Mark this booking complete? This can trigger the post-event follow-up.'
+                                    : action.nextStatus === 'cancelled'
+                                      ? 'Cancel this booking?'
+                                      : null
+
+                              return (
+                                <form key={action.nextStatus} action={updateBookingStatusAction}>
+                                  <input type="hidden" name="id" value={b.id} />
+                                  <input type="hidden" name="next_status" value={action.nextStatus} />
+                                  {confirmationMessage ? (
+                                    <ConfirmSubmitButton
+                                      message={confirmationMessage}
+                                      className="booking-actions-item"
+                                      style={
+                                        action.tone === 'danger'
+                                          ? { color: '#e85d75' }
+                                          : undefined
+                                      }
+                                    >
+                                      {action.label}
+                                    </ConfirmSubmitButton>
+                                  ) : (
+                                    <button
+                                      type="submit"
+                                      className="booking-actions-item"
+                                      style={
+                                        action.tone === 'danger'
+                                          ? { color: '#e85d75' }
+                                          : undefined
+                                      }
+                                    >
+                                      {action.label}
+                                    </button>
+                                  )}
+                                </form>
+                              )
+                            })}
+                            {b.linked_event_id ? (
+                              <Link href={`/admin/events/${b.linked_event_id}`} className="booking-actions-item">
+                                View Event
+                              </Link>
+                            ) : canCreateEvent(b.status) ? (
                               <form action={createEventFromBookingAction}>
                                 <input type="hidden" name="booking_id" value={b.id} />
                                 <button type="submit" className="booking-actions-item">
                                   Create Event
                                 </button>
                               </form>
-                            )}
+                            ) : null}
                             <a href={`/api/invoice/${b.id}`} download className="booking-actions-item">
                               Download PDF
                             </a>

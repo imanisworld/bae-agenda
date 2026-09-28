@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deleteMixAction, updateMixAction } from '@/app/actions/mixes'
+import { getEventInputDateTime } from '@/lib/date-time'
 
 interface MixRow {
   id: string
@@ -31,19 +33,19 @@ function inputStyle(): React.CSSProperties {
 
 function toDateTimeLocal(iso: string | null): string {
   if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  const offsetMs = d.getTimezoneOffset() * 60_000
-  return new Date(d.getTime() - offsetMs).toISOString().slice(0, 16)
+  const parts = getEventInputDateTime(iso, 'America/Indiana/Indianapolis')
+  return parts ? `${parts.date}T${parts.time}` : ''
 }
 
 async function getMix(id: string): Promise<MixRow | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('mixes')
     .select('id, title, description, genre, duration, embed_url, cover_url, is_featured, sort_order, published_at')
     .eq('id', id)
     .maybeSingle()
+
+  if (error) throw new Error(error.message || 'Unable to load mix.')
 
   return (data as MixRow | null) ?? null
 }
@@ -135,8 +137,8 @@ export default async function EditMixPage({
 
       <form action={deleteMixAction}>
         <input type="hidden" name="id" value={mix.id} />
-        <button
-          type="submit"
+        <ConfirmSubmitButton
+          message="Delete this mix? This cannot be undone."
           className="admin-btn-ghost"
           style={{
             color: '#e85d75',
@@ -144,7 +146,7 @@ export default async function EditMixPage({
           }}
         >
           Delete Mix
-        </button>
+        </ConfirmSubmitButton>
       </form>
     </div>
   )

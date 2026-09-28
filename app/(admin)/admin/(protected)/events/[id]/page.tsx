@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import EventLocationFields from '@/components/admin/EventLocationFields'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deleteEventAction, updateEventAction } from '@/app/actions/events'
@@ -18,6 +19,7 @@ interface EventRow {
   public: boolean
   featured: boolean
   show_description: boolean
+  booking_id: string | null
 }
 
 function inputStyle(): React.CSSProperties {
@@ -34,11 +36,13 @@ function inputStyle(): React.CSSProperties {
 
 async function getEvent(id: string): Promise<EventRow | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('events')
-    .select('id, title, event_date, event_timezone, venue, city, description, public, featured, show_description')
+    .select('id, title, event_date, event_timezone, venue, city, description, public, featured, show_description, booking_id')
     .eq('id', id)
     .maybeSingle()
+
+  if (error) throw new Error(error.message || 'Unable to load event.')
 
   return (data as EventRow | null) ?? null
 }
@@ -63,6 +67,22 @@ export default async function EditEventPage({
         subtitle="Update event details, visibility, and featured status."
         action={{ label: 'Back To Events', href: '/admin/events' }}
       />
+
+      <div className="admin-section" style={{ padding: '16px 18px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div>
+            <div className="admin-section-title" style={{ marginBottom: '5px' }}>Booking Link</div>
+            <div className="muted" style={{ fontSize: '12px' }}>
+              {event.booking_id ? 'This event is linked to a booking record.' : 'This is a standalone event.'}
+            </div>
+          </div>
+          {event.booking_id && (
+            <Link href={`/admin/bookings/${event.booking_id}`} className="admin-btn-ghost">
+              View Booking
+            </Link>
+          )}
+        </div>
+      </div>
 
       <form action={updateEventAction} className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
         <input type="hidden" name="id" value={event.id} />
@@ -141,8 +161,8 @@ export default async function EditEventPage({
 
       <form action={deleteEventAction}>
         <input type="hidden" name="id" value={event.id} />
-        <button
-          type="submit"
+        <ConfirmSubmitButton
+          message="Delete this event? This cannot be undone."
           className="admin-btn-ghost"
           style={{
             color: '#e85d75',
@@ -150,7 +170,7 @@ export default async function EditEventPage({
           }}
         >
           Delete Event
-        </button>
+        </ConfirmSubmitButton>
       </form>
     </div>
   )

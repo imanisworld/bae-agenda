@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import PageHeader from '@/components/admin/PageHeader'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { createInvoiceFromBookingAction, restoreInvoiceDraftAction, voidInvoiceAction } from '@/app/actions/invoices'
 import { createBookingPaymentAction } from '@/app/actions/bookings'
 import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
@@ -47,7 +48,7 @@ interface BookingRow {
 
 async function getBooking(id: string): Promise<BookingRow | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('bookings')
     .select(`
       id, event_name, event_type, event_date, event_end_time, event_timezone, venue, city,
@@ -56,17 +57,19 @@ async function getBooking(id: string): Promise<BookingRow | null> {
     `)
     .eq('id', id)
     .maybeSingle()
+  if (error) throw new Error(error.message || 'Unable to load booking.')
   return (data as BookingRow | null) ?? null
 }
 
 async function getInvoiceState(id: string): Promise<InvoiceState | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('invoices')
     .select('status, invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, due_date, payment_terms, line_items, sent_at, created_at')
     .eq('booking_id', id)
     .maybeSingle()
 
+  if (error) throw new Error(error.message || 'Unable to load invoice.')
   return (data as InvoiceState | null) ?? null
 }
 
@@ -418,9 +421,12 @@ export default async function InvoicePage({
             {invoiceState.status !== 'paid' && invoiceState.status !== 'void' && (
               <form action={voidInvoiceAction}>
                 <input type="hidden" name="booking_id" value={id} />
-                <button type="submit" className="admin-btn-danger">
+                <ConfirmSubmitButton
+                  message="Void this invoice? You can restore it later, but it will stop being active."
+                  className="admin-btn-danger"
+                >
                   Void Invoice
-                </button>
+                </ConfirmSubmitButton>
               </form>
             )}
             {invoiceState.status === 'void' && (

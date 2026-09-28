@@ -34,12 +34,13 @@ function getErrorMessage(errorParam: string | string[] | undefined) {
 
 async function getInvoice(bookingId: string): Promise<InvoiceEditRow | null> {
   const admin = createAdminClient()
-  const { data } = await admin
+  const { data, error } = await admin
     .from('invoices')
     .select('booking_id, status, invoice_number, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, due_date, payment_terms, line_items')
     .eq('booking_id', bookingId)
     .maybeSingle()
 
+  if (error) throw new Error(error.message || 'Unable to load invoice.')
   return (data as InvoiceEditRow | null) ?? null
 }
 

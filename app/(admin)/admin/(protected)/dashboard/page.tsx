@@ -8,6 +8,7 @@ import Link            from 'next/link'
 import StatCard        from '@/components/admin/StatCard'
 import Badge           from '@/components/admin/Badge'
 import PageHeader      from '@/components/admin/PageHeader'
+import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import { getPrimaryBookingClient } from '@/lib/booking-client'
 import { getDepositStatus } from '@/lib/booking-deposit'
 import { getBookingLifecycleStatus, getBookingWorkflowPaymentStatus, type BookingLifecycleStatus, type BookingWorkflowPaymentStatus } from '@/lib/booking-workflow'
@@ -34,6 +35,7 @@ interface UpcomingEvent {
   event_date: string
   venue:      string | null
   featured:   boolean
+  event_timezone?: string | null
 }
 
 interface PaymentReminder {
@@ -42,13 +44,6 @@ interface PaymentReminder {
   amount:       number
   status:       PaymentStatus
   type:         string
-}
-
-interface DashboardStats {
-  upcomingEvents:   number
-  activeBookings:   number
-  pendingInquiries: number
-  totalClients:     number
 }
 
 interface BookingQueryRow {
@@ -73,36 +68,6 @@ interface PaymentQueryRow {
   bookings: { event_name: string | null }[] | null
 }
 
-// ── Mock Data (shown when DB not connected) ───────────────────────────────────
-
-const MOCK_STATS: DashboardStats = {
-  upcomingEvents:   4,
-  activeBookings:   7,
-  pendingInquiries: 3,
-  totalClients:     22,
-}
-
-const MOCK_BOOKINGS: RecentBooking[] = [
-  { id: 'm1', event_name: 'Birthday Celebration',    event_date: '2026-03-22', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Marcus Webb',    status: 'new',       payment_status: 'unpaid',             deposit_status: 'unpaid' },
-  { id: 'm2', event_name: 'House Music Brunch',      event_date: '2026-03-15', event_timezone: 'America/Chicago',               client_name: 'Nadia Thomas',   status: 'confirmed', payment_status: 'deposit_requested',  deposit_status: 'pending' },
-  { id: 'm3', event_name: 'Corporate After-Party',   event_date: '2026-04-05', event_timezone: 'America/Chicago',               client_name: 'Priya Sharma',   status: 'confirmed', payment_status: 'unpaid',  deposit_status: 'unpaid' },
-  { id: 'm4', event_name: 'Club Night at Spybar',    event_date: '2026-04-12', event_timezone: 'America/Chicago',               client_name: 'Jordan Lee',     status: 'new',       payment_status: 'unpaid',  deposit_status: 'unpaid' },
-  { id: 'm5', event_name: 'Wedding Reception',       event_date: '2026-02-28', event_timezone: 'America/Indiana/Indianapolis', client_name: 'Destiny Brown',  status: 'completed', payment_status: 'paid',    deposit_status: 'paid' },
-]
-
-const MOCK_EVENTS: UpcomingEvent[] = [
-  { id: 'e1', title: 'The Agenda: Monthly Residency', event_date: '2026-03-21', venue: 'Spybar Chicago',        featured: true  },
-  { id: 'e2', title: 'Day Party Series Vol. 3',        event_date: '2026-04-04', venue: 'The Promontory',        featured: false },
-  { id: 'e3', title: 'Corporate After-Party',          event_date: '2026-04-17', venue: 'Ace Hotel Chicago',     featured: false },
-  { id: 'e4', title: 'Summer Kickoff Rooftop',         event_date: '2026-05-25', venue: 'Soho House Chicago',    featured: true  },
-]
-
-const MOCK_PAYMENTS: PaymentReminder[] = [
-  { id: 'p1', booking_name: 'Birthday Celebration',  amount: 300, status: 'pending', type: 'deposit' },
-  { id: 'p2', booking_name: 'House Music Brunch',    amount: 150, status: 'pending', type: 'balance' },
-  { id: 'p3', booking_name: 'Corporate After-Party', amount: 300, status: 'pending', type: 'deposit' },
-]
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function fmtDate(iso: string, timeZone = 'America/Indiana/Indianapolis') {
@@ -114,7 +79,7 @@ function fmtDate(iso: string, timeZone = 'America/Indiana/Indianapolis') {
 
 function fmtCurrency(n: number) {
   return new Intl.NumberFormat('en-US', {
-    style: 'currency', currency: 'USD', maximumFractionDigits: 0,
+    style: 'currency', currency: 'USD',
   }).format(n)
 }
 
@@ -126,13 +91,13 @@ async function getDashboardData() {
     const now = new Date().toISOString()
 
     const [
-      { count: upcomingEvents   },
-      { count: activeBookings   },
-      { count: pendingInquiries },
-      { count: totalClients     },
-      { data: bookingRows       },
-      { data: eventRows         },
-      { data: paymentRows       },
+      { count: upcomingEvents, error: upcomingEventsError   },
+      { count: activeBookings, error: activeBookingsError   },
+      { count: pendingInquiries, error: pendingInquiriesError },
+      { count: totalClients, error: totalClientsError     },
+      { data: bookingRows, error: bookingRowsError       },
+      { data: eventRows, error: eventRowsError         },
+      { data: paymentRows, error: paymentRowsError       },
     ] = await Promise.all([
       supabase.from('events').select('*', { count: 'exact', head: true })
         .eq('public', true).gte('event_date', now),
@@ -145,7 +110,7 @@ async function getDashboardData() {
         .select('id, event_name, event_date, event_timezone, status, lifecycle_status, payment_status, quote, deposit_amount, clients(first_name, last_name, email), payments(amount, type, status)')
         .order('created_at', { ascending: false }).limit(5),
       supabase.from('events')
-        .select('id, title, event_date, venue, featured')
+        .select('id, title, event_date, event_timezone, venue, featured')
         .eq('public', true).gte('event_date', now)
         .order('event_date', { ascending: true }).limit(4),
       supabase.from('payments')
@@ -154,9 +119,21 @@ async function getDashboardData() {
         .order('created_at', { ascending: false }).limit(5),
     ])
 
+    const loadError =
+      upcomingEventsError ||
+      activeBookingsError ||
+      pendingInquiriesError ||
+      totalClientsError ||
+      bookingRowsError ||
+      eventRowsError ||
+      paymentRowsError
+
+    if (loadError) {
+      throw new Error(loadError.message || 'Unable to load dashboard data.')
+    }
+
     return {
       connected: true,
-      mock: false,
       stats: {
         upcomingEvents:   upcomingEvents   ?? 0,
         activeBookings:   activeBookings   ?? 0,
@@ -197,14 +174,12 @@ async function getDashboardData() {
       }) as PaymentReminder[],
     }
   } catch {
-    // DB not connected — return mock data so the dashboard feels operational
     return {
       connected: false,
-      mock: true,
-      stats:           MOCK_STATS,
-      recentBookings:  MOCK_BOOKINGS,
-      upcomingEvents:  MOCK_EVENTS,
-      paymentReminders: MOCK_PAYMENTS,
+      stats: { upcomingEvents: 0, activeBookings: 0, pendingInquiries: 0, totalClients: 0 },
+      recentBookings: [] as RecentBooking[],
+      upcomingEvents: [] as UpcomingEvent[],
+      paymentReminders: [] as PaymentReminder[],
     }
   }
 }
@@ -214,22 +189,14 @@ async function getDashboardData() {
 export default async function DashboardPage() {
   const raw = await getDashboardData()
 
-  // Use sample data whenever there's nothing real to show yet —
-  // either DB isn't connected, or connected but tables are still empty.
-  const isEmpty =
-    raw.recentBookings.length === 0 &&
-    raw.upcomingEvents.length  === 0 &&
-    raw.paymentReminders.length === 0
-
-  const usingSample = !raw.connected || isEmpty
-
-  const stats           = usingSample ? MOCK_STATS    : raw.stats
-  const recentBookings  = usingSample ? MOCK_BOOKINGS : raw.recentBookings
-  const upcomingEvents  = usingSample ? MOCK_EVENTS   : raw.upcomingEvents
-  const paymentReminders = usingSample ? MOCK_PAYMENTS : raw.paymentReminders
+  const stats = raw.stats
+  const recentBookings = raw.recentBookings
+  const upcomingEvents = raw.upcomingEvents
+  const paymentReminders = raw.paymentReminders
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+    timeZone: 'America/Indiana/Indianapolis',
   })
 
   return (
@@ -238,17 +205,12 @@ export default async function DashboardPage() {
       <PageHeader title="Dashboard" subtitle={today} />
 
       {/* ── Status Banner ───────────────────────────────────────── */}
-      {usingSample && (
+      {!raw.connected && (
         <div className="admin-preview-banner">
           <span className="admin-preview-mark" aria-hidden="true">◈</span>
           <div>
-            <div className="admin-preview-title">Preview Mode — Sample Data</div>
-            <p>
-              {raw.connected
-                ? <>Run the migration SQL in Supabase to load live data. Sample data is shown until your first records are added.</>
-                : <>Add your Supabase credentials to <code>.env.local</code> to activate live data.</>
-              }
-            </p>
+            <div className="admin-preview-title">Live Data Unavailable</div>
+            <p>The dashboard could not load the database. No sample bookings, events, or payments are being substituted.</p>
           </div>
         </div>
       )}
@@ -290,6 +252,13 @@ export default async function DashboardPage() {
           <Link href="/admin/bookings" className="admin-view-all">View All →</Link>
         </div>
 
+        {recentBookings.length === 0 ? (
+          <AdminEmptyState
+            title="No bookings yet"
+            desc="New booking inquiries will appear here."
+            action={{ label: 'Open Bookings', href: '/admin/bookings' }}
+          />
+        ) : (
         <div className="admin-table-wrap">
           <table className="admin-table admin-table-stack">
             <thead>
@@ -318,6 +287,7 @@ export default async function DashboardPage() {
             </tbody>
           </table>
         </div>
+        )}
       </div>
 
       {/* ── Two-column lower row ─────────────────────────────────── */}
@@ -334,6 +304,13 @@ export default async function DashboardPage() {
             <Link href="/admin/events" className="admin-view-all">View All →</Link>
           </div>
 
+          {upcomingEvents.length === 0 ? (
+            <AdminEmptyState
+              title="No upcoming public events"
+              desc="Create or publish an event when you have a date to show."
+              action={{ label: 'Open Events', href: '/admin/events' }}
+            />
+          ) : (
           <div>
             {upcomingEvents.map((ev, i) => (
               <div key={ev.id} style={{
@@ -348,7 +325,7 @@ export default async function DashboardPage() {
                     {ev.title}
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
-                    {fmtDate(ev.event_date)}{ev.venue ? ` · ${ev.venue}` : ''}
+                    {fmtDate(ev.event_date, ev.event_timezone ?? 'America/Indiana/Indianapolis')}{ev.venue ? ` · ${ev.venue}` : ''}
                   </div>
                 </div>
                 {ev.featured && (
@@ -363,6 +340,7 @@ export default async function DashboardPage() {
               </div>
             ))}
           </div>
+          )}
         </div>
 
         {/* Payment Reminders */}
@@ -372,6 +350,13 @@ export default async function DashboardPage() {
             <Link href="/admin/payments" className="admin-view-all">View All →</Link>
           </div>
 
+          {paymentReminders.length === 0 ? (
+            <AdminEmptyState
+              title="No pending payments"
+              desc="Pending deposits and balances will appear here."
+              action={{ label: 'Open Payments', href: '/admin/payments' }}
+            />
+          ) : (
           <div>
             {paymentReminders.map((p, i) => (
               <div key={p.id} style={{
@@ -403,6 +388,7 @@ export default async function DashboardPage() {
               </div>
             ))}
           </div>
+          )}
         </div>
 
       </div>

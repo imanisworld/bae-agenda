@@ -22,16 +22,17 @@ export async function getAllContent(): Promise<ContentItem[]> {
     const { data, error } = await supabase
       .from('site_content')
       .select('*')
+      .not('key', 'like', 'w9_%')
       .order('key', { ascending: true })
 
     if (error) {
       console.error('[getAllContent]', error.message)
-      return []
+      throw new Error(error.message || 'Unable to load site content.')
     }
     return data ?? []
   } catch (err) {
     console.error('[getAllContent] unexpected:', err)
-    return []
+    throw err instanceof Error ? err : new Error('Unable to load site content.')
   }
 }
 

@@ -5,7 +5,7 @@
  */
 import PageHeader from '@/components/admin/PageHeader'
 import W9Form    from '@/components/admin/W9Form'
-import { getContentMap } from '@/lib/db/content'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
 
@@ -18,8 +18,26 @@ const W9_KEYS = [
   'w9_tax_id',
 ]
 
+async function getW9Content() {
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('site_content')
+    .select('key, value')
+    .in('key', W9_KEYS)
+
+  if (error) {
+    throw new Error(error.message || 'Unable to load W-9 information.')
+  }
+
+  return Object.fromEntries(
+    (data ?? [])
+      .filter((row) => row.value !== null && row.value !== '')
+      .map((row) => [row.key, row.value as string])
+  )
+}
+
 export default async function W9Page() {
-  const saved = await getContentMap(W9_KEYS)
+  const saved = await getW9Content()
 
   return (
     <div className="admin-page admin-page--narrow">

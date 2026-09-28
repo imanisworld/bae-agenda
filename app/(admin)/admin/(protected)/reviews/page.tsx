@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import PageHeader from '@/components/admin/PageHeader'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { approveReview, rejectReview } from '@/app/actions/reviews'
 
 interface Review {
@@ -19,14 +20,15 @@ function Stars({ n }: { n: number }) {
 async function getReviews() {
   try {
     const supabase = createAdminClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('reviews')
       .select('id, name, event_type, rating, message, approved, created_at')
       .order('created_at', { ascending: false })
 
+    if (error) throw new Error(error.message || 'Unable to load reviews.')
     return (data ?? []) as Review[]
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load reviews.')
   }
 }
 
@@ -66,9 +68,12 @@ export default async function ReviewsPage() {
               </button>
             </form>
             <form action={rejectReview.bind(null, r.id)}>
-              <button type="submit" className="admin-btn-danger">
+              <ConfirmSubmitButton
+                message="Delete this review? This cannot be undone."
+                className="admin-btn-danger"
+              >
                 Delete
-              </button>
+              </ConfirmSubmitButton>
             </form>
           </div>
         )}

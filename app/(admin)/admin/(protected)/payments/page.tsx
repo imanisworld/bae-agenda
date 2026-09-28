@@ -3,6 +3,7 @@
  * Full payments table grouped by status. Data fetched server-side.
  */
 import type { CSSProperties } from 'react'
+import Link from 'next/link'
 import PageHeader      from '@/components/admin/PageHeader'
 import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
@@ -12,6 +13,7 @@ import type { PaymentStatus } from '@/types/index'
 
 interface PaymentRow {
   id:           string
+  booking_id:   string | null
   booking_name: string
   amount:       number
   type:         string
@@ -30,8 +32,8 @@ interface PaymentQueryRow {
   paid_at: string | null
   created_at: string
   bookings:
-    | { event_name: string | null }
-    | { event_name: string | null }[]
+    | { id: string; event_name: string | null }
+    | { id: string; event_name: string | null }[]
     | null
 }
 
@@ -39,13 +41,13 @@ function fmtDate(iso: string | null) {
   if (!iso) return '—'
   return new Date(iso).toLocaleDateString('en-US', {
     month: 'short', day: 'numeric', year: 'numeric',
-    timeZone: 'America/Chicago',
+    timeZone: 'America/Indiana/Indianapolis',
   })
 }
 
 function fmtCurrency(n: number) {
   return new Intl.NumberFormat('en-US', {
-    style: 'currency', currency: 'USD', maximumFractionDigits: 0,
+    style: 'currency', currency: 'USD',
   }).format(n)
 }
 
@@ -63,14 +65,16 @@ function getBookingName(
 async function getPayments(): Promise<PaymentRow[]> {
   try {
     const supabase = createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('payments')
-      .select('id, amount, type, method, status, paid_at, created_at, bookings(event_name)')
+      .select('id, amount, type, method, status, paid_at, created_at, bookings(id, event_name)')
       .order('created_at', { ascending: false })
+    if (error) throw new Error(error.message || 'Unable to load payments.')
     const rows = (data ?? []) as PaymentQueryRow[]
     return rows.map((p) => {
       return {
         id:           p.id,
+        booking_id:   Array.isArray(p.bookings) ? p.bookings[0]?.id ?? null : p.bookings?.id ?? null,
         booking_name: getBookingName(p.bookings),
         amount:       p.amount,
         type:         p.type,
@@ -80,8 +84,8 @@ async function getPayments(): Promise<PaymentRow[]> {
         created_at:   p.created_at,
       }
     })
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load payments.')
   }
 }
 
@@ -138,6 +142,7 @@ export default async function PaymentsPage() {
                   <th>Method</th>
                   <th>Status</th>
                   <th>Paid</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -157,7 +162,18 @@ export default async function PaymentsPage() {
                       {formatPaymentMethodLabel(p.method)}
                     </td>
                     <td data-label="Status"><Badge variant={p.status} /></td>
-                    <td data-label="Paid" className="muted">{fmtDate(p.paid_at)}</td>
+                    <td data-label="Paid" className="muted">
+                      {p.status === 'received' && !p.paid_at
+                        ? <span style={{ color: 'var(--gold)' }}>Missing date</span>
+                        : fmtDate(p.paid_at)}
+                    </td>
+                    <td data-label="Actions">
+                      {p.booking_id ? (
+                        <Link href={`/admin/bookings/${p.booking_id}`} className="admin-view-all">
+                          Open / Correct →
+                        </Link>
+                      ) : '—'}
+                    </td>
                   </tr>
                 ))}
               </tbody>

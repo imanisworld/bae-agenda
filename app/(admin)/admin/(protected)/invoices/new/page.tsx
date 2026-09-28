@@ -27,7 +27,6 @@ function fmtCurrency(value: number | null) {
   return (value ?? 0).toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
-    maximumFractionDigits: 0,
   })
 }
 
@@ -43,7 +42,10 @@ function fmtDate(value: string, timeZone: string | null) {
 async function getAvailableBookings() {
   const admin = createAdminClient()
 
-  const [{ data: bookingRows }, { data: invoiceRows }] = await Promise.all([
+  const [
+    { data: bookingRows, error: bookingError },
+    { data: invoiceRows, error: invoiceError },
+  ] = await Promise.all([
     admin
       .from('bookings')
       .select('id, event_name, event_date, event_timezone, quote, deposit_amount, status, clients(first_name, last_name, email)')
@@ -52,6 +54,10 @@ async function getAvailableBookings() {
       .from('invoices')
       .select('booking_id'),
   ])
+
+  if (bookingError || invoiceError) {
+    throw new Error(bookingError?.message || invoiceError?.message || 'Unable to load invoice source bookings.')
+  }
 
   const alreadyInvoiced = new Set((invoiceRows ?? []).map((row) => row.booking_id))
   const bookings = (bookingRows ?? []) as BookingOption[]

@@ -40,18 +40,19 @@ function inputStyle(changed: boolean): React.CSSProperties {
 
 export default function ContentEditor({ saved }: Props) {
   // Build initial map from saved DB rows
-  const savedMap: Record<string, string> = Object.fromEntries(
+  const initialSavedMap: Record<string, string> = Object.fromEntries(
     saved.map(item => [item.key, item.value ?? ''])
   )
 
-  const [values,    setValues]    = useState<Record<string, string>>(savedMap)
+  const [savedValues, setSavedValues] = useState<Record<string, string>>(initialSavedMap)
+  const [values,    setValues]    = useState<Record<string, string>>(initialSavedMap)
   const [status,    setStatus]    = useState<SaveStatus>('idle')
   const [errorMsg,  setErrorMsg]  = useState('')
   const [isPending, startTransition] = useTransition()
 
   const allFields = CONTENT_GROUPS.flatMap(g => g.fields)
   const isDirty   = allFields.some(f =>
-    (values[f.key] ?? '') !== (savedMap[f.key] ?? '')
+    (values[f.key] ?? '') !== (savedValues[f.key] ?? '')
   )
 
   function handleChange(key: string, value: string) {
@@ -66,8 +67,7 @@ export default function ContentEditor({ saved }: Props) {
         allFields.map(f => ({ key: f.key, value: values[f.key] ?? '', label: f.label }))
       )
       if (result.success) {
-        // Sync savedMap so dirty indicators reset
-        allFields.forEach(f => { savedMap[f.key] = values[f.key] ?? '' })
+        setSavedValues({ ...values })
         setStatus('saved')
         setTimeout(() => setStatus('idle'), 3500)
       } else {
@@ -123,7 +123,7 @@ export default function ContentEditor({ saved }: Props) {
           <div>
             {group.fields.map((field, i) => {
               const currentVal = values[field.key] ?? ''
-              const savedVal   = savedMap[field.key]  ?? ''
+              const savedVal   = savedValues[field.key]  ?? ''
               const isChanged  = currentVal !== savedVal
 
               return (

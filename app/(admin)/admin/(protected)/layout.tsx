@@ -8,6 +8,8 @@ import AdminShell from '@/components/admin/AdminShell'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
 import { redirect } from 'next/navigation'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminProtectedLayout({
   children,
 }: {

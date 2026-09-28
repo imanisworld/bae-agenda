@@ -73,6 +73,16 @@ function parseDateTimeLocal(value: FormDataEntryValue | null) {
   }
 }
 
+function addCalendarDay(dateValue: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateValue)
+  if (!match) return null
+
+  const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])))
+  if (Number.isNaN(date.getTime())) return null
+  date.setUTCDate(date.getUTCDate() + 1)
+  return date.toISOString().slice(0, 10)
+}
+
 function parseOptionalNumber(value: FormDataEntryValue | null): number | null {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
@@ -790,7 +800,7 @@ export async function createAdminBookingAction(formData: FormData) {
     redirectWithError(returnPath, 'Enter a valid event date and start time.')
   }
 
-  const eventEndIso = eventEndTime
+  let eventEndIso = eventEndTime
     ? toEventISO(eventDate, eventTimeZone, eventEndTime)
     : null
 
@@ -798,8 +808,13 @@ export async function createAdminBookingAction(formData: FormData) {
     redirectWithError(returnPath, 'Enter a valid event end time.')
   }
 
-  if (eventEndIso && new Date(eventEndIso).getTime() <= new Date(eventDateIso).getTime()) {
-    redirectWithError(returnPath, 'Event end time must be after the start time.')
+  if (eventEndTime && eventEndIso && new Date(eventEndIso).getTime() <= new Date(eventDateIso).getTime()) {
+    const nextDate = addCalendarDay(eventDate)
+    eventEndIso = nextDate ? toEventISO(nextDate, eventTimeZone, eventEndTime) : null
+  }
+
+  if (eventEndTime && !eventEndIso) {
+    redirectWithError(returnPath, 'Enter a valid event end time.')
   }
 
   if (hours !== null && hours <= 0) {
@@ -1070,31 +1085,47 @@ export async function createEventFromBookingAction(formData: FormData) {
     redirectWithError('/admin/bookings', 'Only confirmed bookings can be turned into events.')
   }
 
-  const { data: existingEvent, error: existingEventError } = await admin
+  const { data: linkedEvent, error: linkedEventError } = await admin
     .from('events')
-    .select('id, booking_id')
+    .select('id')
+    .eq('booking_id', source.id)
+    .maybeSingle()
+
+  if (linkedEventError) {
+    redirectWithError('/admin/bookings', 'Could not verify whether this booking already has a linked event.')
+  }
+
+  if (linkedEvent?.id) {
+    redirect(`/admin/events/${linkedEvent.id}`)
+  }
+
+  // Legacy fallback: only adopt an older event when it is currently unlinked.
+  // Once booking_id exists, that relationship is authoritative.
+  const { data: legacyEvent, error: legacyEventError } = await admin
+    .from('events')
+    .select('id')
+    .is('booking_id', null)
     .eq('title', source.event_name)
     .eq('event_date', source.event_date)
     .limit(1)
     .maybeSingle()
 
-  if (existingEventError) {
-    redirectWithError('/admin/bookings', 'Could not verify whether this booking already has an event.')
+  if (legacyEventError) {
+    redirectWithError('/admin/bookings', 'Could not verify whether an older matching event can be linked.')
   }
 
-  if (existingEvent?.id) {
-    if (!existingEvent.booking_id) {
-      const { error: linkError } = await admin
-        .from('events')
-        .update({ booking_id: source.id })
-        .eq('id', existingEvent.id)
+  if (legacyEvent?.id) {
+    const { error: linkError } = await admin
+      .from('events')
+      .update({ booking_id: source.id })
+      .eq('id', legacyEvent.id)
+      .is('booking_id', null)
 
-      if (linkError) {
-        redirectWithError('/admin/bookings', linkError.message || 'Unable to link the existing event to this booking.')
-      }
+    if (linkError) {
+      redirectWithError('/admin/bookings', linkError.message || 'Unable to link the existing event to this booking.')
     }
 
-    redirect(`/admin/events/${existingEvent.id}`)
+    redirect(`/admin/events/${legacyEvent.id}`)
   }
 
   const { data: createdEvent, error: createError } = await admin
@@ -1255,6 +1286,87 @@ export async function createBookingPaymentAction(formData: FormData) {
   redirect(returnTo)
 }
 
+export async function updateBookingPaymentAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+  const paymentId = optionalString(formData.get('payment_id'))
+  const bookingId = optionalString(formData.get('booking_id'))
+  const amount = parseOptionalNumber(formData.get('amount'))
+  const typeRaw = optionalString(formData.get('type'))
+  const methodRaw = optionalString(formData.get('method'))
+  const statusRaw = optionalString(formData.get('status'))
+  const paidAt = parseOptionalDate(formData.get('paid_at'))
+  const notes = optionalString(formData.get('notes'))
+
+  if (!paymentId || !bookingId || amount === null || amount <= 0 || !typeRaw || !statusRaw) {
+    redirectWithError(bookingId ? `/admin/bookings/${bookingId}` : '/admin/payments', 'Payment id, booking, amount, type, and status are required.')
+  }
+
+  if (!isPaymentType(typeRaw) || !isPaymentStatus(statusRaw)) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Invalid payment correction details.')
+  }
+
+  if (methodRaw && !isPaymentMethod(methodRaw)) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Invalid payment method.')
+  }
+
+  if (statusRaw === 'received' && !paidAt) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Received payments need a paid date.')
+  }
+
+  const { data: current, error: lookupError } = await admin
+    .from('payments')
+    .select('id, booking_id, amount, type, method, status, paid_at')
+    .eq('id', paymentId)
+    .eq('booking_id', bookingId)
+    .maybeSingle()
+
+  if (lookupError || !current) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Could not find that payment record.')
+  }
+
+  const finalMethod = methodRaw as PaymentMethod | null
+  const finalStatus = statusRaw as PaymentStatus
+  const finalType = typeRaw as PaymentType
+
+  const { error } = await admin
+    .from('payments')
+    .update({
+      amount,
+      type: finalType,
+      method: finalMethod,
+      status: finalStatus,
+      paid_at: finalStatus === 'pending' ? null : paidAt,
+      notes,
+    })
+    .eq('id', paymentId)
+    .eq('booking_id', bookingId)
+
+  if (error) {
+    redirectWithError(`/admin/bookings/${bookingId}`, error.message || 'Unable to correct payment record.')
+  }
+
+  await syncInvoicePaymentState(admin, bookingId)
+  await syncBookingDepositState(admin, bookingId)
+  await syncBookingWorkflowState(admin, bookingId)
+
+  await appendBookingTimelineNote(
+    admin,
+    bookingId,
+    `Payment ${paymentId.slice(0, 8).toUpperCase()} corrected: ${formatCurrency(amount)} ${finalType}, ${finalStatus}.`
+  )
+
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/payments')
+  revalidatePath('/admin/dashboard')
+  revalidatePath(`/admin/bookings/${bookingId}/invoice`)
+  revalidatePath('/admin/invoices')
+  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Payment record corrected.')}`)
+}
+
+
 // ─── WORKFLOW TRANSITION ACTIONS ─────────────────────────────────────────────
 
 export async function markBookingContactedAction(formData: FormData) {
@@ -1327,6 +1439,21 @@ export async function confirmBookingAction(formData: FormData) {
 
   await syncComputedBookingPaymentState(admin, bookingId as string)
 
+  const invoiceDraftResult = await ensureInvoiceDraft(admin, bookingId as string)
+  if (invoiceDraftResult.created) {
+    await appendBookingTimelineNote(
+      admin,
+      bookingId as string,
+      'Invoice draft created automatically when the booking was confirmed.'
+    )
+  } else if (invoiceDraftResult.updated) {
+    await appendBookingTimelineNote(
+      admin,
+      bookingId as string,
+      'Invoice draft refreshed when the booking was confirmed.'
+    )
+  }
+
   void logBookingActivity({
     bookingId: bookingId as string,
     type: 'status_changed',
@@ -1354,6 +1481,8 @@ export async function confirmBookingAction(formData: FormData) {
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/dashboard')
+  revalidatePath('/admin/invoices')
+  revalidatePath(`/admin/bookings/${bookingId}/invoice`)
   redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Booking confirmed.')}`)
 }
 
@@ -1413,27 +1542,43 @@ export async function requestFinalPaymentAction(formData: FormData) {
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
 
   const source = await getBookingBalanceReminderSource(admin, bookingId as string)
-  if (source) {
-    const payload = await getBalanceReminderPayloadFromBooking(source)
-    if (payload) {
-      const result = await sendBookingBalanceReminder(payload)
-      if (result.ok) {
-        await stampBookingEmailSentAt(admin, bookingId as string, 'last_balance_reminder_sent_at')
-        await appendBookingTimelineNote(admin, bookingId as string, `Final payment requested. Balance reminder sent to ${payload.email}.`)
-      } else {
-        await appendBookingTimelineNote(admin, bookingId as string, 'Final payment requested. Balance reminder email could not be sent.')
-      }
-    } else {
-      await appendBookingTimelineNote(admin, bookingId as string, 'Final payment requested. No client email on file — balance reminder not sent.')
-    }
+  if (!source) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Could not load this booking for a final payment reminder.')
   }
 
+  const payload = await getBalanceReminderPayloadFromBooking(source)
+  if (!payload) {
+    redirectWithError(
+      `/admin/bookings/${bookingId}`,
+      'Final payment reminder is blocked. Check the client email and outstanding balance first.'
+    )
+  }
+
+  const result = await sendBookingBalanceReminder(payload)
+  if (!result.ok) {
+    await appendBookingTimelineNote(
+      admin,
+      bookingId as string,
+      'Final payment reminder could not be sent.'
+    )
+    redirectWithError(
+      `/admin/bookings/${bookingId}`,
+      result.detail || 'Final payment reminder could not be sent.'
+    )
+  }
+
+  await stampBookingEmailSentAt(admin, bookingId as string, 'last_balance_reminder_sent_at')
+  await appendBookingTimelineNote(
+    admin,
+    bookingId as string,
+    `Final payment requested. Balance reminder sent to ${payload.email}.`
+  )
   await syncComputedBookingPaymentState(admin, bookingId as string)
 
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/dashboard')
-  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Final payment requested.')}`)
+  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Final payment reminder sent to ${payload.email}.`)}`)
 }
 
 export async function markFullyPaidAction(formData: FormData) {
