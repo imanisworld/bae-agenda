@@ -203,6 +203,7 @@ export default async function BookingsPage({
       <PageHeader
         title="Bookings"
         subtitle={bookings.length ? `${bookings.length} total` : undefined}
+        action={{ label: 'New Booking', href: '/admin/bookings/new' }}
       />
 
       {errorMessage && <AdminNotice message={errorMessage} />}
@@ -252,7 +253,8 @@ export default async function BookingsPage({
         {bookings.length === 0 ? (
           <AdminEmptyState
             title="No bookings yet"
-            desc="Booking requests submitted through the site will appear here."
+            desc="Booking requests from the public site and bookings you add manually will appear here."
+            action={{ label: 'Create Booking', href: '/admin/bookings/new' }}
           />
         ) : visibleBookings.length === 0 ? (
           <AdminEmptyState

@@ -31,7 +31,8 @@ import {
   type BookingPostEventFollowUpSource,
   type BookingReviewRequestSource,
 } from '@/lib/booking-email-payloads'
-import { toEventISO } from '@/lib/date-time'
+import { isValidTimeZone, toEventISO } from '@/lib/date-time'
+import { suggestEventTimeZone } from '@/lib/event-form-options'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
 import { sendBookingBalanceReminder, sendBookingConfirmedNotification, sendBookingInquiryReceipt, sendW9Notification } from '@/lib/notifications'
 import { BOOKING_LIFECYCLE_STATUSES, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
@@ -743,6 +744,171 @@ export async function updateBookingStatusAction(formData: FormData) {
   redirect('/admin/bookings')
 }
 
+export async function createAdminBookingAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+
+  const firstName = optionalString(formData.get('first_name'))
+  const lastName = optionalString(formData.get('last_name'))
+  const email = optionalString(formData.get('email'))?.toLowerCase() ?? null
+  const phone = optionalString(formData.get('phone'))
+  const eventName = optionalString(formData.get('event_name'))
+  const eventType = optionalString(formData.get('event_type'))
+  const eventDate = optionalString(formData.get('event_date'))
+  const eventTime = optionalString(formData.get('event_time'))
+  const eventEndTime = optionalString(formData.get('event_end_time'))
+  const city = optionalString(formData.get('city'))
+  const submittedTimeZone = optionalString(formData.get('event_timezone'))
+  const eventTimeZone = submittedTimeZone || suggestEventTimeZone(city) || null
+  const venue = optionalString(formData.get('venue'))
+  const packageName = optionalString(formData.get('package'))
+  const hours = parseOptionalNumber(formData.get('hours'))
+  const quote = parseOptionalNumber(formData.get('quote'))
+  const depositAmount = parseOptionalNumber(formData.get('deposit_amount'))
+  const notes = optionalString(formData.get('notes'))
+
+  const returnPath = '/admin/bookings/new'
+
+  if (!firstName || !email || !eventName || !eventDate || !eventTime || !eventTimeZone) {
+    redirectWithError(
+      returnPath,
+      'Client first name, email, event name, date, start time, and timezone are required.'
+    )
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    redirectWithError(returnPath, 'Enter a valid client email address.')
+  }
+
+  if (!isValidTimeZone(eventTimeZone)) {
+    redirectWithError(returnPath, 'Choose a valid event timezone.')
+  }
+
+  const eventDateIso = toEventISO(eventDate, eventTimeZone, eventTime)
+  if (!eventDateIso) {
+    redirectWithError(returnPath, 'Enter a valid event date and start time.')
+  }
+
+  const eventEndIso = eventEndTime
+    ? toEventISO(eventDate, eventTimeZone, eventEndTime)
+    : null
+
+  if (eventEndTime && !eventEndIso) {
+    redirectWithError(returnPath, 'Enter a valid event end time.')
+  }
+
+  if (eventEndIso && new Date(eventEndIso).getTime() <= new Date(eventDateIso).getTime()) {
+    redirectWithError(returnPath, 'Event end time must be after the start time.')
+  }
+
+  if (hours !== null && hours <= 0) {
+    redirectWithError(returnPath, 'Hours must be greater than 0.')
+  }
+
+  if (quote !== null && quote < 0) {
+    redirectWithError(returnPath, 'Quote cannot be negative.')
+  }
+
+  if (depositAmount !== null && depositAmount < 0) {
+    redirectWithError(returnPath, 'Deposit cannot be negative.')
+  }
+
+  if (depositAmount !== null && quote === null) {
+    redirectWithError(returnPath, 'Add a quote before setting a deposit amount.')
+  }
+
+  if (quote !== null && depositAmount !== null && depositAmount > quote) {
+    redirectWithError(returnPath, 'Deposit cannot be greater than the quote.')
+  }
+
+  const { data: existingClient, error: existingClientError } = await admin
+    .from('clients')
+    .select('id, first_name, last_name, phone')
+    .eq('email', email)
+    .maybeSingle()
+
+  if (existingClientError) {
+    redirectWithError(returnPath, existingClientError.message || 'Unable to check the client record.')
+  }
+
+  let clientId = existingClient?.id as string | undefined
+
+  if (clientId) {
+    const { error: clientUpdateError } = await admin
+      .from('clients')
+      .update({
+        first_name: firstName,
+        last_name: lastName ?? existingClient?.last_name ?? null,
+        phone: phone ?? existingClient?.phone ?? null,
+      })
+      .eq('id', clientId)
+
+    if (clientUpdateError) {
+      redirectWithError(returnPath, clientUpdateError.message || 'Unable to update the client record.')
+    }
+  } else {
+    const { data: createdClient, error: clientCreateError } = await admin
+      .from('clients')
+      .insert({
+        first_name: firstName,
+        last_name: lastName,
+        email,
+        phone,
+      })
+      .select('id')
+      .single()
+
+    if (clientCreateError || !createdClient?.id) {
+      redirectWithError(returnPath, clientCreateError?.message || 'Unable to create the client record.')
+    }
+
+    clientId = createdClient.id
+  }
+
+  const { data: booking, error: bookingError } = await admin
+    .from('bookings')
+    .insert({
+      client_id: clientId,
+      event_name: eventName,
+      event_type: eventType,
+      event_date: eventDateIso,
+      event_end_time: eventEndIso,
+      event_timezone: eventTimeZone,
+      venue,
+      city,
+      package: packageName,
+      hours,
+      quote,
+      deposit_amount: depositAmount,
+      notes,
+      status: 'inquiry',
+      lifecycle_status: 'new',
+      payment_status: 'unpaid',
+    })
+    .select('id')
+    .single()
+
+  if (bookingError || !booking?.id) {
+    redirectWithError(returnPath, bookingError?.message || 'Unable to create the booking.')
+  }
+
+  await appendBookingTimelineNote(
+    admin,
+    booking.id,
+    'Booking created manually in Admin.'
+  )
+
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/dashboard')
+  revalidatePath('/admin/clients')
+  revalidatePath(`/admin/bookings/${booking.id}`)
+
+  redirect(
+    `/admin/bookings/${booking.id}?success=${encodeURIComponent('Booking created. Review the details, then confirm it when you are ready.')}`
+  )
+}
+
 export async function updateBookingDetailsAction(formData: FormData) {
   await requireAdminUser()
 
@@ -906,7 +1072,7 @@ export async function createEventFromBookingAction(formData: FormData) {
 
   const { data: existingEvent, error: existingEventError } = await admin
     .from('events')
-    .select('id')
+    .select('id, booking_id')
     .eq('title', source.event_name)
     .eq('event_date', source.event_date)
     .limit(1)
@@ -917,12 +1083,24 @@ export async function createEventFromBookingAction(formData: FormData) {
   }
 
   if (existingEvent?.id) {
+    if (!existingEvent.booking_id) {
+      const { error: linkError } = await admin
+        .from('events')
+        .update({ booking_id: source.id })
+        .eq('id', existingEvent.id)
+
+      if (linkError) {
+        redirectWithError('/admin/bookings', linkError.message || 'Unable to link the existing event to this booking.')
+      }
+    }
+
     redirect(`/admin/events/${existingEvent.id}`)
   }
 
   const { data: createdEvent, error: createError } = await admin
     .from('events')
     .insert({
+      booking_id: source.id,
       title: source.event_name,
       event_date: source.event_date,
       event_timezone: source.event_timezone,
