@@ -65,10 +65,11 @@ function getBookingName(
 async function getPayments(): Promise<PaymentRow[]> {
   try {
     const supabase = createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('payments')
       .select('id, amount, type, method, status, paid_at, created_at, bookings(id, event_name)')
       .order('created_at', { ascending: false })
+    if (error) throw new Error(error.message || 'Unable to load payments.')
     const rows = (data ?? []) as PaymentQueryRow[]
     return rows.map((p) => {
       return {
@@ -83,8 +84,8 @@ async function getPayments(): Promise<PaymentRow[]> {
         created_at:   p.created_at,
       }
     })
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load payments.')
   }
 }
 
