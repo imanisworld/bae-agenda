@@ -18,7 +18,7 @@ type Props = { finish?: LogoFinish; className?: string }
 export function HangingLogo({ finish = 'red', className }: Props) {
   const tag = FINISHES[finish]
   const [kicked, setKicked] = useState(false)
-  const directionRef = useRef<1 | -1>(1)
+  const [direction, setDirection] = useState<1 | -1>(1)
   const timerRef = useRef<number | null>(null)
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export function HangingLogo({ finish = 'red', className }: Props) {
 
   function kick(event: PointerEvent<HTMLSpanElement>) {
     event.stopPropagation()
-    directionRef.current = directionRef.current === 1 ? -1 : 1
+    setDirection((value) => value === 1 ? -1 : 1)
 
     if (timerRef.current) window.clearTimeout(timerRef.current)
     setKicked(false)
@@ -43,7 +43,7 @@ export function HangingLogo({ finish = 'red', className }: Props) {
   const copy = (layer: string, interactive = false) => (
     <span
       className={`${styles.swing} ${layer}${kicked ? ` ${styles.kicked}` : ''}`}
-      style={{ '--kick-dir': directionRef.current } as CSSProperties}
+      style={{ '--kick-dir': direction } as CSSProperties}
       onPointerDown={interactive ? kick : undefined}
     >
       <Image src={tag.src} alt="" width={900} height={tag.height} sizes="120px" className={styles.logo} />
