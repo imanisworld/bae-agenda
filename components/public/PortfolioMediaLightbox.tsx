@@ -27,7 +27,7 @@ export type PortfolioArchiveMedia = {
 type LightboxItem = PortfolioArchiveMedia & { synthetic?: boolean }
 
 function buildItems(entry: PortfolioArchiveEntry, media: PortfolioArchiveMedia[]): LightboxItem[] {
-  const items = [...media].sort((a, b) => a.sort_order - b.sort_order)
+  const items: LightboxItem[] = [...media].sort((a, b) => a.sort_order - b.sort_order)
   if (entry.photo_url && !items.some((item) => item.media_url === entry.photo_url)) {
     items.unshift({
       id: `cover-${entry.id}`,
