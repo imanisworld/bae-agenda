@@ -9,13 +9,17 @@ import { createClient } from '@/lib/supabase/server'
 import { getEventCandidateFloorIso, isUpcomingEventRecord } from '@/lib/event-schedule'
 import type { Database } from '@/types/database'
 
-export type Event = Database['public']['Tables']['events']['Row']
+type EventRow = Database['public']['Tables']['events']['Row']
+export type Event = Omit<EventRow, 'booking_id'>
+
+const PUBLIC_EVENT_COLUMNS =
+  'id,title,slug,event_date,event_timezone,venue,city,description,public,featured,show_description,created_at,updated_at' as const
 
 async function loadUpcomingCandidates(limit: number, featuredOnly = false): Promise<Event[]> {
   const supabase = await createClient()
   let query = supabase
     .from('events')
-    .select('*')
+    .select(PUBLIC_EVENT_COLUMNS)
     .eq('public', true)
     .gte('event_date', getEventCandidateFloorIso())
     .order('event_date', { ascending: true })
@@ -58,7 +62,7 @@ export async function getPastEvents(limit = 20): Promise<Event[]> {
     const ceiling = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
     const { data, error } = await supabase
       .from('events')
-      .select('*')
+      .select(PUBLIC_EVENT_COLUMNS)
       .eq('public', true)
       .lt('event_date', ceiling)
       .order('event_date', { ascending: false })

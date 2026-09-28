@@ -24,6 +24,7 @@ export type Database = {
       events: {
         Row: {
           id:          string
+          booking_id:  string | null // internal FK → bookings.id; never expose on public event reads
           title:       string
           slug:        string        // used for /events/[slug] routing
           event_date:  string        // ISO timestamptz — determines upcoming vs past
