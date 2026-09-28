@@ -1,6 +1,8 @@
 /* The pin point is the top of the logo's clasp; the tag rotates around it. */
 .hanger {
-  --size: clamp(60px, 6.2vw, 92px);
+  /* The dimensional mark needs enough physical size for the clasp and DJ B.A.E.
+     lettering to read; smaller UI marks should use the flat asset once added. */
+  --size: clamp(68px, 6.4vw, 98px);
   /* The clasp's slot is ~13% down the tag (tag height ≈ .73 × width); the
      letter stroke or photo edge runs through it there. */
   --hook: calc(var(--size) * .73 * .13);
@@ -79,7 +81,7 @@
 
 @media (max-width: 620px) {
   .hanger {
-    --size: 58px;
+    --size: 68px;
   }
 }
 
