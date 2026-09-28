@@ -81,16 +81,9 @@ export default function ContentEditor({ saved }: Props) {
     <div>
 
       {/* ── Header bar ──────────────────────────────────────────── */}
-      <div style={{
-        display:        'flex',
-        alignItems:     'center',
-        justifyContent: 'space-between',
-        marginBottom:   '32px',
-        gap:            '16px',
-        flexWrap:       'wrap',
-      }}>
+      <div className="admin-content-toolbar">
         {/* Status indicator */}
-        <div style={{ fontSize: '12px', letterSpacing: '0.04em', minHeight: '18px' }}>
+        <div className="admin-content-status">
           {status === 'saved' && (
             <span style={{ color: '#34d399' }}>✓ Saved — public site updated</span>
           )}
@@ -136,26 +129,12 @@ export default function ContentEditor({ saved }: Props) {
               return (
                 <div
                   key={field.key}
-                  style={{
-                    padding:      '20px 24px',
-                    borderBottom: i < group.fields.length - 1
-                      ? '1px solid var(--border)' : 'none',
-                    display:             'grid',
-                    gridTemplateColumns: '200px 1fr',
-                    gap:                 '24px',
-                    alignItems:          'start',
-                  }}
+                  className="admin-content-row"
+                  data-last={i === group.fields.length - 1 ? 'true' : 'false'}
                 >
                   {/* Label column */}
-                  <div>
-                    <div style={{
-                      fontSize:    '13px',
-                      color:       'var(--white)',
-                      marginBottom:'4px',
-                      display:     'flex',
-                      alignItems:  'center',
-                      gap:         '7px',
-                    }}>
+                  <div className="admin-content-label">
+                    <div className="admin-content-label-title">
                       {field.label}
                       {isChanged && (
                         <span style={{
@@ -165,22 +144,12 @@ export default function ContentEditor({ saved }: Props) {
                       )}
                     </div>
 
-                    <code style={{
-                      fontSize:       '10px',
-                      color:          'var(--muted)',
-                      letterSpacing:  '0.08em',
-                      fontFamily:     'monospace',
-                    }}>
+                    <code className="admin-content-key">
                       {field.key}
                     </code>
 
                     {field.hint && (
-                      <p style={{
-                        fontSize:    '11px',
-                        color:       'var(--muted)',
-                        marginTop:   '6px',
-                        lineHeight:  1.5,
-                      }}>
+                      <p className="admin-content-hint">
                         {field.hint}
                       </p>
                     )}

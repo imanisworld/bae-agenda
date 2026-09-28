@@ -239,24 +239,14 @@ export default async function DashboardPage() {
 
       {/* ── Status Banner ───────────────────────────────────────── */}
       {usingSample && (
-        <div style={{
-          background: 'rgba(155,93,229,0.06)',
-          border: '1px solid rgba(155,93,229,0.18)',
-          padding: '14px 20px', marginBottom: '36px',
-          display: 'flex', alignItems: 'flex-start', gap: '12px',
-        }}>
-          <span style={{ fontSize: '13px', marginTop: '1px', flexShrink: 0, color: 'var(--violet)' }}>◈</span>
+        <div className="admin-preview-banner">
+          <span className="admin-preview-mark" aria-hidden="true">◈</span>
           <div>
-            <div style={{
-              fontSize: '10px', letterSpacing: '0.15em', textTransform: 'uppercase',
-              color: 'var(--violet)', marginBottom: '4px', fontWeight: 500,
-            }}>
-              Preview Mode — Sample Data
-            </div>
-            <p style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>
+            <div className="admin-preview-title">Preview Mode — Sample Data</div>
+            <p>
               {raw.connected
                 ? <>Run the migration SQL in Supabase to load live data. Sample data is shown until your first records are added.</>
-                : <>Add your Supabase credentials to <code style={{ color: 'var(--white)', fontSize: '11px' }}>.env.local</code> to activate live data.</>
+                : <>Add your Supabase credentials to <code>.env.local</code> to activate live data.</>
               }
             </p>
           </div>

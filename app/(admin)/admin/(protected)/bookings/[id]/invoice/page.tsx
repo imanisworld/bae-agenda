@@ -3,9 +3,19 @@ import Link from 'next/link'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import PageHeader from '@/components/admin/PageHeader'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import { createInvoiceFromBookingAction, restoreInvoiceDraftAction, voidInvoiceAction } from '@/app/actions/invoices'
+import { createBookingPaymentAction } from '@/app/actions/bookings'
 import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
+import { applyInvoiceSnapshot, type InvoiceSnapshotData } from '@/lib/invoices'
+import { PAYMENT_METHODS } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
+
+interface InvoiceState extends InvoiceSnapshotData {
+  status: 'draft' | 'sent' | 'paid' | 'void'
+  sent_at: string | null
+  created_at: string
+}
 
 interface BookingRow {
   id:             string
@@ -43,6 +53,17 @@ async function getBooking(id: string): Promise<BookingRow | null> {
   return (data as BookingRow | null) ?? null
 }
 
+async function getInvoiceState(id: string): Promise<InvoiceState | null> {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('invoices')
+    .select('status, invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, sent_at, created_at')
+    .eq('booking_id', id)
+    .maybeSingle()
+
+  return (data as InvoiceState | null) ?? null
+}
+
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div style={{
@@ -65,10 +86,14 @@ export default async function InvoicePage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
-  const booking = await getBooking(id)
+  const [booking, invoiceState] = await Promise.all([
+    getBooking(id),
+    getInvoiceState(id),
+  ])
   if (!booking) notFound()
 
-  const client = booking.clients as {
+  const effectiveBooking = applyInvoiceSnapshot(booking, invoiceState)
+  const client = effectiveBooking.clients as {
     first_name: string | null
     last_name: string | null
     email: string | null
@@ -79,12 +104,12 @@ export default async function InvoicePage({
     ? `${client.first_name ?? ''} ${client.last_name ?? ''}`.trim()
     : '—'
 
-  const eventDate = formatEventDate(booking.event_date, booking.event_timezone)
-  const eventTime = formatEventTimeRange(booking.event_date, booking.event_end_time, booking.event_timezone)
+  const eventDate = formatEventDate(effectiveBooking.event_date, effectiveBooking.event_timezone)
+  const eventTime = formatEventTimeRange(effectiveBooking.event_date, effectiveBooking.event_end_time, effectiveBooking.event_timezone)
 
-  const total   = booking.quote         ?? 0
-  const deposit = booking.deposit_amount ?? 0
-  const balance = total - deposit
+  const total = effectiveBooking.quote ?? 0
+  const deposit = effectiveBooking.deposit_amount ?? 0
+  const balance = invoiceState ? Number(invoiceState.balance_due ?? total - deposit) : total - deposit
 
   const fmt = (n: number) =>
     n.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
@@ -93,9 +118,38 @@ export default async function InvoicePage({
     <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Invoice Preview"
-        subtitle={`${booking.event_name} · ${clientName}`}
-        action={{ label: 'Back to Booking', href: `/admin/bookings/${id}` }}
+        subtitle={`${effectiveBooking.event_name} · ${clientName}`}
+        action={{ label: 'Invoice Register', href: '/admin/invoices' }}
       />
+
+      <div className="invoice-preview-meta">
+        <div>
+          <span className="admin-section-title">Invoice State</span>
+          {invoiceState ? (
+            <span className={`invoice-status invoice-status--${invoiceState.status}`}>
+              {invoiceState.status}
+            </span>
+          ) : (
+            <span className="invoice-status">not created</span>
+          )}
+        </div>
+        <div>
+          <span className="admin-section-title">Created</span>
+          <strong>
+            {invoiceState
+              ? new Date(invoiceState.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              : '—'}
+          </strong>
+        </div>
+        <div>
+          <span className="admin-section-title">Last Sent</span>
+          <strong>
+            {invoiceState?.sent_at
+              ? new Date(invoiceState.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              : '—'}
+          </strong>
+        </div>
+      </div>
 
       {/* Invoice card */}
       <div className="admin-section" style={{ padding: '32px', marginBottom: '24px' }}>
@@ -117,7 +171,7 @@ export default async function InvoicePage({
               letterSpacing: '0.08em',
               marginBottom: '4px',
             }}>
-              DJ <span style={{ color: 'var(--violet)' }}>B.A.E.</span>
+              DJ <span style={{ color: 'var(--gold)' }}>B.A.E.</span>
             </div>
             <div style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.7 }}>
               Imani Crumble<br />
@@ -131,14 +185,14 @@ export default async function InvoicePage({
             <div style={{
               fontFamily: 'Conthrax, sans-serif',
               fontSize: '22px',
-              color: 'var(--violet)',
+              color: 'var(--gold)',
               letterSpacing: '0.06em',
               marginBottom: '4px',
             }}>
               INVOICE
             </div>
             <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
-              #{id.slice(0, 8).toUpperCase()}
+              #{invoiceState?.invoice_number ?? id.slice(0, 8).toUpperCase()}
             </div>
             <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '4px' }}>
               {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -163,13 +217,13 @@ export default async function InvoicePage({
 
         {/* Event details */}
         <div style={{ marginBottom: '24px' }}>
-          <Row label="Event" value={booking.event_name} />
+          <Row label="Event" value={effectiveBooking.event_name} />
           <Row label="Date" value={eventDate} />
           {eventTime && <Row label="Time" value={eventTime} />}
-          {booking.venue && <Row label="Venue" value={booking.venue} />}
-          {booking.city  && <Row label="City"  value={booking.city}  />}
-          {booking.package && <Row label="Package" value={booking.package} />}
-          {booking.hours   && <Row label="Hours"   value={`${booking.hours} hr${booking.hours !== 1 ? 's' : ''}`} />}
+          {effectiveBooking.venue && <Row label="Venue" value={effectiveBooking.venue} />}
+          {effectiveBooking.city  && <Row label="City"  value={effectiveBooking.city}  />}
+          {effectiveBooking.package && <Row label="Package" value={effectiveBooking.package} />}
+          {effectiveBooking.hours   && <Row label="Hours"   value={`${effectiveBooking.hours} hr${effectiveBooking.hours !== 1 ? 's' : ''}`} />}
         </div>
 
         {/* Totals */}
@@ -198,12 +252,12 @@ export default async function InvoicePage({
             paddingTop: '10px', marginTop: '4px',
           }}>
             <span style={{ color: 'var(--muted)' }}>Balance Due</span>
-            <span style={{ color: 'var(--violet)', fontFamily: 'Conthrax, sans-serif' }}>{fmt(balance)}</span>
+            <span style={{ color: 'var(--gold)', fontFamily: 'Conthrax, sans-serif' }}>{fmt(balance)}</span>
           </div>
         </div>
 
         {/* Notes */}
-        {booking.notes && (
+        {effectiveBooking.notes && (
           <div style={{
             marginTop: '24px',
             borderTop: '1px solid var(--border)',
@@ -213,7 +267,7 @@ export default async function InvoicePage({
             lineHeight: 1.7,
           }}>
             <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', marginBottom: '6px' }}>Notes</div>
-            {booking.notes}
+            {effectiveBooking.notes}
           </div>
         )}
 
@@ -228,23 +282,130 @@ export default async function InvoicePage({
         </div>
       </div>
 
+      {invoiceState && invoiceState.status !== 'paid' && invoiceState.status !== 'void' && balance > 0 && (
+        <section className="admin-section invoice-payment-panel">
+          <div className="admin-section-header">
+            <span className="admin-section-title">Record Payment</span>
+            <span className="invoice-balance-due">{fmt(balance)} remaining</span>
+          </div>
+
+          <form action={createBookingPaymentAction} className="invoice-payment-form">
+            <input type="hidden" name="booking_id" value={id} />
+            <input type="hidden" name="type" value="balance" />
+            <input type="hidden" name="status" value="received" />
+            <input type="hidden" name="return_to" value={`/admin/bookings/${id}/invoice`} />
+
+            <label>
+              <span className="admin-field-label">Amount Received</span>
+              <input
+                name="amount"
+                type="number"
+                min="0.01"
+                max={balance}
+                step="0.01"
+                defaultValue={balance.toFixed(2)}
+                required
+              />
+            </label>
+
+            <label>
+              <span className="admin-field-label">Method</span>
+              <select name="method" defaultValue="">
+                <option value="">Not specified</option>
+                {PAYMENT_METHODS.map((method) => (
+                  <option key={method} value={method}>
+                    {method === 'cash_app'
+                      ? 'Cash App'
+                      : method === 'ach'
+                        ? 'ACH'
+                        : method.charAt(0).toUpperCase() + method.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="invoice-payment-notes">
+              <span className="admin-field-label">Internal Note</span>
+              <input
+                name="notes"
+                placeholder="Optional payment note or reference"
+              />
+            </label>
+
+            <div className="admin-form-actions">
+              <button type="submit" className="admin-btn-primary">
+                Record Payment
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
       {/* Actions */}
       <div className="admin-form-actions">
-        <SendInvoiceButton
-          bookingId={id}
-          clientEmail={client?.email}
-          className="admin-btn-primary"
-          label="Send Invoice Email"
-        />
-        <a
-          href={`/api/invoice/${id}`}
-          download
-          className="admin-btn-ghost"
-        >
-          Download PDF
-        </a>
+        {!invoiceState ? (
+          <form action={createInvoiceFromBookingAction}>
+            <input type="hidden" name="booking_id" value={id} />
+            <button type="submit" className="admin-btn-primary" disabled={!booking.quote || booking.quote <= 0}>
+              Create Invoice
+            </button>
+          </form>
+        ) : (
+          <>
+            {invoiceState.status !== 'paid' && invoiceState.status !== 'void' && (
+              <Link href={`/admin/bookings/${id}/invoice/edit`} className="admin-btn-ghost">
+                Edit Invoice
+              </Link>
+            )}
+            {invoiceState.status !== 'paid' && invoiceState.status !== 'void' && (
+              <SendInvoiceButton
+                bookingId={id}
+                clientEmail={client?.email}
+                className="admin-btn-primary"
+                label={invoiceState.sent_at ? 'Resend Invoice' : 'Send Invoice Email'}
+              />
+            )}
+            {invoiceState.status === 'sent' && balance > 0 && (
+              <SendInvoiceButton
+                bookingId={id}
+                clientEmail={client?.email}
+                className="admin-btn-ghost"
+                label="Send Payment Reminder"
+                mode="reminder"
+              />
+            )}
+            {invoiceState.status !== 'void' && (
+              <a
+                href={`/api/invoice/${id}`}
+                download
+                className="admin-btn-ghost"
+              >
+                Download PDF
+              </a>
+            )}
+            {invoiceState.status !== 'paid' && invoiceState.status !== 'void' && (
+              <form action={voidInvoiceAction}>
+                <input type="hidden" name="booking_id" value={id} />
+                <button type="submit" className="admin-btn-danger">
+                  Void Invoice
+                </button>
+              </form>
+            )}
+            {invoiceState.status === 'void' && (
+              <form action={restoreInvoiceDraftAction}>
+                <input type="hidden" name="booking_id" value={id} />
+                <button type="submit" className="admin-btn-primary">
+                  Restore To Draft
+                </button>
+              </form>
+            )}
+          </>
+        )}
         <Link href={`/admin/bookings/${id}`} className="admin-btn-ghost">
-          Back to Booking
+          Edit Booking
+        </Link>
+        <Link href="/admin/invoices" className="admin-btn-ghost">
+          All Invoices
         </Link>
       </div>
     </div>

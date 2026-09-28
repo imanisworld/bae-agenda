@@ -75,32 +75,16 @@ export default async function PortfolioAdminPage({
       {errorMessage && <AdminNotice message={errorMessage} />}
 
       {/* Stats row */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(120px, 1fr))',
-        gap: '1px',
-        background: 'var(--border)',
-        border: '1px solid var(--border)',
-        marginBottom: '24px',
-      }}>
+      <div className="admin-portfolio-stats">
         {[
           { label: 'Total',     value: all.length   },
           { label: 'Published', value: published     },
           { label: 'Drafts',    value: drafts        },
           { label: 'Featured',  value: featCount     },
         ].map(({ label, value }) => (
-          <div key={label} style={{
-            background: 'var(--off-black)',
-            padding: '16px 20px',
-            display: 'grid',
-            gap: '4px',
-          }}>
-            <div style={{ fontSize: '8px', letterSpacing: '0.24em', textTransform: 'uppercase', color: 'var(--muted)' }}>
-              {label}
-            </div>
-            <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '20px', color: 'var(--white)' }}>
-              {value}
-            </div>
+          <div key={label} className="admin-portfolio-stat">
+            <span>{label}</span>
+            <strong>{value}</strong>
           </div>
         ))}
       </div>
@@ -211,7 +195,7 @@ export default async function PortfolioAdminPage({
                           style={{
                             padding: '4px 8px',
                             fontSize: '9px',
-                            color: entry.featured ? 'var(--violet)' : 'var(--muted)',
+                            color: entry.featured ? 'var(--gold)' : 'var(--muted)',
                           }}
                         >
                           {entry.featured ? '★ Featured' : 'Set Featured'}

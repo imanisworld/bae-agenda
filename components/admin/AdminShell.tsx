@@ -29,6 +29,7 @@ export default function AdminShell({ userEmail, children }: AdminShellProps) {
 
   return (
     <div className="admin-shell">
+      <div className="admin-atmosphere" aria-hidden="true" />
       <div className="admin-mobile-bar" aria-hidden={sidebarOpen}>
         <button
           className="admin-mobile-menu-btn"
@@ -41,7 +42,8 @@ export default function AdminShell({ userEmail, children }: AdminShellProps) {
           <span />
         </button>
         <div className="admin-mobile-bar-brand">
-          DJ <span>B.A.E.</span>
+          <span className="admin-mobile-brand-mark">DJ <strong>B.A.E.</strong></span>
+          <span className="admin-mobile-brand-label">Control Room</span>
         </div>
         <div style={{ width: 36, flexShrink: 0 }} />
       </div>

@@ -24,6 +24,40 @@ export interface InvoiceBookingData {
   } | null
 }
 
+export interface InvoiceSnapshotData {
+  invoice_number: string
+  pdf_filename: string
+  event_name: string | null
+  client_name: string | null
+  client_email: string | null
+  total_amount: number
+  deposit_amount: number
+  balance_due: number
+}
+
+export function applyInvoiceSnapshot(
+  booking: InvoiceBookingData,
+  invoice: InvoiceSnapshotData | null | undefined
+): InvoiceBookingData {
+  if (!invoice) return booking
+
+  const originalClient = booking.clients
+  const clientName = invoice.client_name?.trim()
+
+  return {
+    ...booking,
+    event_name: invoice.event_name?.trim() || booking.event_name,
+    quote: Number(invoice.total_amount ?? booking.quote ?? 0),
+    deposit_amount: Number(invoice.deposit_amount ?? booking.deposit_amount ?? 0),
+    clients: {
+      first_name: clientName || originalClient?.first_name || null,
+      last_name: clientName ? null : originalClient?.last_name || null,
+      email: invoice.client_email?.trim() || originalClient?.email || null,
+      phone: originalClient?.phone || null,
+    },
+  }
+}
+
 const PAGE = {
   width: 612,
   height: 792,
