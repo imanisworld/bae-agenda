@@ -280,9 +280,10 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
 
   const header = (
     <header className={styles.header}>
-      <div>
-        <p>Bae&apos;s in the Lab</p>
+      <div className={styles.headerIdentity}>
+        <p>Bae&apos;s in the Lab · Listening Room</p>
         <h1><HangFrom finish="chrome">O</HangFrom>n wax.</h1>
+        <span className={styles.headerNote}>Pick a sleeve. Drop the needle. Drag the record.</span>
       </div>
       {crates.length > 1 ? (
         <div className={styles.crateSwitch} role="group" aria-label="Choose a crate">
@@ -346,6 +347,10 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
 
       {/* ── Crate: 3D cover carousel ── */}
       <div className={styles.crate}>
+        <div className={styles.crateLabelRow} aria-hidden="true">
+          <span>The crate</span>
+          <span>Swipe · drag · tap</span>
+        </div>
         <div
           key={crate?.key}
           className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}`}
@@ -407,6 +412,10 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
 
       {/* ── Deck: picture-disc turntable + transport ── */}
       <div className={`${styles.deck}${playing ? ` ${styles.deckPlaying}` : ''}`}>
+        <div className={styles.deckPlate} aria-hidden="true">
+          <span>BAE-01</span>
+          <span>Listening deck</span>
+        </div>
         <button
           ref={turntableRef}
           type="button"
