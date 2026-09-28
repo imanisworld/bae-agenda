@@ -8,6 +8,7 @@ import { getOutstandingDeposit, getReceivedPaymentTotal } from '@/lib/booking-fi
 import { getStripePublishableKey } from '@/lib/stripe'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
+import { isValidTimeZone } from '@/lib/date-time'
 
 export const metadata: Metadata = {
   title: 'Pay Deposit',
@@ -76,10 +77,11 @@ function formatCurrency(value: number | null) {
   })
 }
 
-function formatDateTime(iso: string | null) {
+function formatDateTime(iso: string | null, timeZone?: string | null) {
   if (!iso) return '—'
   const date = new Date(iso)
   if (Number.isNaN(date.getTime())) return '—'
+  const zone = timeZone && isValidTimeZone(timeZone) ? timeZone : undefined
 
   return date.toLocaleString('en-US', {
     month: 'short',
@@ -87,6 +89,7 @@ function formatDateTime(iso: string | null) {
     year: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
+    ...(zone ? { timeZone: zone } : {}),
   })
 }
 
@@ -116,7 +119,7 @@ export default async function PayBookingPage({
   const checkoutState = getMessage(resolvedSearchParams?.checkout)
 
   return (
-    <main
+    <section
       style={{
         minHeight: '100svh',
         background:
@@ -154,7 +157,7 @@ export default async function PayBookingPage({
 
         {checkoutState === 'success' && depositStatus !== 'paid' && (
           <div style={{ border: '1px solid rgba(201, 168, 76, 0.24)', background: 'rgba(201, 168, 76, 0.08)', color: '#fef3c7', padding: '14px 16px' }}>
-            Checkout returned successfully. We&apos;re waiting for Stripe&apos;s webhook to confirm the payment.
+            Checkout completed. Stripe confirmation is still processing.
           </div>
         )}
 
@@ -181,14 +184,14 @@ export default async function PayBookingPage({
               {booking.event_name}
             </h1>
             <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: 1.7, maxWidth: '680px' }}>
-              Secure the date with Stripe Checkout or follow the manual Zelle / Cash App instructions shared with you by the DJ B.A.E. team.
+              Secure the date with Stripe Checkout or use the manual Zelle / Cash App instructions shared with you directly.
             </p>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
             {[
               { label: 'Booking ID', value: booking.id.slice(0, 8).toUpperCase() },
-              { label: 'Event Date', value: formatDateTime(booking.event_date) },
+              { label: 'Event Date', value: formatDateTime(booking.event_date, booking.event_timezone) },
               { label: 'Quote', value: formatCurrency(booking.quote) },
               { label: 'Deposit Due', value: formatCurrency(booking.deposit_amount) },
               { label: 'Received So Far', value: formatCurrency(receivedTotal) },
@@ -219,7 +222,7 @@ export default async function PayBookingPage({
                 <input type="hidden" name="booking_id" value={booking.id} />
                 <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '18px' }}>Pay with Stripe</div>
                 <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7 }}>
-                  Pay the deposit online now. Stripe will send us a secure webhook confirmation before the booking updates to paid.
+                  Pay the deposit online now. Stripe confirms the payment before the booking is marked paid.
                 </p>
                 <button
                   type="submit"
@@ -246,7 +249,7 @@ export default async function PayBookingPage({
                 </button>
                 {!stripeReady && (
                   <div style={{ color: '#fef3c7', fontSize: '12px', lineHeight: 1.6 }}>
-                    Stripe keys are still being added. Use the manual option if you need to pay before the Stripe setup finishes.
+                    Online card payment is temporarily unavailable. Use the manual option below if you need to pay now.
                   </div>
                 )}
               </form>
@@ -255,12 +258,12 @@ export default async function PayBookingPage({
                 <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '18px' }}>Manual Zelle / Cash App</div>
                 <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7 }}>
                   If you were given a manual payment option, include your booking ID in the memo and send proof of payment to{' '}
-                  <a href={`mailto:${process.env.BOOKING_ALERT_EMAIL ?? DEFAULT_BOOKING_EMAIL}`} style={{ color: 'var(--white)' }}>
-                    {process.env.BOOKING_ALERT_EMAIL ?? DEFAULT_BOOKING_EMAIL}
+                  <a href={`mailto:${DEFAULT_BOOKING_EMAIL}`} style={{ color: 'var(--white)' }}>
+                    {DEFAULT_BOOKING_EMAIL}
                   </a>.
                 </p>
                 <div style={{ border: '1px dashed rgba(255,255,255,0.18)', padding: '12px 14px', fontSize: '13px', lineHeight: 1.7, overflowWrap: 'anywhere' }}>
-                  Manual payments do not auto-confirm. The team will review the transfer and mark the deposit paid from the admin panel.
+                  Manual payments do not auto-confirm. I&apos;ll review the transfer and mark the deposit paid once it&apos;s verified.
                 </div>
               </div>
             </div>
@@ -295,6 +298,6 @@ export default async function PayBookingPage({
           )}
         </section>
       </div>
-    </main>
+    </section>
   )
 }
