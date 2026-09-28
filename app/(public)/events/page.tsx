@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import EventExperienceStage from '@/components/public/EventExperienceStage'
-import { getPastEvents, getUpcomingEvents } from '@/lib/db/events'
+import { getPastEvents, getPublicEventMedia, getUpcomingEvents } from '@/lib/db/events'
 
 export const dynamic = 'force-dynamic'
 
@@ -27,5 +27,13 @@ export const metadata: Metadata = {
 
 export default async function EventsPage() {
   const [events, pastEvents] = await Promise.all([getUpcomingEvents(50), getPastEvents(20)])
-  return <EventExperienceStage events={events} pastEvents={pastEvents} />
+  const pastEventMedia = await getPublicEventMedia(pastEvents.map((event) => event.id))
+
+  return (
+    <EventExperienceStage
+      events={events}
+      pastEvents={pastEvents}
+      pastEventMedia={pastEventMedia}
+    />
+  )
 }
