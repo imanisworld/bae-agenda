@@ -135,12 +135,34 @@ export async function POST(
 
   try {
     const admin = createAdminClient()
+    const sentAt = new Date().toISOString()
+
+    const { error: invoiceError } = await admin
+      .from('invoices')
+      .upsert({
+        booking_id: booking.id,
+        status: 'sent',
+        invoice_number: invoiceNumberOf(booking),
+        pdf_filename: invoiceFilename(booking),
+        event_name: booking.event_name,
+        client_name: clientName,
+        client_email: clientEmail,
+        total_amount: booking.quote ?? 0,
+        deposit_amount: booking.deposit_amount ?? 0,
+        balance_due: balance,
+        sent_at: sentAt,
+      }, { onConflict: 'booking_id' })
+
+    if (invoiceError) {
+      console.error('[invoice-send] unable to save invoice state:', invoiceError)
+    }
+
     await admin.from('notes').insert({
       booking_id: booking.id,
       body: `Invoice email sent to ${clientEmail}.`,
     })
   } catch (error) {
-    console.error('[invoice-send] note insert failed:', error)
+    console.error('[invoice-send] post-send bookkeeping failed:', error)
   }
 
   return NextResponse.json(
