@@ -97,7 +97,7 @@ export default async function ClientDetailPage({
     <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Edit Client"
-        subtitle="Correct contact details used by bookings, invoices, and client portal access."
+        subtitle="Correct the client record used by bookings, email, and portal access. Existing invoice snapshots are edited separately."
         action={{ label: 'Back To Clients', href: '/admin/clients' }}
       />
 
