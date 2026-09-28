@@ -129,7 +129,6 @@ export default function PublicExperienceShell({ children, footer, sticky }: { ch
   useEffect(() => {
     if (!arriving) return
     setPullOffset(0)
-    setPullState('idle')
     clearTimer(arrivalTimer)
     arrivalTimer.current = window.setTimeout(() => {
       setDepartingFrom(null)
