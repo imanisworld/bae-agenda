@@ -959,6 +959,7 @@ export async function createBookingPaymentAction(formData: FormData) {
   const statusRaw = optionalString(formData.get('status'))
   const paidAt = parseOptionalDate(formData.get('paid_at'))
   const notes = optionalString(formData.get('notes'))
+  const requestedReturnTo = optionalString(formData.get('return_to'))
 
   if (!bookingId || amount === null || amount <= 0 || !typeRaw || !statusRaw) {
     redirectWithError('/admin/payments', 'Booking, amount, payment type, and status are required.')
@@ -969,7 +970,8 @@ export async function createBookingPaymentAction(formData: FormData) {
   }
 
   if (methodRaw && !isPaymentMethod(methodRaw)) {
-    redirectWithError(`/admin/bookings/${bookingId}`, 'Invalid payment method.')
+    const fallback = bookingId ? `/admin/bookings/${bookingId}` : '/admin/payments'
+    redirectWithError(fallback, 'Invalid payment method.')
   }
 
   const finalBookingId = bookingId as string
@@ -977,6 +979,12 @@ export async function createBookingPaymentAction(formData: FormData) {
   const finalType = typeRaw as PaymentType
   const finalStatus = statusRaw as PaymentStatus
   const finalMethod = methodRaw as PaymentMethod | null
+  const returnTo = requestedReturnTo &&
+      requestedReturnTo.startsWith('/admin/') &&
+      !requestedReturnTo.startsWith('//') &&
+      !requestedReturnTo.includes('://')
+    ? requestedReturnTo
+    : `/admin/bookings/${finalBookingId}`
 
   const finalPaidAt = finalStatus === 'received'
     ? paidAt ?? new Date().toISOString()
@@ -995,7 +1003,7 @@ export async function createBookingPaymentAction(formData: FormData) {
   })
 
   if (error) {
-    redirectWithError(`/admin/bookings/${finalBookingId}`, error.message || 'Unable to record payment.')
+    redirectWithError(returnTo, error.message || 'Unable to record payment.')
   }
 
   if (shouldAutoSendW9ForPayment(finalAmount, finalStatus)) {
@@ -1065,7 +1073,8 @@ export async function createBookingPaymentAction(formData: FormData) {
   revalidatePath('/admin/payments')
   revalidatePath('/admin/dashboard')
   revalidatePath(`/admin/bookings/${finalBookingId}/invoice`)
-  redirect(`/admin/bookings/${finalBookingId}`)
+  revalidatePath('/admin/invoices')
+  redirect(returnTo)
 }
 
 // ─── WORKFLOW TRANSITION ACTIONS ─────────────────────────────────────────────
