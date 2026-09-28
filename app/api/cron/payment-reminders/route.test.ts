@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { NextRequest } from 'next/server'
 
 const mocks = vi.hoisted(() => ({
@@ -112,6 +112,10 @@ beforeEach(() => {
       throw new Error(`Unexpected table: ${table}`)
     }),
   })
+})
+
+afterEach(() => {
+  vi.unstubAllEnvs()
 })
 
 describe('payment reminder cron endpoint', () => {
