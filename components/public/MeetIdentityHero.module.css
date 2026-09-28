@@ -152,7 +152,13 @@
   flex-shrink: 0;
   /* Sized by height so it matches the two-line headline. */
   height: clamp(120px, 13vw, 210px);
-  transform: rotate(7deg);
+  transform:
+    perspective(620px)
+    rotateX(var(--tilt-y, 0deg))
+    rotateY(var(--tilt-x, 0deg))
+    rotateZ(7deg);
+  transform-style: preserve-3d;
+  transition: transform 360ms cubic-bezier(.2,.7,.2,1);
   filter: drop-shadow(0 24px 24px rgba(0,0,0,.4));
 }
 
