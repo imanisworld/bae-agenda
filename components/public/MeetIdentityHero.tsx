@@ -62,13 +62,13 @@ export default function MeetIdentityHero() {
 
         <div className={styles.details}>
           <div className={styles.summary}>
-            Open-format selection, room-aware pacing, and sets built around the people actually in front of the booth.
+            Open-format, not random. I move across genres with intention, read the room, and build the set around the people in front of me.
           </div>
 
           <div className={styles.signals} aria-label="DJ B.A.E. profile highlights">
             <span>Open format</span>
-            <span>Room-aware pacing</span>
-            <span>Travel-ready</span>
+            <span>Reads the room</span>
+            <span>Available to travel</span>
           </div>
 
           <div className={styles.actions}>
