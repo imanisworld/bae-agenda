@@ -2,8 +2,13 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import AdminNotice from '@/components/admin/AdminNotice'
+import InvoiceLineItemsEditor from '@/components/admin/InvoiceLineItemsEditor'
 import { updateInvoiceDetailsAction } from '@/app/actions/invoices'
 import { createAdminClient } from '@/lib/supabase/admin'
+import {
+  DEFAULT_INVOICE_PAYMENT_TERMS,
+  normalizeInvoiceLineItems,
+} from '@/lib/invoices'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,6 +22,9 @@ interface InvoiceEditRow {
   total_amount: number
   deposit_amount: number
   balance_due: number
+  due_date: string | null
+  payment_terms: string | null
+  line_items: unknown
 }
 
 function getErrorMessage(errorParam: string | string[] | undefined) {
@@ -28,7 +36,7 @@ async function getInvoice(bookingId: string): Promise<InvoiceEditRow | null> {
   const admin = createAdminClient()
   const { data } = await admin
     .from('invoices')
-    .select('booking_id, status, invoice_number, event_name, client_name, client_email, total_amount, deposit_amount, balance_due')
+    .select('booking_id, status, invoice_number, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, due_date, payment_terms, line_items')
     .eq('booking_id', bookingId)
     .maybeSingle()
 
@@ -49,6 +57,11 @@ export default async function EditInvoicePage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined
   const errorMessage = getErrorMessage(resolvedSearchParams?.error)
   const locked = invoice.status === 'paid' || invoice.status === 'void'
+  const lineItems = normalizeInvoiceLineItems(
+    invoice.line_items,
+    invoice.event_name ?? 'DJ Services',
+    Number(invoice.total_amount ?? 0)
+  )
 
   return (
     <div className="admin-page admin-page--narrow">
@@ -110,20 +123,12 @@ export default async function EditInvoicePage({
             />
           </label>
 
-          <div className="admin-form-grid-two">
-            <label>
-              <span className="admin-field-label">Invoice Total</span>
-              <input
-                name="total_amount"
-                type="number"
-                min="0"
-                step="0.01"
-                required
-                defaultValue={Number(invoice.total_amount ?? 0)}
-                disabled={locked}
-              />
-            </label>
+          <InvoiceLineItemsEditor
+            initialItems={lineItems}
+            disabled={locked}
+          />
 
+          <div className="admin-form-grid-two">
             <label>
               <span className="admin-field-label">Deposit / Credit</span>
               <input
@@ -136,7 +141,29 @@ export default async function EditInvoicePage({
                 disabled={locked}
               />
             </label>
+
+            <label>
+              <span className="admin-field-label">Due Date</span>
+              <input
+                name="due_date"
+                type="date"
+                defaultValue={invoice.due_date ?? ''}
+                disabled={locked}
+              />
+            </label>
           </div>
+
+          <label>
+            <span className="admin-field-label">Payment Terms</span>
+            <textarea
+              name="payment_terms"
+              rows={4}
+              maxLength={1000}
+              required
+              defaultValue={invoice.payment_terms?.trim() || DEFAULT_INVOICE_PAYMENT_TERMS}
+              disabled={locked}
+            />
+          </label>
 
           <div className="invoice-edit-summary">
             <span>Current balance</span>
@@ -147,7 +174,7 @@ export default async function EditInvoicePage({
               })}
             </strong>
             <p>
-              Saving recalculates the balance. If this invoice was already sent, editing it resets it to Draft so you can review and resend the corrected version.
+              The invoice total is calculated from the line items. Saving recalculates the balance. If this invoice was already sent, editing it resets it to Draft so you can review and resend the corrected version.
             </p>
           </div>
 
