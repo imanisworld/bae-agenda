@@ -25,6 +25,20 @@
   top: 17%;
   width: min(42vw, 540px);
   perspective: 1100px;
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+}
+
+.portraitWrap:active {
+  cursor: grabbing;
+}
+
+.portraitInteracting .portrait {
+  transition: transform 80ms linear, box-shadow 160ms ease;
+  box-shadow:
+    7px 10px 0 rgba(45,35,31,.9),
+    0 28px 56px rgba(0,0,0,.48);
 }
 
 .portrait {
@@ -57,6 +71,8 @@
 .portrait img {
   object-fit: cover;
   object-position: center;
+  pointer-events: none;
+  user-select: none;
 }
 
 .portraitLabel {
