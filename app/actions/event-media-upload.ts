@@ -11,6 +11,7 @@ export interface RegisterEventUploadInput {
   storagePath: string
   mediaType: 'image' | 'video'
   public?: boolean
+  rightsConfirmed: boolean
 }
 
 export interface RegisterEventUploadResult {
@@ -35,6 +36,7 @@ export async function registerEventUploadAction(
 
   if (
     (input.mediaType !== 'image' && input.mediaType !== 'video') ||
+    !input.rightsConfirmed ||
     !validPath(input.eventId, input.storagePath)
   ) {
     return { ok: false, error: 'Invalid media upload.' }
