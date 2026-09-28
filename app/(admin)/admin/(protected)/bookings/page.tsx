@@ -98,7 +98,7 @@ function getCompactDepositLabel(status: 'unpaid' | 'pending' | 'paid') {
 async function getBookings(): Promise<BookingRow[]> {
   try {
     const supabase = createClient()
-    const [{ data }, { data: eventRows }] = await Promise.all([
+    const [{ data, error: bookingsError }, { data: eventRows, error: eventsError }] = await Promise.all([
       supabase
         .from('bookings')
         .select('id, event_name, event_date, event_timezone, venue, city, package, quote, deposit_amount, status, lifecycle_status, payment_status, created_at, clients(first_name, last_name, email), payments(amount, type, status)')
@@ -108,6 +108,10 @@ async function getBookings(): Promise<BookingRow[]> {
         .select('id, booking_id')
         .not('booking_id', 'is', null),
     ])
+    if (bookingsError || eventsError) {
+      throw new Error(bookingsError?.message || eventsError?.message || 'Unable to load bookings.')
+    }
+
     const rows = (data ?? []) as BookingQueryRow[]
     const linkedEventByBooking = new Map(
       ((eventRows ?? []) as EventLinkRow[])
@@ -141,8 +145,8 @@ async function getBookings(): Promise<BookingRow[]> {
         created_at: b.created_at,
       }
     })
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load bookings.')
   }
 }
 
