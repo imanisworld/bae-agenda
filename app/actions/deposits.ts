@@ -94,6 +94,8 @@ export async function startStripeDepositCheckoutAction(formData: FormData) {
     redirectToPay(bookingId as string, 'This deposit is already covered.', 'success')
   }
 
+  let checkoutUrl: string
+
   try {
     const stripe = getStripeClient()
     const baseUrl = getAppBaseUrl()
@@ -130,13 +132,14 @@ export async function startStripeDepositCheckoutAction(formData: FormData) {
     })
 
     await updateBookingDepositCheckoutSnapshot(admin, bookingId as string, session.id)
-
     revalidatePath(`/pay/${bookingId}`)
-    redirect(session.url ?? `/pay/${bookingId}`)
+    checkoutUrl = session.url ?? `/pay/${bookingId}`
   } catch (error) {
     console.error('[deposit-checkout] unable to create session:', error)
     redirectToPay(bookingId as string, 'Stripe checkout is not ready yet. Please try again shortly or use the manual payment option.')
   }
+
+  redirect(checkoutUrl)
 }
 
 const MANUAL_METHODS: PaymentMethod[] = ['zelle', 'cash_app']
