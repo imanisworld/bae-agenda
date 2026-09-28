@@ -23,11 +23,11 @@
 
 .header h2 {
   margin: 10px 0 14px;
-  font-family: DM Sans, sans-serif;
-  font-size: clamp(48px, 7vw, 92px);
-  font-weight: 400;
-  line-height: .9;
-  letter-spacing: -.055em;
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(31.7px, 4.6vw, 60.7px);
+  font-weight: 600;
+  line-height: .95;
+  letter-spacing: -.02em;
 }
 
 .header p {

@@ -1,6 +1,5 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { PUBLIC_NAV } from '@/lib/constants'
@@ -27,17 +26,8 @@ export default function Nav() {
   return (
     <div className={styles.chrome}>
       <div className={styles.topbar}>
-        <Link href="/" className={styles.brand} aria-label="DJ B.A.E. — Home">
-          <Image
-            src="/brand/dj-bae-logo.png"
-            alt="DJ B.A.E."
-            width={900}
-            height={659}
-            priority
-            sizes="96px"
-            className={styles.logo}
-          />
-        </Link>
+        {/* The logo now hangs from each page's own art (see brand/HangingLogo). */}
+        <span aria-hidden="true" />
         <span className={styles.route}>{routeLabel}</span>
         <NowPlayingPill fallback={<span className={styles.status}>Indianapolis</span>} />
       </div>

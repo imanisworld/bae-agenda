@@ -19,7 +19,7 @@ export default async function BookExperienceRail() {
   }))
 
   return (
-    <div className="book-experience-rail-inner" id="contact">
+    <div className="book-experience-rail-inner">
       <header>
         <span>Contact</span>
         <h2>Rather reach out directly?</h2>
