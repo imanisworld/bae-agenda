@@ -15,12 +15,11 @@ const routes = [
 ] as const
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date()
-
   return routes.map((route) => ({
     url: `${BASE_URL}${route}`,
-    lastModified: now,
-    changeFrequency: route === '' ? 'weekly' : 'monthly',
-    priority: route === '' ? 1 : route === '/book' ? 0.9 : 0.7,
+    // Do not emit a synthetic "last modified now" value on every request.
+    // A false lastmod signal teaches crawlers to ignore the field.
+    changeFrequency: route === '' || route === '/events' ? 'weekly' : 'monthly',
+    priority: route === '' ? 1 : route === '/book' ? 0.9 : route === '/events' ? 0.8 : 0.7,
   }))
 }
