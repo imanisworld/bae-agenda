@@ -52,7 +52,6 @@ export default function EventPoster({
   return (
     <article
       className={`${styles.poster}${past ? ` ${styles.past}` : ''}${onArchiveClick ? ` ${styles.archiveReady}` : ''}`}
-      onClick={onArchiveClick}
     >
       <Image
         src="/photos/PlexMix19-DJBAE.JPEG"
@@ -66,6 +65,14 @@ export default function EventPoster({
         aria-hidden="true"
       />
       <div className={styles.shade} aria-hidden="true" />
+      {onArchiveClick ? (
+        <button
+          type="button"
+          className={styles.archiveHitArea}
+          onClick={onArchiveClick}
+          aria-label={`Open media archive for ${event.title}`}
+        />
+      ) : null}
 
       <div className={styles.topline}>
         <span>{past ? 'Past Event' : 'Upcoming Event'}</span>
