@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import type { Event } from '@/lib/db/events'
 import { isValidTimeZone } from '@/lib/date-time'
 import styles from './EventPoster.module.css'
@@ -31,12 +32,17 @@ export default function EventPoster({
   event,
   priority = false,
   past = false,
+  showDetailsLink = false,
+  headingLevel = 'h3',
 }: {
   event: Event
   priority?: boolean
   past?: boolean
+  showDetailsLink?: boolean
+  headingLevel?: 'h1' | 'h3'
 }) {
   const { dateLabel, timeLabel } = parts(event)
+  const Heading = headingLevel
   const location = [event.venue, event.city].filter(Boolean).join(' · ')
 
   return (
@@ -61,10 +67,15 @@ export default function EventPoster({
 
       <div className={styles.info}>
         <p className={styles.date}>{dateLabel}{timeLabel ? ` · ${timeLabel}` : ''}</p>
-        <h3>{event.title}</h3>
+        <Heading>{event.title}</Heading>
         {location ? <p className={styles.location}>{location}</p> : null}
         {event.show_description && event.description ? (
           <p className={styles.description}>{event.description}</p>
+        ) : null}
+        {showDetailsLink ? (
+          <Link href={`/events/${event.slug}`} className={styles.detailsLink}>
+            Event details <span aria-hidden="true">→</span>
+          </Link>
         ) : null}
       </div>
     </article>
