@@ -249,6 +249,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
   const [blockedDates, setBlockedDates] = useState<string[]>([])
   const [calendarMonth, setCalendarMonth] = useState(() => startOfMonth(new Date()))
   const [draftRestored, setDraftRestored] = useState(false)
+  const [termsAccepted, setTermsAccepted] = useState(false)
   const hasCheckedDraft = useRef(false)
 
   // Restore a saved draft once, on first mount only.
@@ -277,6 +278,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
     setFieldErrors({})
     setAvailabilityError('')
     setDraftRestored(false)
+    setTermsAccepted(false)
   }
 
   const blockedDateSet = useMemo(() => new Set(blockedDates), [blockedDates])
@@ -530,6 +532,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
           ...form,
           eventTime: normalizedStart,
           eventEndTime: normalizedEnd,
+          acceptedTerms: termsAccepted,
         }),
       })
 
@@ -596,6 +599,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
       })
       setSuccess(true)
       clearDraft()
+      setTermsAccepted(false)
       setForm({ ...INITIAL_STATE, startedAt: String(Date.now()) })
       setStep(1)
       setLoading(false)
@@ -731,12 +735,27 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
           </div>
 
           {step === 3 && (
-            <p className="booking-policy-note">
-              Submitting sends the booking details you entered so I can review the request.{' '}
-              <Link href="/privacy">Privacy</Link>
-              <span aria-hidden="true"> · </span>
-              <Link href="/terms">Booking Terms</Link>
-            </p>
+            <div className="booking-policy-note">
+              <label style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '10px',
+                cursor: 'pointer',
+              }}>
+                <input
+                  type="checkbox"
+                  required
+                  checked={termsAccepted}
+                  onChange={(e) => setTermsAccepted(e.target.checked)}
+                  style={{ marginTop: '3px', width: '18px', height: '18px', flex: '0 0 auto' }}
+                />
+                <span>
+                  I agree to the <Link href="/terms" target="_blank">Booking Terms</Link> and acknowledge the{' '}
+                  <Link href="/privacy" target="_blank">Privacy Policy</Link>. I understand this submission is an inquiry,
+                  not a confirmed reservation, and that any required deposit must be received before the date is secured.
+                </span>
+              </label>
+            </div>
           )}
 
           <div style={{
