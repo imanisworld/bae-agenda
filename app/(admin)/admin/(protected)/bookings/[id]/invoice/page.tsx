@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import PageHeader from '@/components/admin/PageHeader'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { createInvoiceFromBookingAction, restoreInvoiceDraftAction, voidInvoiceAction } from '@/app/actions/invoices'
 import { createBookingPaymentAction } from '@/app/actions/bookings'
 import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
@@ -418,9 +419,12 @@ export default async function InvoicePage({
             {invoiceState.status !== 'paid' && invoiceState.status !== 'void' && (
               <form action={voidInvoiceAction}>
                 <input type="hidden" name="booking_id" value={id} />
-                <button type="submit" className="admin-btn-danger">
+                <ConfirmSubmitButton
+                  message="Void this invoice? You can restore it later, but it will stop being active."
+                  className="admin-btn-danger"
+                >
                   Void Invoice
-                </button>
+                </ConfirmSubmitButton>
               </form>
             )}
             {invoiceState.status === 'void' && (
