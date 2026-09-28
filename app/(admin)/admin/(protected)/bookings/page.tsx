@@ -300,10 +300,10 @@ export default async function BookingsPage({
           <div className="admin-list-tools">
             <form method="GET" action="/admin/bookings" className="admin-search-form">
               {activeFilter !== 'all' ? <input type="hidden" name="filter" value={activeFilter} /> : null}
-              <label htmlFor="booking-search" className="sr-only">Search bookings</label>
               <input
                 id="booking-search"
                 type="search"
+                aria-label="Search bookings"
                 name="q"
                 defaultValue={query}
                 className="admin-search-input"
