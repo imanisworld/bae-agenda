@@ -385,7 +385,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
             <div className={styles.links}>
               <button type="button" onClick={share}>{shareNote || 'Share'}</button>
               <a href={loadedPermalink || SOUNDCLOUD_PROFILE} target="_blank" rel="noopener noreferrer">
-                SoundCloud <span aria-hidden="true">↗</span>
+                SoundCloud
               </a>
             </div>
           </div>
