@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import styles from './PortfolioArchiveHero.module.css'
 
 export type ArchivePrint = {
@@ -22,6 +23,38 @@ export default function PortfolioArchiveHero({
   onOpenEntry?: (entryId: string) => void
   instagramUrl?: string
 }) {
+  const [logoKicked, setLogoKicked] = useState(false)
+  const logoTimer = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (logoTimer.current) window.clearTimeout(logoTimer.current)
+    }
+  }, [])
+
+  function kickLogo() {
+    if (logoTimer.current) window.clearTimeout(logoTimer.current)
+    setLogoKicked(false)
+    window.requestAnimationFrame(() => {
+      setLogoKicked(true)
+      logoTimer.current = window.setTimeout(() => setLogoKicked(false), 900)
+    })
+  }
+
+  function tiltPrint(event: PointerEvent<HTMLButtonElement>) {
+    if (event.pointerType !== 'mouse') return
+    const rect = event.currentTarget.getBoundingClientRect()
+    const px = (event.clientX - rect.left) / rect.width - .5
+    const py = (event.clientY - rect.top) / rect.height - .5
+    event.currentTarget.style.setProperty('--print-ry', `${px * 5}deg`)
+    event.currentTarget.style.setProperty('--print-rx', `${py * -4}deg`)
+  }
+
+  function settlePrint(event: PointerEvent<HTMLButtonElement>) {
+    event.currentTarget.style.setProperty('--print-ry', '0deg')
+    event.currentTarget.style.setProperty('--print-rx', '0deg')
+  }
+
   return (
     <section className={styles.hero} aria-labelledby="portfolio-title">
       <Image
@@ -56,10 +89,15 @@ export default function PortfolioArchiveHero({
 
       {prints.length === 0 ? (
         // Fills the open side of the hero until portfolio photos are added in admin.
-        <div className={styles.logoSpin} aria-hidden="true">
+        <button
+          type="button"
+          className={`${styles.logoSpin}${logoKicked ? ` ${styles.logoKicked}` : ''}`}
+          onPointerDown={kickLogo}
+          aria-label="Bounce the DJ B.A.E. logo"
+        >
           <Image src="/brand/dj-bae-logo.png" alt="" width={900} height={659} sizes="(max-width: 760px) 78vw, 42vw" className={styles.logoBounce} />
-          <span className={styles.logoShadow} />
-        </div>
+          <span className={styles.logoShadow} aria-hidden="true" />
+        </button>
       ) : null}
 
       <div className={styles.printField} aria-label="Selected past work">
@@ -71,6 +109,9 @@ export default function PortfolioArchiveHero({
               onClick={() => onOpenEntry?.(entry.id)}
               disabled={!onOpenEntry}
               aria-label={`Open photos and video for ${entry.event_name}`}
+              onPointerMove={tiltPrint}
+              onPointerLeave={settlePrint}
+              onPointerUp={settlePrint}
             >
               <div className={styles.printImage}>
               <Image
