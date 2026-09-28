@@ -244,19 +244,21 @@ export async function updateInvoiceDetailsAction(formData: FormData) {
     .toLowerCase() || 'client'
 
   const resetToDraft = invoice.status === 'sent'
+  const updatePayload = {
+    event_name: eventName,
+    client_name: clientName,
+    client_email: clientEmail,
+    total_amount: totalAmount,
+    deposit_amount: depositAmount,
+    balance_due: totalAmount - depositAmount,
+    pdf_filename: `invoice-${filenameClient}-${bookingId.slice(0, 8)}.pdf`,
+    status: resetToDraft ? 'draft' as const : invoice.status,
+    ...(resetToDraft ? { sent_at: null } : {}),
+  }
+
   const { error } = await admin
     .from('invoices')
-    .update({
-      event_name: eventName,
-      client_name: clientName,
-      client_email: clientEmail,
-      total_amount: totalAmount,
-      deposit_amount: depositAmount,
-      balance_due: totalAmount - depositAmount,
-      pdf_filename: `invoice-${filenameClient}-${bookingId.slice(0, 8)}.pdf`,
-      status: resetToDraft ? 'draft' : invoice.status,
-      sent_at: resetToDraft ? null : undefined,
-    })
+    .update(updatePayload)
     .eq('booking_id', bookingId)
 
   if (error) {
