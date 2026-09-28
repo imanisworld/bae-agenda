@@ -504,7 +504,10 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
   return summary
 }
 
-export async function sendBookingInquiryReceipt(payload: BookingInquiryReceiptPayload) {
+export async function sendBookingInquiryReceipt(
+  payload: BookingInquiryReceiptPayload,
+  options?: { idempotencyKey?: string }
+) {
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
   const eventType = payload.eventType?.trim() || payload.eventName
@@ -514,6 +517,7 @@ export async function sendBookingInquiryReceipt(payload: BookingInquiryReceiptPa
   return sendEmailNotification({
     to: payload.email,
     subject: 'DJ B.A.E. inquiry received',
+    idempotencyKey: options?.idempotencyKey,
     text: [
       `Hey ${guestName},`,
       '',
@@ -540,7 +544,10 @@ export async function sendBookingInquiryReceipt(payload: BookingInquiryReceiptPa
   })
 }
 
-export async function sendBookingConfirmedNotification(payload: BookingConfirmedNotificationPayload) {
+export async function sendBookingConfirmedNotification(
+  payload: BookingConfirmedNotificationPayload,
+  options?: { idempotencyKey?: string }
+) {
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
   const hasDepositLink = Boolean(payload.depositDue && payload.payUrl)
@@ -556,6 +563,7 @@ export async function sendBookingConfirmedNotification(payload: BookingConfirmed
   return sendEmailNotification({
     to: payload.email,
     subject: 'DJ B.A.E. booking confirmed',
+    idempotencyKey: options?.idempotencyKey,
     text: [
       `Hey ${guestName},`,
       '',
