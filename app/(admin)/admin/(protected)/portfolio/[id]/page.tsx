@@ -3,6 +3,7 @@ import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import AdminNotice from '@/components/admin/AdminNotice'
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
+import MediaUploader from '@/components/admin/MediaUploader'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import {
   addPortfolioMediaAction,
@@ -190,9 +191,11 @@ export default async function EditPortfolioEntryPage({
         <div style={{ marginBottom: '20px' }}>
           <span className="admin-section-title">Full Archive Media</span>
           <p className="muted" style={{ margin: '7px 0 0', fontSize: '12px', lineHeight: 1.6 }}>
-            Add the extra photos and video clips that should pop up when someone clicks this entry inside “See the full archive.”
+            Add the photos and video clips that should pop up when someone clicks this entry inside “See the full archive.”
           </p>
         </div>
+
+        <MediaUploader target="portfolio" targetId={entry.id} />
 
         {media.length > 0 ? (
           <div style={{ display: 'grid', gap: '12px', marginBottom: '24px' }}>
@@ -283,7 +286,7 @@ export default async function EditPortfolioEntryPage({
             <span className="admin-field-label">Media URL *</span>
             <input name="media_url" type="url" required placeholder="https://..." style={inputStyle()} />
             <span className="muted" style={{ fontSize: '11px', lineHeight: 1.5 }}>
-              Photo URLs and direct playable video-file URLs work now. A phone upload flow can use Supabase Storage later without changing this archive.
+              Use this only for media already hosted somewhere else. For normal uploads, use “Upload From Device” above.
             </span>
           </label>
 
