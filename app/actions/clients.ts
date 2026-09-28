@@ -54,9 +54,39 @@ export async function updateClientAction(formData: FormData) {
     redirectWithError(id, error.code === '23505' ? 'That email is already assigned to another client.' : error.message)
   }
 
+  const { data: clientBookings, error: bookingLookupError } = await admin
+    .from('bookings')
+    .select('id')
+    .eq('client_id', id)
+
+  if (bookingLookupError) {
+    redirectWithError(id, 'Client details were saved, but linked bookings could not be checked for draft invoice updates.')
+  }
+
+  const bookingIds = (clientBookings ?? []).map((booking) => booking.id)
+  if (bookingIds.length > 0) {
+    const clientName = [first_name, last_name].filter(Boolean).join(' ')
+    const { error: invoiceSyncError } = await admin
+      .from('invoices')
+      .update({
+        client_name: clientName,
+        client_email: email,
+      })
+      .in('booking_id', bookingIds)
+      .eq('status', 'draft')
+
+    if (invoiceSyncError) {
+      redirectWithError(id, 'Client details were saved, but draft invoices could not be synced. Review any draft invoice before sending.')
+    }
+  }
+
   revalidatePath('/admin/clients')
   revalidatePath(`/admin/clients/${id}`)
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/invoices')
-  redirect(`/admin/clients/${id}?success=${encodeURIComponent('Client details saved.')}`)
+  for (const bookingId of bookingIds) {
+    revalidatePath(`/admin/bookings/${bookingId}`)
+    revalidatePath(`/admin/bookings/${bookingId}/invoice`)
+  }
+  redirect(`/admin/clients/${id}?success=${encodeURIComponent('Client details saved. Draft invoice recipients were synced; sent invoices were left unchanged.')}`)
 }
