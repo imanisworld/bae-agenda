@@ -6385,6 +6385,8 @@ body.has-custom-cursor * { cursor: none !important; }
 
 /* Sidebar */
 .admin-sidebar {
+  display: flex;
+  flex-direction: column;
   width: 270px !important;
   padding: var(--safe-top) 14px var(--safe-bottom);
   border-right: 1px solid rgba(196,165,116,.16) !important;
