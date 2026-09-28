@@ -37,6 +37,15 @@ describe('invoice draft helpers', () => {
       total_amount: 1200,
       deposit_amount: 300,
       balance_due: 900,
+      due_date: '2026-07-04',
+      payment_terms: 'Balance due on or before the event date. Deposit is non-refundable. Final balance must be paid before the event.',
+      line_items: [
+        {
+          description: 'House Music Brunch',
+          quantity: 1,
+          unit_amount: 1200,
+        },
+      ],
     })
   })
 
@@ -52,6 +61,13 @@ describe('invoice draft helpers', () => {
       total_amount: 0,
       deposit_amount: 0,
       balance_due: 0,
+      line_items: [
+        {
+          description: 'House Music Brunch',
+          quantity: 1,
+          unit_amount: 0,
+        },
+      ],
     })
   })
 })
