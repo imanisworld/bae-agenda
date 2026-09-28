@@ -3,6 +3,7 @@ import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import AdminNotice from '@/components/admin/AdminNotice'
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
+import MediaUploader from '@/components/admin/MediaUploader'
 import EventLocationFields from '@/components/admin/EventLocationFields'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import {
@@ -218,9 +219,11 @@ export default async function EditEventPage({
         <div style={{ marginBottom: '20px' }}>
           <span className="admin-section-title">Event Media Archive</span>
           <p className="muted" style={{ margin: '7px 0 0', fontSize: '12px', lineHeight: 1.6 }}>
-            Past events open this archive from the public Events page. Add image or direct-video URLs now; a file uploader can be layered onto the same records later.
+            Past events open this archive from the public Events page. Upload directly from your phone/computer, or paste an external media URL below.
           </p>
         </div>
+
+        <MediaUploader target="event" targetId={event.id} />
 
         {media.length > 0 ? (
           <div style={{ display: 'grid', gap: '12px', marginBottom: '24px' }}>
@@ -330,7 +333,7 @@ export default async function EditEventPage({
               style={inputStyle()}
             />
             <span className="muted" style={{ fontSize: '11px', lineHeight: 1.5 }}>
-              Photos can use any public image URL. Video should point directly to a playable video file. Supabase Storage URLs will work with this model later.
+              Use this only for media already hosted somewhere else. For normal uploads, use “Upload From Device” above.
             </span>
           </label>
 
