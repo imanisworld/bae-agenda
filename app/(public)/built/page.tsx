@@ -101,7 +101,7 @@ export default async function BuiltPage() {
               <span style={{ color: 'var(--amber)' }}>Scratch.</span>
             </h1>
             <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '8px' }}>
-              Custom websites and booking systems for artists, DJs, promoters, and creative businesses that need more than a template.
+              Custom websites and booking systems for artists, DJs, promoters, and creative businesses.
             </p>
             <p style={{ fontSize: '15px', color: 'var(--amber)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '28px', fontWeight: 500 }}>
               That can mean a public site, booking flow, admin tools, content management, or all of it together.
@@ -152,7 +152,7 @@ export default async function BuiltPage() {
             <span style={{ color: 'var(--amber)' }}>Promoters & Venues.</span>
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '32px' }}>
-            The site should fit the business—not the other way around. Hosting and third-party services may have their own costs.
+            Hosting and third-party services may have their own costs.
           </p>
 
           <div style={{
@@ -221,7 +221,6 @@ export default async function BuiltPage() {
           </div>
 
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.7 }}>
-            Not sure which fits?{' '}
             <a
               href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`}
               style={{ color: 'var(--amber)', textDecoration: 'underline' }}
