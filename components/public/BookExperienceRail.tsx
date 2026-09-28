@@ -1,5 +1,5 @@
 import ReviewDrawer from '@/components/public/ReviewDrawer'
-import { HangingLogo } from '@/components/public/brand/HangingLogo'
+import { HangFrom } from '@/components/public/brand/HangingLogo'
 import { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
 import { SOCIALS } from '@/lib/constants'
 import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
@@ -22,9 +22,7 @@ export default async function BookExperienceRail() {
   return (
     <div className="book-experience-rail-inner">
       <header>
-        <span>Contact</span>
-        <h2>Contact DJ B.A.E.</h2>
-        <HangingLogo finish="gold" className="book-experience-contact-logo" />
+        <h2>C<HangFrom finish="gold">o</HangFrom>ntact</h2>
       </header>
 
       <div className="book-experience-contact">
