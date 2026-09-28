@@ -52,7 +52,7 @@ const BookingSchema = z.object({
   notes:        z.string().optional(),
   // Consent / honeypot / meta
   acceptedTerms: z.literal(true, {
-    errorMap: () => ({ message: "Booking Terms must be accepted." }),
+    message: "Booking Terms must be accepted.",
   }),
   website:      z.string().optional(),
   startedAt:    z.string().optional(),
