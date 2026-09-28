@@ -20,7 +20,11 @@ export default function Nav() {
   const [showDockCue, setShowDockCue] = useState(false)
 
   useEffect(() => {
-    setShowDockCue(sessionStorage.getItem(NAV_CUE_SESSION_KEY) !== '1')
+    const frame = requestAnimationFrame(() => {
+      setShowDockCue(sessionStorage.getItem(NAV_CUE_SESSION_KEY) !== '1')
+    })
+
+    return () => cancelAnimationFrame(frame)
   }, [])
 
   function dismissDockCue() {
