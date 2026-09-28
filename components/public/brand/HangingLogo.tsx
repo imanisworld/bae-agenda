@@ -18,8 +18,14 @@ type Props = { finish?: LogoFinish; className?: string }
 export function HangingLogo({ finish = 'red', className }: Props) {
   const tag = FINISHES[finish]
   const [kicked, setKicked] = useState(false)
+  const [dragging, setDragging] = useState(false)
   const [direction, setDirection] = useState<1 | -1>(1)
+  const [dragAngle, setDragAngle] = useState(0)
+  const [releaseAngle, setReleaseAngle] = useState(0)
   const timerRef = useRef<number | null>(null)
+  const pointerRef = useRef<number | null>(null)
+  const startXRef = useRef(0)
+  const dragAngleRef = useRef(0)
 
   useEffect(() => {
     return () => {
@@ -27,24 +33,65 @@ export function HangingLogo({ finish = 'red', className }: Props) {
     }
   }, [])
 
-  function kick(event: PointerEvent<HTMLSpanElement>) {
+  function startDrag(event: PointerEvent<HTMLSpanElement>) {
     event.stopPropagation()
-    setDirection((value) => value === 1 ? -1 : 1)
+    pointerRef.current = event.pointerId
+    startXRef.current = event.clientX
+    setDragging(true)
+    dragAngleRef.current = 0
+    setDragAngle(0)
 
     if (timerRef.current) window.clearTimeout(timerRef.current)
+    setKicked(false)
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  function drag(event: PointerEvent<HTMLSpanElement>) {
+    if (pointerRef.current !== event.pointerId) return
+    const angle = Math.max(-32, Math.min(32, (event.clientX - startXRef.current) * .28))
+    dragAngleRef.current = angle
+    setDragAngle(angle)
+  }
+
+  function finishDrag(event: PointerEvent<HTMLSpanElement>) {
+    if (pointerRef.current !== event.pointerId) return
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+
+    pointerRef.current = null
+    setDragging(false)
+    const finalAngle = dragAngleRef.current
+    setReleaseAngle(finalAngle)
+
+    const nextDirection: 1 | -1 = Math.abs(finalAngle) > 2
+      ? (finalAngle >= 0 ? 1 : -1)
+      : (direction === 1 ? -1 : 1)
+
+    setDirection(nextDirection)
+    dragAngleRef.current = 0
+    setDragAngle(0)
     setKicked(false)
 
     window.requestAnimationFrame(() => {
       setKicked(true)
-      timerRef.current = window.setTimeout(() => setKicked(false), 1350)
+      timerRef.current = window.setTimeout(() => setKicked(false), 900)
     })
   }
 
   const copy = (layer: string, interactive = false) => (
     <span
-      className={`${styles.swing} ${layer}${kicked ? ` ${styles.kicked}` : ''}`}
-      style={{ '--kick-dir': direction } as CSSProperties}
-      onPointerDown={interactive ? kick : undefined}
+      className={`${styles.swing} ${layer}${kicked ? ` ${styles.kicked}` : ''}${dragging ? ` ${styles.dragging}` : ''}`}
+      style={{
+        '--kick-dir': direction,
+        '--drag-angle': `${dragAngle}deg`,
+        '--release-angle': `${releaseAngle}deg`,
+      } as CSSProperties}
+      onPointerDown={interactive ? startDrag : undefined}
+      onPointerMove={interactive ? drag : undefined}
+      onPointerUp={interactive ? finishDrag : undefined}
+      onPointerCancel={interactive ? finishDrag : undefined}
     >
       <Image src={tag.src} alt="" width={900} height={tag.height} sizes="120px" className={styles.logo} />
     </span>
