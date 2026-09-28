@@ -29,8 +29,23 @@
 /* Behind the letter/photo. Only the clasp's gate shows from this copy, so the
    stroke reads as passing in front of the gate and behind the spine. */
 .back {
-  z-index: -1;
+  z-index: 1;
   filter: brightness(.82);
+}
+
+.edgeOccluder {
+  position: absolute;
+  z-index: 2;
+  left: calc(var(--size) * -.01);
+  top: calc(var(--hook) - 2px);
+  width: calc(var(--size) * .34);
+  height: 5px;
+  border-radius: 999px;
+  background: var(--clip-color, #15100f);
+  rotate: 7deg;
+  transform-origin: left center;
+  box-shadow: 0 1px 0 rgba(255,255,255,.04);
+  pointer-events: none;
 }
 
 .logo {
@@ -44,6 +59,7 @@
 }
 
 .front {
+  z-index: 3;
   pointer-events: auto;
   touch-action: manipulation;
   cursor: grab;
@@ -93,6 +109,25 @@
   position: relative;
   z-index: 6;
   display: inline-block;
+  isolation: isolate;
+}
+
+.letterBase {
+  position: relative;
+  z-index: 0;
+}
+
+.letterMask {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  pointer-events: none;
+  user-select: none;
 }
 
 /* In Conthrax at line-height ~.95 the baseline sits ~.8em down the letter
