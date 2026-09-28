@@ -7,6 +7,7 @@
   padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
   background: rgba(5, 4, 4, .88);
   backdrop-filter: blur(16px);
+  animation: lightbox-fade 180ms ease-out both;
 }
 
 .dialog {
@@ -18,6 +19,17 @@
     radial-gradient(circle at 18% 0%, rgba(112, 37, 53, .22), transparent 34%),
     #0d0b0b;
   box-shadow: 0 30px 90px rgba(0, 0, 0, .65);
+  animation: lightbox-rise 220ms cubic-bezier(.2,.8,.2,1) both;
+}
+
+@keyframes lightbox-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes lightbox-rise {
+  from { opacity: 0; transform: translateY(8px) scale(.99); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .header,
@@ -261,5 +273,10 @@
 @media (prefers-reduced-motion: reduce) {
   .backdrop {
     backdrop-filter: none;
+    animation: none;
+  }
+
+  .dialog {
+    animation: none;
   }
 }
