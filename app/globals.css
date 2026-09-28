@@ -5930,6 +5930,18 @@ body.has-custom-cursor * { cursor: none !important; }
   padding: 32px clamp(20px,4vw,38px) 42px;
 }
 
+.book-experience-rail-inner header {
+  position: relative;
+  min-height: 104px;
+  padding-right: 108px;
+}
+
+.book-experience-contact-logo {
+  right: 52px;
+  top: calc(0% - var(--hook));
+  z-index: 2;
+}
+
 .book-experience-rail-inner header > span,
 .book-experience-faq > span,
 .book-experience-contact small,
@@ -6113,6 +6125,15 @@ body.has-custom-cursor * { cursor: none !important; }
 }
 
 @media (max-width: 620px) {
+  .book-experience-rail-inner header {
+    min-height: 92px;
+    padding-right: 86px;
+  }
+
+  .book-experience-contact-logo {
+    right: 38px;
+  }
+
   .events-experience {
     padding-top: 52px;
     padding-bottom: 74px;
