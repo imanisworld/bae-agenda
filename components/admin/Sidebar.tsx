@@ -18,6 +18,7 @@ interface SidebarProps {
 const GLYPHS: Record<string, string> = {
   Dashboard: 'DB',
   Bookings: 'BK',
+  Invoices: 'INV',
   Events: 'EV',
   Mixes: 'LAB',
   Portfolio: 'WK',
