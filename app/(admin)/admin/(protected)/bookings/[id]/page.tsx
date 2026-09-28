@@ -9,9 +9,10 @@ import { getBookingFinancialSnapshot } from '@/lib/booking-finance'
 import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } from '@/lib/booking-deposit'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
+import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, updateBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { createInvoiceFromBookingAction } from '@/app/actions/invoices'
+import { getEventInputDateTime } from '@/lib/date-time'
 import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingLifecycleStatus, BookingStatus, BookingWorkflowPaymentStatus } from '@/types/index'
 
@@ -90,11 +91,9 @@ function inputStyle(): React.CSSProperties {
   }
 }
 
-function toDateTimeLocal(iso: string): string {
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  const offsetMs = d.getTimezoneOffset() * 60_000
-  return new Date(d.getTime() - offsetMs).toISOString().slice(0, 16)
+function toEventDateTimeLocal(iso: string, timeZone: string): string {
+  const parts = getEventInputDateTime(iso, timeZone)
+  return parts ? `${parts.date}T${parts.time}` : ''
 }
 
 function formatCurrency(value: number | null): string {
@@ -114,6 +113,7 @@ function formatDateTime(iso: string) {
     year: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
+    timeZone: 'America/Indiana/Indianapolis',
   })
 }
 
@@ -388,7 +388,7 @@ export default async function EditBookingPage({
                 name="event_date"
                 type="datetime-local"
                 required
-                defaultValue={toDateTimeLocal(booking.event_date)}
+                defaultValue={toEventDateTimeLocal(booking.event_date, booking.event_timezone)}
                 style={inputStyle()}
               />
             </label>
@@ -403,7 +403,7 @@ export default async function EditBookingPage({
             <input
               name="event_end_time"
               type="datetime-local"
-              defaultValue={booking.event_end_time ? toDateTimeLocal(booking.event_end_time) : ''}
+              defaultValue={booking.event_end_time ? toEventDateTimeLocal(booking.event_end_time, booking.event_timezone) : ''}
               style={inputStyle()}
             />
           </label>
@@ -649,6 +649,70 @@ export default async function EditBookingPage({
                     {payment.notes}
                   </div>
                 )}
+                <details style={{ marginTop: '4px' }}>
+                  <summary className="admin-view-all" style={{ cursor: 'pointer', width: 'fit-content' }}>
+                    Correct Record
+                  </summary>
+                  <form action={updateBookingPaymentAction} style={{ marginTop: '14px', display: 'grid', gap: '12px' }}>
+                    <input type="hidden" name="payment_id" value={payment.id} />
+                    <input type="hidden" name="booking_id" value={booking.id} />
+
+                    <div className="admin-form-grid-two">
+                      <label style={{ display: 'grid', gap: '7px' }}>
+                        <span className="muted" style={{ fontSize: '12px' }}>Amount</span>
+                        <input name="amount" type="number" min={0.01} step="0.01" required defaultValue={payment.amount} style={inputStyle()} />
+                      </label>
+                      <label style={{ display: 'grid', gap: '7px' }}>
+                        <span className="muted" style={{ fontSize: '12px' }}>Type</span>
+                        <select name="type" defaultValue={payment.type} style={inputStyle()}>
+                          {PAYMENT_TYPES.map((type) => (
+                            <option key={type} value={type}>
+                              {type.charAt(0).toUpperCase() + type.slice(1)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+
+                    <div className="admin-form-grid-two">
+                      <label style={{ display: 'grid', gap: '7px' }}>
+                        <span className="muted" style={{ fontSize: '12px' }}>Method</span>
+                        <select name="method" defaultValue={payment.method ?? ''} style={inputStyle()}>
+                          <option value="">Select method</option>
+                          {PAYMENT_METHODS.map((method) => (
+                            <option key={method} value={method}>
+                              {formatPaymentMethodLabel(method)}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label style={{ display: 'grid', gap: '7px' }}>
+                        <span className="muted" style={{ fontSize: '12px' }}>Status</span>
+                        <select name="status" defaultValue={payment.status} style={inputStyle()}>
+                          <option value="received">Received</option>
+                          <option value="pending">Pending</option>
+                          <option value="refunded">Refunded</option>
+                        </select>
+                      </label>
+                    </div>
+
+                    <label style={{ display: 'grid', gap: '7px' }}>
+                      <span className="muted" style={{ fontSize: '12px' }}>
+                        Paid Date {payment.status === 'received' && !payment.paid_at ? '— required to complete this record' : ''}
+                      </span>
+                      <input name="paid_at" type="date" defaultValue={toDateInputValue(payment.paid_at)} style={inputStyle()} />
+                    </label>
+
+                    <label style={{ display: 'grid', gap: '7px' }}>
+                      <span className="muted" style={{ fontSize: '12px' }}>Note</span>
+                      <textarea name="notes" rows={2} defaultValue={payment.notes ?? ''} style={inputStyle()} />
+                    </label>
+
+                    <div className="admin-form-actions">
+                      <button type="submit" className="admin-btn-ghost">Save Correction</button>
+                    </div>
+                  </form>
+                </details>
               </div>
             ))}
           </div>
@@ -659,7 +723,7 @@ export default async function EditBookingPage({
           <div className="admin-form-grid-two">
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Amount *</span>
-              <input name="amount" type="number" min={0} step="1" required style={inputStyle()} />
+              <input name="amount" type="number" min={0.01} step="0.01" required style={inputStyle()} />
             </label>
             <label style={{ display: 'grid', gap: '7px' }}>
               <span className="admin-section-title">Type *</span>
