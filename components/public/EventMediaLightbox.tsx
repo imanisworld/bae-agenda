@@ -31,15 +31,19 @@ export default function EventMediaLightbox({
 }) {
   const [index, setIndex] = useState(0)
   const closeRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLElement>(null)
+  const returnFocusRef = useRef<HTMLElement | null>(null)
   const current = media[index] ?? null
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow
+    returnFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null
     document.body.style.overflow = 'hidden'
     closeRef.current?.focus()
 
     return () => {
       document.body.style.overflow = previousOverflow
+      returnFocusRef.current?.focus()
     }
   }, [event.id])
 
@@ -57,6 +61,20 @@ export default function EventMediaLightbox({
       } else if (canStep && keyEvent.key === 'ArrowLeft') {
         keyEvent.preventDefault()
         setIndex((value) => (value - 1 + media.length) % media.length)
+      } else if (keyEvent.key === 'Tab') {
+        const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), video[controls], [tabindex]:not([tabindex="-1"])'
+        )
+        if (!focusable?.length) return
+        const first = focusable[0]
+        const last = focusable[focusable.length - 1]
+        if (keyEvent.shiftKey && document.activeElement === first) {
+          keyEvent.preventDefault()
+          last.focus()
+        } else if (!keyEvent.shiftKey && document.activeElement === last) {
+          keyEvent.preventDefault()
+          first.focus()
+        }
       }
     }
 
@@ -67,6 +85,7 @@ export default function EventMediaLightbox({
   return (
     <div className={styles.backdrop} role="presentation" onMouseDown={onClose}>
       <section
+        ref={dialogRef}
         className={styles.dialog}
         role="dialog"
         aria-modal="true"
