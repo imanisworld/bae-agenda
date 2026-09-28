@@ -34,19 +34,25 @@ export default function EventPoster({
   past = false,
   showDetailsLink = false,
   headingLevel = 'h3',
+  onArchiveClick,
+  mediaCount = 0,
 }: {
   event: Event
   priority?: boolean
   past?: boolean
   showDetailsLink?: boolean
   headingLevel?: 'h1' | 'h3'
+  onArchiveClick?: () => void
+  mediaCount?: number
 }) {
   const { dateLabel, timeLabel } = parts(event)
   const Heading = headingLevel
   const location = [event.venue, event.city].filter(Boolean).join(' · ')
 
   return (
-    <article className={`${styles.poster}${past ? ` ${styles.past}` : ''}`}>
+    <article
+      className={`${styles.poster}${past ? ` ${styles.past}` : ''}${onArchiveClick ? ` ${styles.archiveReady}` : ''}`}
+    >
       <Image
         src="/photos/PlexMix19-DJBAE.JPEG"
         alt=""
@@ -59,6 +65,14 @@ export default function EventPoster({
         aria-hidden="true"
       />
       <div className={styles.shade} aria-hidden="true" />
+      {onArchiveClick ? (
+        <button
+          type="button"
+          className={styles.archiveHitArea}
+          onClick={onArchiveClick}
+          aria-label={`Open media archive for ${event.title}`}
+        />
+      ) : null}
 
       <div className={styles.topline}>
         <span>{past ? 'Past Event' : 'Upcoming Event'}</span>
@@ -72,8 +86,24 @@ export default function EventPoster({
         {event.show_description && event.description ? (
           <p className={styles.description}>{event.description}</p>
         ) : null}
+        {onArchiveClick ? (
+          <button
+            type="button"
+            className={styles.archiveButton}
+            onClick={(clickEvent) => {
+              clickEvent.stopPropagation()
+              onArchiveClick()
+            }}
+          >
+            {mediaCount > 0 ? `View media · ${mediaCount}` : 'Open media archive'}
+          </button>
+        ) : null}
         {showDetailsLink ? (
-          <Link href={`/events/${event.slug}`} className={styles.detailsLink}>
+          <Link
+            href={`/events/${event.slug}`}
+            className={styles.detailsLink}
+            onClick={(clickEvent) => clickEvent.stopPropagation()}
+          >
             Event details <span aria-hidden="true">→</span>
           </Link>
         ) : null}
