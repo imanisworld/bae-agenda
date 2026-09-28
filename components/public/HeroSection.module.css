@@ -163,6 +163,8 @@
 .photoTag {
   left: 30%;
   top: calc(86% - var(--hook));
+  z-index: 5;
+  transform: translateZ(42px);
 }
 
 @keyframes hero-photo-gravity {
