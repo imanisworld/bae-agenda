@@ -126,19 +126,23 @@
   margin-top: 20px;
 }
 
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 3vw, 56px);
+}
+
 .phone {
-  position: absolute;
-  z-index: 5;
-  left: 42%;
-  bottom: 11%;
-  width: min(150px, 13vw);
+  flex-shrink: 0;
+  /* Sized by height so it matches the two-line headline. */
+  height: clamp(120px, 13vw, 210px);
   transform: rotate(7deg);
   filter: drop-shadow(0 24px 24px rgba(0,0,0,.4));
 }
 
 .phone img {
-  width: 100%;
-  height: auto;
+  width: auto;
+  height: 100%;
   display: block;
 }
 
@@ -204,11 +208,7 @@
   }
 
   .phone {
-    left: auto;
-    right: 8%;
-    top: 96px;
-    bottom: auto;
-    width: 104px;
+    height: clamp(110px, 18vw, 170px);
   }
 }
 
@@ -255,8 +255,16 @@
     text-shadow: 0 2px 18px rgba(0,0,0,.68);
   }
 
+  /* Small phone at the end of the one-line headline. */
+  .titleRow {
+    align-items: flex-end;
+    gap: 12px;
+  }
+
   .phone {
-    display: none;
+    height: clamp(48px, 15vw, 66px);
+    margin-bottom: -2px;
+    transform: rotate(10deg);
   }
 }
 

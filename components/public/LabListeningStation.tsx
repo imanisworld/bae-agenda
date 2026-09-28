@@ -1,258 +1,395 @@
 'use client'
 
+/**
+ * LAB — crate + turntable.
+ * Crates are DJ B.A.E.'s public SoundCloud playlists (see LAB_CRATES). A 3D
+ * cover carousel (swipe / drag / arrows / trackpad) feeds a picture-disc
+ * turntable. Audio runs through the site-wide PlayerProvider so it keeps
+ * playing after the visitor leaves the Lab.
+ */
 import Image from 'next/image'
-import Script from 'next/script'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { permalinkFor, usePlayer } from '@/components/public/player/PlayerProvider'
+import { useLabCrates, type CrateMix } from '@/components/public/player/useLabCrates'
 import styles from './LabListeningStation.module.css'
 
-export type ListeningMix = {
-  id: string
-  title: string
-  description: string | null
-  genre: string | null
-  embed_url: string | null
-  cover_url: string | null
+export type ListeningMix = CrateMix
+
+const SOUNDCLOUD_PROFILE = 'https://soundcloud.com/deejaybae'
+const SWIPE_THRESHOLD = 40
+
+function formatTime(ms: number) {
+  if (!Number.isFinite(ms) || ms <= 0) return '0:00'
+  const total = Math.floor(ms / 1000)
+  const h = Math.floor(total / 3600)
+  const m = Math.floor((total % 3600) / 60)
+  const s = String(total % 60).padStart(2, '0')
+  return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`
 }
 
-type SoundCloudWidget = {
-  play: () => void
-  pause: () => void
-  bind: (eventName: string, listener: () => void) => void
+function coverStyle(offset: number): CSSProperties {
+  const abs = Math.abs(offset)
+  const side = Math.sign(offset)
+  // Center cover faces forward; the rest angle toward it and step back in depth.
+  const x = offset === 0 ? 0 : side * (0.64 + (abs - 1) * 0.3)
+  return {
+    '--x': x,
+    '--z': offset === 0 ? 1 : -abs,
+    '--ry': offset === 0 ? '0deg' : `${side * -54}deg`,
+    zIndex: 20 - abs,
+    opacity: abs > 3 ? 0 : 1,
+    pointerEvents: abs > 3 ? 'none' : undefined,
+  } as CSSProperties
 }
 
-type SoundCloudNamespace = {
-  Widget: ((iframe: HTMLIFrameElement) => SoundCloudWidget) & {
-    Events?: Record<string, string>
-  }
+function PlayIcon() {
+  return <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 3.2v9.6a.6.6 0 0 0 .9.5l7.6-4.8a.6.6 0 0 0 0-1L5.9 2.7a.6.6 0 0 0-.9.5Z" /></svg>
 }
 
-declare global {
-  interface Window {
-    SC?: SoundCloudNamespace
-  }
+function PauseIcon() {
+  return <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="3" width="3" height="10" rx="1" /><rect x="9" y="3" width="3" height="10" rx="1" /></svg>
 }
 
-function playerUrl(url: string | null) {
-  if (!url) return ''
-  if (url.includes('w.soundcloud.com/player')) return url
-  if (!url.toLowerCase().includes('soundcloud.com')) return ''
-  return `https://w.soundcloud.com/player/?url=${encodeURIComponent(url)}&color=%238f2d3c&auto_play=false&hide_related=true&show_comments=false&show_user=false&show_reposts=false&visual=false`
-}
+export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }) {
+  const player = usePlayer()
+  const { cue } = player
+  const { status: cratesStatus, crates } = useLabCrates(mixes)
+  const [crateKey, setCrateKey] = useState<string | null>(null)
+  const [focus, setFocus] = useState(0)
+  const [shareNote, setShareNote] = useState('')
+  const drag = useRef<{ x: number; moved: boolean } | null>(null)
+  const wheelLock = useRef(0)
 
-export default function LabListeningStation({ mixes, compact = false }: { mixes: ListeningMix[]; compact?: boolean }) {
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [playing, setPlaying] = useState(false)
-  const [coasting, setCoasting] = useState(false)
-  const [apiReady, setApiReady] = useState(false)
-  const [loadPulse, setLoadPulse] = useState(0)
-  const iframeRef = useRef<HTMLIFrameElement>(null)
-  const widgetRef = useRef<SoundCloudWidget | null>(null)
-  const coastTimer = useRef<number | null>(null)
+  const crate = crates.find((item) => item.key === crateKey) ?? crates[0] ?? null
+  const list = crate?.mixes ?? []
 
-  const active = mixes[activeIndex] ?? null
-  const activePlayer = playerUrl(active?.embed_url ?? null)
-
+  // Put the first crate's lead mix on the platter so the first tap plays instantly.
   useEffect(() => {
-    if (!apiReady || !activePlayer || !iframeRef.current || !window.SC) return
-    const widget = window.SC.Widget(iframeRef.current)
-    widgetRef.current = widget
+    if (crates[0]?.mixes.length) cue(crates[0].mixes)
+  }, [crates, cue])
 
-    const events = window.SC.Widget.Events
-    if (events?.PLAY) widget.bind(events.PLAY, () => setPlaying(true))
-    if (events?.PAUSE) widget.bind(events.PAUSE, () => setPlaying(false))
-    if (events?.FINISH) widget.bind(events.FINISH, () => setPlaying(false))
-  }, [apiReady, active?.id, activePlayer])
-
-  useEffect(() => () => {
-    if (coastTimer.current !== null) window.clearTimeout(coastTimer.current)
-  }, [])
-
-  function choose(index: number) {
-    if (index === activeIndex) return
-    widgetRef.current?.pause()
-    setPlaying(false)
-    setCoasting(false)
-    setActiveIndex(index)
-    setLoadPulse((value) => value + 1)
-  }
-
-  function togglePlayback() {
-    if (!activePlayer || !widgetRef.current) return
-    if (playing) {
-      widgetRef.current.pause()
-      setPlaying(false)
-      setCoasting(true)
-      if (coastTimer.current !== null) window.clearTimeout(coastTimer.current)
-      coastTimer.current = window.setTimeout(() => setCoasting(false), 1100)
-    } else {
-      setCoasting(false)
-      widgetRef.current.play()
-      setPlaying(true)
+  // The crate follows the player: returning mid-mix, or next / previous,
+  // brings the playing cover (and its crate) to the front.
+  const currentId = player.current?.id
+  const [followedId, setFollowedId] = useState<string | undefined>(undefined)
+  if (crates.length > 0 && currentId !== followedId) {
+    setFollowedId(currentId)
+    const home = crates.find((item) => item.mixes.some((mix) => mix.id === currentId))
+    if (home) {
+      setCrateKey(home.key)
+      setFocus(home.mixes.findIndex((mix) => mix.id === currentId))
     }
   }
 
-  return (
-    <section className={compact ? `${styles.station} ${styles.compact}` : styles.station} aria-label="B.A.E. listening station">
-      <Script
-        src="https://w.soundcloud.com/player/api.js"
-        strategy="afterInteractive"
-        onLoad={() => setApiReady(true)}
-        onReady={() => setApiReady(true)}
-      />
+  const focused = list[focus] ?? null
+  const playing = player.status === 'playing'
+  const onPlatter = player.status === 'playing' || player.status === 'loading'
+  // While music plays the deck shows the playing mix; otherwise it shows the
+  // cover at the front of the crate, so the big play button plays what you see.
+  const loaded = (onPlatter ? (player.current as ListeningMix | null) : focused) ?? focused ?? list[0] ?? null
+  const loadedIsCurrent = Boolean(loaded && loaded.id === currentId)
+  const loadedIndex = loaded ? list.findIndex((mix) => mix.id === loaded.id) : -1
+  const duration = loadedIsCurrent && player.duration ? player.duration : (loaded?.duration ?? 0) * 1000
+  const position = loadedIsCurrent ? player.position : 0
+  const progress = duration ? Math.min(1, position / duration) : 0
+  const canPlay = Boolean(loaded)
+  const loadedPermalink = loadedIsCurrent ? player.permalink : permalinkFor(loaded?.embed_url ?? null)
 
-      <header className={styles.header}>
-        <div>
-          <p>Bae&apos;s in the Lab</p>
-          <h1>On wax.</h1>
-        </div>
-        <span>SoundCloud · audio source</span>
-      </header>
+  /** Play / pause whatever the deck is showing. */
+  function deckToggle() {
+    if (!loaded) return
+    if (loadedIsCurrent && player.engaged) {
+      player.toggle()
+      return
+    }
+    const i = list.findIndex((mix) => mix.id === loaded.id)
+    if (i >= 0) player.playFrom(list, i)
+  }
 
-      {active ? (
-        <div className={styles.deck}>
-          <div className={styles.platterColumn}>
-            <div className={styles.deckLabel}>
-              <span className={playing ? styles.liveDot : styles.idleDot} />
-              <strong>B.A.E. LISTENING STATION</strong>
-              <span>{playing ? 'PLAYING' : coasting ? 'COASTING' : 'READY'}</span>
-            </div>
+  function chooseCrate(key: string) {
+    const next = crates.find((item) => item.key === key)
+    if (!next) return
+    setCrateKey(key)
+    const i = next.mixes.findIndex((mix) => mix.id === currentId)
+    setFocus(i >= 0 ? i : 0)
+  }
 
+  function move(step: number) {
+    setFocus((value) => Math.max(0, Math.min(list.length - 1, value + step)))
+  }
+
+  function putOn(index: number) {
+    const mix = list[index]
+    if (!mix) return
+    if (mix.id === currentId && player.engaged) player.toggle()
+    else player.playFrom(list, index)
+  }
+
+  function onCoverClick(index: number) {
+    if (drag.current?.moved) return
+    if (index === focus) putOn(index)
+    else setFocus(index)
+  }
+
+  function onPointerDown(event: React.PointerEvent) {
+    drag.current = { x: event.clientX, moved: false }
+  }
+
+  function onPointerMove(event: React.PointerEvent) {
+    if (drag.current && Math.abs(event.clientX - drag.current.x) > 8) drag.current.moved = true
+  }
+
+  function onPointerUp(event: React.PointerEvent) {
+    const start = drag.current
+    if (!start) return
+    const dx = event.clientX - start.x
+    if (dx > SWIPE_THRESHOLD) move(-1)
+    else if (dx < -SWIPE_THRESHOLD) move(1)
+    // Let the click handler see `moved`, then reset.
+    window.setTimeout(() => { drag.current = null }, 0)
+  }
+
+  function onWheel(event: React.WheelEvent) {
+    if (Math.abs(event.deltaX) < Math.abs(event.deltaY) || Math.abs(event.deltaX) < 12) return
+    const now = Date.now()
+    if (now - wheelLock.current < 320) return
+    wheelLock.current = now
+    move(event.deltaX > 0 ? 1 : -1)
+  }
+
+  function onCrateKeyDown(event: React.KeyboardEvent) {
+    if (event.key === 'ArrowRight') { event.preventDefault(); move(1) }
+    if (event.key === 'ArrowLeft') { event.preventDefault(); move(-1) }
+  }
+
+  // Keep the carousel in step with the transport's next / previous.
+  function transport(step: 1 | -1) {
+    if (step === 1) player.next()
+    else player.previous()
+  }
+
+  async function share() {
+    if (!loaded) return
+    const url = loadedPermalink || `${window.location.origin}/lab`
+    const data = { title: `${loaded.title} — DJ B.A.E.`, url }
+    try {
+      if (navigator.share) {
+        await navigator.share(data)
+        return
+      }
+      await navigator.clipboard.writeText(url)
+      setShareNote('Link copied')
+    } catch (error) {
+      if ((error as Error)?.name === 'AbortError') return
+      setShareNote('Could not share')
+    }
+    window.setTimeout(() => setShareNote(''), 2200)
+  }
+
+  const header = (
+    <header className={styles.header}>
+      <div>
+        <p>Bae&apos;s in the Lab</p>
+        <h1>On wax.</h1>
+      </div>
+      {crates.length > 1 ? (
+        <div className={styles.crateSwitch} role="group" aria-label="Choose a crate">
+          {crates.map((item) => (
             <button
+              key={item.key}
               type="button"
-              className={styles.platter}
-              onClick={togglePlayback}
-              aria-label={playing ? `Pause ${active.title}` : `Play ${active.title}`}
-              disabled={!activePlayer}
+              aria-pressed={item.key === crate?.key}
+              onClick={() => chooseCrate(item.key)}
             >
-              <span className={playing || coasting ? styles.tonearmOn : styles.tonearmOff} aria-hidden="true">
-                <i />
-              </span>
-              <span
-                key={`${active.id}-${loadPulse}`}
-                className={[
-                  styles.record,
-                  playing ? styles.recordPlaying : '',
-                  coasting ? styles.recordCoasting : '',
-                  loadPulse ? styles.recordLoaded : '',
-                ].filter(Boolean).join(' ')}
-              >
-                <span className={styles.grooveOne} />
-                <span className={styles.grooveTwo} />
-                <span className={styles.label}>
-                  {active.cover_url ? (
-                    <Image src={active.cover_url} alt="" fill sizes="120px" quality={90} />
-                  ) : (
-                    <span>BAE</span>
-                  )}
-                </span>
-                <span className={styles.spindle} />
-              </span>
+              {item.label}
+              <small>{item.mixes.length}</small>
             </button>
+          ))}
+        </div>
+      ) : crates.length === 1 ? (
+        <span>{String(list.length).padStart(2, '0')} mixes</span>
+      ) : null}
+    </header>
+  )
 
-            <div className={styles.readout} aria-live="polite">
-              <span>Now spinning</span>
-              <h2>{active.title}</h2>
-              <p>{active.genre || 'Open format'}{active.description ? ` · ${active.description}` : ''}</p>
-            </div>
-
-            {activePlayer ? (
-              <iframe
-                key={active.id}
-                ref={iframeRef}
-                title={`${active.title} SoundCloud player`}
-                src={activePlayer}
-                allow="autoplay"
-                tabIndex={-1}
-                aria-hidden="true"
-                className={styles.audioFrame}
-              />
-            ) : (
-              <p className={styles.unavailable}>Audio link is not available for this release yet.</p>
-            )}
+  if (cratesStatus === 'loading') {
+    return (
+      <section className={styles.station} aria-label="B.A.E. listening station" aria-busy="true">
+        {header}
+        <div className={styles.crate}>
+          <div className={styles.coverflow} aria-hidden="true">
+            {[-1, 0, 1].map((offset) => (
+              <span key={offset} className={`${styles.cover} ${styles.skeleton}`} style={coverStyle(offset)} />
+            ))}
           </div>
-
-          <div className={styles.sleeveColumn}>
-            <div className={styles.sleeveHeading}>
-              <span>Published mixes</span>
-              <strong>{String(mixes.length).padStart(2, '0')}</strong>
-            </div>
-
-            <div className={styles.sleeves}>
-              {mixes.map((mix, index) => {
-                const selected = index === activeIndex
-                return (
-                  <button
-                    type="button"
-                    key={mix.id}
-                    className={selected ? styles.sleeveActive : styles.sleeve}
-                    aria-pressed={selected}
-                    onClick={() => choose(index)}
-                  >
-                    <span className={styles.sleeveVisual}>
-                      <span className={styles.sleeveDisc} aria-hidden="true" />
-                      <span className={styles.sleeveStack} aria-hidden="true">
-                        <i />
-                        <i />
-                        <i />
-                      </span>
-                      <span className={styles.sleeveArt}>
-                        {mix.cover_url ? (
-                          <Image src={mix.cover_url} alt="" fill sizes="260px" quality={90} />
-                        ) : (
-                          <span className={styles.sleeveFallback}>DJ B.A.E.</span>
-                        )}
-                      </span>
-                    </span>
-                    <span className={styles.sleeveMeta}>
-                      <small>{String(index + 1).padStart(3, '0')}</small>
-                      <strong>{mix.title}</strong>
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className={styles.comingSoon}>
-              <div className={styles.comingSoonIntro}>
-                <span>In the Lab</span>
-                <p>Unreleased work stays visibly separate from published SoundCloud mixes.</p>
-              </div>
-              <div className={styles.futureSleeves}>
-                <div className={styles.futureSleeve}>
-                  <span className={styles.futureVisual} aria-hidden="true">
-                    <span className={styles.futureDisc} />
-                    <span className={styles.futureStack}>
-                      <i />
-                      <i />
-                      <i />
-                    </span>
-                    <span className={styles.futureJacket} />
-                  </span>
-                  <span className={styles.futureLabel}>COMING SOON</span>
-                </div>
-                <div className={styles.futureSleeve}>
-                  <span className={styles.futureVisual} aria-hidden="true">
-                    <span className={styles.futureDisc} />
-                    <span className={styles.futureStack}>
-                      <i />
-                      <i />
-                      <i />
-                    </span>
-                    <span className={styles.futureJacket} />
-                  </span>
-                  <span className={styles.futureLabel}>WORK IN PROGRESS</span>
-                </div>
-              </div>
+          <div className={styles.crateBar}>
+            <div className={styles.crateCaption}>
+              <small>SoundCloud</small>
+              <strong>Pulling the crates…</strong>
             </div>
           </div>
         </div>
-      ) : (
+      </section>
+    )
+  }
+
+  if (!loaded) {
+    return (
+      <section className={styles.station} aria-label="B.A.E. listening station">
+        {header}
         <div className={styles.empty}>
           <span>Archive empty</span>
           <h2>New mixes will land here.</h2>
-          <a href="https://soundcloud.com/deejaybae" target="_blank" rel="noopener noreferrer">Follow on SoundCloud →</a>
+          <a href={SOUNDCLOUD_PROFILE} target="_blank" rel="noopener noreferrer">Follow on SoundCloud →</a>
         </div>
-      )}
+      </section>
+    )
+  }
+
+  const focusedIsLoaded = focused?.id === loaded.id
+
+  return (
+    <section className={styles.station} aria-label="B.A.E. listening station">
+      {header}
+
+      {/* ── Crate: 3D cover carousel ── */}
+      <div className={styles.crate}>
+        <div
+          key={crate?.key}
+          className={styles.coverflow}
+          role="listbox"
+          aria-label={`${crate?.label ?? 'Mixes'} — use arrow keys or swipe to browse`}
+          aria-activedescendant={focused ? `lab-cover-${focused.id}` : undefined}
+          tabIndex={0}
+          onKeyDown={onCrateKeyDown}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={() => { drag.current = null }}
+          onWheel={onWheel}
+        >
+          {list.map((mix, index) => {
+            const offset = index - focus
+            const isLoaded = index === loadedIndex
+            return (
+              <button
+                type="button"
+                key={mix.id}
+                id={`lab-cover-${mix.id}`}
+                role="option"
+                aria-selected={offset === 0}
+                aria-label={offset === 0 ? `${mix.title} — ${isLoaded && playing ? 'pause' : 'play'}` : `Show ${mix.title}`}
+                tabIndex={-1}
+                className={`${styles.cover}${offset === 0 ? ` ${styles.coverFront}` : ''}`}
+                style={coverStyle(offset)}
+                onClick={() => onCoverClick(index)}
+              >
+                <span className={styles.coverArt}>
+                  {/* Only covers near the front load an image; far ones are invisible anyway. */}
+                  {mix.cover_url && Math.abs(offset) <= 3 ? (
+                    <Image src={mix.cover_url} alt="" fill sizes="(max-width: 620px) 50vw, 280px" quality={90} draggable={false} />
+                  ) : (
+                    <span className={styles.coverFallback}>DJ B.A.E.</span>
+                  )}
+                </span>
+                {offset === 0 ? (
+                  <span className={styles.coverBadge} aria-hidden="true">
+                    {isLoaded && playing ? <PauseIcon /> : <PlayIcon />}
+                  </span>
+                ) : null}
+              </button>
+            )
+          })}
+        </div>
+
+        <div className={styles.crateBar}>
+          <button type="button" className={styles.round} onClick={() => move(-1)} disabled={focus === 0} aria-label="Previous cover">←</button>
+          <div className={styles.crateCaption} aria-live="polite">
+            <small>{String(focus + 1).padStart(3, '0')}{focused?.genre ? ` · ${focused.genre}` : ''}</small>
+            <strong>{focused?.title}</strong>
+            <span>{focusedIsLoaded && onPlatter ? 'On the platter' : `${focus + 1} of ${list.length} · tap the cover to play`}</span>
+          </div>
+          <button type="button" className={styles.round} onClick={() => move(1)} disabled={focus === list.length - 1} aria-label="Next cover">→</button>
+        </div>
+      </div>
+
+      {/* ── Deck: picture-disc turntable + transport ── */}
+      <div className={styles.deck}>
+        <button
+          type="button"
+          className={styles.turntable}
+          onClick={deckToggle}
+          disabled={!canPlay}
+          aria-label={playing ? `Pause ${loaded.title}` : `Play ${loaded.title}`}
+        >
+          <span className={styles.platter}>
+            <span
+              key={loaded.id}
+              className={`${styles.record}${playing ? ` ${styles.spinning}` : ''}`}
+            >
+              {loaded.cover_url ? (
+                <Image src={loaded.cover_url} alt="" fill sizes="(max-width: 620px) 40vw, 320px" quality={90} />
+              ) : null}
+              <span className={styles.grooves} aria-hidden="true" />
+              <span className={styles.hole} aria-hidden="true" />
+            </span>
+          </span>
+          <span className={`${styles.tonearm}${onPlatter ? ` ${styles.tonearmOn}` : ''}`} aria-hidden="true">
+            <i />
+          </span>
+        </button>
+
+        <div className={styles.console}>
+          <div className={styles.readout}>
+            <span className={styles.state}>
+              <i className={playing ? styles.liveDot : styles.idleDot} />
+              {player.status === 'loading' ? 'Dropping the needle' : playing ? 'Now spinning' : loadedIsCurrent && player.engaged ? 'Paused' : 'Cued up'}
+            </span>
+            <h2>{loaded.title}</h2>
+            <p>{[loaded.genre || 'Open format', loaded.description].filter(Boolean).join(' · ')}</p>
+          </div>
+
+          <div className={styles.progress}>
+            <input
+              type="range"
+              min={0}
+              max={1000}
+              step={1}
+              value={Math.round(progress * 1000)}
+              onChange={(event) => player.seek(Number(event.target.value) / 1000)}
+              disabled={!loadedIsCurrent || !player.engaged || !duration}
+              aria-label="Seek"
+              aria-valuetext={`${formatTime(position)} of ${formatTime(duration)}`}
+              style={{ '--progress': `${progress * 100}%` } as CSSProperties}
+            />
+            <div className={styles.times}>
+              <span>{formatTime(position)}</span>
+              <span>{formatTime(duration)}</span>
+            </div>
+          </div>
+
+          <div className={styles.controls}>
+            <div className={styles.transport}>
+              <button type="button" className={styles.round} onClick={() => transport(-1)} disabled={!player.engaged} aria-label="Previous mix or restart">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 3v10M13 3.6v8.8a.6.6 0 0 1-.9.5L6 8.5a.6.6 0 0 1 0-1l6.1-4.4a.6.6 0 0 1 .9.5Z" /></svg>
+              </button>
+              <button type="button" className={styles.play} onClick={deckToggle} disabled={!canPlay} aria-label={playing ? 'Pause' : 'Play'}>
+                {playing ? <PauseIcon /> : <PlayIcon />}
+              </button>
+              <button type="button" className={styles.round} onClick={() => transport(1)} disabled={player.queue.length < 2} aria-label="Next mix">
+                <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M12 3v10M3 3.6v8.8a.6.6 0 0 0 .9.5L10 8.5a.6.6 0 0 0 0-1L3.9 3.1a.6.6 0 0 0-.9.5Z" /></svg>
+              </button>
+            </div>
+
+            <div className={styles.links}>
+              <button type="button" onClick={share}>{shareNote || 'Share'}</button>
+              <a href={loadedPermalink || SOUNDCLOUD_PROFILE} target="_blank" rel="noopener noreferrer">
+                SoundCloud <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   )
 }

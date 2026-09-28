@@ -1,0 +1,99 @@
+.pill {
+  justify-self: end;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: min(260px, 52vw);
+  height: 32px;
+  padding: 0 3px 0 4px;
+  border: 1px solid rgba(196,165,116,.28);
+  border-radius: 999px;
+  background: rgba(22,18,16,.82);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 8px 22px rgba(0,0,0,.28);
+}
+
+.track {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  color: #f6f1e8;
+  text-decoration: none;
+}
+
+.disc {
+  position: relative;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: radial-gradient(circle, #2a2421 0 30%, #0e0b0a 31%);
+  box-shadow: inset 0 0 0 1px rgba(246,241,232,.14);
+}
+
+.disc img {
+  object-fit: cover;
+}
+
+/* Spindle hole so the cover reads as a record. */
+.disc::after {
+  content: '';
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: #0e0b0a;
+}
+
+.spinning {
+  animation: pill-spin 2.4s linear infinite;
+}
+
+@keyframes pill-spin {
+  to { transform: rotate(360deg); }
+}
+
+.title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.toggle {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #8f2d3c;
+  color: #f6f1e8;
+  cursor: pointer;
+  transition: background 150ms ease;
+}
+
+.toggle:hover {
+  background: #a33a4b;
+}
+
+.toggle svg {
+  width: 12px;
+  height: 12px;
+  fill: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinning { animation: none; }
+}

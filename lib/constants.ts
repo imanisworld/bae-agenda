@@ -85,6 +85,15 @@ export const PAYMENT_METHODS = ['cash', 'venmo', 'zelle', 'cash_app', 'stripe', 
 export const PAYMENT_TYPES   = ['deposit', 'balance', 'full', 'refund'] as const
 
 // ---- Socials -----------------------------------------------
+// ---- Lab crates ------------------------------------------
+// Public SoundCloud playlists the Lab reads live. Add a track to one of these
+// on SoundCloud and it appears in the Lab — no admin entry needed.
+export const LAB_CRATES = [
+  { key: 'mixes',   label: 'Mixes',     url: 'https://soundcloud.com/deejaybae/sets/mixes'    },
+  { key: 'mashups', label: 'Mashups',   url: 'https://soundcloud.com/deejaybae/sets/mashups'  },
+  { key: 'edits',   label: 'Edits P.1', url: 'https://soundcloud.com/deejaybae/sets/edit-p-1' },
+] as const
+
 export const SOCIALS = [
   { label: 'Instagram', url: 'https://www.instagram.com/dj_b.a.e/',                      icon: 'IG' },
   { label: 'TikTok',    url: 'https://www.tiktok.com/@djbae1',                            icon: 'TT' },

@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import LogoSpinVideo from '@/components/public/LogoSpinVideo'
 import styles from './PortfolioArchiveHero.module.css'
 
 export type ArchivePrint = {
@@ -51,6 +52,13 @@ export default function PortfolioArchiveHero({
           ) : null}
         </div>
       </div>
+
+      {prints.length === 0 ? (
+        // Fills the open side of the hero until portfolio photos are added in admin.
+        <div className={styles.logoSpin} aria-hidden="true">
+          <LogoSpinVideo />
+        </div>
+      ) : null}
 
       <div className={styles.printField} aria-label="Selected past work">
         {prints.slice(0, 3).map((entry, index) => (

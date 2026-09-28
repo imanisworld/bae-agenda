@@ -5,7 +5,7 @@ import { getPublishedMixes } from '@/lib/db/mixes'
 export const metadata: Metadata = {
   title: 'Lab',
   alternates: { canonical: '/lab' },
-  description: 'Bae’s in the Lab — published SoundCloud mixes, physical listening-station interaction, and work in progress from DJ B.A.E.',
+  description: 'Bae’s in the Lab — published SoundCloud mixes from DJ B.A.E. on a crate-and-turntable listening station.',
 }
 
 export default async function LabPage() {
@@ -17,11 +17,12 @@ export default async function LabPage() {
     genre: mix.genre,
     embed_url: mix.embed_url,
     cover_url: mix.cover_url,
+    duration: mix.duration,
   }))
 
   return (
     <div className="lab-experience">
-      <LabListeningStation mixes={listeningMixes} compact />
+      <LabListeningStation mixes={listeningMixes} />
     </div>
   )
 }
