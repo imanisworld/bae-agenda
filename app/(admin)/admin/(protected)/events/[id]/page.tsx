@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import EventLocationFields from '@/components/admin/EventLocationFields'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deleteEventAction, updateEventAction } from '@/app/actions/events'
@@ -141,8 +142,8 @@ export default async function EditEventPage({
 
       <form action={deleteEventAction}>
         <input type="hidden" name="id" value={event.id} />
-        <button
-          type="submit"
+        <ConfirmSubmitButton
+          message="Delete this event? This cannot be undone."
           className="admin-btn-ghost"
           style={{
             color: '#e85d75',
@@ -150,7 +151,7 @@ export default async function EditEventPage({
           }}
         >
           Delete Event
-        </button>
+        </ConfirmSubmitButton>
       </form>
     </div>
   )
