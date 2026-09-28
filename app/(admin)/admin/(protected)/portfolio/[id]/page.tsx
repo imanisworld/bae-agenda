@@ -34,11 +34,12 @@ function inputStyle(): React.CSSProperties {
 
 async function getEntry(id: string): Promise<PortfolioEntry | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('portfolio_entries')
     .select('*')
     .eq('id', id)
     .maybeSingle()
+  if (error) throw new Error(error.message || 'Unable to load portfolio entry.')
   return (data as PortfolioEntry | null) ?? null
 }
 
