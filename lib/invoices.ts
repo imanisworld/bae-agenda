@@ -24,6 +24,15 @@ export interface InvoiceBookingData {
   } | null
 }
 
+export const DEFAULT_INVOICE_PAYMENT_TERMS =
+  'Balance due on or before the event date. Deposit is non-refundable. Final balance must be paid before the event.'
+
+export interface InvoiceLineItem {
+  description: string
+  quantity: number
+  unit_amount: number
+}
+
 export interface InvoiceSnapshotData {
   invoice_number: string
   pdf_filename: string
@@ -33,6 +42,72 @@ export interface InvoiceSnapshotData {
   total_amount: number
   deposit_amount: number
   balance_due: number
+  due_date?: string | null
+  payment_terms?: string | null
+  line_items?: unknown
+}
+
+function roundCurrency(value: number) {
+  return Math.round((value + Number.EPSILON) * 100) / 100
+}
+
+export function normalizeInvoiceLineItems(
+  value: unknown,
+  fallbackDescription = 'DJ Services',
+  fallbackTotal = 0
+): InvoiceLineItem[] {
+  const rows = Array.isArray(value) ? value : []
+  const normalized = rows.flatMap((row) => {
+    if (!row || typeof row !== 'object') return []
+
+    const candidate = row as Record<string, unknown>
+    const description = typeof candidate.description === 'string'
+      ? candidate.description.trim()
+      : ''
+    const quantity = Number(candidate.quantity)
+    const unitAmount = Number(candidate.unit_amount)
+
+    if (!description || !Number.isFinite(quantity) || quantity <= 0 || !Number.isFinite(unitAmount) || unitAmount < 0) {
+      return []
+    }
+
+    return [{
+      description,
+      quantity: roundCurrency(quantity),
+      unit_amount: roundCurrency(unitAmount),
+    }]
+  })
+
+  if (normalized.length) return normalized.slice(0, 8)
+
+  if (fallbackTotal > 0) {
+    return [{
+      description: fallbackDescription.trim() || 'DJ Services',
+      quantity: 1,
+      unit_amount: roundCurrency(fallbackTotal),
+    }]
+  }
+
+  return []
+}
+
+export function invoiceLineItemsTotal(items: InvoiceLineItem[]) {
+  return roundCurrency(
+    items.reduce((sum, item) => sum + item.quantity * item.unit_amount, 0)
+  )
+}
+
+export function formatInvoiceDueDate(value: string | null | undefined) {
+  if (!value) return null
+  const parsed = new Date(`${value}T12:00:00Z`)
+  if (Number.isNaN(parsed.getTime())) return null
+
+  return parsed.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  })
 }
 
 export function applyInvoiceSnapshot(
@@ -187,7 +262,10 @@ function drawLabelValueRow(
   return y - 26
 }
 
-export async function generateInvoicePdf(booking: InvoiceBookingData) {
+export async function generateInvoicePdf(
+  booking: InvoiceBookingData,
+  invoice?: InvoiceSnapshotData | null
+) {
   const pdf = await PDFDocument.create()
   const page = pdf.addPage([PAGE.width, PAGE.height])
   const fontRegular = await pdf.embedFont(StandardFonts.Helvetica)
@@ -204,10 +282,17 @@ export async function generateInvoicePdf(booking: InvoiceBookingData) {
     day: 'numeric',
   })
   const eventTime = formatEventTimeRange(booking.event_date, booking.event_end_time, booking.event_timezone)
-  const total = booking.quote ?? 0
-  const deposit = booking.deposit_amount ?? 0
-  const balance = balanceDueOf(booking)
-  const invoiceNumber = invoiceNumberOf(booking)
+  const total = invoice ? Number(invoice.total_amount ?? 0) : booking.quote ?? 0
+  const deposit = invoice ? Number(invoice.deposit_amount ?? 0) : booking.deposit_amount ?? 0
+  const balance = invoice ? Number(invoice.balance_due ?? Math.max(total - deposit, 0)) : balanceDueOf(booking)
+  const invoiceNumber = invoice?.invoice_number || invoiceNumberOf(booking)
+  const dueDate = formatInvoiceDueDate(invoice?.due_date)
+  const paymentTerms = invoice?.payment_terms?.trim() || DEFAULT_INVOICE_PAYMENT_TERMS
+  const lineItems = normalizeInvoiceLineItems(
+    invoice?.line_items,
+    booking.event_name ?? 'DJ Services',
+    total
+  )
 
   page.drawText('DJ ', {
     x: PAGE.marginX,
@@ -310,41 +395,38 @@ export async function generateInvoicePdf(booking: InvoiceBookingData) {
   })
   y -= 20
 
-  page.drawText(booking.event_name ?? 'DJ Services', {
-    x: PAGE.marginX,
-    y,
-    size: 12,
-    font: fontBold,
-    color: black,
-  })
-  page.drawText(formatCurrency(total), {
-    x: PAGE.width - PAGE.marginX - 82,
-    y,
-    size: 12,
-    font: fontBold,
-    color: black,
-  })
-
-  const description = [
-    booking.package,
-    booking.hours !== null ? `${booking.hours} hr${booking.hours !== 1 ? 's' : ''}` : null,
-    eventDate !== '-' ? eventDate : null,
-    eventTime,
-    [booking.venue, booking.city].filter(Boolean).join(', ') || null,
-  ].filter(Boolean).join(' | ')
-
-  if (description) {
-    y = drawTextBlock(page, description, {
+  for (const item of lineItems) {
+    const itemTotal = item.quantity * item.unit_amount
+    page.drawText(item.description, {
       x: PAGE.marginX,
-      y: y - 18,
-      width: PAGE.width - PAGE.marginX * 2 - 100,
-      font: fontRegular,
-      size: 10,
-      color: muted,
-      lineGap: 2,
-    }) - 4
-  } else {
-    y -= 22
+      y,
+      size: 11,
+      font: fontBold,
+      color: black,
+    })
+    page.drawText(formatCurrency(itemTotal), {
+      x: PAGE.width - PAGE.marginX - 82,
+      y,
+      size: 11,
+      font: fontBold,
+      color: black,
+    })
+
+    if (item.quantity !== 1) {
+      y -= 14
+      page.drawText(
+        `${item.quantity} × ${formatCurrency(item.unit_amount)}`,
+        {
+          x: PAGE.marginX,
+          y,
+          size: 9,
+          font: fontRegular,
+          color: muted,
+        }
+      )
+    }
+
+    y -= 26
   }
 
   drawRule(page, y)
@@ -423,16 +505,12 @@ export async function generateInvoicePdf(booking: InvoiceBookingData) {
 
   const paymentInstructionLines = getPaymentInstructionTextLines()
   const invoiceFooter = [
+    ...(dueDate ? [`Due Date: ${dueDate}`, ''] : []),
     'Payment Methods:',
     ...paymentInstructionLines,
     '',
-    'Deposit secures your booking.',
-    'Remaining balance due before event date.',
-    '',
     'Terms:',
-    '- Deposit is non-refundable',
-    '- Date is not secured until deposit is received',
-    '- Final balance must be paid before event',
+    paymentTerms,
   ].join('\n')
 
   drawTextBlock(page, invoiceFooter, {
