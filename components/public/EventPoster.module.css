@@ -27,7 +27,7 @@
 .topline,
 .info {
   position: absolute;
-  z-index: 2;
+  z-index: 3;
 }
 
 .topline {
@@ -215,4 +215,23 @@
 .archiveButton:focus-visible {
   border-color: rgba(196,165,116,.72);
   color: #d8ba88;
+}
+
+
+.archiveHitArea {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.archiveReady .info {
+  pointer-events: none;
+}
+
+.archiveReady .archiveButton,
+.archiveReady .detailsLink {
+  pointer-events: auto;
 }
