@@ -9,14 +9,14 @@ export const size = {
   height: 512,
 }
 
-async function getBackgroundDataUrl() {
-  const filePath = path.join(process.cwd(), 'public', 'photos', 'images', 'outside.jpg')
+async function getLogoDataUrl() {
+  const filePath = path.join(process.cwd(), 'public', 'brand', 'dj-bae-logo.png')
   const buffer = await readFile(filePath)
-  return `data:image/jpeg;base64,${buffer.toString('base64')}`
+  return `data:image/png;base64,${buffer.toString('base64')}`
 }
 
 export default async function Icon() {
-  const backgroundSrc = await getBackgroundDataUrl()
+  const logoSrc = await getLogoDataUrl()
 
   return new ImageResponse(
     (
@@ -26,103 +26,35 @@ export default async function Icon() {
           height: '100%',
           position: 'relative',
           display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
           overflow: 'hidden',
-          background: '#0d0d0f',
-          color: '#faf8f3',
+          background:
+            'radial-gradient(circle at 50% 42%, rgba(143,45,60,.42) 0%, rgba(70,28,35,.22) 34%, rgba(13,13,15,1) 72%)',
         }}
       >
+        <div
+          style={{
+            position: 'absolute',
+            inset: '26px',
+            border: '1px solid rgba(210,177,125,.22)',
+            borderRadius: '92px',
+            background: 'linear-gradient(145deg, rgba(255,255,255,.035), rgba(0,0,0,.08))',
+          }}
+        />
         <img
-          src={backgroundSrc}
+          src={logoSrc}
           alt=""
-          width={512}
-          height={512}
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            objectPosition: 'center 46%',
-            filter: 'saturate(0.9) contrast(1.02)',
-          }}
-        />
-
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(180deg, rgba(8,8,10,0.28) 0%, rgba(8,8,10,0.46) 44%, rgba(8,8,10,0.88) 100%)',
-          }}
-        />
-
-        <div
-          style={{
-            position: 'absolute',
-            inset: '24px',
-            border: '1px solid rgba(250,248,243,0.16)',
-            background: 'linear-gradient(180deg, rgba(13,13,15,0.18), rgba(13,13,15,0.12))',
-          }}
-        />
-
-        <div
+          width={460}
+          height={337}
           style={{
             position: 'relative',
-            zIndex: 1,
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            padding: '42px 38px 34px',
+            width: '90%',
+            height: 'auto',
+            objectFit: 'contain',
+            filter: 'drop-shadow(0 24px 30px rgba(0,0,0,.58))',
           }}
-        >
-          <div
-            style={{
-              fontSize: 24,
-              letterSpacing: '0.34em',
-              textTransform: 'uppercase',
-              opacity: 0.78,
-            }}
-          >
-            The
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 0,
-              lineHeight: 0.9,
-              textTransform: 'uppercase',
-              fontWeight: 800,
-            }}
-          >
-            <div style={{ fontSize: 86, color: '#faf8f3' }}>Bae</div>
-            <div style={{ fontSize: 86, color: '#9b5de5' }}>Agenda</div>
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-              fontSize: 20,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              opacity: 0.82,
-            }}
-          >
-            <div
-              style={{
-                width: 30,
-                height: 1,
-                background: 'rgba(250,248,243,0.5)',
-              }}
-            />
-            DJ B.A.E.
-          </div>
-        </div>
+        />
       </div>
     ),
     size,
