@@ -141,6 +141,7 @@ export async function confirmManualDepositAction(formData: FormData) {
   const bookingId = optionalString(formData.get('booking_id'))
   const method = optionalString(formData.get('method'))
   const notes = optionalString(formData.get('notes'))
+  const confirmationId = optionalString(formData.get('confirmation_id'))
 
   if (!bookingId) {
     redirect('/admin/bookings')
@@ -149,6 +150,12 @@ export async function confirmManualDepositAction(formData: FormData) {
   if (!method || !MANUAL_METHODS.includes(method as PaymentMethod)) {
     redirectToAdmin(bookingId as string, 'Choose Zelle or Cash App before confirming the deposit.')
   }
+
+  if (!confirmationId || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(confirmationId)) {
+    redirectToAdmin(bookingId as string, 'Refresh the page and try confirming the deposit again.')
+  }
+
+  const externalReference = `manual-deposit:${bookingId}:${confirmationId}`
 
   const { data: booking, error } = await admin
     .from('bookings')
@@ -180,10 +187,36 @@ export async function confirmManualDepositAction(formData: FormData) {
       method,
       status: 'received',
       paid_at: new Date().toISOString(),
+      external_reference: externalReference,
       notes: notes ?? `Manual ${methodLabel} deposit confirmation.`,
     })
 
   if (paymentError) {
+    if (paymentError.code === '23505') {
+      const { data: existingPayment } = await admin
+        .from('payments')
+        .select('id')
+        .eq('external_reference', externalReference)
+        .maybeSingle()
+
+      if (existingPayment?.id) {
+        await syncBookingDepositState(admin, bookingId as string)
+        await syncComputedBookingPaymentState(admin, bookingId as string)
+
+        await admin
+          .from('bookings')
+          .update({ payment_method: method })
+          .eq('id', bookingId as string)
+
+        revalidatePath(`/admin/bookings/${bookingId}`)
+        revalidatePath('/admin/bookings')
+        revalidatePath('/admin/payments')
+        revalidatePath('/admin/dashboard')
+        revalidatePath(`/pay/${bookingId}`)
+        redirectToAdmin(bookingId as string, `${methodLabel} deposit was already confirmed.`, 'success')
+      }
+    }
+
     redirectToAdmin(bookingId as string, paymentError.message || 'Unable to confirm the manual deposit.')
   }
 
