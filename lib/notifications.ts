@@ -342,6 +342,7 @@ export async function sendEmailNotification(args: {
   text: string
   html: string
   replyTo?: string
+  idempotencyKey?: string
   attachments?: Array<{
     filename: string
     content: string
@@ -369,6 +370,7 @@ export async function sendEmailNotification(args: {
       headers: {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
+        ...(args.idempotencyKey ? { 'Idempotency-Key': args.idempotencyKey } : {}),
       },
       body: JSON.stringify({
         from,
@@ -589,7 +591,10 @@ export async function sendBookingConfirmedNotification(payload: BookingConfirmed
   })
 }
 
-export async function sendBookingBalanceReminder(payload: BookingBalanceReminderPayload) {
+export async function sendBookingBalanceReminder(
+  payload: BookingBalanceReminderPayload,
+  options?: { idempotencyKey?: string }
+) {
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
   const paymentInstructionRows = getPaymentInstructionRows({
@@ -604,6 +609,7 @@ export async function sendBookingBalanceReminder(payload: BookingBalanceReminder
   return sendEmailNotification({
     to: payload.email,
     subject: 'DJ B.A.E. final payment reminder',
+    idempotencyKey: options?.idempotencyKey,
     text: [
       `Hey ${guestName},`,
       '',
@@ -631,13 +637,17 @@ export async function sendBookingBalanceReminder(payload: BookingBalanceReminder
   })
 }
 
-export async function sendBookingPostEventFollowUp(payload: BookingPostEventFollowUpPayload) {
+export async function sendBookingPostEventFollowUp(
+  payload: BookingPostEventFollowUpPayload,
+  options?: { idempotencyKey?: string }
+) {
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
 
   return sendEmailNotification({
     to: payload.email,
     subject: 'Thank you for booking DJ B.A.E.',
+    idempotencyKey: options?.idempotencyKey,
     text: [
       `Hey ${guestName},`,
       '',
@@ -662,13 +672,17 @@ export async function sendBookingPostEventFollowUp(payload: BookingPostEventFoll
   })
 }
 
-export async function sendBookingReviewRequest(payload: BookingReviewRequestPayload) {
+export async function sendBookingReviewRequest(
+  payload: BookingReviewRequestPayload,
+  options?: { idempotencyKey?: string }
+) {
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ').trim() || payload.firstName
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
 
   return sendEmailNotification({
     to: payload.email,
     subject: 'How did DJ B.A.E. do?',
+    idempotencyKey: options?.idempotencyKey,
     text: [
       `Hey ${guestName},`,
       '',
@@ -695,7 +709,10 @@ export async function sendBookingReviewRequest(payload: BookingReviewRequestPayl
   })
 }
 
-export async function sendInvoiceNotification(payload: InvoiceNotificationPayload) {
+export async function sendInvoiceNotification(
+  payload: InvoiceNotificationPayload,
+  options?: { idempotencyKey?: string }
+) {
   const greetingName = payload.clientName.trim() || 'there'
   const isReminder = payload.mode === 'reminder'
   const subject = isReminder
@@ -712,6 +729,7 @@ export async function sendInvoiceNotification(payload: InvoiceNotificationPayloa
   return sendEmailNotification({
     to: payload.to,
     subject,
+    idempotencyKey: options?.idempotencyKey,
     text: [
       `Hi ${greetingName},`,
       '',
