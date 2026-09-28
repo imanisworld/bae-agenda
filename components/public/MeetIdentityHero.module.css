@@ -9,6 +9,24 @@
     #0e0b0a;
 }
 
+.hero::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: 3%;
+  top: 12%;
+  width: 49%;
+  height: 72%;
+  opacity: .22;
+  background:
+    linear-gradient(180deg, rgba(14,11,10,.08), rgba(14,11,10,.56)),
+    url('/photos/images/outside.jpg') center / cover no-repeat;
+  clip-path: polygon(2% 5%, 94% 0, 100% 92%, 8% 100%);
+  transform: rotate(-1.4deg);
+  filter: saturate(.72) contrast(1.05);
+  pointer-events: none;
+}
+
 .glow {
   position: absolute;
   inset: 12% 10%;
@@ -142,27 +160,24 @@
   margin-top: 20px;
 }
 
-.titleRow {
-  display: flex;
-  align-items: center;
-  gap: clamp(12px, 3vw, 56px);
-}
-
-.phone {
-  flex-shrink: 0;
-  /* Sized by height so it matches the two-line headline. */
-  height: clamp(120px, 13vw, 210px);
+.phoneTop {
+  position: absolute;
+  z-index: 5;
+  top: clamp(72px, 8vw, 112px);
+  right: 7%;
+  height: clamp(82px, 9vw, 138px);
   transform:
     perspective(620px)
     rotateX(var(--tilt-y, 0deg))
     rotateY(var(--tilt-x, 0deg))
-    rotateZ(7deg);
+    rotateZ(9deg);
   transform-style: preserve-3d;
   transition: transform 360ms cubic-bezier(.2,.7,.2,1);
   filter: drop-shadow(0 24px 24px rgba(0,0,0,.4));
+  pointer-events: none;
 }
 
-.phone img {
+.phoneTop img {
   width: auto;
   height: 100%;
   display: block;
@@ -240,12 +255,33 @@
   }
 
   .portraitWrap {
-    width: 82%;
-    margin-left: 6%;
+    flex: none;
+    width: 78%;
+    height: clamp(300px, 48dvh, 440px);
+    max-height: none;
+    margin-left: 10%;
   }
 
   .portrait {
+    height: 100%;
+    aspect-ratio: auto;
     border-radius: 20px;
+  }
+
+  .portraitLabel {
+    display: block;
+    margin-top: 16px;
+    color: #c4a574;
+    font-size: 9px;
+    letter-spacing: .19em;
+  }
+
+  .hero::before {
+    left: 3%;
+    top: 22%;
+    width: 92%;
+    height: 44%;
+    opacity: .2;
   }
 
   /* Phone: title moves above the portrait on one line; details stay below. */
@@ -277,15 +313,10 @@
     text-shadow: 0 2px 18px rgba(0,0,0,.68);
   }
 
-  /* Small phone at the end of the one-line headline. */
-  .titleRow {
-    align-items: flex-end;
-    gap: 12px;
-  }
-
-  .phone {
+  .phoneTop {
+    top: 70px;
+    right: 7%;
     height: clamp(48px, 15vw, 66px);
-    margin-bottom: -2px;
     transform: rotate(10deg);
   }
 
@@ -332,7 +363,7 @@
     transition: none;
   }
 
-  .phone {
+  .phoneTop {
     display: none;
   }
 }
