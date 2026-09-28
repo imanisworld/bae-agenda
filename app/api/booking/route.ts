@@ -50,7 +50,10 @@ const BookingSchema = z.object({
   // Details
   package:      z.string().optional(),
   notes:        z.string().optional(),
-  // Honeypot / meta
+  // Consent / honeypot / meta
+  acceptedTerms: z.literal(true, {
+    errorMap: () => ({ message: "Booking Terms must be accepted." }),
+  }),
   website:      z.string().optional(),
   startedAt:    z.string().optional(),
 }).superRefine((data, ctx) => {
@@ -256,6 +259,8 @@ export async function POST(req: NextRequest) {
         package: optionalString(data.package),
         notes: optionalString(data.notes),
         status: "inquiry",
+        terms_accepted_at: new Date().toISOString(),
+        terms_version: "2026-09-28",
       })
       .select("id")
       .single();
