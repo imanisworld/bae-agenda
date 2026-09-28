@@ -71,6 +71,8 @@
 .portrait img {
   object-fit: cover;
   object-position: center;
+  filter: brightness(1.02) saturate(1.03) contrast(1.05);
+  backface-visibility: hidden;
   pointer-events: none;
   user-select: none;
 }
