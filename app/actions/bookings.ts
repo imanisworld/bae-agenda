@@ -1439,6 +1439,21 @@ export async function confirmBookingAction(formData: FormData) {
 
   await syncComputedBookingPaymentState(admin, bookingId as string)
 
+  const invoiceDraftResult = await ensureInvoiceDraft(admin, bookingId as string)
+  if (invoiceDraftResult.created) {
+    await appendBookingTimelineNote(
+      admin,
+      bookingId as string,
+      'Invoice draft created automatically when the booking was confirmed.'
+    )
+  } else if (invoiceDraftResult.updated) {
+    await appendBookingTimelineNote(
+      admin,
+      bookingId as string,
+      'Invoice draft refreshed when the booking was confirmed.'
+    )
+  }
+
   void logBookingActivity({
     bookingId: bookingId as string,
     type: 'status_changed',
@@ -1466,6 +1481,8 @@ export async function confirmBookingAction(formData: FormData) {
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/dashboard')
+  revalidatePath('/admin/invoices')
+  revalidatePath(`/admin/bookings/${bookingId}/invoice`)
   redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Booking confirmed.')}`)
 }
 
@@ -1525,27 +1542,43 @@ export async function requestFinalPaymentAction(formData: FormData) {
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
 
   const source = await getBookingBalanceReminderSource(admin, bookingId as string)
-  if (source) {
-    const payload = await getBalanceReminderPayloadFromBooking(source)
-    if (payload) {
-      const result = await sendBookingBalanceReminder(payload)
-      if (result.ok) {
-        await stampBookingEmailSentAt(admin, bookingId as string, 'last_balance_reminder_sent_at')
-        await appendBookingTimelineNote(admin, bookingId as string, `Final payment requested. Balance reminder sent to ${payload.email}.`)
-      } else {
-        await appendBookingTimelineNote(admin, bookingId as string, 'Final payment requested. Balance reminder email could not be sent.')
-      }
-    } else {
-      await appendBookingTimelineNote(admin, bookingId as string, 'Final payment requested. No client email on file — balance reminder not sent.')
-    }
+  if (!source) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Could not load this booking for a final payment reminder.')
   }
 
+  const payload = await getBalanceReminderPayloadFromBooking(source)
+  if (!payload) {
+    redirectWithError(
+      `/admin/bookings/${bookingId}`,
+      'Final payment reminder is blocked. Check the client email and outstanding balance first.'
+    )
+  }
+
+  const result = await sendBookingBalanceReminder(payload)
+  if (!result.ok) {
+    await appendBookingTimelineNote(
+      admin,
+      bookingId as string,
+      'Final payment reminder could not be sent.'
+    )
+    redirectWithError(
+      `/admin/bookings/${bookingId}`,
+      result.detail || 'Final payment reminder could not be sent.'
+    )
+  }
+
+  await stampBookingEmailSentAt(admin, bookingId as string, 'last_balance_reminder_sent_at')
+  await appendBookingTimelineNote(
+    admin,
+    bookingId as string,
+    `Final payment requested. Balance reminder sent to ${payload.email}.`
+  )
   await syncComputedBookingPaymentState(admin, bookingId as string)
 
   revalidatePath(`/admin/bookings/${bookingId}`)
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/dashboard')
-  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Final payment requested.')}`)
+  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent(`Final payment reminder sent to ${payload.email}.`)}`)
 }
 
 export async function markFullyPaidAction(formData: FormData) {
