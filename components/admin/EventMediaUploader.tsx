@@ -48,10 +48,11 @@ export default function EventMediaUploader({ eventId }: { eventId: string }) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [publish, setPublish] = useState(true)
+  const [rightsConfirmed, setRightsConfirmed] = useState(false)
   const [statuses, setStatuses] = useState<UploadStatus[]>([])
 
   async function upload(files: FileList | null) {
-    if (!files?.length || busy) return
+    if (!files?.length || busy || !rightsConfirmed) return
 
     const selected = Array.from(files)
     setBusy(true)
@@ -98,6 +99,7 @@ export default function EventMediaUploader({ eventId }: { eventId: string }) {
         storagePath: path,
         mediaType,
         public: publish,
+        rightsConfirmed,
       })
 
       setStatuses((current) => current.map((item, itemIndex) =>
@@ -134,12 +136,24 @@ export default function EventMediaUploader({ eventId }: { eventId: string }) {
         </div>
       </div>
 
+      <label style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', color: 'var(--muted)', fontSize: '12px', lineHeight: 1.5 }}>
+        <input
+          type="checkbox"
+          checked={rightsConfirmed}
+          onChange={(event) => setRightsConfirmed(event.target.checked)}
+          disabled={busy}
+          style={{ marginTop: '2px' }}
+        />
+        I own this media or have permission from the copyright owner to publish it on The Bae Agenda.
+      </label>
+
       <input
         ref={inputRef}
         type="file"
         multiple
         accept="image/jpeg,image/png,image/webp,image/gif,image/avif,image/heic,image/heif,video/mp4,video/quicktime,video/webm"
-        disabled={busy}
+        disabled={busy || !rightsConfirmed}
+        aria-describedby="event-media-rights-note"
         onChange={(event) => void upload(event.target.files)}
         style={{
           width: '100%',
@@ -161,8 +175,8 @@ export default function EventMediaUploader({ eventId }: { eventId: string }) {
         Publish uploaded media
       </label>
 
-      <div className="muted" style={{ fontSize: '11px', lineHeight: 1.5 }}>
-        Maximum 100 MB per file. JPEG, PNG, WebP, GIF, AVIF, HEIC/HEIF, MP4, MOV, and WebM are accepted.
+      <div id="event-media-rights-note" className="muted" style={{ fontSize: '11px', lineHeight: 1.5 }}>
+        Only upload media you own or are authorized to publish. Maximum 100 MB per file. JPEG, PNG, WebP, GIF, AVIF, HEIC/HEIF, MP4, MOV, and WebM are accepted.
       </div>
 
       {statuses.length > 0 ? (
