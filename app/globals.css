@@ -7761,3 +7761,39 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 }
 
+.invoice-preview-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.invoice-preview-meta > div {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-height: 86px;
+  padding: 14px 15px;
+  border: 1px solid rgba(196,165,116,.12);
+  border-radius: 12px;
+  background:
+    linear-gradient(145deg, rgba(246,241,232,.02), transparent 42%),
+    #15110f;
+}
+
+.invoice-preview-meta strong {
+  color: rgba(246,241,232,.82);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+@media (max-width: 620px) {
+  .invoice-preview-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .invoice-preview-meta > div {
+    min-height: 0;
+  }
+}
+
