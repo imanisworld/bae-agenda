@@ -5,12 +5,12 @@ import PageHeader from '@/components/admin/PageHeader'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import { createInvoiceFromBookingAction, restoreInvoiceDraftAction, voidInvoiceAction } from '@/app/actions/invoices'
 import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
+import { applyInvoiceSnapshot, type InvoiceSnapshotData } from '@/lib/invoices'
 
 export const dynamic = 'force-dynamic'
 
-interface InvoiceState {
+interface InvoiceState extends InvoiceSnapshotData {
   status: 'draft' | 'sent' | 'paid' | 'void'
-  invoice_number: string
   sent_at: string | null
   created_at: string
 }
@@ -55,7 +55,7 @@ async function getInvoiceState(id: string): Promise<InvoiceState | null> {
   const supabase = createClient()
   const { data } = await supabase
     .from('invoices')
-    .select('status, invoice_number, sent_at, created_at')
+    .select('status, invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, sent_at, created_at')
     .eq('booking_id', id)
     .maybeSingle()
 
@@ -90,7 +90,8 @@ export default async function InvoicePage({
   ])
   if (!booking) notFound()
 
-  const client = booking.clients as {
+  const effectiveBooking = applyInvoiceSnapshot(booking, invoiceState)
+  const client = effectiveBooking.clients as {
     first_name: string | null
     last_name: string | null
     email: string | null
@@ -101,12 +102,12 @@ export default async function InvoicePage({
     ? `${client.first_name ?? ''} ${client.last_name ?? ''}`.trim()
     : '—'
 
-  const eventDate = formatEventDate(booking.event_date, booking.event_timezone)
-  const eventTime = formatEventTimeRange(booking.event_date, booking.event_end_time, booking.event_timezone)
+  const eventDate = formatEventDate(effectiveBooking.event_date, effectiveBooking.event_timezone)
+  const eventTime = formatEventTimeRange(effectiveBooking.event_date, effectiveBooking.event_end_time, effectiveBooking.event_timezone)
 
-  const total   = booking.quote         ?? 0
-  const deposit = booking.deposit_amount ?? 0
-  const balance = total - deposit
+  const total = effectiveBooking.quote ?? 0
+  const deposit = effectiveBooking.deposit_amount ?? 0
+  const balance = invoiceState ? Number(invoiceState.balance_due ?? total - deposit) : total - deposit
 
   const fmt = (n: number) =>
     n.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
@@ -115,7 +116,7 @@ export default async function InvoicePage({
     <div className="admin-page admin-page--narrow">
       <PageHeader
         title="Invoice Preview"
-        subtitle={`${booking.event_name} · ${clientName}`}
+        subtitle={`${effectiveBooking.event_name} · ${clientName}`}
         action={{ label: 'Invoice Register', href: '/admin/invoices' }}
       />
 
@@ -189,7 +190,7 @@ export default async function InvoicePage({
               INVOICE
             </div>
             <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
-              #{id.slice(0, 8).toUpperCase()}
+              #{invoiceState?.invoice_number ?? id.slice(0, 8).toUpperCase()}
             </div>
             <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '4px' }}>
               {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
@@ -214,13 +215,13 @@ export default async function InvoicePage({
 
         {/* Event details */}
         <div style={{ marginBottom: '24px' }}>
-          <Row label="Event" value={booking.event_name} />
+          <Row label="Event" value={effectiveBooking.event_name} />
           <Row label="Date" value={eventDate} />
           {eventTime && <Row label="Time" value={eventTime} />}
-          {booking.venue && <Row label="Venue" value={booking.venue} />}
-          {booking.city  && <Row label="City"  value={booking.city}  />}
-          {booking.package && <Row label="Package" value={booking.package} />}
-          {booking.hours   && <Row label="Hours"   value={`${booking.hours} hr${booking.hours !== 1 ? 's' : ''}`} />}
+          {effectiveBooking.venue && <Row label="Venue" value={effectiveBooking.venue} />}
+          {effectiveBooking.city  && <Row label="City"  value={effectiveBooking.city}  />}
+          {effectiveBooking.package && <Row label="Package" value={effectiveBooking.package} />}
+          {effectiveBooking.hours   && <Row label="Hours"   value={`${effectiveBooking.hours} hr${effectiveBooking.hours !== 1 ? 's' : ''}`} />}
         </div>
 
         {/* Totals */}
@@ -254,7 +255,7 @@ export default async function InvoicePage({
         </div>
 
         {/* Notes */}
-        {booking.notes && (
+        {effectiveBooking.notes && (
           <div style={{
             marginTop: '24px',
             borderTop: '1px solid var(--border)',
@@ -264,7 +265,7 @@ export default async function InvoicePage({
             lineHeight: 1.7,
           }}>
             <div style={{ fontSize: '9px', letterSpacing: '0.28em', textTransform: 'uppercase', marginBottom: '6px' }}>Notes</div>
-            {booking.notes}
+            {effectiveBooking.notes}
           </div>
         )}
 
@@ -290,6 +291,11 @@ export default async function InvoicePage({
           </form>
         ) : (
           <>
+            {invoiceState.status !== 'paid' && invoiceState.status !== 'void' && (
+              <Link href={`/admin/bookings/${id}/invoice/edit`} className="admin-btn-ghost">
+                Edit Invoice
+              </Link>
+            )}
             {invoiceState.status !== 'paid' && invoiceState.status !== 'void' && (
               <SendInvoiceButton
                 bookingId={id}
