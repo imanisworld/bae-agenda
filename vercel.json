@@ -4,5 +4,7 @@
       "path": "/api/cron/payment-reminders",
       "schedule": "0 15 * * *"
     }
-  ]
+  ],
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "ignoreCommand": "node scripts/vercel-ignore-build.mjs"
 }
