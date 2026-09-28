@@ -48,13 +48,14 @@ function isPast(iso: string, eventTimeZone: string | null) {
 async function getEvents(): Promise<EventRow[]> {
   try {
     const supabase = createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('events')
       .select('id, title, event_date, event_timezone, venue, city, public, featured, booking_id')
       .order('event_date', { ascending: false })
+    if (error) throw new Error(error.message || 'Unable to load events.')
     return (data ?? []) as EventRow[]
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load events.')
   }
 }
 
