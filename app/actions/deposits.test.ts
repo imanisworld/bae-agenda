@@ -7,6 +7,9 @@ const mocks = vi.hoisted(() => ({
   createAdminClient: vi.fn(),
   syncBookingDepositState: vi.fn(),
   syncComputedBookingPaymentState: vi.fn(),
+  getStripeClient: vi.fn(),
+  getAppBaseUrl: vi.fn(),
+  checkoutCreate: vi.fn(),
 }))
 
 vi.mock('next/navigation', () => ({
@@ -33,7 +36,12 @@ vi.mock('@/lib/booking-payment-sync', () => ({
   syncComputedBookingPaymentState: mocks.syncComputedBookingPaymentState,
 }))
 
-import { confirmManualDepositAction } from './deposits'
+vi.mock('@/lib/stripe', () => ({
+  getStripeClient: mocks.getStripeClient,
+  getAppBaseUrl: mocks.getAppBaseUrl,
+}))
+
+import { confirmManualDepositAction, startStripeDepositCheckoutAction } from './deposits'
 
 class RedirectSignal extends Error {
   constructor(public url: string) {
@@ -61,10 +69,18 @@ function formData(overrides: Record<string, string> = {}) {
 function buildAdmin(options?: { duplicate?: boolean }) {
   const bookingMaybeSingle = vi.fn().mockResolvedValue({
     data: {
+      id: 'booking-1',
+      event_name: 'Birthday Party',
+      event_date: '2026-10-03T23:00:00.000Z',
       status: 'confirmed',
       lifecycle_status: 'confirmed',
       quote: 1000,
       deposit_amount: 250,
+      clients: {
+        first_name: 'Imani',
+        last_name: 'Crumble',
+        email: 'imani@example.com',
+      },
       payments: [],
     },
     error: null,
@@ -135,6 +151,18 @@ beforeEach(() => {
   mocks.redirect.mockImplementation((url: string) => {
     throw new RedirectSignal(url)
   })
+  mocks.getAppBaseUrl.mockReturnValue('https://thebaeagenda.com')
+  mocks.getStripeClient.mockReturnValue({
+    checkout: {
+      sessions: {
+        create: mocks.checkoutCreate,
+      },
+    },
+  })
+  mocks.checkoutCreate.mockResolvedValue({
+    id: 'cs_test_1',
+    url: 'https://checkout.stripe.test/cs_test_1',
+  })
 })
 
 describe('manual deposit confirmation', () => {
@@ -183,5 +211,74 @@ describe('manual deposit confirmation', () => {
 
     expect(setup.paymentInsert).not.toHaveBeenCalled()
     expect(setup.noteInsert).not.toHaveBeenCalled()
+  })
+})
+
+
+function stripeFormData(overrides: Record<string, string> = {}) {
+  const data = new FormData()
+  const values = {
+    booking_id: 'booking-1',
+    checkout_attempt_id: '123e4567-e89b-42d3-a456-426614174001',
+    ...overrides,
+  }
+
+  for (const [key, value] of Object.entries(values)) {
+    data.set(key, value)
+  }
+
+  return data
+}
+
+describe('Stripe deposit checkout', () => {
+  it('uses a stable Stripe idempotency key and redirects to Checkout on success', async () => {
+    const setup = buildAdmin()
+    mocks.createAdminClient.mockReturnValue(setup.admin)
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    await expect(
+      startStripeDepositCheckoutAction(stripeFormData())
+    ).rejects.toMatchObject({
+      url: 'https://checkout.stripe.test/cs_test_1',
+    })
+
+    expect(mocks.checkoutCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: 'payment',
+        customer_email: 'imani@example.com',
+        metadata: {
+          bookingId: 'booking-1',
+          paymentType: 'deposit',
+        },
+      }),
+      {
+        idempotencyKey: 'deposit-checkout:booking-1:123e4567-e89b-42d3-a456-426614174001',
+      }
+    )
+    expect(log).not.toHaveBeenCalled()
+  })
+
+  it('rejects an invalid checkout attempt ID before calling Stripe', async () => {
+    const setup = buildAdmin()
+    mocks.createAdminClient.mockReturnValue(setup.admin)
+
+    await expect(
+      startStripeDepositCheckoutAction(stripeFormData({ checkout_attempt_id: 'bad-id' }))
+    ).rejects.toBeInstanceOf(RedirectSignal)
+
+    expect(mocks.checkoutCreate).not.toHaveBeenCalled()
+  })
+
+  it('turns a real Stripe session creation failure into a payment-page error', async () => {
+    const setup = buildAdmin()
+    mocks.createAdminClient.mockReturnValue(setup.admin)
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    mocks.checkoutCreate.mockRejectedValue(new Error('Stripe unavailable'))
+
+    await expect(
+      startStripeDepositCheckoutAction(stripeFormData())
+    ).rejects.toMatchObject({
+      url: expect.stringContaining('/pay/booking-1?error='),
+    })
   })
 })
