@@ -22,6 +22,7 @@ interface EventRow {
   city:       string | null
   public:     boolean
   featured:   boolean
+  booking_id: string | null
 }
 
 function fmtDate(iso: string, eventTimeZone: string | null) {
@@ -49,7 +50,7 @@ async function getEvents(): Promise<EventRow[]> {
     const supabase = createClient()
     const { data } = await supabase
       .from('events')
-      .select('id, title, event_date, event_timezone, venue, city, public, featured')
+      .select('id, title, event_date, event_timezone, venue, city, public, featured, booking_id')
       .order('event_date', { ascending: false })
     return (data ?? []) as EventRow[]
   } catch {
@@ -113,7 +114,10 @@ export default async function EventsPage({
                       fontWeight: 400,
                       color: isPast(ev.event_date, ev.event_timezone) ? 'var(--muted)' : 'var(--white)',
                     }}>
-                      {ev.title}
+                      <div>{ev.title}</div>
+                      <div className="muted" style={{ fontSize: '11px', marginTop: '4px' }}>
+                        {ev.booking_id ? 'Linked booking' : 'Standalone event'}
+                      </div>
                     </td>
                     <td data-label="Date" className="muted">{fmtDate(ev.event_date, ev.event_timezone)}</td>
                     <td data-label="Time Zone" className="muted">
@@ -156,9 +160,16 @@ export default async function EventsPage({
                       </form>
                     </td>
                     <td data-label="Actions">
-                      <Link href={`/admin/events/${ev.id}`} className="admin-view-all">
-                        Edit →
-                      </Link>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        <Link href={`/admin/events/${ev.id}`} className="admin-view-all">
+                          Edit →
+                        </Link>
+                        {ev.booking_id && (
+                          <Link href={`/admin/bookings/${ev.booking_id}`} className="admin-view-all">
+                            View Booking →
+                          </Link>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
