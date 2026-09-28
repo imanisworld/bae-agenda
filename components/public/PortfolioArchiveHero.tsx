@@ -46,7 +46,7 @@ export default function PortfolioArchiveHero({
           )}
           {instagramUrl ? (
             <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className={styles.instagram}>
-              More photos on Instagram <span aria-hidden="true">↗</span>
+              More photos on Instagram
             </a>
           ) : null}
         </div>
