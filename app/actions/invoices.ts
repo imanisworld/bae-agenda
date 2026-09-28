@@ -38,8 +38,9 @@ function parseInvoiceLineItems(formData: FormData): InvoiceLineItem[] | null {
   const items: InvoiceLineItem[] = []
 
   for (let index = 0; index < descriptions.length; index += 1) {
-    const description = typeof descriptions[index] === 'string'
-      ? descriptions[index].trim()
+    const rawDescription = descriptions[index]
+    const description = typeof rawDescription === 'string'
+      ? rawDescription.trim()
       : ''
     const quantity = Number(quantities[index])
     const unitAmount = Number(unitAmounts[index])
