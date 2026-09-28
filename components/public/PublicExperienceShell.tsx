@@ -90,7 +90,7 @@ export default function PublicExperienceShell({ children, footer, sticky }: { ch
     shellRef.current?.style.setProperty('--route-pull-x', `${px}px`)
   }
 
-  function clearTimer(ref: React.MutableRefObject<number | null>) {
+  function clearTimer(ref: { current: number | null }) {
     if (ref.current !== null) {
       window.clearTimeout(ref.current)
       ref.current = null
