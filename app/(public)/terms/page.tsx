@@ -17,10 +17,13 @@ export default function TermsPage() {
       title="Booking & Site Terms"
       currentPath="/terms"
       intro={
-        <p>
-          These terms explain the general booking, payment, client-portal, and website rules used by The Bae Agenda.
-          A specific written quote, invoice, or agreed booking term controls if it says something different.
-        </p>
+        <>
+          <p>
+            These terms explain the general booking, payment, client-portal, and website rules used by The Bae Agenda.
+            A specific written quote, invoice, or agreed booking term controls if it says something different.
+          </p>
+          <p><strong>Effective September 28, 2026.</strong></p>
+        </>
       }
     >
       <UtilitySection title="Inquiries and booking confirmation">
@@ -42,14 +45,40 @@ export default function TermsPage() {
         </p>
       </UtilitySection>
 
-      <UtilitySection title="Changes and cancellations">
+      <UtilitySection title="Changes, cancellations, and rescheduling">
         <p>
-          Clients can request booking changes or discuss a cancellation through the client portal or by contacting DJ B.A.E.
-          A request does not automatically modify or cancel the booking. Changes are effective only after they are reviewed and confirmed.
+          Clients can request booking changes, rescheduling, or cancellation through the client portal or by contacting DJ B.A.E.
+          A request does not automatically modify or cancel the booking. Changes are effective only after they are reviewed and confirmed in writing.
         </p>
         <p>
-          Any refund, rescheduling credit, or other exception is handled according to the specific booking circumstances and any
-          written terms already provided for that booking.
+          Unless a written quote or invoice says otherwise, required deposits are non-refundable. Any refund, rescheduling credit,
+          cancellation charge, or other exception is handled according to the written terms for that booking and the circumstances involved.
+        </p>
+      </UtilitySection>
+
+      <UtilitySection title="Timing, overtime, travel, and scope changes">
+        <p>
+          The quoted service window, location, setup requirements, and requested services are part of the booking scope.
+          Added performance time, major schedule changes, additional equipment or services, parking, tolls, or travel outside the quoted scope
+          may require an updated quote or invoice.
+        </p>
+        <p>
+          Overtime is not guaranteed and depends on availability, venue limits, and agreement on any additional charge.
+        </p>
+      </UtilitySection>
+
+      <UtilitySection title="Venue access, setup, and event conditions">
+        <p>
+          Clients are responsible for providing accurate venue information and reasonable access for load-in, setup, performance, and breakdown.
+          The venue must permit the contracted services and provide any agreed power, space, access, or other event requirements.
+        </p>
+      </UtilitySection>
+
+      <UtilitySection title="Events outside either party's reasonable control">
+        <p>
+          If performance becomes impossible or materially unsafe because of severe weather, venue closure, government action, major outage,
+          illness or emergency, or another circumstance outside reasonable control, the parties will communicate promptly and address
+          rescheduling, credits, refunds, or other next steps under the written booking terms and the circumstances involved.
         </p>
       </UtilitySection>
 
