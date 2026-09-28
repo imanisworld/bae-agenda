@@ -54,6 +54,11 @@ export default function MeetIdentityHero() {
     >
       <div className={styles.glow} aria-hidden="true" />
 
+      <div className={styles.phoneTop} aria-hidden="true">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/brand/phone-3d.webp" alt="" width={241} height={420} />
+      </div>
+
       <div
         className={`${styles.portraitWrap}${interacting ? ` ${styles.portraitInteracting}` : ''}`}
         onPointerDown={pointerDown}
@@ -75,19 +80,13 @@ export default function MeetIdentityHero() {
             draggable={false}
           />
         </div>
-        <span className={styles.portraitLabel}>DJ B.A.E. · drag / tilt</span>
+        <span className={styles.portraitLabel}>DJ B.A.E.</span>
       </div>
 
       <div className={styles.copy}>
         <div className={styles.title}>
           <p>Indianapolis</p>
-          <div className={styles.titleRow}>
-            <h1 id="meet-title">Meet<br /> DJ B.A.E.</h1>
-            <div className={styles.phone} aria-hidden="true">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brand/phone-3d.webp" alt="" width={241} height={420} />
-            </div>
-          </div>
+          <h1 id="meet-title">Meet</h1>
         </div>
 
         <div className={styles.details}>
