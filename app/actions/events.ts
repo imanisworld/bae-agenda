@@ -224,11 +224,12 @@ export async function addEventMediaAction(formData: FormData) {
   const mediaType = optionalString(formData.get('media_type'))
   const mediaUrl = requiredHttpUrl(formData.get('media_url'))
   const posterUrl = optionalHttpUrl(formData.get('poster_url'))
+  const rightsConfirmed = formData.get('rights_confirmed') === 'on'
 
-  if (!eventId || (mediaType !== 'image' && mediaType !== 'video') || !mediaUrl) {
+  if (!eventId || (mediaType !== 'image' && mediaType !== 'video') || !mediaUrl || !rightsConfirmed) {
     redirectWithError(
       eventId ? `/admin/events/${eventId}` : '/admin/events',
-      'Event, media type, and a valid http(s) media URL are required.'
+      'Event, media type, a valid http(s) media URL, and confirmation that you have publishing rights are required.'
     )
   }
 
