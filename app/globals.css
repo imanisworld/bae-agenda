@@ -7464,3 +7464,120 @@ body.has-custom-cursor * { cursor: none !important; }
   line-height: 1.55;
 }
 
+/* Admin content editor + field polish */
+.admin-content-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+.admin-content-status {
+  min-height: 18px;
+  color: rgba(246,241,232,.58);
+  font-size: 11px;
+  letter-spacing: .03em;
+}
+
+.admin-content-row {
+  display: grid;
+  grid-template-columns: minmax(170px, .72fr) minmax(0, 1.6fr);
+  gap: 28px;
+  align-items: start;
+  padding: 22px 24px;
+  border-bottom: 1px solid rgba(196,165,116,.1);
+}
+
+.admin-content-row[data-last='true'] {
+  border-bottom: 0;
+}
+
+.admin-content-label-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 5px;
+  color: #f6f1e8;
+  font-size: 13px;
+}
+
+.admin-content-key {
+  color: rgba(246,241,232,.38);
+  font: 500 9px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: .06em;
+}
+
+.admin-content-hint {
+  margin-top: 7px;
+  color: rgba(246,241,232,.52);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.admin-field-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #c4a574;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .17em;
+  text-transform: uppercase;
+}
+
+.admin-field-label > span {
+  margin-left: 4px;
+  color: #d98a99;
+}
+
+.admin-sensitive-note,
+.admin-pricing-note {
+  border: 1px solid rgba(196,165,116,.12);
+  border-radius: 10px;
+  background: rgba(246,241,232,.018);
+  color: rgba(246,241,232,.56);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
+.admin-sensitive-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 16px;
+  padding: 12px 13px;
+}
+
+.admin-sensitive-note > span {
+  flex-shrink: 0;
+  color: #c4844a;
+  font-size: 8px;
+  line-height: 1.8;
+}
+
+.admin-pricing-note {
+  padding: 12px 14px;
+}
+
+@media (max-width: 720px) {
+  .admin-content-toolbar {
+    align-items: stretch;
+    margin-bottom: 22px;
+  }
+
+  .admin-content-toolbar > * {
+    width: 100%;
+  }
+
+  .admin-content-row {
+    grid-template-columns: 1fr;
+    gap: 13px;
+    padding: 18px 16px;
+  }
+
+  .admin-content-key {
+    font-size: 8px;
+  }
+}
+
