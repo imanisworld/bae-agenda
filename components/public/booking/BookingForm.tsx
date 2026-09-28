@@ -615,11 +615,12 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
         <div style={{ marginBottom: '36px' }}>
           <span className="section-label">Booking Inquiry</span>
           <h1 style={{
-            fontFamily: 'Conthrax, sans-serif',
-            fontSize: 'clamp(28px, 4.5vw, 48px)',
-            fontWeight: 600,
+            fontFamily: 'DM Sans, sans-serif',
+            fontSize: 'clamp(44px, 6vw, 84px)',
+            fontWeight: 400,
             color: 'var(--white)',
-            lineHeight: 1.1,
+            lineHeight: 0.9,
+            letterSpacing: '-0.055em',
             margin: '12px 0 0',
           }}>
             Book DJ B.A.E<span style={{ color: 'var(--gold)' }}>.</span>
@@ -805,7 +806,7 @@ function BookingSuccess({ summary, embedded = false }: { summary: BookingSuccess
         <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '22px', color: 'var(--violet)', marginBottom: '16px' }}>◈</div>
           <div>
             <div className="section-label" style={{ marginBottom: '10px' }}>Inquiry Sent</div>
-            <h1 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(22px, 4vw, 32px)', color: 'var(--white)', margin: 0 }}>Request Received</h1>
+            <h1 style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 0.92, letterSpacing: '-0.05em', color: 'var(--white)', margin: 0 }}>Request Received</h1>
             <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.75, margin: '16px 0 0' }}>
               We&apos;ll review your details and reach back within 24–48 hours. Keep an eye on <span style={{ color: 'var(--white)' }}>{summary?.email || 'your inbox'}</span> for the first follow-up.
             </p>

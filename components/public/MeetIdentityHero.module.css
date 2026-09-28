@@ -71,12 +71,12 @@
 .copy {
   position: absolute;
   z-index: 4;
-  right: 7%;
+  left: calc(7% + min(42vw, 540px) + max(40px, 4vw));
+  right: 6%;
   top: 25%;
-  width: min(44vw, 650px);
 }
 
-.copy > p {
+.title > p {
   margin: 0 0 14px;
   color: #c4a574;
   font-size: 10px;
@@ -87,7 +87,7 @@
 .copy h1 {
   margin: 0;
   font-family: DM Sans, sans-serif;
-  font-size: clamp(68px, 8.6vw, 132px);
+  font-size: clamp(64px, 7.8vw, 124px);
   font-weight: 400;
   line-height: .82;
   letter-spacing: -.065em;
@@ -152,68 +152,111 @@
 }
 
 @media (max-width: 860px) {
+  /* Stacked layout: the page is locked to one screen, so the portrait flexes
+     to the space left and the copy always sits below it. */
   .hero {
-    min-height: 940px;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 84px 0 104px;
   }
 
   .portraitWrap {
-    left: 7%;
-    top: 10%;
+    position: relative;
+    left: auto;
+    top: auto;
+    flex: 1 1 auto;
+    min-height: 150px;
+    max-height: 520px;
     width: 70%;
+    margin-left: 7%;
+  }
+
+  .portrait {
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  /* Darken the portrait's lower edge where the eyebrow crosses it. */
+  .portrait::after {
+    background:
+      linear-gradient(180deg, transparent 58%, rgba(14,11,10,.78)),
+      linear-gradient(110deg, rgba(255,255,255,.08), transparent 26%, transparent 72%, rgba(196,132,74,.08));
+    mix-blend-mode: normal;
+  }
+
+  .portraitLabel {
+    display: none;
   }
 
   .copy {
-    left: 26%;
-    right: 6%;
+    position: relative;
+    left: auto;
+    right: auto;
     top: auto;
-    bottom: 98px;
+    flex: none;
     width: auto;
+    margin: 28px 6% 0 26%;
   }
 
   .copy h1 {
-    font-size: clamp(62px, 16vw, 110px);
+    font-size: clamp(58px, 14vw, 104px);
   }
 
   .phone {
     left: auto;
     right: 8%;
-    top: 38%;
+    top: 96px;
     bottom: auto;
-    width: 118px;
+    width: 104px;
   }
 }
 
 @media (max-width: 560px) {
-  .hero { min-height: 880px; }
+  .hero {
+    padding: 72px 0 96px;
+  }
 
   .portraitWrap {
-    left: 6%;
-    top: 8%;
     width: 82%;
+    margin-left: 6%;
   }
 
   .portrait {
     border-radius: 20px;
   }
 
-  .portraitLabel {
-    margin-top: 28px;
+  /* Phone: title moves above the portrait on one line; details stay below. */
+  .copy {
+    display: contents;
   }
 
-  .copy {
-    left: 12%;
-    right: 14px;
-    bottom: 104px;
+  .title {
+    order: -1;
+    margin: 0 16px 18px 6%;
+  }
+
+  .title > p {
+    margin-bottom: 8px;
   }
 
   .copy h1 {
-    font-size: clamp(58px, 18vw, 88px);
+    font-size: clamp(38px, 11.5vw, 52px);
+    line-height: .95;
+    letter-spacing: -.05em;
+  }
+
+  .copy h1 br {
+    display: none;
+  }
+
+  .details {
+    margin: 22px 16px 0 6%;
+    text-shadow: 0 2px 18px rgba(0,0,0,.68);
   }
 
   .phone {
-    top: 39%;
-    right: 4%;
-    width: 92px;
+    display: none;
   }
 }
 
@@ -242,19 +285,17 @@
 
 @media (max-width: 560px) {
   .copy {
-    padding: 12px 12px 14px 0;
-    background: linear-gradient(90deg, rgba(14,11,10,.86) 0%, rgba(14,11,10,.67) 68%, rgba(14,11,10,.18) 100%);
     text-shadow: 0 2px 18px rgba(0,0,0,.68);
   }
 
-  .copy > p {
+  .title > p {
     color: #d8ba88;
     font-size: 11px;
   }
 
   .summary {
     max-width: 34ch;
-    margin-top: 20px;
+    margin-top: 16px;
     color: rgba(246,241,232,.88);
     font-size: 15px;
     line-height: 1.55;

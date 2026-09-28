@@ -103,7 +103,7 @@ export default function LabListeningStation({ mixes, compact = false }: { mixes:
       <header className={styles.header}>
         <div>
           <p>Bae&apos;s in the Lab</p>
-          <h1>Mixes on wax.</h1>
+          <h1>On wax.</h1>
         </div>
         <span>SoundCloud · audio source</span>
       </header>

@@ -6166,3 +6166,186 @@ body.has-custom-cursor * { cursor: none !important; }
     font-size: 15px;
   }
 }
+
+
+/* ================================================================
+   BOOK PAGE — form leads, contact rail supports
+   ================================================================ */
+
+.book-experience-rail-inner header h2 {
+  font-size: clamp(28px, 2.6vw, 38px);
+  line-height: 1;
+  letter-spacing: -.035em;
+}
+
+.book-experience-rail-inner header p {
+  color: rgba(246,241,232,.68);
+  font-size: 14px;
+}
+
+.book-experience-rail-inner header > span,
+.book-experience-faq > span,
+.book-experience-contact small,
+.book-experience-review small {
+  font-size: 10px;
+  letter-spacing: .16em;
+}
+
+.book-experience-contact a {
+  font-size: 15px;
+}
+
+.book-experience-socials a {
+  min-height: 36px;
+  padding: 0 12px;
+  color: rgba(246,241,232,.8);
+  font-size: 11px;
+  letter-spacing: .04em;
+  transition: border-color 150ms ease, color 150ms ease;
+}
+
+.book-experience-socials a:hover {
+  border-color: rgba(196,165,116,.4);
+  color: var(--white);
+}
+
+.book-experience-socials span {
+  font-size: 9px;
+}
+
+.book-experience-faq summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 15px 0;
+  font-size: 14px;
+}
+
+.book-experience-faq summary::after {
+  content: '+';
+  flex-shrink: 0;
+  color: var(--gold);
+  font-size: 16px;
+  line-height: 1;
+  transition: transform 150ms ease;
+}
+
+.book-experience-faq details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.book-experience-faq p {
+  color: rgba(246,241,232,.68);
+  font-size: 13px;
+}
+
+.book-experience-review p {
+  font-size: 13px;
+}
+
+@media (max-width: 900px) {
+  .book-experience-switch button {
+    font-size: 10px;
+  }
+}
+
+/* ================================================================
+   EVENTS — swipeable carousel + upcoming / past switch
+   ================================================================ */
+
+.events-view-switch {
+  display: inline-flex;
+  padding: 3px;
+  border: 1px solid rgba(246,241,232,.14);
+  border-radius: 999px;
+  background: rgba(22,18,16,.72);
+}
+
+.events-view-switch button {
+  min-height: 32px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(246,241,232,.62);
+  font: inherit;
+  font-size: 10px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.events-view-switch button[aria-pressed='true'] {
+  background: rgba(143,45,60,.34);
+  color: var(--white);
+}
+
+.events-experience-pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.experience-arrow:disabled {
+  opacity: .32;
+  cursor: default;
+  transform: none;
+}
+
+.events-carousel {
+  height: 100%;
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.events-carousel::-webkit-scrollbar { display: none; }
+
+.events-carousel:focus-visible {
+  outline: 1px solid rgba(196,165,116,.6);
+  outline-offset: 3px;
+}
+
+.events-carousel-slide {
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: start;
+}
+
+.events-carousel-slide > article {
+  height: 100%;
+  min-height: 0;
+}
+
+@media (max-width: 620px) {
+  .events-experience-head {
+    flex-wrap: wrap;
+  }
+
+  .events-experience-tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* On phones, let the next poster peek in so it's obvious you can swipe. */
+  .events-carousel--multi .events-carousel-slide {
+    flex-basis: 88%;
+  }
+
+  .events-carousel--multi .events-carousel-slide:last-child {
+    scroll-snap-align: end;
+  }
+}
+
+@media (max-width: 620px) and (pointer: coarse) {
+  .events-experience-pager .experience-arrow {
+    display: none;
+  }
+}

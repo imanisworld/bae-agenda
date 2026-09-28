@@ -10,8 +10,10 @@
 .background {
   object-fit: cover;
   object-position: center 44%;
-  filter: brightness(.58) saturate(.78) contrast(1.05);
-  transform: scale(1.02);
+  /* The source photo is low-res at full-bleed size, so blur it into an
+     atmospheric backdrop instead of showing it soft. Scale hides blurred edges. */
+  filter: blur(14px) brightness(.52) saturate(.8) contrast(1.05);
+  transform: scale(1.1);
 }
 
 .shade {

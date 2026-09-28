@@ -19,8 +19,8 @@ export default function PortfolioArchiveHero({ prints, onExplore }: { prints: Ar
         alt=""
         fill
         priority
-        sizes="100vw"
-        quality={95}
+        sizes="(max-width: 760px) 100vw, 60vw"
+        quality={80}
         aria-hidden="true"
         className={styles.background}
       />

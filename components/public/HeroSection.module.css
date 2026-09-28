@@ -24,12 +24,20 @@
   opacity: .96;
 }
 
+.wordmarkOutline {
+  z-index: 3;
+  color: transparent;
+  -webkit-text-stroke: 1.5px rgba(184,90,102,.72);
+  opacity: 1;
+  pointer-events: none;
+}
+
 .photo {
   position: absolute;
   z-index: 2;
   top: clamp(96px, 11vh, 138px);
-  left: 31%;
-  width: min(43vw, 620px);
+  left: 23%;
+  width: min(38vw, 580px);
   height: min(72vh, 760px);
   min-height: 540px;
   overflow: hidden;
@@ -46,11 +54,19 @@
 }
 
 .copy {
+  --overhang: 4vw;
   position: absolute;
   z-index: 4;
+  left: calc(23% + min(38vw, 580px) - var(--overhang));
   right: max(4vw, 34px);
   top: 31%;
-  width: min(40vw, 620px);
+}
+
+/* Only the headline overhangs the photo; small copy and buttons clear its edge. */
+.eyebrow,
+.meta,
+.actions {
+  padding-left: calc(var(--overhang) + 28px);
 }
 
 .eyebrow {
@@ -68,7 +84,7 @@
   font-weight: 400;
   line-height: .84;
   letter-spacing: -.065em;
-  text-shadow: 0 8px 36px rgba(0,0,0,.34);
+  text-shadow: 0 4px 24px rgba(0,0,0,.55), 0 1px 3px rgba(0,0,0,.35);
 }
 
 .meta {
@@ -102,8 +118,13 @@
 }
 
 @media (max-width: 900px) {
+  /* Stacked layout: the page is locked to one screen, so the photo flexes
+     to whatever height is left and the copy always fits below it. */
   .hero {
-    min-height: 920px;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    padding-top: 190px;
   }
 
   .wordmark {
@@ -112,29 +133,43 @@
   }
 
   .photo {
-    top: 190px;
-    left: 9%;
+    position: relative;
+    top: auto;
+    left: auto;
+    flex: 1 1 auto;
     width: 72%;
-    height: 570px;
-    min-height: 0;
+    height: auto;
+    min-height: 160px;
+    max-height: 520px;
+    margin-left: 9%;
   }
 
   .copy {
+    --overhang: 0px;
+    position: relative;
     top: auto;
-    left: 26%;
-    right: 5%;
-    bottom: 92px;
+    left: auto;
+    right: auto;
+    bottom: auto;
+    flex: none;
     width: auto;
+    margin: 26px 5% 0 26%;
   }
 
   .copy h1 {
     font-size: clamp(58px, 15vw, 104px);
   }
+
+  .eyebrow,
+  .meta,
+  .actions {
+    padding-left: 0;
+  }
 }
 
 @media (max-width: 560px) {
   .hero {
-    min-height: 830px;
+    padding-top: 170px;
   }
 
   .wordmark {
@@ -144,17 +179,13 @@
   }
 
   .photo {
-    top: 170px;
-    left: 8%;
     width: 83%;
-    height: 455px;
+    margin-left: 8%;
     transform: rotate(1deg);
   }
 
   .copy {
-    left: 18%;
-    right: 16px;
-    bottom: 78px;
+    margin: 22px 16px 0 12%;
   }
 
   .eyebrow {
