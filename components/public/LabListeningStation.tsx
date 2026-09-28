@@ -7,7 +7,7 @@
  * turntable. Audio runs through the site-wide PlayerProvider so it keeps
  * playing after the visitor leaves the Lab.
  */
-import { HangFrom } from '@/components/public/brand/HangingLogo'
+import { HangingLogo } from '@/components/public/brand/HangingLogo'
 import Image from 'next/image'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { permalinkFor, usePlayer } from '@/components/public/player/PlayerProvider'
@@ -282,8 +282,9 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
     <header className={styles.header}>
       <div className={styles.headerIdentity}>
         <p>Bae&apos;s in the Lab · Listening Room</p>
-        <h1><HangFrom finish="chrome">O</HangFrom>n wax.</h1>
+        <h1>On wax.</h1>
         <span className={styles.headerNote}>Pick a sleeve. Drop the needle. Drag the record.</span>
+        <HangingLogo finish="chrome" className={styles.headerTag} />
       </div>
       {crates.length > 1 ? (
         <div className={styles.crateSwitch} role="group" aria-label="Choose a crate">
@@ -384,7 +385,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                 <span className={styles.coverArt}>
                   {/* Only covers near the front load an image; far ones are invisible anyway. */}
                   {mix.cover_url && Math.abs(offset) <= 3 ? (
-                    <Image src={mix.cover_url} alt="" fill sizes="(max-width: 620px) 50vw, 280px" quality={90} draggable={false} />
+                    <Image src={mix.cover_url} alt="" fill sizes="(max-width: 620px) 50vw, 280px" quality={95} draggable={false} />
                   ) : (
                     <span className={styles.coverFallback}>DJ B.A.E.</span>
                   )}
@@ -436,7 +437,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
             >
               <span className={`${styles.record}${playing ? ` ${styles.spinning}` : ''}`}>
                 {loaded.cover_url ? (
-                  <Image src={loaded.cover_url} alt="" fill sizes="(max-width: 620px) 40vw, 320px" quality={90} draggable={false} />
+                  <Image src={loaded.cover_url} alt="" fill sizes="(max-width: 620px) 40vw, 320px" quality={95} draggable={false} />
                 ) : null}
                 <span className={styles.grooves} aria-hidden="true" />
                 <span className={styles.hole} aria-hidden="true" />
