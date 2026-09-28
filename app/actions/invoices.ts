@@ -104,3 +104,86 @@ export async function createInvoiceFromBookingAction(formData: FormData) {
 
   redirect(`/admin/bookings/${bookingId}/invoice`)
 }
+
+export async function voidInvoiceAction(formData: FormData) {
+  await requireAdminUser()
+
+  const bookingId = optionalString(formData.get('booking_id'))
+  if (!bookingId) redirectWithError('/admin/invoices', 'Missing booking for invoice.')
+
+  const admin = createAdminClient()
+  const { data: invoice, error: lookupError } = await admin
+    .from('invoices')
+    .select('status, invoice_number')
+    .eq('booking_id', bookingId as string)
+    .maybeSingle()
+
+  if (lookupError || !invoice) {
+    redirectWithError('/admin/invoices', lookupError?.message || 'Invoice not found.')
+  }
+
+  if (invoice.status === 'paid') {
+    redirectWithError('/admin/invoices', 'Paid invoices cannot be voided.')
+  }
+
+  const { error } = await admin
+    .from('invoices')
+    .update({ status: 'void' })
+    .eq('booking_id', bookingId as string)
+
+  if (error) {
+    redirectWithError('/admin/invoices', error.message || 'Unable to void invoice.')
+  }
+
+  await admin.from('notes').insert({
+    booking_id: bookingId as string,
+    body: `Invoice #${invoice.invoice_number} marked void.`,
+  })
+
+  revalidatePath('/admin/invoices')
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath(`/admin/bookings/${bookingId}/invoice`)
+  redirect('/admin/invoices')
+}
+
+export async function restoreInvoiceDraftAction(formData: FormData) {
+  await requireAdminUser()
+
+  const bookingId = optionalString(formData.get('booking_id'))
+  if (!bookingId) redirectWithError('/admin/invoices', 'Missing booking for invoice.')
+
+  const admin = createAdminClient()
+  const { data: invoice, error: lookupError } = await admin
+    .from('invoices')
+    .select('status, invoice_number')
+    .eq('booking_id', bookingId as string)
+    .maybeSingle()
+
+  if (lookupError || !invoice) {
+    redirectWithError('/admin/invoices', lookupError?.message || 'Invoice not found.')
+  }
+
+  if (invoice.status !== 'void') {
+    redirectWithError('/admin/invoices', 'Only void invoices can be restored to draft.')
+  }
+
+  const { error } = await admin
+    .from('invoices')
+    .update({ status: 'draft', sent_at: null })
+    .eq('booking_id', bookingId as string)
+
+  if (error) {
+    redirectWithError('/admin/invoices', error.message || 'Unable to restore invoice.')
+  }
+
+  await admin.from('notes').insert({
+    booking_id: bookingId as string,
+    body: `Invoice #${invoice.invoice_number} restored to draft.`,
+  })
+
+  revalidatePath('/admin/invoices')
+  revalidatePath(`/admin/bookings/${bookingId}`)
+  revalidatePath(`/admin/bookings/${bookingId}/invoice`)
+  redirect(`/admin/bookings/${bookingId}/invoice`)
+}
+
