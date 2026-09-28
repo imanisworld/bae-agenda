@@ -38,7 +38,7 @@ export default async function PortalVerifyPage({
           </h1>
           <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: 1.75, maxWidth: '34rem' }}>
             {sent
-              ? `We sent a code to ${masked || 'your phone'}.`
+              ? `A code was sent to ${masked || 'your phone'}.`
               : 'Enter the code from your text message to open your portal.'}
           </p>
         </div>
