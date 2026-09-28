@@ -53,6 +53,28 @@ function optionalString(value: FormDataEntryValue | null): string | null {
   return trimmed.length ? trimmed : null
 }
 
+function paymentAttemptReference(prefix: string, bookingId: string, value: FormDataEntryValue | null) {
+  const attemptId = optionalString(value)
+  if (!attemptId || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(attemptId)) {
+    return null
+  }
+
+  return `${prefix}:${bookingId}:${attemptId}`
+}
+
+async function findPaymentByExternalReference(
+  admin: ReturnType<typeof createAdminClient>,
+  externalReference: string
+) {
+  const { data } = await admin
+    .from('payments')
+    .select('id')
+    .eq('external_reference', externalReference)
+    .maybeSingle()
+
+  return data?.id ?? null
+}
+
 function isBookingStatus(value: string): value is BookingStatus {
   return ['inquiry', 'confirmed', 'completed', 'cancelled'].includes(value)
 }
@@ -1169,6 +1191,7 @@ export async function createBookingPaymentAction(formData: FormData) {
   const paidAt = parseOptionalDate(formData.get('paid_at'))
   const notes = optionalString(formData.get('notes'))
   const requestedReturnTo = optionalString(formData.get('return_to'))
+  const paymentAttemptId = formData.get('payment_attempt_id')
 
   if (!bookingId || amount === null || amount <= 0 || !typeRaw || !statusRaw) {
     redirectWithError('/admin/payments', 'Booking, amount, payment type, and status are required.')
@@ -1194,6 +1217,11 @@ export async function createBookingPaymentAction(formData: FormData) {
       !requestedReturnTo.includes('://')
     ? requestedReturnTo
     : `/admin/bookings/${finalBookingId}`
+  const paymentReference = paymentAttemptReference('admin-payment', finalBookingId, paymentAttemptId)
+
+  if (!paymentReference) {
+    redirectWithError(returnTo, 'Refresh the page and try recording the payment again.')
+  }
 
   const finalPaidAt = finalStatus === 'received'
     ? paidAt ?? new Date().toISOString()
@@ -1208,10 +1236,25 @@ export async function createBookingPaymentAction(formData: FormData) {
       method: finalMethod,
       status: finalStatus,
       paid_at: finalPaidAt,
+      external_reference: paymentReference,
       notes,
   })
 
   if (error) {
+    if (error.code === '23505' && await findPaymentByExternalReference(admin, paymentReference)) {
+      await syncInvoicePaymentState(admin, finalBookingId)
+      await syncBookingDepositState(admin, finalBookingId)
+      await syncBookingWorkflowState(admin, finalBookingId)
+
+      revalidatePath(`/admin/bookings/${finalBookingId}`)
+      revalidatePath('/admin/bookings')
+      revalidatePath('/admin/payments')
+      revalidatePath('/admin/dashboard')
+      revalidatePath(`/admin/bookings/${finalBookingId}/invoice`)
+      revalidatePath('/admin/invoices')
+      redirect(returnTo)
+    }
+
     redirectWithError(returnTo, error.message || 'Unable to record payment.')
   }
 
@@ -1491,6 +1534,10 @@ export async function markDepositReceivedAction(formData: FormData) {
   const admin = createAdminClient()
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+  const paymentReference = paymentAttemptReference('quick-deposit', bookingId as string, formData.get('payment_attempt_id'))
+  if (!paymentReference) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try recording the deposit again.')
+  }
 
   const { data: booking, error } = await admin
     .from('bookings')
@@ -1520,10 +1567,24 @@ export async function markDepositReceivedAction(formData: FormData) {
       type: 'deposit',
       status: 'received',
       paid_at: new Date().toISOString(),
+      external_reference: paymentReference,
       notes: 'Deposit marked received from booking workflow quick action.',
     })
 
-  if (paymentError) redirectWithError(`/admin/bookings/${bookingId}`, paymentError.message || 'Unable to record deposit payment.')
+  if (paymentError) {
+    if (paymentError.code === '23505' && await findPaymentByExternalReference(admin, paymentReference)) {
+      await syncBookingDepositState(admin, bookingId as string)
+      await syncComputedBookingPaymentState(admin, bookingId as string)
+
+      revalidatePath(`/admin/bookings/${bookingId}`)
+      revalidatePath('/admin/bookings')
+      revalidatePath('/admin/payments')
+      revalidatePath('/admin/dashboard')
+      redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Deposit was already recorded.')}`)
+    }
+
+    redirectWithError(`/admin/bookings/${bookingId}`, paymentError.message || 'Unable to record deposit payment.')
+  }
 
   await syncBookingDepositState(admin, bookingId as string)
   await syncComputedBookingPaymentState(admin, bookingId as string)
@@ -1586,6 +1647,10 @@ export async function markFullyPaidAction(formData: FormData) {
   const admin = createAdminClient()
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+  const paymentReference = paymentAttemptReference('quick-balance', bookingId as string, formData.get('payment_attempt_id'))
+  if (!paymentReference) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try recording the final payment again.')
+  }
 
   const { data: booking, error } = await admin
     .from('bookings')
@@ -1615,10 +1680,23 @@ export async function markFullyPaidAction(formData: FormData) {
       type: 'balance',
       status: 'received',
       paid_at: new Date().toISOString(),
+      external_reference: paymentReference,
       notes: 'Balance marked received from booking workflow quick action.',
     })
 
-  if (paymentError) redirectWithError(`/admin/bookings/${bookingId}`, paymentError.message || 'Unable to record the final payment.')
+  if (paymentError) {
+    if (paymentError.code === '23505' && await findPaymentByExternalReference(admin, paymentReference)) {
+      await syncComputedBookingPaymentState(admin, bookingId as string)
+
+      revalidatePath(`/admin/bookings/${bookingId}`)
+      revalidatePath('/admin/bookings')
+      revalidatePath('/admin/payments')
+      revalidatePath('/admin/dashboard')
+      redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Final payment was already recorded.')}`)
+    }
+
+    redirectWithError(`/admin/bookings/${bookingId}`, paymentError.message || 'Unable to record the final payment.')
+  }
 
   await syncComputedBookingPaymentState(admin, bookingId as string)
 
