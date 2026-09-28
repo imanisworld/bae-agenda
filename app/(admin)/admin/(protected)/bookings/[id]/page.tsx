@@ -235,6 +235,12 @@ export default async function EditBookingPage({
   const paymentLogAttemptId = randomUUID()
   const markDepositAttemptId = randomUUID()
   const markFullyPaidAttemptId = randomUUID()
+  const inquiryReceiptEmailAttemptId = randomUUID()
+  const confirmationEmailAttemptId = randomUUID()
+  const balanceReminderEmailAttemptId = randomUUID()
+  const finalPaymentEmailAttemptId = randomUUID()
+  const postEventEmailAttemptId = randomUUID()
+  const reviewRequestEmailAttemptId = randomUUID()
 
   const clientName = booking.clients
     ? `${booking.clients.first_name ?? ''} ${booking.clients.last_name ?? ''}`.trim()
@@ -379,6 +385,7 @@ export default async function EditBookingPage({
             {lifecycleStatus === 'confirmed' && paymentStatus === 'deposit_paid' && (
               <form action={requestFinalPaymentAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
+                <input type="hidden" name="email_attempt_id" value={finalPaymentEmailAttemptId} />
                 <ConfirmSubmitButton
                   message="Send the final payment reminder to the client now?"
                   className="admin-btn-primary"
@@ -881,6 +888,7 @@ export default async function EditBookingPage({
           <div className="admin-form-actions">
             <form action={resendBookingInquiryReceiptAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
+              <input type="hidden" name="email_attempt_id" value={inquiryReceiptEmailAttemptId} />
               <button
                 type="submit"
                 className="admin-btn-ghost"
@@ -893,6 +901,7 @@ export default async function EditBookingPage({
             </form>
             <form action={resendBookingConfirmationAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
+              <input type="hidden" name="email_attempt_id" value={confirmationEmailAttemptId} />
               <button
                 type="submit"
                 className="admin-btn-ghost"
@@ -915,6 +924,7 @@ export default async function EditBookingPage({
             </form>
             <form action={sendBookingBalanceReminderAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
+              <input type="hidden" name="email_attempt_id" value={balanceReminderEmailAttemptId} />
               <button
                 type="submit"
                 className="admin-btn-ghost"
@@ -937,6 +947,7 @@ export default async function EditBookingPage({
             </form>
             <form action={resendBookingPostEventFollowUpAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
+              <input type="hidden" name="email_attempt_id" value={postEventEmailAttemptId} />
               <button
                 type="submit"
                 className="admin-btn-ghost"
@@ -959,6 +970,7 @@ export default async function EditBookingPage({
             </form>
             <form action={sendBookingReviewRequestAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
+              <input type="hidden" name="email_attempt_id" value={reviewRequestEmailAttemptId} />
               <button
                 type="submit"
                 className="admin-btn-ghost"
