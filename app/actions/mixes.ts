@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdminUser } from '@/lib/admin-auth'
+import { toEventISO } from '@/lib/date-time'
 
 function redirectWithError(path: string, message: string): never {
   const params = new URLSearchParams({ error: message })
@@ -25,9 +26,14 @@ function optionalNumber(value: FormDataEntryValue | null): number | null {
 
 function parseDateTimeLocal(value: FormDataEntryValue | null): string | null {
   if (typeof value !== 'string' || value.trim().length === 0) return null
-  const d = new Date(value)
-  if (Number.isNaN(d.getTime())) return null
-  return d.toISOString()
+  const match = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(value.trim())
+  if (!match) return null
+
+  return toEventISO(
+    `${match[1]}-${match[2]}-${match[3]}`,
+    'America/Indiana/Indianapolis',
+    `${match[4]}:${match[5]}`
+  )
 }
 
 function revalidateMixPaths() {
