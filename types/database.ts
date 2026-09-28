@@ -123,8 +123,8 @@ export type Database = {
           updated_at:     string
         }
         Insert: Omit<Database['public']['Tables']['bookings']['Row'],
-          'id' | 'created_at' | 'updated_at'
-        > & { id?: string }
+          'id' | 'created_at' | 'updated_at' | 'submission_key'
+        > & { id?: string; submission_key?: string | null }
         Update: Partial<Database['public']['Tables']['bookings']['Insert']>
       }
 
