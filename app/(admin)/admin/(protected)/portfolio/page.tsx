@@ -26,14 +26,15 @@ interface PortfolioRow {
 async function getAllEntries(): Promise<PortfolioRow[]> {
   try {
     const admin = createAdminClient()
-    const { data } = await admin
+    const { data, error } = await admin
       .from('portfolio_entries')
       .select('id, event_name, venue, city, year, tags, featured, status')
       .order('year', { ascending: false })
       .order('event_name', { ascending: true })
+    if (error) throw new Error(error.message || 'Unable to load portfolio entries.')
     return (data ?? []) as PortfolioRow[]
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load portfolio entries.')
   }
 }
 
