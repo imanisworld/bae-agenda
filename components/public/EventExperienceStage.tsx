@@ -84,7 +84,6 @@ export default function EventExperienceStage({
     <section className="events-experience" aria-labelledby="events-stage-title">
       <div className="events-experience-head">
         <div>
-          <span className="section-label">{isPast ? 'Past Events' : 'Coming Up'}</span>
           <h1 id="events-stage-title">
             {isPast ? <>Past Events</> : <>Upcoming <HangFrom finish="silver">E</HangFrom>vents</>}
           </h1>
