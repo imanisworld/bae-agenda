@@ -330,3 +330,24 @@
     text-shadow: 0 2px 14px rgba(0,0,0,.6);
   }
 }
+
+
+.printOpen {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.printOpen:disabled {
+  cursor: default;
+}
+
+.printOpen:focus-visible {
+  outline: 2px solid rgba(196,165,116,.82);
+  outline-offset: 4px;
+}
