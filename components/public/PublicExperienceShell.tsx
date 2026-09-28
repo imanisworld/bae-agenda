@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
+import { useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Nav from '@/components/public/Nav'
 import PublicPageStage from '@/components/public/PublicPageStage'
@@ -13,19 +13,9 @@ export default function PublicExperienceShell({ children, footer, sticky }: { ch
   const pathname = usePathname()
   const router = useRouter()
   const experienceMode = EXPERIENCE_ROUTES.has(pathname)
-  const [leaving, setLeaving] = useState(false)
+  const [departingFrom, setDepartingFrom] = useState<string | null>(null)
   const navigationTimer = useRef<number | null>(null)
-
-  useEffect(() => {
-    setLeaving(false)
-
-    return () => {
-      if (navigationTimer.current !== null) {
-        window.clearTimeout(navigationTimer.current)
-        navigationTimer.current = null
-      }
-    }
-  }, [pathname])
+  const leaving = departingFrom === pathname
 
   function handleRouteClick(event: ReactMouseEvent<HTMLDivElement>) {
     if (
@@ -55,7 +45,7 @@ export default function PublicExperienceShell({ children, footer, sticky }: { ch
 
     event.preventDefault()
     router.prefetch(url.pathname)
-    setLeaving(true)
+    setDepartingFrom(pathname)
 
     navigationTimer.current = window.setTimeout(() => {
       router.push(`${url.pathname}${url.search}${url.hash}`)
