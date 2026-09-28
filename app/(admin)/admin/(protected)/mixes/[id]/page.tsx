@@ -39,11 +39,13 @@ function toDateTimeLocal(iso: string | null): string {
 
 async function getMix(id: string): Promise<MixRow | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('mixes')
     .select('id, title, description, genre, duration, embed_url, cover_url, is_featured, sort_order, published_at')
     .eq('id', id)
     .maybeSingle()
+
+  if (error) throw new Error(error.message || 'Unable to load mix.')
 
   return (data as MixRow | null) ?? null
 }
