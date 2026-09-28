@@ -53,7 +53,7 @@ function optionalString(value: FormDataEntryValue | null): string | null {
   return trimmed.length ? trimmed : null
 }
 
-function paymentAttemptReference(prefix: string, bookingId: string, value: FormDataEntryValue | null) {
+function actionAttemptReference(prefix: string, bookingId: string, value: FormDataEntryValue | null) {
   const attemptId = optionalString(value)
   if (!attemptId || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(attemptId)) {
     return null
@@ -519,6 +519,10 @@ export async function resendBookingConfirmationAction(formData: FormData) {
   }
 
   const bookingId = bookingIdRaw as string
+  const emailReference = actionAttemptReference('email-confirmation', bookingId, formData.get('email_attempt_id'))
+  if (!emailReference) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try sending the confirmation email again.')
+  }
   const booking = await getBookingConfirmationSource(admin, bookingId)
   if (!booking) {
     redirectWithError('/admin/bookings', 'Could not find that booking.')
@@ -547,7 +551,9 @@ export async function resendBookingConfirmationAction(formData: FormData) {
   }
 
   const confirmationPayload = payload as NonNullable<typeof payload>
-  const result = await sendBookingConfirmedNotification(confirmationPayload)
+  const result = await sendBookingConfirmedNotification(confirmationPayload, {
+    idempotencyKey: emailReference,
+  })
   if (!result.ok) {
     redirectWithError(`/admin/bookings/${bookingId}`, result.detail || 'Unable to send confirmation email.')
   }
@@ -574,6 +580,10 @@ export async function resendBookingInquiryReceiptAction(formData: FormData) {
   }
 
   const bookingId = bookingIdRaw as string
+  const emailReference = actionAttemptReference('email-inquiry-receipt', bookingId, formData.get('email_attempt_id'))
+  if (!emailReference) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try sending the inquiry receipt again.')
+  }
   const booking = await getBookingInquiryReceiptSource(admin, bookingId)
   if (!booking) {
     redirectWithError('/admin/bookings', 'Could not find that booking.')
@@ -596,7 +606,9 @@ export async function resendBookingInquiryReceiptAction(formData: FormData) {
   }
 
   const inquiryPayload = payload as NonNullable<typeof payload>
-  const result = await sendBookingInquiryReceipt(inquiryPayload)
+  const result = await sendBookingInquiryReceipt(inquiryPayload, {
+    idempotencyKey: emailReference,
+  })
   if (!result.ok) {
     redirectWithError(`/admin/bookings/${bookingId}`, result.detail || 'Unable to send inquiry receipt email.')
   }
@@ -623,6 +635,10 @@ export async function sendBookingBalanceReminderAction(formData: FormData) {
   }
 
   const bookingId = bookingIdRaw as string
+  const emailReference = actionAttemptReference('email-balance-reminder', bookingId, formData.get('email_attempt_id'))
+  if (!emailReference) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try sending the balance reminder again.')
+  }
   const booking = await getBookingBalanceReminderSource(admin, bookingId)
   if (!booking) {
     redirectWithError('/admin/bookings', 'Could not find that booking.')
@@ -634,7 +650,9 @@ export async function sendBookingBalanceReminderAction(formData: FormData) {
   }
 
   const balancePayload = payload as NonNullable<typeof payload>
-  const result = await sendBookingBalanceReminder(balancePayload)
+  const result = await sendBookingBalanceReminder(balancePayload, {
+    idempotencyKey: emailReference,
+  })
   if (!result.ok) {
     redirectWithError(`/admin/bookings/${bookingId}`, result.detail || 'Unable to send balance reminder email.')
   }
@@ -661,6 +679,10 @@ export async function resendBookingPostEventFollowUpAction(formData: FormData) {
   }
 
   const bookingId = bookingIdRaw as string
+  const emailReference = actionAttemptReference('email-post-event', bookingId, formData.get('email_attempt_id'))
+  if (!emailReference) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try sending the post-event follow-up again.')
+  }
   const booking = await getBookingPostEventFollowUpSource(admin, bookingId)
   if (!booking) {
     redirectWithError('/admin/bookings', 'Could not find that booking.')
@@ -671,7 +693,11 @@ export async function resendBookingPostEventFollowUpAction(formData: FormData) {
     redirectWithError(`/admin/bookings/${bookingId}`, 'Only completed bookings can send the post-event follow-up email.')
   }
 
-  const result = await sendBookingPostEventFollowUpEmail(admin, bookingId, { force: true, mode: 'resend' })
+  const result = await sendBookingPostEventFollowUpEmail(admin, bookingId, {
+    force: true,
+    mode: 'resend',
+    idempotencyKey: emailReference,
+  })
   if (result.status === 'failed') {
     redirectWithError(`/admin/bookings/${bookingId}`, result.detail)
   }
@@ -693,6 +719,10 @@ export async function sendBookingReviewRequestAction(formData: FormData) {
   }
 
   const bookingId = bookingIdRaw as string
+  const emailReference = actionAttemptReference('email-review-request', bookingId, formData.get('email_attempt_id'))
+  if (!emailReference) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try sending the review request again.')
+  }
   const booking = await getBookingReviewRequestSource(admin, bookingId)
   if (!booking) {
     redirectWithError('/admin/bookings', 'Could not find that booking.')
@@ -703,7 +733,11 @@ export async function sendBookingReviewRequestAction(formData: FormData) {
     redirectWithError(`/admin/bookings/${bookingId}`, 'Only completed bookings can send the review request email.')
   }
 
-  const result = await sendBookingReviewRequestEmail(admin, bookingId, { force: true, mode: 'resend' })
+  const result = await sendBookingReviewRequestEmail(admin, bookingId, {
+    force: true,
+    mode: 'resend',
+    idempotencyKey: emailReference,
+  })
   if (result.status === 'failed') {
     redirectWithError(`/admin/bookings/${bookingId}`, result.detail)
   }
@@ -1217,7 +1251,7 @@ export async function createBookingPaymentAction(formData: FormData) {
       !requestedReturnTo.includes('://')
     ? requestedReturnTo
     : `/admin/bookings/${finalBookingId}`
-  const paymentReference = paymentAttemptReference('admin-payment', finalBookingId, paymentAttemptId)
+  const paymentReference = actionAttemptReference('admin-payment', finalBookingId, paymentAttemptId)
 
   if (!paymentReference) {
     redirectWithError(returnTo, 'Refresh the page and try recording the payment again.')
@@ -1534,7 +1568,7 @@ export async function markDepositReceivedAction(formData: FormData) {
   const admin = createAdminClient()
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
-  const paymentReference = paymentAttemptReference('quick-deposit', bookingId as string, formData.get('payment_attempt_id'))
+  const paymentReference = actionAttemptReference('quick-deposit', bookingId as string, formData.get('payment_attempt_id'))
   if (!paymentReference) {
     redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try recording the deposit again.')
   }
@@ -1601,6 +1635,10 @@ export async function requestFinalPaymentAction(formData: FormData) {
   const admin = createAdminClient()
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+  const emailReference = actionAttemptReference('email-final-payment', bookingId as string, formData.get('email_attempt_id'))
+  if (!emailReference) {
+    redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try sending the final payment reminder again.')
+  }
 
   const source = await getBookingBalanceReminderSource(admin, bookingId as string)
   if (!source) {
@@ -1615,7 +1653,9 @@ export async function requestFinalPaymentAction(formData: FormData) {
     )
   }
 
-  const result = await sendBookingBalanceReminder(payload)
+  const result = await sendBookingBalanceReminder(payload, {
+    idempotencyKey: emailReference,
+  })
   if (!result.ok) {
     await appendBookingTimelineNote(
       admin,
@@ -1647,7 +1687,7 @@ export async function markFullyPaidAction(formData: FormData) {
   const admin = createAdminClient()
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
-  const paymentReference = paymentAttemptReference('quick-balance', bookingId as string, formData.get('payment_attempt_id'))
+  const paymentReference = actionAttemptReference('quick-balance', bookingId as string, formData.get('payment_attempt_id'))
   if (!paymentReference) {
     redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try recording the final payment again.')
   }
