@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import { PUBLIC_NAV } from '@/lib/constants'
 import styles from './Nav.module.css'
 
@@ -16,8 +17,20 @@ const GLYPHS: Record<string, string> = {
 
 const TONES = ['burgundy', 'gold', 'ink', 'copper', 'champagne', 'oxblood'] as const
 
+const NAV_CUE_SESSION_KEY = 'bae-nav-cue-dismissed'
+
 export default function Nav() {
   const pathname = usePathname()
+  const [showDockCue, setShowDockCue] = useState(false)
+
+  useEffect(() => {
+    setShowDockCue(sessionStorage.getItem(NAV_CUE_SESSION_KEY) !== '1')
+  }, [])
+
+  function dismissDockCue() {
+    setShowDockCue(false)
+    sessionStorage.setItem(NAV_CUE_SESSION_KEY, '1')
+  }
 
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`)
@@ -37,11 +50,13 @@ export default function Nav() {
       </div>
 
       <div className={styles.dockWrap}>
-        <div className={styles.dockCue} aria-hidden="true">
-          <span className={styles.cueDesktop}>Click a section</span>
-          <span className={styles.cueMobile}>Tap a section</span>
-          <span className={styles.cueArrow}>↓</span>
-        </div>
+        {showDockCue ? (
+          <div className={styles.dockCue} aria-hidden="true">
+            <span className={styles.cueDesktop}>Click a section</span>
+            <span className={styles.cueMobile}>Tap a section</span>
+            <span className={styles.cueArrow}>↓</span>
+          </div>
+        ) : null}
         <nav className={styles.dock} aria-label="Primary navigation">
           {PUBLIC_NAV.map((item, index) => {
             const active = isActive(item.href)
@@ -53,6 +68,7 @@ export default function Nav() {
                 aria-label={item.label}
                 className={`${styles.item} ${active ? styles.active : ''}`}
                 data-tone={TONES[index % TONES.length]}
+                onClick={dismissDockCue}
               >
                 <span className={styles.glyph} aria-hidden="true">{GLYPHS[item.label] ?? item.label.slice(0, 2)}</span>
                 <span className={styles.tip} aria-hidden="true">{item.label}</span>
