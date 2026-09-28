@@ -56,8 +56,8 @@ export default function W9Form({ saved }: Props) {
             <div className="admin-form-grid">
               {FIELDS.map(f => (
                 <div key={f.key}>
-                  <label style={{ display: 'block', fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '6px' }}>
-                    {f.label}{f.required && <span style={{ color: 'var(--violet)', marginLeft: '4px' }}>*</span>}
+                  <label className="admin-field-label">
+                    {f.label}{f.required && <span>*</span>}
                   </label>
                   <input
                     type={f.key === 'w9_tax_id' ? 'password' : 'text'}
@@ -80,7 +80,8 @@ export default function W9Form({ saved }: Props) {
               ))}
             </div>
 
-            <p style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '16px', lineHeight: 1.7 }}>
+            <p className="admin-sensitive-note">
+              <span aria-hidden="true">●</span>
               Your tax ID is stored securely and masked in the form. It is only used to generate your W-9 PDF.
             </p>
           </div>
