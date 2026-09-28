@@ -136,6 +136,9 @@ export default async function NewBookingPage({
             <label style={{ display: 'grid', gap: '7px', maxWidth: 'calc(50% - 6px)' }}>
               <span className="admin-field-label">End Time</span>
               <input name="event_end_time" type="time" step={900} style={inputStyle()} />
+              <span className="muted" style={{ fontSize: '11px', lineHeight: 1.5 }}>
+                If the end time is earlier than the start time, it is treated as the next day.
+              </span>
             </label>
 
             <EventLocationFields
