@@ -124,12 +124,24 @@
   transition: transform 220ms cubic-bezier(.2,.8,.2,1), border-color 180ms ease, background 180ms ease;
 }
 
-.item[data-tone='burgundy'] { background: linear-gradient(145deg, #a33a4b, #5a202c); }
-.item[data-tone='gold'] { background: linear-gradient(145deg, #d5b77f, #8f6f3f); color:#171210; }
-.item[data-tone='copper'] { background: linear-gradient(145deg, #d49255, #7b492a); }
-.item[data-tone='ink'] { background: linear-gradient(145deg, #2a2421, #0e0b0a); }
-.item[data-tone='champagne'] { background: linear-gradient(145deg, #f6f1e8, #bcae9d); color:#171210; }
-.item[data-tone='oxblood'] { background: linear-gradient(145deg, #782737, #34161d); }
+.item:not(.active) {
+  color: rgba(246,241,232,.78);
+}
+
+.item:not(.active):hover,
+.item:not(.active):focus-visible {
+  border-color: rgba(196,165,116,.28);
+  background:
+    linear-gradient(145deg, rgba(246,241,232,.12), transparent 42%),
+    linear-gradient(160deg, #2a2320, #130f0e);
+}
+
+.item.active[data-tone='burgundy'] { background: linear-gradient(145deg, #963447, #5a202c); }
+.item.active[data-tone='gold'] { background: linear-gradient(145deg, #cfb176, #8f6f3f); color:#171210; }
+.item.active[data-tone='copper'] { background: linear-gradient(145deg, #c98248, #744326); }
+.item.active[data-tone='ink'] { background: linear-gradient(145deg, #38302c, #171210); }
+.item.active[data-tone='champagne'] { background: linear-gradient(145deg, #eee7db, #b7aa9a); color:#171210; }
+.item.active[data-tone='oxblood'] { background: linear-gradient(145deg, #702535, #34161d); }
 
 .glyph {
   font-family: 'DM Sans', sans-serif;
