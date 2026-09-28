@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
+import { useRouter } from 'next/navigation'
 
 type Props = {
   bookingId: string
@@ -15,6 +16,7 @@ export default function SendInvoiceButton({
   className = 'admin-btn-ghost',
   label = 'Send Invoice Email',
 }: Props) {
+  const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [status, setStatus] = useState<{ tone: 'idle' | 'success' | 'error'; message: string }>({
     tone: 'idle',
@@ -48,6 +50,7 @@ export default function SendInvoiceButton({
           tone: 'success',
           message: `Invoice sent to ${clientEmail}.`,
         })
+        router.refresh()
       } catch {
         setStatus({
           tone: 'error',
