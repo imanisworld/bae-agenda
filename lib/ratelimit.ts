@@ -16,6 +16,7 @@ let warnedMissingRedis = false
 const limiterCache = {
   notifySignup: null as Ratelimit | null,
   booking: null as Ratelimit | null,
+  availabilityCheck: null as Ratelimit | null,
   review: null as Ratelimit | null,
   invoiceSend: null as Ratelimit | null,
   portalSendCode: null as Ratelimit | null,
@@ -128,6 +129,19 @@ export async function limitBookingSubmission(headers: Headers) {
   const result = await limitByKey(
     ip,
     createLimiter('booking', 5, '10 m', 'ratelimit:booking')
+  )
+
+  return {
+    ip,
+    ...result,
+  }
+}
+
+export async function limitAvailabilityCheck(headers: Headers) {
+  const ip = getClientIp(headers)
+  const result = await limitByKey(
+    ip,
+    createLimiter('availabilityCheck', 30, '5 m', 'ratelimit:availability-check')
   )
 
   return {
