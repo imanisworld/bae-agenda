@@ -142,7 +142,7 @@
   background: #1c1614;
   cursor: pointer;
   transform:
-    translateX(calc(var(--x) * var(--cover)))
+    translateX(calc(var(--x) * var(--cover) + var(--drag-px, 0px)))
     translateZ(calc(var(--z) * 60px))
     rotateY(var(--ry));
   transform-style: preserve-3d;
@@ -154,6 +154,14 @@
 .coverFront {
   filter: none;
   box-shadow: 0 28px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(246,241,232,.12);
+}
+
+.coverflowDragging .cover {
+  transition: filter 160ms ease, opacity 160ms ease;
+}
+
+.cover:active {
+  scale: .975;
 }
 
 .coverArt {
@@ -274,6 +282,10 @@
   border-color: rgba(196,165,116,.6);
 }
 
+.round:active:not(:disabled) {
+  transform: translateY(2px) scale(.96);
+}
+
 .round:disabled {
   opacity: .3;
   cursor: default;
@@ -303,6 +315,19 @@
     radial-gradient(circle at 10% 20%, rgba(143,45,60,.16), transparent 40%),
     #151110;
   box-shadow: 0 24px 60px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
+  transition: box-shadow 320ms ease, border-color 320ms ease, background 320ms ease;
+}
+
+.deckPlaying {
+  border-color: rgba(196,165,116,.28);
+  background:
+    radial-gradient(circle at 12% 24%, rgba(143,45,60,.24), transparent 42%),
+    radial-gradient(circle at 72% 22%, rgba(196,132,74,.08), transparent 34%),
+    #151110;
+  box-shadow:
+    0 26px 66px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.05),
+    inset 0 0 46px rgba(143,45,60,.08);
 }
 
 .turntable {
@@ -334,9 +359,28 @@
   box-shadow: 0 10px 22px rgba(0,0,0,.55), inset 0 0 0 2px rgba(246,241,232,.05);
 }
 
-.record {
+.recordGrip {
+  --scratch-angle: 0deg;
   position: absolute;
   inset: 3%;
+  z-index: 2;
+  border-radius: 50%;
+  transform: rotate(var(--scratch-angle));
+  transform-origin: center;
+  transition: transform 520ms cubic-bezier(.16,.8,.2,1);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.turntableScratching .recordGrip {
+  transition: none;
+  cursor: grabbing;
+}
+
+.record {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
   border-radius: 50%;
   background: #120e0d;
@@ -394,7 +438,7 @@
   width: 12%;
   height: 72%;
   transform-origin: 50% 7%;
-  transform: rotate(-8deg);
+  transform: rotate(calc(-8deg + var(--scratch-react, 0deg)));
   transition: transform 700ms cubic-bezier(.3,.7,.2,1);
   pointer-events: none;
 }
@@ -438,7 +482,7 @@
 }
 
 .tonearmOn {
-  transform: rotate(20deg);
+  transform: rotate(calc(20deg + var(--scratch-react, 0deg)));
 }
 
 .console {
@@ -594,6 +638,10 @@
   transform: scale(1.05);
 }
 
+.play:active:not(:disabled) {
+  transform: translateY(3px) scale(.96);
+}
+
 .play:disabled {
   opacity: .4;
   cursor: default;
@@ -634,6 +682,12 @@
 .links a:hover {
   border-color: rgba(196,165,116,.5);
   color: #f6f1e8;
+}
+
+.links button:active,
+.links a:active,
+.crateSwitch button:active {
+  transform: translateY(2px) scale(.98);
 }
 
 /* ── Empty ── */
@@ -817,7 +871,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cover,
-  .tonearm {
+  .tonearm,
+  .recordGrip,
+  .deck {
     transition: none;
   }
 
@@ -828,5 +884,16 @@
   .liveDot,
   .skeleton {
     animation: none;
+  }
+}
+
+
+@media (hover: hover) and (pointer: fine) {
+  .turntable:hover .recordGrip {
+    filter: brightness(1.04);
+  }
+
+  .coverFront:hover {
+    scale: 1.018;
   }
 }
