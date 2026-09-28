@@ -5,6 +5,7 @@ import Badge from '@/components/admin/Badge'
 import AdminNotice from '@/components/admin/AdminNotice'
 import BookingPricingFields from '@/components/admin/BookingPricingFields'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { getBookingFinancialSnapshot } from '@/lib/booking-finance'
 import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } from '@/lib/booking-deposit'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
@@ -345,41 +346,72 @@ export default async function EditBookingPage({
             {lifecycleStatus === 'negotiating' && (
               <form action={confirmBookingAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
-                <button type="submit" className="admin-btn-primary">Confirm Booking</button>
+                <ConfirmSubmitButton
+                  message="Confirm this booking? This sends the client confirmation/deposit email and prepares the invoice draft."
+                  className="admin-btn-primary"
+                >
+                  Confirm Booking
+                </ConfirmSubmitButton>
               </form>
             )}
 
             {lifecycleStatus === 'confirmed' && paymentStatus === 'deposit_requested' && (
               <form action={markDepositReceivedAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
-                <button type="submit" className="admin-btn-primary">Mark Deposit Received</button>
+                <ConfirmSubmitButton
+                  message="Record the outstanding deposit as received?"
+                  className="admin-btn-primary"
+                >
+                  Mark Deposit Received
+                </ConfirmSubmitButton>
               </form>
             )}
 
             {lifecycleStatus === 'confirmed' && paymentStatus === 'deposit_paid' && (
               <form action={requestFinalPaymentAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
-                <button type="submit" className="admin-btn-primary">Request Final Payment</button>
+                <ConfirmSubmitButton
+                  message="Send the final payment reminder to the client now?"
+                  className="admin-btn-primary"
+                >
+                  Request Final Payment
+                </ConfirmSubmitButton>
               </form>
             )}
 
             {lifecycleStatus === 'confirmed' && paymentStatus === 'balance_requested' && (
               <form action={markFullyPaidAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
-                <button type="submit" className="admin-btn-primary">Mark Fully Paid</button>
+                <ConfirmSubmitButton
+                  message="Record the remaining balance as received and mark this booking fully paid?"
+                  className="admin-btn-primary"
+                >
+                  Mark Fully Paid
+                </ConfirmSubmitButton>
               </form>
             )}
 
             {lifecycleStatus === 'confirmed' && paymentStatus === 'paid' && (
               <form action={markBookingCompleteAction}>
                 <input type="hidden" name="booking_id" value={booking.id} />
-                <button type="submit" className="admin-btn-primary">Mark Complete</button>
+                <ConfirmSubmitButton
+                  message="Mark this booking complete? This may send the post-event follow-up email."
+                  className="admin-btn-primary"
+                >
+                  Mark Complete
+                </ConfirmSubmitButton>
               </form>
             )}
 
             <form action={markBookingLostAction}>
               <input type="hidden" name="booking_id" value={booking.id} />
-              <button type="submit" className="admin-btn-ghost" style={{ color: '#e85d75' }}>Mark Lost</button>
+              <ConfirmSubmitButton
+                message="Mark this booking lost/cancelled?"
+                className="admin-btn-ghost"
+                style={{ color: '#e85d75' }}
+              >
+                Mark Lost
+              </ConfirmSubmitButton>
             </form>
           </div>
         </div>
