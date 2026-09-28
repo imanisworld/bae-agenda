@@ -193,6 +193,9 @@ export default async function DashboardPage() {
   const recentBookings = raw.recentBookings
   const upcomingEvents = raw.upcomingEvents
   const paymentReminders = raw.paymentReminders
+  const deploymentEnvironment =
+    process.env.NEXT_PUBLIC_DEPLOYMENT_ENV ?? process.env.VERCEL_ENV ?? 'local'
+  const deploymentCommit = process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? 'local'
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
@@ -214,6 +217,44 @@ export default async function DashboardPage() {
           </div>
         </div>
       )}
+
+      <div className="admin-section" style={{ marginBottom: 24 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">System Health</span>
+          <span style={{ fontSize: 10, color: 'var(--muted)' }}>Live check</span>
+        </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+          gap: 1,
+          background: 'var(--border)',
+        }}>
+          {[
+            ['App', 'Online'],
+            ['Database', raw.connected ? 'Connected' : 'Unavailable'],
+            ['Environment', deploymentEnvironment],
+            ['Build', deploymentCommit],
+          ].map(([label, value]) => (
+            <div key={label} style={{ padding: '14px 16px', background: 'var(--surface)' }}>
+              <div style={{
+                fontSize: 9,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                color: 'var(--muted)',
+                marginBottom: 5,
+              }}>
+                {label}
+              </div>
+              <div style={{
+                fontSize: 12,
+                color: label === 'Database' && !raw.connected ? 'var(--gold)' : 'var(--white)',
+              }}>
+                {value}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* ── Stat Cards ──────────────────────────────────────────── */}
       <div style={{
