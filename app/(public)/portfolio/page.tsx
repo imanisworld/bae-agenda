@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getPortfolioEntries, getFeaturedPortfolioEntries, getPortfolioStats } from '@/app/actions/portfolio'
+import { getPortfolioEntries, getFeaturedPortfolioEntries, getPortfolioMedia, getPortfolioStats } from '@/app/actions/portfolio'
 import PortfolioExperienceStage from '@/components/public/PortfolioExperienceStage'
 import { SOCIALS } from '@/lib/constants'
 import { getContentMap } from '@/lib/db/content'
@@ -29,6 +29,7 @@ export default async function PortfolioPage() {
     getPortfolioStats(),
     getContentMap(['instagram_url']),
   ])
+  const media = await getPortfolioMedia(entries.map((entry) => entry.id))
   const instagramUrl =
     content.instagram_url || SOCIALS.find((social) => social.label === 'Instagram')!.url
 
@@ -55,6 +56,16 @@ export default async function PortfolioPage() {
         year: entry.year,
         tags: entry.tags ?? [],
         featured: entry.featured,
+        photo_url: entry.photo_url ?? null,
+      }))}
+      media={media.map((item) => ({
+        id: item.id,
+        portfolio_entry_id: item.portfolio_entry_id,
+        media_type: item.media_type,
+        media_url: item.media_url,
+        poster_url: item.poster_url,
+        caption: item.caption,
+        sort_order: item.sort_order,
       }))}
       stats={stats}
       instagramUrl={instagramUrl}
