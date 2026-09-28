@@ -1,3 +1,4 @@
+import { HangFrom } from '@/components/public/brand/HangingLogo'
 import ReviewDrawer from '@/components/public/ReviewDrawer'
 import { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
 import { SOCIALS } from '@/lib/constants'
@@ -20,10 +21,9 @@ export default async function BookExperienceRail() {
 
   return (
     <div className="book-experience-rail-inner">
-      <header>
-        <span>Contact</span>
-        <h2>Prefer email or DM?</h2>
-        <p>That works too. Quick answers are below.</p>
+      <header className="book-contact-heading">
+        <h2>C<HangFrom finish="gold">o</HangFrom>ntact</h2>
+        <p>Prefer email or DM? That works too. Quick answers are below.</p>
       </header>
 
       <div className="book-experience-contact">
