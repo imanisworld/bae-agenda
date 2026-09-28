@@ -63,7 +63,7 @@ async function getBooking(id: string): Promise<BookingRow | null> {
 
 async function getInvoiceState(id: string): Promise<InvoiceState | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('invoices')
     .select('status, invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, due_date, payment_terms, line_items, sent_at, created_at')
     .eq('booking_id', id)
