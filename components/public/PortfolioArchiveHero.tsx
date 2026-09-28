@@ -125,7 +125,7 @@ export default function PortfolioArchiveHero({
                 alt={entry.event_name}
                 fill
                 sizes="(max-width: 760px) 44vw, 300px"
-                quality={90}
+                quality={95}
               />
             </div>
             <div className={styles.printMeta}>
