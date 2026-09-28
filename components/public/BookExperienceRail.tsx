@@ -22,8 +22,8 @@ export default async function BookExperienceRail() {
     <div className="book-experience-rail-inner">
       <header>
         <span>Contact</span>
-        <h2>Rather reach out directly?</h2>
-        <p>Email, DM, or check a quick answer below.</p>
+        <h2>Prefer email or DM?</h2>
+        <p>That works too. Quick answers are below.</p>
       </header>
 
       <div className="book-experience-contact">
@@ -57,8 +57,8 @@ export default async function BookExperienceRail() {
 
       <div className="book-experience-review">
         <div>
-          <small>Already worked together?</small>
-          <p>Share the experience.</p>
+          <small>Worked with me before?</small>
+          <p>Leave a review.</p>
         </div>
         <ReviewDrawer />
       </div>
