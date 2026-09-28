@@ -83,7 +83,9 @@ export async function sendBookingPostEventFollowUpEmail(admin: AdminClient, book
   const payload = getPostEventFollowUpPayloadFromBooking(booking)
   if (!payload) return { status: 'skipped', reason: 'not_ready' }
 
-  const result = await sendBookingPostEventFollowUp(payload)
+  const result = await sendBookingPostEventFollowUp(payload, {
+    idempotencyKey: options?.force ? undefined : `booking-post-event-${bookingId}`,
+  })
   if (!result.ok) return { status: 'failed', detail: result.detail || 'Unable to send post-event follow-up email.' }
 
   if (!booking.post_event_follow_up_sent_at) {
@@ -101,7 +103,9 @@ export async function sendBookingReviewRequestEmail(admin: AdminClient, bookingI
   const payload = getReviewRequestPayloadFromBooking(booking)
   if (!payload) return { status: 'skipped', reason: 'not_ready' }
 
-  const result = await sendBookingReviewRequest(payload)
+  const result = await sendBookingReviewRequest(payload, {
+    idempotencyKey: options?.force ? undefined : `booking-review-request-${bookingId}`,
+  })
   if (!result.ok) return { status: 'failed', detail: result.detail || 'Unable to send review request email.' }
 
   if (!booking.review_request_sent_at) {
