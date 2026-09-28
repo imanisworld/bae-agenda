@@ -275,7 +275,7 @@ export default async function PortalBookingDetailPage({
           <div style={{ display: 'grid', gap: '8px' }}>
             <h2 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '22px' }}>Request An Update</h2>
             <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: 1.75, margin: 0 }}>
-              Use this form if you need to update event details or start a cancellation conversation. The team will review your request and follow up directly.
+              Use this form if you need to change event details or discuss a cancellation. I&apos;ll review the request and follow up directly.
             </p>
           </div>
 
@@ -315,14 +315,14 @@ export default async function PortalBookingDetailPage({
                 rows={5}
                 minLength={12}
                 required
-                placeholder="Share the change you need, the new details, or any cancellation context the team should know."
+                placeholder="Share the change you need, the new details, or anything else I should know."
                 style={{ width: '100%', background: 'var(--bg-sunken)', border: '1px solid var(--border)', color: 'var(--white)', padding: '14px', fontSize: '14px', lineHeight: 1.7, resize: 'vertical' }}
               />
             </label>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: '14px', flexWrap: 'wrap', alignItems: 'center' }}>
               <p style={{ color: 'var(--muted)', fontSize: '12px', lineHeight: 1.6, margin: 0 }}>
-                Requests do not automatically change your booking. The team reviews them first.
+                A request does not change your booking automatically. I&apos;ll review it first.
               </p>
               <button type="submit" className="btn-primary">
                 Send Request

@@ -466,7 +466,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
         const result = await res.json() as CheckResult
 
         if (!res.ok) {
-          setAvailabilityError(result.error ?? 'We could not verify availability right now. Please try again.')
+          setAvailabilityError(result.error ?? 'Availability could not be verified right now. Please try again.')
           setCheckingAvailability(false)
           return
         }
@@ -480,7 +480,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
           setAvailabilityError(
             result.hasTime
               ? `That time is no longer available. Please choose another time. Current conflicts: ${names}.`
-              : `There are already events scheduled that day: ${names}. Add a start time so we can check availability more accurately.`
+              : `There are already events scheduled that day: ${names}. Add a start time for a more precise availability check.`
           )
           setCheckingAvailability(false)
           return
@@ -854,7 +854,7 @@ function BookingSuccess({ summary, embedded = false }: { summary: BookingSuccess
               What Happens Next
             </div>
             <div style={{ fontSize: '14px', lineHeight: 1.75, color: 'rgba(250,248,243,0.76)' }}>
-              We review availability, format, and event fit first. If it looks like a match, the next email will cover follow-up questions, pricing clarity, and what it takes to lock the date in.
+              I review availability, format, and event fit first. If it looks like a match, I&apos;ll email you with follow-up questions, pricing, and what it takes to hold the date.
             </div>
           </div>
 

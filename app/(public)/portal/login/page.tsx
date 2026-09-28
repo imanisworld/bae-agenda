@@ -30,7 +30,7 @@ export default async function PortalLoginPage({
             Sign in with your phone number
           </h1>
           <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: 1.75, maxWidth: '34rem' }}>
-            We&apos;ll text you a one-time code so you can check your booking details without creating a password.
+            You&apos;ll get a one-time code by text so you can check your booking details without creating a password.
           </p>
         </div>
 
@@ -71,8 +71,8 @@ export default async function PortalLoginPage({
         </form>
 
         <p style={{ color: 'var(--text-secondary)', fontSize: '12px', lineHeight: 1.7 }}>
-          If that number matches a booking, we&apos;ll send a code. Need help instead?{' '}
-          <Link href="/book#contact" className="inline-link">Contact the team</Link>.
+          If that number matches a booking, a code will be sent. Need help instead?{' '}
+          <Link href="/book#contact" className="inline-link">Contact me</Link>.
         </p>
       </div>
     </section>
