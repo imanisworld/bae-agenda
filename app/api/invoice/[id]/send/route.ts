@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { balanceDueOf, generateInvoicePdf, invoiceFilename, invoiceNumberOf, type InvoiceBookingData } from '@/lib/invoices'
+import { applyInvoiceSnapshot, balanceDueOf, generateInvoicePdf, invoiceFilename, invoiceNumberOf, type InvoiceBookingData, type InvoiceSnapshotData } from '@/lib/invoices'
 import { sendInvoiceNotification } from '@/lib/notifications'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
 import { limitInvoiceSend } from '@/lib/ratelimit'
@@ -70,26 +70,33 @@ export async function POST(
     )
   }
 
-  const { data } = await supabase
-    .from('bookings')
-    .select(`
-      id,
-      event_name,
-      event_type,
-      event_date,
-      event_end_time,
-      event_timezone,
-      venue,
-      city,
-      package,
-      hours,
-      quote,
-      deposit_amount,
-      notes,
-      clients(first_name, last_name, email, phone)
-    `)
-    .eq('id', id)
-    .maybeSingle()
+  const [{ data }, { data: invoiceData }] = await Promise.all([
+    supabase
+      .from('bookings')
+      .select(`
+        id,
+        event_name,
+        event_type,
+        event_date,
+        event_end_time,
+        event_timezone,
+        venue,
+        city,
+        package,
+        hours,
+        quote,
+        deposit_amount,
+        notes,
+        clients(first_name, last_name, email, phone)
+      `)
+      .eq('id', id)
+      .maybeSingle(),
+    supabase
+      .from('invoices')
+      .select('status, invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due')
+      .eq('booking_id', id)
+      .maybeSingle(),
+  ])
 
   const booking = (data as InvoiceBookingData | null) ?? null
 
@@ -97,27 +104,40 @@ export async function POST(
     return NextResponse.json({ error: 'Booking not found.' }, { status: 404 })
   }
 
-  const clientEmail = booking.clients?.email?.trim()
-  if (!clientEmail) {
-    return NextResponse.json({ error: 'This booking does not have a client email yet.' }, { status: 400 })
+  const invoice = (invoiceData as (InvoiceSnapshotData & { status: 'draft' | 'sent' | 'paid' | 'void' }) | null) ?? null
+
+  if (invoice?.status === 'void') {
+    return NextResponse.json({ error: 'Void invoices cannot be sent.' }, { status: 400 })
   }
 
-  const clientName = [booking.clients?.first_name, booking.clients?.last_name]
+  if (invoice?.status === 'paid') {
+    return NextResponse.json({ error: 'Paid invoices cannot be sent again from the invoice workflow.' }, { status: 400 })
+  }
+
+  const effectiveBooking = applyInvoiceSnapshot(booking, invoice)
+  const clientEmail = effectiveBooking.clients?.email?.trim()
+  if (!clientEmail) {
+    return NextResponse.json({ error: 'This invoice does not have a client email yet.' }, { status: 400 })
+  }
+
+  const clientName = [effectiveBooking.clients?.first_name, effectiveBooking.clients?.last_name]
     .filter(Boolean)
     .join(' ')
     .trim() || 'Client'
 
-  const pdfBase64 = Buffer.from(await generateInvoicePdf(booking)).toString('base64')
-  const balance = balanceDueOf(booking)
+  const pdfBase64 = Buffer.from(await generateInvoicePdf(effectiveBooking)).toString('base64')
+  const balance = invoice ? Number(invoice.balance_due ?? 0) : balanceDueOf(effectiveBooking)
+  const invoiceNumber = invoice?.invoice_number || invoiceNumberOf(effectiveBooking)
+  const pdfFilename = invoice?.pdf_filename || invoiceFilename(effectiveBooking)
 
   const result = await sendInvoiceNotification({
     to: clientEmail,
     clientName,
-    eventName: booking.event_name ?? 'your event',
-    invoiceNumber: invoiceNumberOf(booking),
+    eventName: effectiveBooking.event_name ?? 'your event',
+    invoiceNumber,
     balanceDue: formatCurrency(balance),
     pdfBase64,
-    pdfFilename: invoiceFilename(booking),
+    pdfFilename,
   })
 
   if (!result.ok) {
@@ -142,13 +162,13 @@ export async function POST(
       .upsert({
         booking_id: booking.id,
         status: 'sent',
-        invoice_number: invoiceNumberOf(booking),
-        pdf_filename: invoiceFilename(booking),
-        event_name: booking.event_name,
+        invoice_number: invoiceNumber,
+        pdf_filename: pdfFilename,
+        event_name: effectiveBooking.event_name,
         client_name: clientName,
         client_email: clientEmail,
-        total_amount: booking.quote ?? 0,
-        deposit_amount: booking.deposit_amount ?? 0,
+        total_amount: effectiveBooking.quote ?? 0,
+        deposit_amount: effectiveBooking.deposit_amount ?? 0,
         balance_due: balance,
         sent_at: sentAt,
       }, { onConflict: 'booking_id' })
