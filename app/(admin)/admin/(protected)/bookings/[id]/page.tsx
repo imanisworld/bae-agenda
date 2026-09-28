@@ -9,7 +9,7 @@ import { getBookingFinancialSnapshot } from '@/lib/booking-finance'
 import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } from '@/lib/booking-deposit'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, updateBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
+import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, createEventFromBookingAction, updateBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { createInvoiceFromBookingAction } from '@/app/actions/invoices'
 import { getEventInputDateTime } from '@/lib/date-time'
@@ -77,6 +77,12 @@ interface BookingInvoiceState {
   status: 'draft' | 'sent' | 'paid' | 'void'
   invoice_number: string
   sent_at: string | null
+}
+
+interface LinkedEventState {
+  id: string
+  title: string
+  public: boolean
 }
 
 function inputStyle(): React.CSSProperties {
@@ -175,6 +181,17 @@ async function getBookingInvoiceState(id: string): Promise<BookingInvoiceState |
   return (data as BookingInvoiceState | null) ?? null
 }
 
+async function getLinkedEventState(id: string): Promise<LinkedEventState | null> {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('events')
+    .select('id, title, public')
+    .eq('booking_id', id)
+    .maybeSingle()
+
+  return (data as LinkedEventState | null) ?? null
+}
+
 function getMessage(param: string | string[] | undefined) {
   if (!param) return null
   return Array.isArray(param) ? param[0] ?? null : param
@@ -200,9 +217,10 @@ export default async function EditBookingPage({
 }) {
   const { id } = await params
   const resolvedSearchParams = searchParams ? await searchParams : undefined
-  const [booking, invoiceState] = await Promise.all([
+  const [booking, invoiceState, linkedEvent] = await Promise.all([
     getBooking(id),
     getBookingInvoiceState(id),
+    getLinkedEventState(id),
   ])
   if (!booking) notFound()
 
@@ -279,6 +297,36 @@ export default async function EditBookingPage({
           {clientName && <span style={{ color: 'var(--white)', fontSize: '14px' }}>{clientName}</span>}
           {booking.clients?.email && <span className="muted">{booking.clients.email}</span>}
           {booking.clients?.phone && <span className="muted">{booking.clients.phone}</span>}
+          {booking.clients?.id && (
+            <Link href={`/admin/clients/${booking.clients.id}`} className="admin-view-all">
+              Edit Client →
+            </Link>
+          )}
+        </div>
+      </div>
+
+      <div className="admin-section" style={{ padding: '20px 24px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <div>
+            <div className="admin-section-title" style={{ marginBottom: '6px' }}>Event Record</div>
+            <div className="muted" style={{ fontSize: '12px', lineHeight: 1.6 }}>
+              {linkedEvent
+                ? `Linked to ${linkedEvent.title}${linkedEvent.public ? ' · Public' : ' · Draft'}`
+                : lifecycleStatus === 'confirmed' || lifecycleStatus === 'completed'
+                  ? 'No event record is linked yet.'
+                  : 'Confirm the booking before creating an event record.'}
+            </div>
+          </div>
+          {linkedEvent ? (
+            <Link href={`/admin/events/${linkedEvent.id}`} className="admin-btn-ghost">
+              View Event
+            </Link>
+          ) : (lifecycleStatus === 'confirmed' || lifecycleStatus === 'completed') ? (
+            <form action={createEventFromBookingAction}>
+              <input type="hidden" name="booking_id" value={booking.id} />
+              <button type="submit" className="admin-btn-ghost">Create Event</button>
+            </form>
+          ) : null}
         </div>
       </div>
 
