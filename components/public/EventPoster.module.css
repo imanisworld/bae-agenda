@@ -187,3 +187,32 @@
 .detailsLink:focus-visible {
   color: #d8ba88;
 }
+
+
+.archiveReady {
+  cursor: pointer;
+}
+
+.archiveButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 18px;
+  padding: 9px 12px;
+  border: 1px solid rgba(196,165,116,.36);
+  background: rgba(13,11,11,.52);
+  color: #f6f1e8;
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+}
+
+.archiveButton:hover,
+.archiveButton:focus-visible {
+  border-color: rgba(196,165,116,.72);
+  color: #d8ba88;
+}
