@@ -358,7 +358,7 @@ async function syncInvoicePaymentState(admin: ReturnType<typeof createAdminClien
       .maybeSingle(),
     admin
       .from('invoices')
-      .select('status, sent_at')
+      .select('status, sent_at, total_amount')
       .eq('booking_id', bookingId)
       .maybeSingle(),
   ])
@@ -372,20 +372,24 @@ async function syncInvoicePaymentState(admin: ReturnType<typeof createAdminClien
     console.error('[invoice-payment-sync] unable to load invoice state:', invoiceLookupError)
   }
 
+  const payments = (booking.payments as Array<{ amount: number; status: 'pending' | 'received' | 'refunded' }> | null) ?? null
   const paymentStatus = getBookingPaymentStatus(
     booking.quote as number | null,
-    (booking.payments as Array<{ amount: number; status: 'pending' | 'received' | 'refunded' }> | null) ?? null
+    payments
   )
 
   if (!invoice) {
     return { paymentStatus, updatedInvoice: false }
   }
 
+  const invoiceTotal = Number(invoice.total_amount ?? booking.quote ?? 0)
+  const invoicePaymentStatus = getBookingPaymentStatus(invoiceTotal, payments)
+  const invoiceBalance = getOutstandingBalance(invoiceTotal, payments)
   const currentStatus = invoice.status as 'draft' | 'sent' | 'paid' | 'void'
   const nextStatus =
     currentStatus === 'void'
       ? 'void'
-      : paymentStatus === 'paid'
+      : invoicePaymentStatus === 'paid'
         ? 'paid'
         : currentStatus === 'sent'
           ? 'sent'
@@ -395,6 +399,7 @@ async function syncInvoicePaymentState(admin: ReturnType<typeof createAdminClien
     .from('invoices')
     .update({
       status: nextStatus,
+      balance_due: invoiceBalance,
       sent_at: invoice.sent_at ?? null,
     })
     .eq('booking_id', bookingId)
