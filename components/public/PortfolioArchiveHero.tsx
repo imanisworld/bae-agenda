@@ -11,7 +11,15 @@ export type ArchivePrint = {
   photo_url: string
 }
 
-export default function PortfolioArchiveHero({ prints, onExplore }: { prints: ArchivePrint[]; onExplore?: () => void }) {
+export default function PortfolioArchiveHero({
+  prints,
+  onExplore,
+  instagramUrl,
+}: {
+  prints: ArchivePrint[]
+  onExplore?: () => void
+  instagramUrl?: string
+}) {
   return (
     <section className={styles.hero} aria-labelledby="portfolio-title">
       <Image
@@ -19,8 +27,8 @@ export default function PortfolioArchiveHero({ prints, onExplore }: { prints: Ar
         alt=""
         fill
         priority
-        sizes="100vw"
-        quality={95}
+        sizes="(max-width: 760px) 100vw, 60vw"
+        quality={80}
         aria-hidden="true"
         className={styles.background}
       />
@@ -30,11 +38,18 @@ export default function PortfolioArchiveHero({ prints, onExplore }: { prints: Ar
         <span>Portfolio</span>
         <h1 id="portfolio-title">Past<br />work.</h1>
         <p>Rooms, crowds, and moments collected across the archive.</p>
-        {onExplore ? (
-          <button id="portfolio-explore-archive" type="button" className="btn-ghost" onClick={onExplore}>Explore the archive</button>
-        ) : (
-          <Link href="#archive" className="btn-ghost">Explore the archive</Link>
-        )}
+        <div className={styles.actions}>
+          {onExplore ? (
+            <button id="portfolio-explore-archive" type="button" className="btn-ghost" onClick={onExplore}>Explore the archive</button>
+          ) : (
+            <Link href="#archive" className="btn-ghost">Explore the archive</Link>
+          )}
+          {instagramUrl ? (
+            <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className={styles.instagram}>
+              More photos on Instagram <span aria-hidden="true">↗</span>
+            </a>
+          ) : null}
+        </div>
       </div>
 
       <div className={styles.printField} aria-label="Selected past work">

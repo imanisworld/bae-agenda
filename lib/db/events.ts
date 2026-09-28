@@ -47,6 +47,37 @@ export async function getUpcomingEvents(limit = 10): Promise<Event[]> {
 }
 
 /**
+ * Past public events, most recent first.
+ * Used for the "Past" view on the /events page.
+ */
+export async function getPastEvents(limit = 20): Promise<Event[]> {
+  try {
+    const supabase = await createClient()
+    // Include the last couple of days so same-day events that already ended are caught;
+    // isUpcomingEventRecord makes the final call.
+    const ceiling = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
+    const { data, error } = await supabase
+      .from('events')
+      .select('*')
+      .eq('public', true)
+      .lt('event_date', ceiling)
+      .order('event_date', { ascending: false })
+      .limit(limit + 10)
+
+    if (error) {
+      console.error('[getPastEvents] unable to load events:', error.message)
+      return []
+    }
+
+    const now = new Date()
+    return ((data ?? []) as Event[]).filter((event) => !isUpcomingEventRecord(event, now)).slice(0, limit)
+  } catch (err) {
+    console.error('[getPastEvents] unexpected error:', err)
+    return []
+  }
+}
+
+/**
  * Featured public events for the homepage — up to 3.
  * Falls back to the next 3 upcoming events if none are marked featured.
  */

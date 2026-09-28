@@ -1,17 +1,14 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { PUBLIC_NAV } from '@/lib/constants'
 import styles from './Nav.module.css'
 
-const GLYPHS: Record<string, string> = {
-  Home: 'BAE',
-  Events: 'EV',
-  Lab: 'LAB',
-  Portfolio: 'WK',
-  Meet: 'ME',
-  Book: 'BK',
+// Short, readable dock labels — full names still go to aria-label and the hover tip.
+const DOCK_LABELS: Record<string, string> = {
+  Portfolio: 'Work',
 }
 
 const TONES = ['burgundy', 'gold', 'ink', 'copper', 'champagne', 'oxblood'] as const
@@ -30,18 +27,21 @@ export default function Nav() {
     <div className={styles.chrome}>
       <div className={styles.topbar}>
         <Link href="/" className={styles.brand} aria-label="DJ B.A.E. — Home">
-          DJ <span>B.A.E.</span>
+          <Image
+            src="/brand/dj-bae-logo.png"
+            alt="DJ B.A.E."
+            width={900}
+            height={659}
+            priority
+            sizes="96px"
+            className={styles.logo}
+          />
         </Link>
         <span className={styles.route}>{routeLabel}</span>
         <span className={styles.status}>Indianapolis</span>
       </div>
 
       <div className={styles.dockWrap}>
-        <div className={styles.dockCue} aria-hidden="true">
-          <span className={styles.cueDesktop}>Click a section</span>
-          <span className={styles.cueMobile}>Tap a section</span>
-          <span className={styles.cueArrow}>↓</span>
-        </div>
         <nav className={styles.dock} aria-label="Primary navigation">
           {PUBLIC_NAV.map((item, index) => {
             const active = isActive(item.href)
@@ -54,8 +54,10 @@ export default function Nav() {
                 className={`${styles.item} ${active ? styles.active : ''}`}
                 data-tone={TONES[index % TONES.length]}
               >
-                <span className={styles.glyph} aria-hidden="true">{GLYPHS[item.label] ?? item.label.slice(0, 2)}</span>
-                <span className={styles.tip} aria-hidden="true">{item.label}</span>
+                <span className={styles.glyph} aria-hidden="true">{DOCK_LABELS[item.label] ?? item.label}</span>
+                {DOCK_LABELS[item.label] && (
+                  <span className={styles.tip} aria-hidden="true">{item.label}</span>
+                )}
               </Link>
             )
           })}

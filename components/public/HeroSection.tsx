@@ -25,6 +25,8 @@ export default function HeroSection({ content = {} }: Props) {
       className={styles.hero}
     >
       <div className={styles.wordmark} aria-hidden="true">BAE</div>
+      {/* Outline copy sits above the photo so the letters still read where the photo covers them. */}
+      <div className={`${styles.wordmark} ${styles.wordmarkOutline}`} aria-hidden="true">BAE</div>
 
       <div className={styles.photo}>
         <Image

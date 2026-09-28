@@ -27,17 +27,26 @@ function parts(event: Event) {
   return { dateLabel, timeLabel }
 }
 
-export default function EventPoster({ event, priority = false }: { event: Event; priority?: boolean }) {
+export default function EventPoster({
+  event,
+  priority = false,
+  past = false,
+}: {
+  event: Event
+  priority?: boolean
+  past?: boolean
+}) {
   const { dateLabel, timeLabel } = parts(event)
   const location = [event.venue, event.city].filter(Boolean).join(' · ')
 
   return (
-    <article className={styles.poster}>
+    <article className={`${styles.poster}${past ? ` ${styles.past}` : ''}`}>
       <Image
         src="/photos/PlexMix19-DJBAE.JPEG"
         alt=""
         fill
         priority={priority}
+        loading={priority ? undefined : 'lazy'}
         sizes="(max-width: 760px) 100vw, 1100px"
         quality={95}
         className={styles.image}
@@ -46,8 +55,8 @@ export default function EventPoster({ event, priority = false }: { event: Event;
       <div className={styles.shade} aria-hidden="true" />
 
       <div className={styles.topline}>
-        <span>Upcoming Event</span>
-        {event.featured ? <span className={styles.status}>Featured</span> : null}
+        <span>{past ? 'Past Event' : 'Upcoming Event'}</span>
+        {event.featured && !past ? <span className={styles.status}>Featured</span> : null}
       </div>
 
       <div className={styles.info}>

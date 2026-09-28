@@ -10,8 +10,10 @@
 .background {
   object-fit: cover;
   object-position: center 44%;
-  filter: brightness(.58) saturate(.78) contrast(1.05);
-  transform: scale(1.02);
+  /* The source photo is low-res at full-bleed size, so blur it into an
+     atmospheric backdrop instead of showing it soft. Scale hides blurred edges. */
+  filter: blur(14px) brightness(.52) saturate(.8) contrast(1.05);
+  transform: scale(1.1);
 }
 
 .shade {
@@ -55,6 +57,30 @@
   color: rgba(246,241,232,.62);
   font-size: 15px;
   line-height: 1.65;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 20px;
+}
+
+.instagram {
+  color: #d8ba88;
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(196,165,116,.35);
+  padding-bottom: 3px;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.instagram:hover,
+.instagram:focus-visible {
+  color: #f6f1e8;
+  border-color: rgba(246,241,232,.6);
 }
 
 .printField {

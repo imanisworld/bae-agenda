@@ -21,9 +21,9 @@ export default async function BookExperienceRail() {
   return (
     <div className="book-experience-rail-inner" id="contact">
       <header>
-        <span>Book + Contact</span>
-        <h2>Everything in one place.</h2>
-        <p>Send the inquiry, reach out directly, or check a common question without leaving the stage.</p>
+        <span>Contact</span>
+        <h2>Rather reach out directly?</h2>
+        <p>Email, DM, or check a quick answer below.</p>
       </header>
 
       <div className="book-experience-contact">

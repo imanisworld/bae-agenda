@@ -160,3 +160,8 @@
     line-height: 1.45;
   }
 }
+
+/* Past events read as archive: desaturated photo. */
+.past .image {
+  filter: brightness(.62) saturate(.35) contrast(1.02);
+}
