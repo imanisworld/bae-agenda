@@ -15,7 +15,7 @@ const STYLES: Record<BadgeVariant, { color: string; bg: string; border: string }
   new:       { color: 'var(--gold)',   bg: 'rgba(201,168,76,0.10)',  border: 'rgba(201,168,76,0.30)'  },
   contacted: { color: '#7dd3fc',       bg: 'rgba(125,211,252,0.10)', border: 'rgba(125,211,252,0.30)' },
   negotiating:{ color: '#f59e0b',      bg: 'rgba(245,158,11,0.10)',  border: 'rgba(245,158,11,0.30)'  },
-  confirmed: { color: 'var(--violet)', bg: 'rgba(155,93,229,0.10)',  border: 'rgba(155,93,229,0.30)'  },
+  confirmed: { color: '#d98a99',       bg: 'rgba(143,45,60,0.16)',  border: 'rgba(143,45,60,0.38)'  },
   completed: { color: '#34d399',       bg: 'rgba(52,211,153,0.10)',  border: 'rgba(52,211,153,0.30)'  },
   cancelled: { color: '#e85d75',       bg: 'rgba(232,93,117,0.10)', border: 'rgba(232,93,117,0.30)'  },
   lost:      { color: '#e85d75',       bg: 'rgba(232,93,117,0.10)', border: 'rgba(232,93,117,0.30)'  },
@@ -54,6 +54,7 @@ export default function Badge({ variant, label }: BadgeProps) {
         color: s.color,
         background: s.bg,
         border: `1px solid ${s.border}`,
+        borderRadius: '999px',
         whiteSpace: 'nowrap',
       }}
     >

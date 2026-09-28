@@ -127,7 +127,7 @@ export default async function MixesAdminPage({
                           style={{
                             padding: '4px 8px',
                             fontSize: '9px',
-                            color: mix.is_featured ? 'var(--violet)' : 'var(--muted)',
+                            color: mix.is_featured ? 'var(--gold)' : 'var(--muted)',
                           }}
                         >
                           {mix.is_featured ? '★ Featured' : 'Not Featured'}

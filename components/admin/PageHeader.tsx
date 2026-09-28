@@ -16,8 +16,9 @@ interface PageHeaderProps {
 export default function PageHeader({ title, subtitle, action }: PageHeaderProps) {
   return (
     <div className="admin-page-header">
-      <div>
-        <h1 className="admin-page-title" style={{ marginBottom: subtitle ? '6px' : 0 }}>
+      <div className="admin-page-heading-copy">
+        <span className="admin-page-kicker">B.A.E. Control Room</span>
+        <h1 className="admin-page-title">
           {title}
         </h1>
         {subtitle && (

@@ -11,6 +11,7 @@ import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/li
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
+import { createInvoiceFromBookingAction } from '@/app/actions/invoices'
 import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import type { BookingLifecycleStatus, BookingStatus, BookingWorkflowPaymentStatus } from '@/types/index'
 
@@ -69,6 +70,12 @@ interface BookingDetailRow {
     created_at: string
     client_id: string
   }> | null
+}
+
+interface BookingInvoiceState {
+  status: 'draft' | 'sent' | 'paid' | 'void'
+  invoice_number: string
+  sent_at: string | null
 }
 
 function inputStyle(): React.CSSProperties {
@@ -157,6 +164,17 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
   return (data as BookingDetailRow | null) ?? null
 }
 
+async function getBookingInvoiceState(id: string): Promise<BookingInvoiceState | null> {
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('invoices')
+    .select('status, invoice_number, sent_at')
+    .eq('booking_id', id)
+    .maybeSingle()
+
+  return (data as BookingInvoiceState | null) ?? null
+}
+
 function getMessage(param: string | string[] | undefined) {
   if (!param) return null
   return Array.isArray(param) ? param[0] ?? null : param
@@ -182,7 +200,10 @@ export default async function EditBookingPage({
 }) {
   const { id } = await params
   const resolvedSearchParams = searchParams ? await searchParams : undefined
-  const booking = await getBooking(id)
+  const [booking, invoiceState] = await Promise.all([
+    getBooking(id),
+    getBookingInvoiceState(id),
+  ])
   if (!booking) notFound()
 
   const errorMessage = getMessage(resolvedSearchParams?.error)
@@ -440,16 +461,35 @@ export default async function EditBookingPage({
           </div>
 
           <div className="admin-form-actions">
-            <Link href={`/admin/bookings/${booking.id}/invoice`} className="admin-btn-primary">
-              Preview Invoice →
-            </Link>
-            <SendInvoiceButton
-              bookingId={booking.id}
-              clientEmail={booking.clients?.email}
-            />
-            <a href={`/api/invoice/${booking.id}`} className="admin-btn-ghost">
-              Download PDF
-            </a>
+            {invoiceState ? (
+              <>
+                <Link href={`/admin/bookings/${booking.id}/invoice`} className="admin-btn-primary">
+                  Open Invoice →
+                </Link>
+                {invoiceState.status !== 'paid' && invoiceState.status !== 'void' && (
+                  <SendInvoiceButton
+                    bookingId={booking.id}
+                    clientEmail={booking.clients?.email}
+                    label={invoiceState.sent_at ? 'Resend Invoice' : 'Send Invoice'}
+                  />
+                )}
+                <a href={`/api/invoice/${booking.id}`} className="admin-btn-ghost">
+                  Download PDF
+                </a>
+              </>
+            ) : (
+              <form action={createInvoiceFromBookingAction}>
+                <input type="hidden" name="booking_id" value={booking.id} />
+                <button
+                  type="submit"
+                  className="admin-btn-primary"
+                  disabled={!booking.quote || booking.quote <= 0 || booking.status === 'cancelled'}
+                  title={!booking.quote || booking.quote <= 0 ? 'Add a quote before creating an invoice.' : undefined}
+                >
+                  Create Invoice
+                </button>
+              </form>
+            )}
           </div>
         </div>
 
@@ -465,6 +505,7 @@ export default async function EditBookingPage({
               { label: 'Balance Due', value: formatCurrency(financials.remainingBalance) },
               { label: 'Payment Status', value: BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS[paymentStatus] },
               { label: 'Lifecycle', value: BOOKING_LIFECYCLE_STATUS_LABELS[lifecycleStatus] },
+              ...(invoiceState ? [{ label: 'Invoice Status', value: invoiceState.status.toUpperCase() }] : []),
             ].map((item) => (
             <div
               key={item.label}
@@ -481,8 +522,12 @@ export default async function EditBookingPage({
                 <Badge variant={paymentStatus} />
               ) : item.label === 'Lifecycle' ? (
                 <Badge variant={lifecycleStatus} label={BOOKING_LIFECYCLE_STATUS_LABELS[lifecycleStatus]} />
+              ) : item.label === 'Invoice Status' && invoiceState ? (
+                <span className={`invoice-status invoice-status--${invoiceState.status}`}>
+                  {invoiceState.status}
+                </span>
               ) : (
-                <div style={{ color: item.label === 'Balance Due' ? 'var(--violet)' : 'var(--white)', fontSize: '18px', fontFamily: 'Conthrax, sans-serif' }}>
+                <div style={{ color: item.label === 'Balance Due' ? 'var(--gold)' : 'var(--white)', fontSize: '18px', fontFamily: 'Conthrax, sans-serif' }}>
                   {item.value}
                 </div>
               )}

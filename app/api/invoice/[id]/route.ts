@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { generateInvoicePdf, invoiceFilename, type InvoiceBookingData } from '@/lib/invoices'
+import { applyInvoiceSnapshot, generateInvoicePdf, invoiceFilename, type InvoiceBookingData, type InvoiceSnapshotData } from '@/lib/invoices'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
 
 export async function GET(
@@ -24,7 +24,8 @@ export async function GET(
     )
   }
 
-  const { data } = await supabase
+  const [{ data }, { data: invoiceData }] = await Promise.all([
+    supabase
     .from('bookings')
     .select(`
       id, event_name, event_type, event_date, event_end_time, event_timezone, venue, city,
@@ -32,7 +33,13 @@ export async function GET(
       clients(first_name, last_name, email, phone)
     `)
     .eq('id', id)
-    .maybeSingle()
+    .maybeSingle(),
+    supabase
+      .from('invoices')
+      .select('invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due')
+      .eq('booking_id', id)
+      .maybeSingle(),
+  ])
 
   const booking = (data as InvoiceBookingData | null) ?? null
 
@@ -40,8 +47,10 @@ export async function GET(
     return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
   }
 
-  const pdfBytes = await generateInvoicePdf(booking)
-  const filename = invoiceFilename(booking)
+  const invoice = (invoiceData as InvoiceSnapshotData | null) ?? null
+  const effectiveBooking = applyInvoiceSnapshot(booking, invoice)
+  const pdfBytes = await generateInvoicePdf(effectiveBooking)
+  const filename = invoice?.pdf_filename || invoiceFilename(effectiveBooking)
 
   return new NextResponse(Buffer.from(pdfBytes), {
     headers: {

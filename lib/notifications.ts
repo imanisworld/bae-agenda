@@ -82,6 +82,7 @@ type InvoiceNotificationPayload = {
   balanceDue: string
   pdfBase64: string
   pdfFilename: string
+  mode?: 'invoice' | 'reminder'
 }
 
 type W9NotificationPayload = {
@@ -695,18 +696,33 @@ export async function sendBookingReviewRequest(payload: BookingReviewRequestPayl
 
 export async function sendInvoiceNotification(payload: InvoiceNotificationPayload) {
   const greetingName = payload.clientName.trim() || 'there'
+  const isReminder = payload.mode === 'reminder'
+  const subject = isReminder
+    ? `Reminder: invoice ${payload.invoiceNumber} from DJ B.A.E.`
+    : `Invoice from DJ B.A.E. for ${payload.eventName}`
+  const heading = isReminder ? 'Friendly invoice reminder' : 'Your invoice is ready'
+  const intro = isReminder
+    ? `Hi ${escapeHtml(greetingName)}, this is a reminder that invoice <strong>#${escapeHtml(payload.invoiceNumber)}</strong> for <strong>${escapeHtml(payload.eventName)}</strong> still has a balance due.`
+    : `Hi ${escapeHtml(greetingName)}, your invoice for <strong>${escapeHtml(payload.eventName)}</strong> is attached to this email.`
+  const closing = isReminder
+    ? 'The current invoice is attached again for convenience. If payment has already been sent, you can ignore this reminder or reply with any questions.'
+    : 'If you have any questions, just reply to this email.'
 
   return sendEmailNotification({
     to: payload.to,
-    subject: `Invoice from DJ B.A.E. for ${payload.eventName}`,
+    subject,
     text: [
       `Hi ${greetingName},`,
       '',
-      `Your invoice for ${payload.eventName} is attached.`,
+      isReminder
+        ? `This is a reminder for invoice #${payload.invoiceNumber} for ${payload.eventName}.`
+        : `Your invoice for ${payload.eventName} is attached.`,
       `Invoice #: ${payload.invoiceNumber}`,
       `Balance due: ${payload.balanceDue}`,
       '',
-      'If you have any questions, just reply to this email.',
+      isReminder
+        ? 'The current invoice is attached again for convenience.'
+        : 'If you have any questions, just reply to this email.',
       '',
       'DJ B.A.E. Bookings',
     ].join('\n'),
@@ -734,7 +750,7 @@ export async function sendInvoiceNotification(payload: InvoiceNotificationPayloa
                             The Bae Agenda
                           </div>
                           <div style="margin-top:8px;font-size:13px;line-height:20px;color:#a1a1aa;">
-                            Culture. Events. Community.
+                            DJ B.A.E. Bookings
                           </div>
                         </td>
                       </tr>
@@ -745,10 +761,10 @@ export async function sendInvoiceNotification(payload: InvoiceNotificationPayloa
                               <tr>
                                 <td style="padding:32px 28px 24px 28px;">
                                   <div style="font-size:22px;font-weight:700;line-height:30px;color:#ffffff;margin:0 0 16px 0;">
-                                    Your invoice is ready
+                                    ${heading}
                                   </div>
                                   <p style="margin:0 0 18px 0;font-size:16px;line-height:26px;color:#e4e4e7;">
-                                    Hi ${escapeHtml(greetingName)}, your invoice for <strong>${escapeHtml(payload.eventName)}</strong> is attached to this email.
+                                    ${intro}
                                   </p>
                                   <table width="100%" border="0" cellpadding="0" cellspacing="0" role="presentation" style="margin:0 0 20px 0;background-color:#101017;border:1px solid #27272f;border-radius:14px;">
                                     <tbody>
@@ -773,7 +789,7 @@ export async function sendInvoiceNotification(payload: InvoiceNotificationPayloa
                                     </tbody>
                                   </table>
                                   <p style="margin:16px 0 0 0;font-size:14px;line-height:24px;color:#a1a1aa;">
-                                    If you have any questions, just reply to this email.
+                                    ${escapeHtml(closing)}
                                   </p>
                                 </td>
                               </tr>
