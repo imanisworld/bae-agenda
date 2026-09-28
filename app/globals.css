@@ -7876,3 +7876,60 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 }
 
+.invoice-payment-panel {
+  margin: 0 0 18px;
+  overflow: hidden;
+}
+
+.invoice-payment-form {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  gap: 16px;
+  padding: 20px;
+}
+
+.invoice-payment-form label {
+  display: grid;
+  gap: 7px;
+}
+
+.invoice-payment-form input,
+.invoice-payment-form select {
+  width: 100%;
+  min-height: 48px;
+  padding: 11px 13px;
+  border: 1px solid rgba(196,165,116,.14);
+  border-radius: 10px;
+  background: #100d0c;
+  color: #f6f1e8;
+  font: 400 13px/1.2 DM Sans, sans-serif;
+  outline: none;
+}
+
+.invoice-payment-form input:focus,
+.invoice-payment-form select:focus {
+  border-color: rgba(196,165,116,.48);
+  box-shadow: 0 0 0 3px rgba(143,45,60,.10);
+}
+
+.invoice-payment-notes,
+.invoice-payment-form .admin-form-actions {
+  grid-column: 1 / -1;
+}
+
+.invoice-payment-form .admin-form-actions {
+  margin-top: 2px;
+}
+
+@media (max-width: 620px) {
+  .invoice-payment-form {
+    grid-template-columns: 1fr;
+    padding: 17px 16px;
+  }
+
+  .invoice-payment-notes,
+  .invoice-payment-form .admin-form-actions {
+    grid-column: auto;
+  }
+}
+
