@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { logError } from '@/lib/monitoring'
 import type { Database } from '@/types/database'
 
 export type Mix = Database['public']['Tables']['mixes']['Row']
@@ -24,6 +25,12 @@ export async function getFeaturedMixes(limit = 3): Promise<Mix[]> {
       return featured
     }
 
+    if (featuredError) {
+      logError('Featured mixes query failed; trying fallback', featuredError, {
+        operation: 'getFeaturedMixes',
+      })
+    }
+
     const { data: fallback, error: fallbackError } = await supabase
       .from('mixes')
       .select('*')
@@ -33,11 +40,15 @@ export async function getFeaturedMixes(limit = 3): Promise<Mix[]> {
       .limit(limit)
 
     if (fallbackError) {
+      logError('Mixes fallback query failed', fallbackError, {
+        operation: 'getFeaturedMixes',
+      })
       return []
     }
 
     return fallback ?? []
-  } catch {
+  } catch (error) {
+    logError('Featured mixes load failed', error, { operation: 'getFeaturedMixes' })
     return []
   }
 }
@@ -56,9 +67,13 @@ export async function getPublishedMixes(limit = 50): Promise<Mix[]> {
       .order('sort_order', { ascending: true })
       .limit(limit)
 
-    if (error) return []
+    if (error) {
+      logError('Published mixes query failed', error, { operation: 'getPublishedMixes' })
+      return []
+    }
     return data ?? []
-  } catch {
+  } catch (error) {
+    logError('Published mixes load failed', error, { operation: 'getPublishedMixes' })
     return []
   }
 }
