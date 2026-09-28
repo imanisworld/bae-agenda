@@ -166,16 +166,7 @@ export default function BookingPricingFields({
           />
         </label>
 
-        <div
-          className="muted"
-          style={{
-            border: '1px solid var(--border)',
-            background: 'var(--bg-sunken)',
-            padding: '12px 14px',
-            fontSize: '12px',
-            lineHeight: 1.7,
-          }}
-        >
+        <div className="admin-pricing-note">
           {hasQuote && hasDeposit ? (
             <>
               Deposit is {formatCurrency(depositValue)}.
