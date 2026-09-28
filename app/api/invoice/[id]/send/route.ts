@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { applyInvoiceSnapshot, balanceDueOf, formatInvoiceDueDate, generateInvoicePdf, invoiceFilename, invoiceNumberOf, type InvoiceBookingData, type InvoiceSnapshotData } from '@/lib/invoices'
+import {
+  DEFAULT_INVOICE_PAYMENT_TERMS,
+  applyInvoiceSnapshot,
+  balanceDueOf,
+  formatInvoiceDueDate,
+  generateInvoicePdf,
+  invoiceFilename,
+  invoiceNumberOf,
+  normalizeInvoiceLineItems,
+  type InvoiceBookingData,
+  type InvoiceSnapshotData,
+} from '@/lib/invoices'
 import { sendInvoiceNotification } from '@/lib/notifications'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
 import { limitInvoiceSend } from '@/lib/ratelimit'
@@ -139,6 +150,12 @@ export async function POST(
   const balance = invoice ? Number(invoice.balance_due ?? 0) : balanceDueOf(effectiveBooking)
   const invoiceNumber = invoice?.invoice_number || invoiceNumberOf(effectiveBooking)
   const pdfFilename = invoice?.pdf_filename || invoiceFilename(effectiveBooking)
+  const lineItems = normalizeInvoiceLineItems(
+    invoice?.line_items,
+    effectiveBooking.event_name ?? 'DJ Services',
+    effectiveBooking.quote ?? 0
+  )
+  const paymentTerms = invoice?.payment_terms?.trim() || DEFAULT_INVOICE_PAYMENT_TERMS
 
   if (mode === 'reminder' && balance <= 0) {
     return NextResponse.json({ error: 'This invoice does not have an outstanding balance.' }, { status: 400 })
@@ -187,6 +204,9 @@ export async function POST(
           total_amount: effectiveBooking.quote ?? 0,
           deposit_amount: effectiveBooking.deposit_amount ?? 0,
           balance_due: balance,
+          due_date: invoice?.due_date ?? null,
+          payment_terms: paymentTerms,
+          line_items: lineItems,
           sent_at: sentAt,
         }, { onConflict: 'booking_id' })
 
