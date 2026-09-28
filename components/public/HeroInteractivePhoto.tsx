@@ -65,7 +65,7 @@ export default function HeroInteractivePhoto() {
           <span className={styles.photoSheen} aria-hidden="true" />
         </span>
 
-        <HangingLogo finish="gold" className={styles.photoTag} />
+        <HangingLogo finish="gold" className={styles.photoTag} edgeClip />
       </span>
     </button>
   )
