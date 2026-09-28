@@ -3,6 +3,7 @@ import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { restoreInvoiceDraftAction, voidInvoiceAction } from '@/app/actions/invoices'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { formatInvoiceDueDate } from '@/lib/invoices'
@@ -40,7 +41,6 @@ function fmtCurrency(value: number) {
   return value.toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
-    maximumFractionDigits: 0,
   })
 }
 
@@ -228,9 +228,12 @@ export default async function InvoicesPage({
                             )}
                             <form action={voidInvoiceAction}>
                               <input type="hidden" name="booking_id" value={invoice.booking_id} />
-                              <button type="submit" className="admin-btn-danger">
+                              <ConfirmSubmitButton
+                                message="Void this invoice? You can restore it later, but it will stop being active."
+                                className="admin-btn-danger"
+                              >
                                 Void
-                              </button>
+                              </ConfirmSubmitButton>
                             </form>
                           </>
                         )}
