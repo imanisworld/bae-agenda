@@ -82,6 +82,7 @@ type InvoiceNotificationPayload = {
   balanceDue: string
   pdfBase64: string
   pdfFilename: string
+  dueDate?: string | null
   mode?: 'invoice' | 'reminder'
 }
 
@@ -719,6 +720,7 @@ export async function sendInvoiceNotification(payload: InvoiceNotificationPayloa
         : `Your invoice for ${payload.eventName} is attached.`,
       `Invoice #: ${payload.invoiceNumber}`,
       `Balance due: ${payload.balanceDue}`,
+      ...(payload.dueDate ? [`Due date: ${payload.dueDate}`] : []),
       '',
       isReminder
         ? 'The current invoice is attached again for convenience.'
@@ -781,11 +783,19 @@ export async function sendInvoiceNotification(payload: InvoiceNotificationPayloa
                                         </td>
                                       </tr>
                                       <tr>
-                                        <td style="padding:8px 18px 18px 18px;">
+                                        <td style="padding:8px 18px ${payload.dueDate ? '8px' : '18px'} 18px;">
                                           <div style="font-size:13px;color:#a1a1aa;margin-bottom:6px;">Balance Due</div>
                                           <div style="font-size:16px;color:#ffffff;font-weight:600;">${escapeHtml(payload.balanceDue)}</div>
                                         </td>
                                       </tr>
+                                      ${payload.dueDate ? `
+                                      <tr>
+                                        <td style="padding:8px 18px 18px 18px;">
+                                          <div style="font-size:13px;color:#a1a1aa;margin-bottom:6px;">Due Date</div>
+                                          <div style="font-size:16px;color:#ffffff;">${escapeHtml(payload.dueDate)}</div>
+                                        </td>
+                                      </tr>
+                                      ` : ''}
                                     </tbody>
                                   </table>
                                   <p style="margin:16px 0 0 0;font-size:14px;line-height:24px;color:#a1a1aa;">
