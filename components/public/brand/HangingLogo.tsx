@@ -13,9 +13,9 @@ const FINISHES = {
 
 export type LogoFinish = keyof typeof FINISHES
 
-type Props = { finish?: LogoFinish; className?: string }
+type Props = { finish?: LogoFinish; className?: string; edgeClip?: boolean }
 
-export function HangingLogo({ finish = 'red', className }: Props) {
+export function HangingLogo({ finish = 'red', className, edgeClip = false }: Props) {
   const tag = FINISHES[finish]
   const [kicked, setKicked] = useState(false)
   const [direction, setDirection] = useState<1 | -1>(1)
@@ -57,6 +57,7 @@ export function HangingLogo({ finish = 'red', className }: Props) {
       aria-hidden="true"
     >
       {copy(styles.back)}
+      {edgeClip ? <span className={styles.edgeOccluder} /> : null}
       {copy(styles.front, true)}
     </span>
   )
@@ -65,8 +66,9 @@ export function HangingLogo({ finish = 'red', className }: Props) {
 export function HangFrom({ children, finish, className }: Props & { children: ReactNode }) {
   return (
     <span className={styles.letter}>
-      {children}
+      <span className={styles.letterBase}>{children}</span>
       <HangingLogo finish={finish} className={`${styles.fromLetter} ${className ?? ''}`} />
+      <span className={styles.letterMask} aria-hidden="true">{children}</span>
     </span>
   )
 }
