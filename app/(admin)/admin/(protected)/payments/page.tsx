@@ -105,21 +105,13 @@ export default async function PaymentsPage() {
           { label: 'Pending',   value: fmtCurrency(totalPending),  color: 'var(--gold)'   },
           { label: 'Refunded',  value: `${refunded.length} items`, color: 'var(--muted)'  },
         ].map(({ label, value, color }) => (
-          <div key={label} style={{
-            background: 'var(--surface)', border: '1px solid var(--border)', padding: '20px 24px',
-          }}>
-            <div style={{
-              fontSize: '9px', letterSpacing: '0.22em', textTransform: 'uppercase',
-              color: 'var(--muted)', marginBottom: '8px',
-            }}>
-              {label}
-            </div>
-            <div style={{
-              fontFamily: 'Conthrax, sans-serif', fontSize: '22px',
-              fontWeight: 600, color, lineHeight: 1,
-            }}>
-              {value}
-            </div>
+          <div
+            key={label}
+            className="admin-money-card"
+            style={{ '--admin-money-color': color } as React.CSSProperties}
+          >
+            <span>{label}</span>
+            <strong>{value}</strong>
           </div>
         ))}
       </div>
