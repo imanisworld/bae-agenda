@@ -7402,3 +7402,65 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 }
 
+.admin-empty-state {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  padding: 52px 28px;
+  text-align: center;
+}
+
+.admin-empty-mark {
+  width: 10px;
+  height: 10px;
+  border: 1px solid rgba(196,165,116,.5);
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgba(196,165,116,.12);
+}
+
+.admin-empty-title {
+  color: rgba(246,241,232,.78);
+  font: 500 10px/1.3 DM Sans, sans-serif;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.admin-empty-state p {
+  max-width: 36ch;
+  margin: 0;
+  color: rgba(246,241,232,.52);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.admin-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  border: 1px solid rgba(232,93,117,.24);
+  border-radius: 11px;
+  background: rgba(232,93,117,.055);
+  color: #ffd0d8;
+}
+
+.admin-notice > span {
+  display: grid;
+  place-items: center;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  border: 1px solid rgba(232,93,117,.34);
+  border-radius: 50%;
+  color: #ff8da0;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.admin-notice p {
+  margin: 1px 0 0;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
