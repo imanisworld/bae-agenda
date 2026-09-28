@@ -113,6 +113,7 @@ export type Database = {
           fully_paid_email_sent_at: string | null
           post_event_follow_up_sent_at: string | null
           review_request_sent_at: string | null
+          submission_key: string | null
           balance_paid_at: string | null
           payment_method: 'cash' | 'venmo' | 'zelle' | 'cash_app' | 'stripe' | 'check' | 'ach' | 'other' | null
           payment_status: 'unpaid' | 'deposit_requested' | 'deposit_paid' | 'balance_requested' | 'paid'
@@ -122,8 +123,8 @@ export type Database = {
           updated_at:     string
         }
         Insert: Omit<Database['public']['Tables']['bookings']['Row'],
-          'id' | 'created_at' | 'updated_at'
-        > & { id?: string }
+          'id' | 'created_at' | 'updated_at' | 'submission_key'
+        > & { id?: string; submission_key?: string | null }
         Update: Partial<Database['public']['Tables']['bookings']['Insert']>
       }
 

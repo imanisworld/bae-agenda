@@ -5,6 +5,7 @@
  * Review submission lives on /connect through ReviewDrawer.
  */
 import { createClient } from '@/lib/supabase/server'
+import { logError } from '@/lib/monitoring'
 
 interface Review {
   id:         string
@@ -17,14 +18,19 @@ interface Review {
 async function getApprovedReviews(): Promise<Review[]> {
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('reviews')
       .select('id, name, event_type, rating, message')
       .eq('approved', true)
       .order('created_at', { ascending: false })
       .limit(6)
+    if (error) {
+      logError('Approved reviews query failed', error, { operation: 'getApprovedReviews' })
+      return []
+    }
     return (data ?? []) as Review[]
-  } catch {
+  } catch (error) {
+    logError('Approved reviews load failed', error, { operation: 'getApprovedReviews' })
     return []
   }
 }

@@ -48,6 +48,25 @@ describe('email notification transport', () => {
     expect(body.reply_to).toBeUndefined()
   })
 
+  it('passes an idempotency key through to Resend', async () => {
+    vi.stubEnv('NEXT_PUBLIC_DEPLOYMENT_ENV', 'production')
+    vi.stubEnv('EMAIL_DELIVERY_MODE', '')
+    vi.stubEnv('RESEND_API_KEY', 'test-key')
+    vi.stubEnv('BOOKING_FROM_EMAIL', 'DJ B.A.E. <bookings@example.com>')
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await expect(sendEmailNotification({
+      ...message,
+      idempotencyKey: 'invoice-invoice-booking-1-attempt-1',
+    })).resolves.toEqual({ ok: true })
+
+    const request = fetchMock.mock.calls[0]
+    expect(request?.[1]?.headers).toMatchObject({
+      'Idempotency-Key': 'invoice-invoice-booking-1-attempt-1',
+    })
+  })
+
   it('keeps the original recipient in production', async () => {
     vi.stubEnv('NEXT_PUBLIC_DEPLOYMENT_ENV', 'production')
     vi.stubEnv('EMAIL_DELIVERY_MODE', '')

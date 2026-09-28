@@ -260,7 +260,11 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
     const draft = readDraft()
     if (!draft) return
 
-    setForm({ ...draft.form, website: '', startedAt: String(Date.now()) })
+    setForm({
+      ...draft.form,
+      website: '',
+      startedAt: draft.form.startedAt || String(Date.now()),
+    })
     setStep(draft.step)
     setDraftRestored(true)
   }, [])

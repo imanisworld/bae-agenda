@@ -56,7 +56,9 @@ async function sendScheduledBalanceReminder(
     return false
   }
 
-  const result = await sendBookingBalanceReminder(payload)
+  const result = await sendBookingBalanceReminder(payload, {
+    idempotencyKey: `booking-balance-reminder-${booking.id}`,
+  })
   if (!result.ok) {
     console.error('[cron-payment-reminders] balance email failed:', booking.id, result.reason, result.detail ?? '')
     return false

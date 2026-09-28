@@ -3,6 +3,7 @@
  * Server-side only. Public read policy covers unauthenticated reads.
  */
 import { createClient } from '@/lib/supabase/server'
+import { logError } from '@/lib/monitoring'
 
 export type ContentItem = {
   id:         string
@@ -65,7 +66,8 @@ export async function getContentMap(
       }
     }
     return map
-  } catch {
+  } catch (error) {
+    logError('Public site content load failed', error, { operation: 'getContentMap' })
     return {}
   }
 }
