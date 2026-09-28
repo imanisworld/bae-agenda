@@ -50,7 +50,14 @@ export default function MeetIdentityHero() {
       <div className={styles.copy}>
         <div className={styles.title}>
           <p>Indianapolis</p>
-          <h1 id="meet-title">Meet<br /> DJ B.A.E.</h1>
+          <div className={styles.titleRow}>
+            <h1 id="meet-title">Meet<br /> DJ B.A.E.</h1>
+            {/* Sits in the open space beside the headline (desktop) or at its end (phones). */}
+            <div className={styles.phone} aria-hidden="true">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/brand/phone-3d.webp" alt="" width={241} height={420} />
+            </div>
+          </div>
         </div>
 
         <div className={styles.details}>
@@ -69,11 +76,6 @@ export default function MeetIdentityHero() {
             <Link href="/press-kit" className="btn-ghost">Open Press Kit</Link>
           </div>
         </div>
-      </div>
-
-      <div className={styles.phone} aria-hidden="true">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/photos/images/phone%203d%20.gif" alt="" />
       </div>
 
       <div className={styles.rule} aria-hidden="true" />
