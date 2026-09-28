@@ -51,6 +51,7 @@ export type Database = {
           event_id:   string
           media_type: 'image' | 'video'
           media_url:  string
+          storage_path: string | null
           poster_url: string | null
           caption:    string | null
           sort_order: number
