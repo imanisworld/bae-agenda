@@ -304,14 +304,16 @@ export default function PlayerProvider({ children }: { children: React.ReactNode
           allow="autoplay"
           tabIndex={-1}
           aria-hidden="true"
+          // Invisible but inside the viewport: browsers throttle off-screen
+          // cross-origin iframes, which can stall playback on phones.
           style={{
             position: 'fixed',
             width: 1,
             height: 1,
-            left: -9999,
+            left: 0,
             bottom: 0,
             border: 0,
-            opacity: 0,
+            opacity: 0.01,
             pointerEvents: 'none',
           }}
         />
