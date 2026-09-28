@@ -43,6 +43,16 @@
   transform-origin: var(--clasp) 0;
 }
 
+.front {
+  pointer-events: auto;
+  touch-action: manipulation;
+  cursor: grab;
+}
+
+.front:active {
+  cursor: grabbing;
+}
+
 .front .logo {
   /* Cut away the gate side of the clasp (right of its slot) so the back copy
      shows it passing behind the stroke; the spine stays in front. */
@@ -62,6 +72,19 @@
 @keyframes hang-swing {
   from { rotate: -4deg; }
   to   { rotate: 4deg; }
+}
+
+.kicked {
+  animation: hang-kick 1.35s cubic-bezier(.18,.76,.2,1) both;
+}
+
+@keyframes hang-kick {
+  0%   { rotate: 0deg; }
+  18%  { rotate: calc(var(--kick-dir) * 22deg); }
+  40%  { rotate: calc(var(--kick-dir) * -13deg); }
+  61%  { rotate: calc(var(--kick-dir) * 8deg); }
+  78%  { rotate: calc(var(--kick-dir) * -4deg); }
+  100% { rotate: 0deg; }
 }
 
 /* ── Hooked on a headline letter ── */
@@ -87,4 +110,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   .swing { animation: none; rotate: -2deg; }
+  .kicked { animation: none; }
 }

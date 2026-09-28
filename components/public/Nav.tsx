@@ -63,6 +63,7 @@ export default function Nav() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch
                 aria-current={active ? 'page' : undefined}
                 aria-label={item.label}
                 className={`${styles.item} ${active ? styles.active : ''}`}

@@ -7,6 +7,8 @@ import { requireAdminUser } from '@/lib/admin-auth'
 import { isValidTimeZone, toEventISO } from '@/lib/date-time'
 import { suggestEventTimeZone } from '@/lib/event-form-options'
 
+const MEDIA_BUCKET = 'site-media'
+
 function redirectWithError(path: string, message: string): never {
   const params = new URLSearchParams({ error: message })
   redirect(`${path}?${params.toString()}`)
@@ -136,9 +138,22 @@ export async function deleteEventAction(formData: FormData) {
   const id = optionalString(formData.get('id'))
   if (!id) redirectWithError('/admin/events', 'Missing event id.')
 
+  const { data: storedMedia } = await admin
+    .from('event_media')
+    .select('storage_path')
+    .eq('event_id', id)
+
   const { error } = await admin.from('events').delete().eq('id', id)
   if (error) {
     redirectWithError('/admin/events', error.message || 'Unable to delete event.')
+  }
+
+  const storagePaths = (storedMedia ?? [])
+    .map((item: { storage_path: string | null }) => item.storage_path)
+    .filter((path): path is string => Boolean(path))
+
+  if (storagePaths.length) {
+    await admin.storage.from(MEDIA_BUCKET).remove(storagePaths)
   }
 
   revalidatePath('/admin/events')
@@ -278,6 +293,13 @@ export async function deleteEventMediaAction(formData: FormData) {
     redirectWithError('/admin/events', 'Missing event media id.')
   }
 
+  const { data: mediaRow } = await admin
+    .from('event_media')
+    .select('storage_path')
+    .eq('id', mediaId)
+    .eq('event_id', eventId)
+    .maybeSingle()
+
   const { error } = await admin
     .from('event_media')
     .delete()
@@ -286,6 +308,10 @@ export async function deleteEventMediaAction(formData: FormData) {
 
   if (error) {
     redirectWithError(`/admin/events/${eventId}`, error.message || 'Unable to delete event media.')
+  }
+
+  if (mediaRow?.storage_path) {
+    await admin.storage.from(MEDIA_BUCKET).remove([mediaRow.storage_path])
   }
 
   revalidatePath(`/admin/events/${eventId}`)
