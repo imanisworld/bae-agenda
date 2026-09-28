@@ -6,6 +6,8 @@ import { createInvoiceFromBookingAction } from '@/app/actions/invoices'
 import { getPrimaryBookingClient } from '@/lib/booking-client'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+export const dynamic = 'force-dynamic'
+
 interface BookingOption {
   id: string
   event_name: string
