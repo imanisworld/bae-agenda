@@ -6114,9 +6114,13 @@ body.has-custom-cursor * { cursor: none !important; }
 
 @media (max-width: 620px) {
   .events-experience {
-    padding-top: 52px;
+    padding-top: 38px;
     padding-bottom: 74px;
-    gap: 10px;
+    gap: 8px;
+  }
+
+  .events-experience-head {
+    row-gap: 12px;
   }
 
   .events-experience-head h1 {
@@ -6287,6 +6291,15 @@ body.has-custom-cursor * { cursor: none !important; }
   letter-spacing: -.02em;
 }
 
+.book-contact-heading {
+  position: relative;
+  padding-bottom: clamp(48px, 5.5vw, 70px);
+}
+
+.book-contact-heading h2 {
+  margin-top: 0;
+}
+
 .book-experience-rail-inner header p {
   color: rgba(246,241,232,.68);
   font-size: 14px;
@@ -6436,10 +6449,16 @@ body.has-custom-cursor * { cursor: none !important; }
 @media (max-width: 620px) {
   .events-experience-head {
     flex-wrap: wrap;
+    align-content: flex-start;
+  }
+
+  .events-experience-head > div:first-child {
+    width: 100%;
   }
 
   .events-experience-tools {
     width: 100%;
+    margin-top: 0;
     justify-content: space-between;
   }
 
