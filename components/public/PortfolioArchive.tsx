@@ -1,16 +1,10 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-
-interface Entry {
-  id:         string
-  event_name: string
-  venue:      string | null
-  city:       string
-  year:       number
-  tags:       string[]
-  featured:   boolean
-}
+import { useMemo, useState } from 'react'
+import type {
+  PortfolioArchiveEntry,
+  PortfolioArchiveMedia,
+} from '@/components/public/PortfolioMediaLightbox'
 
 function TagChip({ label }: { label: string }) {
   return (
@@ -55,10 +49,28 @@ const filterBtnActive: React.CSSProperties = {
 
 const COLLAPSED_YEARS = 3
 
-export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
-  const [city,     setCity]     = useState<string | null>(null)
-  const [tag,      setTag]      = useState<string | null>(null)
+export default function PortfolioArchive({
+  entries,
+  media,
+  onOpenEntry,
+}: {
+  entries: PortfolioArchiveEntry[]
+  media: PortfolioArchiveMedia[]
+  onOpenEntry: (entryId: string) => void
+}) {
+  const [city, setCity] = useState<string | null>(null)
+  const [tag, setTag] = useState<string | null>(null)
   const [expanded, setExpanded] = useState(false)
+
+  const mediaByEntry = useMemo(() => {
+    const grouped = new Map<string, PortfolioArchiveMedia[]>()
+    media.forEach((item) => {
+      const list = grouped.get(item.portfolio_entry_id) ?? []
+      list.push(item)
+      grouped.set(item.portfolio_entry_id, list)
+    })
+    return grouped
+  }, [media])
 
   const cities = useMemo(() => {
     const seen = new Set<string>()
@@ -78,14 +90,13 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
   const filtered = useMemo(() => {
     return entries.filter((e) => {
       if (city && !e.city.startsWith(city)) return false
-      if (tag  && !e.tags.includes(tag))   return false
+      if (tag && !e.tags.includes(tag)) return false
       return true
     })
   }, [entries, city, tag])
 
   const allYears = useMemo(() => {
-    const ys = [...new Set(filtered.map((e) => e.year))].sort((a, b) => b - a)
-    return ys
+    return [...new Set(filtered.map((e) => e.year))].sort((a, b) => b - a)
   }, [filtered])
 
   const hasFilters = city !== null || tag !== null
@@ -94,6 +105,21 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
     if (expanded || hasFilters) return allYears
     return allYears.slice(0, COLLAPSED_YEARS)
   }, [allYears, expanded, hasFilters])
+
+  function mediaPreview(entry: PortfolioArchiveEntry) {
+    if (entry.photo_url) return entry.photo_url
+    const items = mediaByEntry.get(entry.id) ?? []
+    const image = items.find((item) => item.media_type === 'image')
+    if (image) return image.media_url
+    const videoPoster = items.find((item) => item.media_type === 'video' && item.poster_url)
+    return videoPoster?.poster_url ?? null
+  }
+
+  function mediaCount(entry: PortfolioArchiveEntry) {
+    const items = mediaByEntry.get(entry.id) ?? []
+    const coverIsExtra = entry.photo_url && !items.some((item) => item.media_url === entry.photo_url)
+    return items.length + (coverIsExtra ? 1 : 0)
+  }
 
   return (
     <section style={{ marginBottom: '80px' }}>
@@ -113,7 +139,6 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
         </span>
       </div>
 
-      {/* Filter bar */}
       {(cities.length > 1 || tags.length > 0) && (
         <div className="portfolio-filter-bar" style={{
           display: 'flex',
@@ -183,8 +208,7 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
                   paddingBottom: '32px',
                   alignItems: 'start',
                 }}
-                >
-                  {/* Year label */}
+              >
                 <div className="portfolio-year-label" style={{
                   fontFamily: 'Conthrax, sans-serif',
                   fontSize: 'clamp(24px, 3.5vw, 40px)',
@@ -197,70 +221,125 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
                   {year}
                 </div>
 
-                {/* Events list */}
                 <div className="portfolio-year-events" style={{ display: 'grid', gap: '0', minWidth: 0 }}>
-                  {yearEntries.map((entry, i) => (
-                    <div
-                      key={entry.id}
-                      className="portfolio-year-row"
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr auto',
-                        alignItems: 'center',
-                        gap: '16px',
-                        padding: '13px 0',
-                        borderBottom: i < yearEntries.length - 1
-                          ? '1px solid rgba(255,255,255,0.06)'
-                          : 'none',
-                      }}
-                    >
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{
-                          fontSize: 'clamp(13px, 1.8vw, 15px)',
-                          color: entry.featured ? 'var(--white)' : 'rgba(250,248,243,0.82)',
-                          fontWeight: entry.featured ? 500 : 300,
-                          marginBottom: entry.tags.length ? '6px' : 0,
-                          lineHeight: 1.4,
-                          overflowWrap: 'anywhere',
-                        }}>
-                          {entry.event_name}
-                          {entry.featured && (
+                  {yearEntries.map((entry, i) => {
+                    const preview = mediaPreview(entry)
+                    const count = mediaCount(entry)
+                    const hasMedia = count > 0
+
+                    return (
+                      <div
+                        key={entry.id}
+                        className="portfolio-year-row"
+                        style={{
+                          display: 'grid',
+                          gridTemplateColumns: preview ? '68px 1fr auto' : '1fr auto',
+                          alignItems: 'center',
+                          gap: '14px',
+                          padding: '13px 0',
+                          borderBottom: i < yearEntries.length - 1
+                            ? '1px solid rgba(255,255,255,0.06)'
+                            : 'none',
+                        }}
+                      >
+                        {preview ? (
+                          <button
+                            type="button"
+                            onClick={() => onOpenEntry(entry.id)}
+                            aria-label={`Open photos and video for ${entry.event_name}`}
+                            style={{
+                              position: 'relative',
+                              width: '68px',
+                              height: '68px',
+                              overflow: 'hidden',
+                              padding: 0,
+                              border: '1px solid rgba(255,255,255,.12)',
+                              background: '#111',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img
+                              src={preview}
+                              alt=""
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          </button>
+                        ) : null}
+
+                        <button
+                          type="button"
+                          onClick={() => hasMedia && onOpenEntry(entry.id)}
+                          disabled={!hasMedia}
+                          style={{
+                            minWidth: 0,
+                            padding: 0,
+                            border: 0,
+                            background: 'transparent',
+                            color: 'inherit',
+                            textAlign: 'left',
+                            cursor: hasMedia ? 'pointer' : 'default',
+                          }}
+                        >
+                          <div style={{
+                            fontSize: 'clamp(13px, 1.8vw, 15px)',
+                            color: entry.featured ? 'var(--white)' : 'rgba(250,248,243,0.82)',
+                            fontWeight: entry.featured ? 500 : 300,
+                            marginBottom: entry.tags.length ? '6px' : 0,
+                            lineHeight: 1.4,
+                            overflowWrap: 'anywhere',
+                          }}>
+                            {entry.event_name}
+                            {entry.featured && (
+                              <span style={{
+                                marginLeft: '8px',
+                                fontSize: '8px',
+                                letterSpacing: '0.2em',
+                                textTransform: 'uppercase',
+                                color: 'var(--violet)',
+                                verticalAlign: 'middle',
+                              }}>
+                                ★
+                              </span>
+                            )}
+                          </div>
+                          {entry.tags.length > 0 && (
+                            <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
+                              {entry.tags.slice(0, 2).map((t) => (
+                                <TagChip key={t} label={t} />
+                              ))}
+                            </div>
+                          )}
+                          {hasMedia ? (
                             <span style={{
-                              marginLeft: '8px',
-                              fontSize: '8px',
-                              letterSpacing: '0.2em',
+                              display: 'inline-block',
+                              marginTop: '8px',
+                              color: '#c4a574',
+                              fontSize: '9px',
+                              letterSpacing: '.14em',
                               textTransform: 'uppercase',
-                              color: 'var(--violet)',
-                              verticalAlign: 'middle',
                             }}>
-                              ★
+                              View media · {count}
                             </span>
+                          ) : null}
+                        </button>
+
+                        <div className="portfolio-year-meta" style={{ textAlign: 'right', flexShrink: 0, minWidth: 0 }}>
+                          <div style={{ fontSize: '11px', color: 'var(--muted)', overflowWrap: 'anywhere' }}>{entry.city}</div>
+                          {entry.venue && (
+                            <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px', overflowWrap: 'anywhere' }}>
+                              {entry.venue}
+                            </div>
                           )}
                         </div>
-                        {entry.tags.length > 0 && (
-                          <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                            {entry.tags.slice(0, 2).map((t) => (
-                              <TagChip key={t} label={t} />
-                            ))}
-                          </div>
-                        )}
                       </div>
-                      <div className="portfolio-year-meta" style={{ textAlign: 'right', flexShrink: 0, minWidth: 0 }}>
-                        <div style={{ fontSize: '11px', color: 'var(--muted)', overflowWrap: 'anywhere' }}>{entry.city}</div>
-                        {entry.venue && (
-                          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px', overflowWrap: 'anywhere' }}>
-                            {entry.venue}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             )
           })}
 
-          {/* Expand / collapse */}
           {!hasFilters && allYears.length > COLLAPSED_YEARS && (
             <div style={{
               borderTop: '1px solid var(--border)',
@@ -283,18 +362,8 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
                   fontFamily: 'DM Sans, sans-serif',
                   transition: 'color 200ms ease, border-color 200ms ease',
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--white)'
-                  e.currentTarget.style.borderColor = 'rgba(143,45,60,0.5)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--muted)'
-                  e.currentTarget.style.borderColor = 'var(--border)'
-                }}
               >
-                {expanded
-                  ? `Show less ↑`
-                  : `Show all ${filtered.length} events ↓`}
+                {expanded ? 'Show less ↑' : `Show all ${filtered.length} events ↓`}
               </button>
             </div>
           )}
