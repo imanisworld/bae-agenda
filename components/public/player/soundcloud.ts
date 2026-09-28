@@ -52,19 +52,47 @@ export const WIDGET_OPTIONS = {
 const API_SRC = 'https://w.soundcloud.com/player/api.js'
 let apiPromise: Promise<SoundCloudNamespace> | null = null
 
-/** Loads the widget API once and resolves with window.SC. */
+const API_TIMEOUT_MS = 10000
+
+/**
+ * Invisible 1px box that stays INSIDE the viewport. Browsers (iOS Safari in
+ * particular) throttle or stall cross-origin iframes parked off-screen, which
+ * left the Lab stuck loading on phones.
+ */
+export const HIDDEN_FRAME_STYLE =
+  'position:fixed;left:0;bottom:0;width:1px;height:1px;border:0;opacity:0.01;pointer-events:none'
+
+function wait(ms: number) {
+  return new Promise<void>((resolve) => window.setTimeout(resolve, ms))
+}
+
+/** Resolves with `fallback` if `promise` hasn't settled in time — nothing here may hang. */
+function withTimeout<T>(promise: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([promise, wait(ms).then(() => fallback)])
+}
+
+/** Loads the widget API once and resolves with window.SC (rejects after 10s). */
 export function loadSoundCloudApi(): Promise<SoundCloudNamespace> {
   if (typeof window === 'undefined') return Promise.reject(new Error('SoundCloud API is client-only'))
   if (window.SC) return Promise.resolve(window.SC)
   if (!apiPromise) {
-    apiPromise = new Promise((resolve, reject) => {
+    apiPromise = new Promise<SoundCloudNamespace>((resolve, reject) => {
+      const fail = (message: string) => {
+        apiPromise = null
+        reject(new Error(message))
+      }
+      const timer = window.setTimeout(() => fail('SoundCloud API timed out'), API_TIMEOUT_MS)
       const script = document.createElement('script')
       script.src = API_SRC
       script.async = true
-      script.onload = () => (window.SC ? resolve(window.SC) : reject(new Error('SoundCloud API missing')))
+      script.onload = () => {
+        window.clearTimeout(timer)
+        if (window.SC) resolve(window.SC)
+        else fail('SoundCloud API missing')
+      }
       script.onerror = () => {
-        apiPromise = null
-        reject(new Error('SoundCloud API failed to load'))
+        window.clearTimeout(timer)
+        fail('SoundCloud API failed to load')
       }
       document.head.appendChild(script)
     })
@@ -78,32 +106,52 @@ export function widgetSrc(url: string, autoPlay = false) {
   return `https://w.soundcloud.com/player/?${params.toString()}`
 }
 
-function wait(ms: number) {
-  return new Promise((resolve) => window.setTimeout(resolve, ms))
+function titled(sounds: SoundCloudSound[]) {
+  return sounds.filter((sound) => sound.title && sound.permalink_url)
 }
 
-async function readAllSounds(widget: SoundCloudWidget, timeoutMs: number): Promise<SoundCloudSound[]> {
+/**
+ * The widget hands over full details for the first few tracks at once and fills
+ * in the rest a moment later. Poll, reporting each time more tracks arrive, and
+ * stop when every track is in, nothing new shows up for a while, or time runs out.
+ */
+async function readAllSounds(
+  widget: SoundCloudWidget,
+  onProgress: (sounds: SoundCloudSound[]) => void,
+  maxMs = 9000,
+): Promise<SoundCloudSound[]> {
   const started = Date.now()
-  let sounds: SoundCloudSound[] = []
-  while (Date.now() - started < timeoutMs) {
-    sounds = await new Promise<SoundCloudSound[]>((resolve) => widget.getSounds(resolve))
-    if (sounds.length > 0 && sounds.every((sound) => sound.title)) break
-    await wait(700)
+  let best: SoundCloudSound[] = []
+  let lastGrowth = Date.now()
+  while (Date.now() - started < maxMs) {
+    const sounds = await withTimeout(
+      new Promise<SoundCloudSound[]>((resolve) => widget.getSounds(resolve)),
+      3000,
+      [] as SoundCloudSound[],
+    )
+    const ready = titled(sounds)
+    if (ready.length > best.length) {
+      best = ready
+      lastGrowth = Date.now()
+      onProgress(best)
+    }
+    if (sounds.length > 0 && ready.length === sounds.length) break
+    if (best.length > 0 && Date.now() - lastGrowth > 4000) break
+    await wait(600)
   }
-  return sounds.filter((sound) => sound.title && sound.permalink_url)
+  return best
 }
 
 /**
  * Reads every track in each public playlist, using ONE hidden widget that loads
  * the playlists one after another (each widget is ~12 MB of memory, so we never
- * run more than one extra). The widget hands over full details for the first
- * few tracks immediately and fills in the rest a moment later, so we poll until
- * every track has a title (or give up and keep what we have).
+ * run more than one extra). `onPlaylist` fires as tracks arrive, so the Lab can
+ * show a crate before it's complete. Every step has a time limit.
  */
 export async function fetchPlaylists(
   playlistUrls: string[],
   onPlaylist?: (index: number, sounds: SoundCloudSound[]) => void,
-  timeoutMs = 14000,
+  stepTimeoutMs = 10000,
 ): Promise<SoundCloudSound[][]> {
   if (playlistUrls.length === 0) return []
   const SC = await loadSoundCloudApi()
@@ -113,33 +161,39 @@ export async function fetchPlaylists(
   iframe.title = 'SoundCloud playlist loader'
   iframe.setAttribute('aria-hidden', 'true')
   iframe.tabIndex = -1
-  iframe.style.cssText = 'position:fixed;left:-9999px;bottom:0;width:1px;height:1px;border:0;opacity:0;pointer-events:none'
+  iframe.style.cssText = HIDDEN_FRAME_STYLE
   document.body.appendChild(iframe)
 
-  const results: SoundCloudSound[][] = []
+  const results: SoundCloudSound[][] = playlistUrls.map(() => [])
   try {
     const widget = SC.Widget(iframe)
-    const ready = await Promise.race([
+    const ready = await withTimeout(
       new Promise<boolean>((resolve) => widget.bind(readyEvent, () => resolve(true))),
-      wait(timeoutMs).then(() => false),
-    ])
-    if (!ready) return playlistUrls.map(() => [])
+      stepTimeoutMs,
+      false,
+    )
+    if (!ready) return results
     widget.unbind(readyEvent)
-    results.push(await readAllSounds(widget, timeoutMs))
-    onPlaylist?.(0, results[0])
 
-    for (const url of playlistUrls.slice(1)) {
-      const loaded = await Promise.race([
-        new Promise<boolean>((resolve) => widget.load(url, { ...WIDGET_OPTIONS, auto_play: false, callback: () => resolve(true) })),
-        wait(timeoutMs).then(() => false),
-      ])
-      const sounds = loaded ? await readAllSounds(widget, timeoutMs) : []
-      results.push(sounds)
-      onPlaylist?.(results.length - 1, sounds)
+    for (let i = 0; i < playlistUrls.length; i++) {
+      if (i > 0) {
+        const loaded = await withTimeout(
+          new Promise<boolean>((resolve) =>
+            widget.load(playlistUrls[i], { ...WIDGET_OPTIONS, auto_play: false, callback: () => resolve(true) }),
+          ),
+          stepTimeoutMs,
+          false,
+        )
+        if (!loaded) continue
+      }
+      results[i] = await readAllSounds(widget, (sounds) => {
+        results[i] = sounds
+        onPlaylist?.(i, sounds)
+      })
     }
     return results
   } catch {
-    return playlistUrls.map((_, i) => results[i] ?? [])
+    return results
   } finally {
     iframe.remove()
   }
