@@ -226,7 +226,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
           <div className={styles.crateBar}>
             <div className={styles.crateCaption}>
               <small>SoundCloud</small>
-              <strong>Pulling the crates…</strong>
+              <strong>Loading mixes…</strong>
             </div>
           </div>
         </div>
@@ -239,8 +239,8 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
       <section className={styles.station} aria-label="B.A.E. listening station">
         {header}
         <div className={styles.empty}>
-          <span>Archive empty</span>
-          <h2>New mixes will land here.</h2>
+          <span>Nothing here yet</span>
+          <h2>New mixes will show up here.</h2>
           <a href={SOUNDCLOUD_PROFILE} target="_blank" rel="noopener noreferrer">Follow on SoundCloud →</a>
         </div>
       </section>

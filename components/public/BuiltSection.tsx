@@ -19,32 +19,32 @@ const STACK = [
   {
     category: 'Framework',
     name:     'Next.js 16',
-    desc:     'App Router, Server Components, and Server Actions. Zero client-side waterfall.',
+    desc:     'App Router, server-rendered pages, and Server Actions.',
   },
   {
     category: 'Language',
     name:     'TypeScript',
-    desc:     'End-to-end type safety from the database schema to the UI layer.',
+    desc:     'Keeps data shapes and UI code consistent as the project grows.',
   },
   {
     category: 'Database',
     name:     'Supabase',
-    desc:     'PostgreSQL with Row Level Security. Auth, storage, and real-time built in.',
+    desc:     'PostgreSQL with Row Level Security, authentication, and storage.',
   },
   {
     category: 'Styling',
     name:     'Tailwind v4',
-    desc:     'CSS-first config via @theme. Custom design tokens. Zero runtime overhead.',
+    desc:     'CSS-first styling with shared design tokens.',
   },
   {
     category: 'Deployment',
     name:     'Vercel',
-    desc:     'Edge-optimized. Automatic previews, CI/CD pipeline, and custom domain.',
+    desc:     'Preview deployments, production hosting, and custom domains.',
   },
   {
     category: 'Tooling',
     name:     'VS Code + Claude',
-    desc:     'Developed locally with AI pair programming. Clean, production-ready architecture.',
+    desc:     'Built locally with AI-assisted development and reviewed before deployment.',
   },
 ] as const
 
@@ -118,8 +118,7 @@ export default function BuiltSection({ aboutQuote }: Props) {
               </h2>
 
               <p className="build-console-body">
-                This site was designed and developed by the same person behind the
-                music. No templates. No drag-and-drop builders.
+                I designed and built this site myself. No template, no drag-and-drop builder.
               </p>
 
               {bio && (

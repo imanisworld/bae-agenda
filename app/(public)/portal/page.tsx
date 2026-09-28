@@ -110,7 +110,7 @@ export default async function PortalHomePage() {
 
         {bookings.length === 0 ? (
           <div style={{ border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '24px', color: 'var(--muted)', fontSize: '14px', lineHeight: 1.7 }}>
-            We couldn&apos;t find any bookings on this account yet. If you think that&apos;s a mismatch, contact the DJ B.A.E. team and we&apos;ll help link the right number.
+            No bookings are linked to this account yet. If that looks wrong, contact me and I&apos;ll help match the right number.
           </div>
         ) : (
           <div style={{ display: 'grid', gap: '16px' }}>

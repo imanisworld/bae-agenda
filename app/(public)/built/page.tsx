@@ -101,10 +101,10 @@ export default async function BuiltPage() {
               <span style={{ color: 'var(--amber)' }}>Scratch.</span>
             </h1>
             <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '8px' }}>
-              Designed and engineered for artists, DJs, promoters, and creative businesses that need more than a basic brochure site.
+              Custom websites and booking systems for artists, DJs, promoters, and creative businesses that need more than a template.
             </p>
             <p style={{ fontSize: '15px', color: 'var(--amber)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '28px', fontWeight: 500 }}>
-              Projects can include public pages, booking flows, content management, and admin tools.
+              That can mean a public site, booking flow, admin tools, content management, or all of it together.
             </p>
             <div className="built-page-hero-actions" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <a href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`} className="btn-primary">
@@ -152,7 +152,7 @@ export default async function BuiltPage() {
             <span style={{ color: 'var(--amber)' }}>Promoters & Venues.</span>
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8, maxWidth: '560px', marginBottom: '32px' }}>
-            The goal is a site that fits the business instead of forcing the business into a preset layout. Hosting and third-party services may still have their own costs.
+            The site should fit the business—not the other way around. Hosting and third-party services may have their own costs.
           </p>
 
           <div style={{
@@ -226,7 +226,7 @@ export default async function BuiltPage() {
               href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`}
               style={{ color: 'var(--amber)', textDecoration: 'underline' }}
             >
-              Send the details and we&apos;ll figure it out together.
+              Send the details and I&apos;ll help you scope it.
             </a>
           </p>
         </section>
@@ -247,9 +247,8 @@ export default async function BuiltPage() {
             <strong style={{ color: 'var(--amber)', fontFamily: 'Conthrax, sans-serif', fontSize: '0.85em' }}>
               You&apos;re looking at the demo.
             </strong>{' '}
-            The Bae Agenda is a live, production system handling real bookings, real events,
-            and real data. Every feature on this page was built for this site first —
-            then made available for yours.
+            The Bae Agenda runs my real bookings, events, and content. I built these tools
+            for this site first, then adapted the same approach for client work.
           </p>
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <a href={`mailto:${WEB_INQUIRY_EMAIL}?subject=Web Build Inquiry`} className="btn-primary">
@@ -283,8 +282,8 @@ export default async function BuiltPage() {
             Maintenance &amp; Growth
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.8 }}>
-            Sites need updates. Features get added. Things break. A monthly retainer keeps your site
-            moving without the back-and-forth of a new project every time.
+            Sites change after launch. I offer a monthly retainer for updates, new features,
+            fixes, and the small stuff that comes up over time.
           </p>
           <p style={{
             fontFamily: 'Conthrax, sans-serif',
@@ -299,7 +298,7 @@ export default async function BuiltPage() {
               className="btn-ghost"
               style={{ display: 'inline-flex' }}
             >
-              Ask about retainer →
+              Ask about a retainer →
             </a>
           </div>
         </section>
@@ -315,11 +314,11 @@ export default async function BuiltPage() {
               },
               {
                 q: 'Do I need to provide content?',
-                a: 'Yes — copy, images, and brand assets come from you. We build the system that presents them.',
+                a: 'Yes. You provide the copy, images, and brand assets; I build the site around them.',
               },
               {
                 q: 'Do you work remotely?',
-                a: '100% remote. No location requirement. Communication happens over email and video calls.',
+                a: 'Yes. I work remotely, so email and video calls are enough.',
               },
               {
                 q: 'How many revisions are included?',
@@ -327,11 +326,11 @@ export default async function BuiltPage() {
               },
               {
                 q: 'I\'m already on GoDaddy or Wix — can I keep my domain?',
-                a: 'Yes. Your domain transfers over. We handle the DNS pointing and setup.',
+                a: 'Yes. You can keep your domain; I’ll handle the DNS setup when it is time to launch.',
               },
               {
                 q: 'What happens after the site launches?',
-                a: 'You own the code. A monthly retainer is available if you want ongoing updates and support.',
+                a: 'You own the code. If you want ongoing updates or support, a monthly retainer is available.',
               },
             ].map(({ q, a }) => (
               <div key={q} style={{

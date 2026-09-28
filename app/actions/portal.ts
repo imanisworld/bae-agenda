@@ -61,7 +61,7 @@ export async function verifyPortalCodeAction(formData: FormData) {
   const normalizedPhone = normalizePortalPhone(rawPhone)
 
   if (!normalizedPhone || rawCode.length !== 6) {
-    redirect(`/portal/verify?phone=${encodeURIComponent(rawPhone)}&error=${encodeURIComponent('Enter the 6-digit code we texted you.')}`)
+    redirect(`/portal/verify?phone=${encodeURIComponent(rawPhone)}&error=${encodeURIComponent('Enter the 6-digit code sent by text.')}`)
   }
 
   const headerStore = await headers()
@@ -78,7 +78,7 @@ export async function verifyPortalCodeAction(formData: FormData) {
     }
   } catch (error) {
     console.error('[portal-verify-code]', error)
-    redirect(`/portal/verify?phone=${encodeURIComponent(normalizedPhone)}&error=${encodeURIComponent('We could not complete sign-in. Please try again.')}`)
+    redirect(`/portal/verify?phone=${encodeURIComponent(normalizedPhone)}&error=${encodeURIComponent('Sign-in could not be completed. Please try again.')}`)
   }
 
   redirect('/portal')
@@ -109,11 +109,11 @@ export async function submitPortalBookingRequestAction(formData: FormData) {
   }
 
   if (!['phone', 'email'].includes(preferredContact)) {
-    redirect(`/portal/bookings/${bookingId}?request_error=${encodeURIComponent('Choose how you want the team to follow up.')}`)
+    redirect(`/portal/bookings/${bookingId}?request_error=${encodeURIComponent('Choose how you want me to follow up.')}`)
   }
 
   if (message.length < 12) {
-    redirect(`/portal/bookings/${bookingId}?request_error=${encodeURIComponent('Add a little more detail so the team knows how to help.')}`)
+    redirect(`/portal/bookings/${bookingId}?request_error=${encodeURIComponent('Add a little more detail so I know how to help.')}`)
   }
 
   const headerStore = await headers()
@@ -146,7 +146,7 @@ export async function submitPortalBookingRequestAction(formData: FormData) {
 
   if (requestInsert.error) {
     console.error('[portal-booking-request]', requestInsert.error.message)
-    redirect(`/portal/bookings/${bookingId}?request_error=${encodeURIComponent('We could not send your request right now. Please try again.')}`)
+    redirect(`/portal/bookings/${bookingId}?request_error=${encodeURIComponent('Your request could not be sent right now. Please try again.')}`)
   }
 
   const noteBody = [
@@ -168,5 +168,5 @@ export async function submitPortalBookingRequestAction(formData: FormData) {
     console.error('[portal-booking-request-note]', noteInsert.error.message)
   }
 
-  redirect(`/portal/bookings/${bookingId}?request_success=${encodeURIComponent('Your request was sent to the DJ B.A.E. team.')}`)
+  redirect(`/portal/bookings/${bookingId}?request_success=${encodeURIComponent('Your request was sent.')}`)
 }

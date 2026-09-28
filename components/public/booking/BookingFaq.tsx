@@ -9,32 +9,32 @@ export const BOOKING_FAQ = [
   {
     question: 'How far in advance should I book?',
     answer:
-      'As early as you can — weekend and holiday dates go first. That said, the form checks the calendar in real time, so if your date is close, send it anyway and you will get a straight answer on availability.',
+      'As early as you can — weekend and holiday dates go first. If your date is coming up soon, send it anyway; the form checks the calendar in real time.',
   },
   {
     question: 'What happens after I send the inquiry?',
     answer:
-      'You get a personal reply with availability and a custom quote for your event. Submitting the form does not charge you or reserve the date; it starts the conversation.',
+      'I’ll reply with availability and a quote based on your event. Sending the form does not charge you or hold the date; it just gets the conversation started.',
   },
   {
     question: 'How does payment work?',
     answer:
-      'Once details are confirmed, a deposit secures your date and the remaining balance is due before the event. Invoices arrive by email, and you can track everything — deposit, balance, receipts — in the client portal.',
+      'Once the details are confirmed, a deposit holds your date. The remaining balance is due before the event. Invoices come by email, and the client portal keeps your deposit, balance, and receipts in one place.',
   },
   {
     question: 'What kinds of events do you play?',
     answer:
-      'Weddings, private parties, corporate events, club nights, brand activations, and festivals — from intimate gatherings to large-scale productions.',
+      'Weddings, private parties, corporate events, club nights, brand activations, festivals, and everything in between.',
   },
   {
     question: 'Do you travel?',
     answer:
-      'Based in Indianapolis with roots in Chicago, and available for travel. Put your city in the request and travel gets factored into the quote.',
+      'Yes. I’m based in Indianapolis with roots in Chicago, and I travel. Add your city to the request and I’ll include travel in the quote.',
   },
   {
     question: 'Can you play my must-have songs?',
     answer:
-      'Yes — the whole point is a set built for your room. Open format across house, hip hop, R&B, Latin, soca, jungle, juke, ballroom, and more, with room for your must-plays and do-not-plays.',
+      'Absolutely. Send your must-plays and do-not-plays. I work open-format across house, hip-hop, R&B, Latin, soca, jungle, juke, ballroom, and more, then shape the set around the room.',
   },
 ] as const
 

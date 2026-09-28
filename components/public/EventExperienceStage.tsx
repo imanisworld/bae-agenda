@@ -70,7 +70,7 @@ export default function EventExperienceStage({
     <section className="events-experience" aria-labelledby="events-stage-title">
       <div className="events-experience-head">
         <div>
-          <span className="section-label">{isPast ? 'Archive' : 'Future Dates'}</span>
+          <span className="section-label">{isPast ? 'Past Events' : 'Coming Up'}</span>
           <h1 id="events-stage-title">{isPast ? 'Past ' : 'Upcoming '}<HangFrom finish="silver">E</HangFrom>vents</h1>
         </div>
         <div className="events-experience-tools">
@@ -99,7 +99,7 @@ export default function EventExperienceStage({
               >→</button>
             </div>
           ) : null}
-          <Link href="/book" className="btn-ghost">Book a date</Link>
+          <Link href="/book" className="btn-ghost">Book DJ B.A.E.</Link>
         </div>
       </div>
 
@@ -130,8 +130,8 @@ export default function EventExperienceStage({
           </div>
         ) : (
           <div className="events-experience-empty">
-            <span className="section-label">No Public Dates Posted</span>
-            <h2>The next room is loading.</h2>
+            <span className="section-label">No dates posted</span>
+            <h2>Nothing on the calendar right now.</h2>
             <Link href="/book" className="btn-primary">Book DJ B.A.E.</Link>
           </div>
         )}

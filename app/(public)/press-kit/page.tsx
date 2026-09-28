@@ -10,13 +10,12 @@ export const metadata: Metadata = {
   alternates: {
     canonical: '/press-kit',
   },
-  description: 'Printable press kit generated from the current site content and showcase data.',
+  description: 'DJ B.A.E. press kit with artist bio, booking information, and selected work.',
 }
 
 const CONTENT_KEYS = [
   'hero_title',
   'hero_subtitle',
-  'about_quote',
   'booking_email',
   'instagram_url',
   'soundcloud_url',
@@ -38,8 +37,8 @@ export default async function PressKitPage() {
   const content = await getContentMap([...CONTENT_KEYS])
 
   const title = content.hero_title ?? 'THE BAE AGENDA'
-  const subtitle = content.hero_subtitle ?? 'Private events, club nights, weddings & branded experiences.'
-  const about = content.about_quote ?? 'From the South Side of Chicago, DJ B.A.E. brings a sound shaped by genre-defying curiosity. Her artistic journey deepened during her years in Boston, where the intersection of visual art and music helped ignite her creative fire. Now based in Indianapolis, DJ B.A.E. is known for genre-fluid sets that move between hip-hop, R&B, bass, house, juke, ATL bass, Jersey and Baltimore club, jungle, baile, and underground edits with intention and cultural awareness.'
+  const subtitle = content.hero_subtitle ?? 'Open-format DJ based in Indianapolis, with roots in Chicago.'
+  const about = 'From Chicago’s South Side and now based in Indianapolis, DJ B.A.E. is an open-format DJ shaped by music, visual art, and years spent around different scenes, including time in Boston. Her sets move through hip-hop, R&B, house, juke, club, jungle, bass, baile, and underground edits with a simple approach: read the room, respect the music, and make every transition make sense.'
   const bookingEmail = content.booking_email ?? ''
 
   return (
@@ -176,7 +175,7 @@ export default async function PressKitPage() {
                 {about}
               </p>
               <p style={{ fontSize: '12px', lineHeight: 1.6, margin: 0, color: '#444' }}>
-                Available for club nights, private events, weddings, branded activations, and curated experiences built around room energy and clean execution.
+                Available for club nights, private events, weddings, brand activations, and other events that need a set tailored to the room.
               </p>
             </section>
 

@@ -466,7 +466,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
         const result = await res.json() as CheckResult
 
         if (!res.ok) {
-          setAvailabilityError(result.error ?? 'We could not verify availability right now. Please try again.')
+          setAvailabilityError(result.error ?? 'Availability could not be verified right now. Please try again.')
           setCheckingAvailability(false)
           return
         }
@@ -480,7 +480,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
           setAvailabilityError(
             result.hasTime
               ? `That time is no longer available. Please choose another time. Current conflicts: ${names}.`
-              : `There are already events scheduled that day: ${names}. Add a start time so we can check availability more accurately.`
+              : `There are already events scheduled that day: ${names}. Add a start time for a more precise availability check.`
           )
           setCheckingAvailability(false)
           return
@@ -810,7 +810,7 @@ function BookingSuccess({ summary, embedded = false }: { summary: BookingSuccess
             <div className="section-label" style={{ marginBottom: '10px' }}>Inquiry Sent</div>
             <h1 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(24px, 3.3vw, 38px)', fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: 'var(--white)', margin: 0 }}>Request Received</h1>
             <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.75, margin: '16px 0 0' }}>
-              We&apos;ll review your details and reach back within 24–48 hours. Keep an eye on <span style={{ color: 'var(--white)' }}>{summary?.email || 'your inbox'}</span> for the first follow-up.
+              I&apos;ll review the details and reply within 24–48 hours. Keep an eye on <span style={{ color: 'var(--white)' }}>{summary?.email || 'your inbox'}</span> for the first follow-up.
             </p>
           </div>
 
@@ -854,13 +854,13 @@ function BookingSuccess({ summary, embedded = false }: { summary: BookingSuccess
               What Happens Next
             </div>
             <div style={{ fontSize: '14px', lineHeight: 1.75, color: 'rgba(250,248,243,0.76)' }}>
-              We review availability, format, and event fit first. If it looks like a match, the next email will cover follow-up questions, pricing clarity, and what it takes to lock the date in.
+              I review availability, format, and event fit first. If it looks like a match, I&apos;ll email you with follow-up questions, pricing, and what it takes to hold the date.
             </div>
           </div>
 
           <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <Link href="/" className="btn-ghost">Back to homepage</Link>
-            <Link href="/portfolio" className="btn-primary">See Recent Events →</Link>
+            <Link href="/portfolio" className="btn-primary">See Past Work →</Link>
           </div>
         </div>
       </div>
@@ -1042,7 +1042,7 @@ function EventStep({
           </div>
         </div>
         <span style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.6 }}>
-          Past dates and dates already used in bookings or admin events are unavailable.
+          Past dates and dates already booked or on my calendar are unavailable.
         </span>
         {loadingBlockedDates && <span style={{ fontSize: '13px', color: 'var(--muted)' }}>Loading unavailable dates…</span>}
         {blockedDatesError && <span style={fieldErrorStyle()}>{blockedDatesError}</span>}
@@ -1269,7 +1269,7 @@ function DetailsStep({
           style={inputStyle()}
         />
         <span style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.6 }}>
-          Type any city. The list is a shortcut.
+          Start typing; the list is just a shortcut.
         </span>
       </label>
 
@@ -1332,7 +1332,7 @@ function DetailsStep({
             ) : matchedPkg === undefined && form.package ? (
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', fontSize: '15px' }}>
                 <span style={{ color: 'var(--muted)' }}>Rate</span>
-                <span style={{ color: 'var(--muted)' }}>Custom — we&apos;ll follow up</span>
+                <span style={{ color: 'var(--muted)' }}>Custom — I&apos;ll follow up</span>
               </div>
             ) : null}
           </div>

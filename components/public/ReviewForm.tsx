@@ -205,7 +205,7 @@ export default function ReviewForm({ compact = false }: { compact?: boolean }) {
           required
           rows={compact ? 3 : 4}
           style={{ ...inputStyle, resize: 'vertical', lineHeight: 1.7 }}
-          placeholder="Tell us about your experience…"
+          placeholder="Tell me about your experience…"
         />
       </div>
 

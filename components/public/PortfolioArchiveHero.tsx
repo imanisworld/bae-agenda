@@ -37,12 +37,12 @@ export default function PortfolioArchiveHero({
       <div className={styles.copy}>
         <span>Portfolio</span>
         <h1 id="portfolio-title">Past<br />work.</h1>
-        <p>Rooms, crowds, and moments collected across the archive.</p>
+        <p>A look back at the rooms, crowds, and events along the way.</p>
         <div className={styles.actions}>
           {onExplore ? (
-            <button id="portfolio-explore-archive" type="button" className="btn-ghost" onClick={onExplore}>Explore the archive</button>
+            <button id="portfolio-explore-archive" type="button" className={`btn-ghost ${styles.archive}`} onClick={onExplore}>See the full archive</button>
           ) : (
-            <Link href="#archive" className="btn-ghost">Explore the archive</Link>
+            <Link href="#archive" className={`btn-ghost ${styles.archive}`}>See the full archive</Link>
           )}
           {instagramUrl ? (
             <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className={styles.instagram}>
