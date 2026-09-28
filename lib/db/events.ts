@@ -10,7 +10,13 @@ import { getEventCandidateFloorIso, isUpcomingEventRecord } from '@/lib/event-sc
 import type { Database } from '@/types/database'
 
 type EventRow = Database['public']['Tables']['events']['Row']
+type EventMediaRow = Database['public']['Tables']['event_media']['Row']
+
 export type Event = Omit<EventRow, 'booking_id'>
+export type EventMedia = Pick<
+  EventMediaRow,
+  'id' | 'event_id' | 'media_type' | 'media_url' | 'poster_url' | 'caption' | 'sort_order'
+>
 
 const PUBLIC_EVENT_COLUMNS =
   'id,title,slug,event_date,event_timezone,venue,city,description,public,featured,show_description,created_at,updated_at' as const
@@ -77,6 +83,35 @@ export async function getPastEvents(limit = 20): Promise<Event[]> {
     return ((data ?? []) as Event[]).filter((event) => !isUpcomingEventRecord(event, now)).slice(0, limit)
   } catch (err) {
     console.error('[getPastEvents] unexpected error:', err)
+    return []
+  }
+}
+
+/**
+ * Public photo/video records for event archive galleries.
+ */
+export async function getPublicEventMedia(eventIds: string[]): Promise<EventMedia[]> {
+  const uniqueIds = [...new Set(eventIds.filter(Boolean))]
+  if (uniqueIds.length === 0) return []
+
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('event_media')
+      .select('id,event_id,media_type,media_url,poster_url,caption,sort_order')
+      .in('event_id', uniqueIds)
+      .eq('public', true)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true })
+
+    if (error) {
+      console.error('[getPublicEventMedia] unable to load media:', error.message)
+      return []
+    }
+
+    return (data ?? []) as EventMedia[]
+  } catch (err) {
+    console.error('[getPublicEventMedia] unexpected error:', err)
     return []
   }
 }
