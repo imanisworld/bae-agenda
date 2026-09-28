@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deleteMixAction, updateMixAction } from '@/app/actions/mixes'
 
@@ -135,8 +136,8 @@ export default async function EditMixPage({
 
       <form action={deleteMixAction}>
         <input type="hidden" name="id" value={mix.id} />
-        <button
-          type="submit"
+        <ConfirmSubmitButton
+          message="Delete this mix? This cannot be undone."
           className="admin-btn-ghost"
           style={{
             color: '#e85d75',
@@ -144,7 +145,7 @@ export default async function EditMixPage({
           }}
         >
           Delete Mix
-        </button>
+        </ConfirmSubmitButton>
       </form>
     </div>
   )
