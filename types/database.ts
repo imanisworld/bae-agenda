@@ -191,6 +191,9 @@ export type Database = {
           total_amount: number
           deposit_amount: number
           balance_due: number
+          due_date: string | null
+          payment_terms: string
+          line_items: Json
           sent_at: string | null
           created_at: string
           updated_at: string
