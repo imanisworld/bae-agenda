@@ -1,4 +1,5 @@
 import ReviewDrawer from '@/components/public/ReviewDrawer'
+import { HangingLogo } from '@/components/public/brand/HangingLogo'
 import { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
 import { SOCIALS } from '@/lib/constants'
 import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
@@ -22,8 +23,8 @@ export default async function BookExperienceRail() {
     <div className="book-experience-rail-inner">
       <header>
         <span>Contact</span>
-        <h2>Prefer email or DM?</h2>
-        <p>That works too. Quick answers are below.</p>
+        <h2>Contact DJ B.A.E.</h2>
+        <HangingLogo finish="gold" className="book-experience-contact-logo" />
       </header>
 
       <div className="book-experience-contact">
