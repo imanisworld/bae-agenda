@@ -2,6 +2,7 @@
  * ADMIN — PAYMENTS
  * Full payments table grouped by status. Data fetched server-side.
  */
+import type { CSSProperties } from 'react'
 import PageHeader      from '@/components/admin/PageHeader'
 import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
@@ -108,7 +109,7 @@ export default async function PaymentsPage() {
           <div
             key={label}
             className="admin-money-card"
-            style={{ '--admin-money-color': color } as React.CSSProperties}
+            style={{ '--admin-money-color': color } as CSSProperties}
           >
             <span>{label}</span>
             <strong>{value}</strong>
