@@ -66,8 +66,13 @@ async function getBookingDepositCheckoutSource(bookingId: string) {
 
 export async function startStripeDepositCheckoutAction(formData: FormData) {
   const bookingId = optionalString(formData.get('booking_id'))
+  const checkoutAttemptId = optionalString(formData.get('checkout_attempt_id'))
   if (!bookingId) {
     redirect('/book')
+  }
+
+  if (!checkoutAttemptId || !/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(checkoutAttemptId)) {
+    redirectToPay(bookingId as string, 'Refresh the page and try Stripe Checkout again.')
   }
 
   const loaded = await getBookingDepositCheckoutSource(bookingId as string)
@@ -120,6 +125,8 @@ export async function startStripeDepositCheckoutAction(formData: FormData) {
           },
         },
       ],
+    }, {
+      idempotencyKey: `deposit-checkout:${bookingId}:${checkoutAttemptId}`,
     })
 
     await updateBookingDepositCheckoutSnapshot(admin, bookingId as string, session.id)
