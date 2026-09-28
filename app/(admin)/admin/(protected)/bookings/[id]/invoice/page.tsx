@@ -4,8 +4,10 @@ import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import PageHeader from '@/components/admin/PageHeader'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import { createInvoiceFromBookingAction, restoreInvoiceDraftAction, voidInvoiceAction } from '@/app/actions/invoices'
+import { createBookingPaymentAction } from '@/app/actions/bookings'
 import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
 import { applyInvoiceSnapshot, type InvoiceSnapshotData } from '@/lib/invoices'
+import { PAYMENT_METHODS } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
 
@@ -279,6 +281,65 @@ export default async function InvoicePage({
           Balance due on or before the event date. All sales final.
         </div>
       </div>
+
+      {invoiceState && invoiceState.status !== 'paid' && invoiceState.status !== 'void' && balance > 0 && (
+        <section className="admin-section invoice-payment-panel">
+          <div className="admin-section-header">
+            <span className="admin-section-title">Record Payment</span>
+            <span className="invoice-balance-due">{fmt(balance)} remaining</span>
+          </div>
+
+          <form action={createBookingPaymentAction} className="invoice-payment-form">
+            <input type="hidden" name="booking_id" value={id} />
+            <input type="hidden" name="type" value="balance" />
+            <input type="hidden" name="status" value="received" />
+            <input type="hidden" name="return_to" value={`/admin/bookings/${id}/invoice`} />
+
+            <label>
+              <span className="admin-field-label">Amount Received</span>
+              <input
+                name="amount"
+                type="number"
+                min="0.01"
+                max={balance}
+                step="0.01"
+                defaultValue={balance.toFixed(2)}
+                required
+              />
+            </label>
+
+            <label>
+              <span className="admin-field-label">Method</span>
+              <select name="method" defaultValue="">
+                <option value="">Not specified</option>
+                {PAYMENT_METHODS.map((method) => (
+                  <option key={method} value={method}>
+                    {method === 'cash_app'
+                      ? 'Cash App'
+                      : method === 'ach'
+                        ? 'ACH'
+                        : method.charAt(0).toUpperCase() + method.slice(1)}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="invoice-payment-notes">
+              <span className="admin-field-label">Internal Note</span>
+              <input
+                name="notes"
+                placeholder="Optional payment note or reference"
+              />
+            </label>
+
+            <div className="admin-form-actions">
+              <button type="submit" className="admin-btn-primary">
+                Record Payment
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
 
       {/* Actions */}
       <div className="admin-form-actions">
