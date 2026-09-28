@@ -24,10 +24,12 @@ export default function PortfolioExperienceStage({
   prints,
   entries,
   stats,
+  instagramUrl,
 }: {
   prints: ArchivePrint[]
   entries: ArchiveEntry[]
   stats: PortfolioStats
+  instagramUrl?: string
 }) {
   const [archiveOpen, setArchiveOpen] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
@@ -52,7 +54,7 @@ export default function PortfolioExperienceStage({
 
   return (
     <section className="portfolio-experience" aria-label="Portfolio and past work">
-      <PortfolioArchiveHero prints={prints} onExplore={() => setArchiveOpen(true)} />
+      <PortfolioArchiveHero prints={prints} onExplore={() => setArchiveOpen(true)} instagramUrl={instagramUrl} />
 
       <div className="portfolio-experience-stats" aria-label="Portfolio summary">
         <span><strong>{stats.total || '—'}</strong> events</span>

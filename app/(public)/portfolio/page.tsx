@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { getPortfolioEntries, getFeaturedPortfolioEntries, getPortfolioStats } from '@/app/actions/portfolio'
 import PortfolioExperienceStage from '@/components/public/PortfolioExperienceStage'
+import { SOCIALS } from '@/lib/constants'
+import { getContentMap } from '@/lib/db/content'
 
 export const metadata: Metadata = {
   title: 'Portfolio | DJ BAE Gig History — Indianapolis & Chicago',
@@ -14,11 +16,14 @@ export const metadata: Metadata = {
 }
 
 export default async function PortfolioPage() {
-  const [entries, featured, stats] = await Promise.all([
+  const [entries, featured, stats, content] = await Promise.all([
     getPortfolioEntries(),
     getFeaturedPortfolioEntries(),
     getPortfolioStats(),
+    getContentMap(['instagram_url']),
   ])
+  const instagramUrl =
+    content.instagram_url || SOCIALS.find((social) => social.label === 'Instagram')!.url
 
   const featuredWithPhotos = featured.filter((entry) => Boolean(entry.photo_url))
   const featuredIds = new Set(featuredWithPhotos.map((entry) => entry.id))
@@ -45,6 +50,7 @@ export default async function PortfolioPage() {
         featured: entry.featured,
       }))}
       stats={stats}
+      instagramUrl={instagramUrl}
     />
   )
 }
