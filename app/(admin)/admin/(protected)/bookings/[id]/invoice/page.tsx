@@ -304,6 +304,15 @@ export default async function InvoicePage({
                 label={invoiceState.sent_at ? 'Resend Invoice' : 'Send Invoice Email'}
               />
             )}
+            {invoiceState.status === 'sent' && balance > 0 && (
+              <SendInvoiceButton
+                bookingId={id}
+                clientEmail={client?.email}
+                className="admin-btn-ghost"
+                label="Send Payment Reminder"
+                mode="reminder"
+              />
+            )}
             {invoiceState.status !== 'void' && (
               <a
                 href={`/api/invoice/${id}`}
