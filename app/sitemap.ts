@@ -12,6 +12,8 @@ const routes = [
   '/portfolio',
   '/press-kit',
   '/privacy',
+  '/terms',
+  '/accessibility',
   '/built',
 ] as const
 
