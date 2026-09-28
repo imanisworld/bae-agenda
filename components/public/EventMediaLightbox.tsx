@@ -34,7 +34,6 @@ export default function EventMediaLightbox({
   const current = media[index] ?? null
 
   useEffect(() => {
-    setIndex(0)
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     closeRef.current?.focus()
