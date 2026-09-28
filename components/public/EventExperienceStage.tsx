@@ -1,5 +1,6 @@
 'use client'
 
+import { HangFrom } from '@/components/public/brand/HangingLogo'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import EventPoster from '@/components/public/EventPoster'
@@ -70,7 +71,7 @@ export default function EventExperienceStage({
       <div className="events-experience-head">
         <div>
           <span className="section-label">{isPast ? 'Archive' : 'Future Dates'}</span>
-          <h1 id="events-stage-title">{isPast ? 'Past Events' : 'Upcoming Events'}</h1>
+          <h1 id="events-stage-title">{isPast ? 'Past ' : 'Upcoming '}<HangFrom finish="silver">E</HangFrom>vents</h1>
         </div>
         <div className="events-experience-tools">
           {pastEvents.length > 0 ? (

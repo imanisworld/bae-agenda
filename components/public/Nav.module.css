@@ -19,49 +19,9 @@
   background: linear-gradient(180deg, rgba(14,11,10,.64), transparent);
 }
 
-.brand,
 .route,
 .status {
   pointer-events: auto;
-}
-
-.brand {
-  justify-self: start;
-  color: #f6f1e8;
-  text-decoration: none;
-  font-family: Conthrax, sans-serif;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: .18em;
-}
-
-.brand span { color: #c4a574; }
-
-/* Sized to sit inside the top bar so it never covers page headings. */
-.brand {
-  align-self: center;
-  line-height: 0;
-  transition: transform 220ms cubic-bezier(.2,.8,.2,1);
-}
-
-.logo {
-  display: block;
-  width: auto;
-  height: 38px;
-  filter: drop-shadow(0 6px 14px rgba(0,0,0,.45));
-}
-
-.brand:hover,
-.brand:focus-visible {
-  transform: rotate(-3deg) translateY(1px);
-}
-
-@media (max-width: 620px) {
-  .logo { height: 34px; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .brand { transition: none; }
 }
 
 .route {

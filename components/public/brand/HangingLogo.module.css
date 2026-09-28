@@ -1,0 +1,88 @@
+/* The pin point is the top of the logo's clasp; the tag rotates around it. */
+.hanger {
+  --size: clamp(60px, 6.2vw, 92px);
+  /* The clasp's slot is ~13% down the tag (tag height ≈ .73 × width); the
+     letter stroke or photo edge runs through it there. */
+  --hook: calc(var(--size) * .73 * .13);
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  /* Headline styles (letter-spacing, shadows) must not leak into the tag. */
+  letter-spacing: normal;
+  line-height: 0;
+  text-shadow: none;
+}
+
+.swing {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--size);
+  translate: calc(var(--clasp) * -1) 0;
+  transform-origin: var(--clasp) 0;
+  animation: hang-swing 3.6s ease-in-out infinite alternate;
+}
+
+/* Behind the letter/photo. Only the clasp's gate shows from this copy, so the
+   stroke reads as passing in front of the gate and behind the spine. */
+.back {
+  z-index: -1;
+  filter: brightness(.82);
+}
+
+.logo {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  /* Weighted off the clasp, the tag tips down to the right. */
+  rotate: 14deg;
+  transform-origin: var(--clasp) 0;
+}
+
+.front .logo {
+  /* Cut away the gate side of the clasp (right of its slot) so the back copy
+     shows it passing behind the stroke; the spine stays in front. */
+  clip-path: polygon(
+    0 0,
+    var(--slot) 0,
+    var(--slot) 26%,
+    calc(var(--clasp) + 16%) 26%,
+    calc(var(--clasp) + 16%) 0,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+  filter: drop-shadow(0 10px 14px rgba(0,0,0,.5));
+}
+
+@keyframes hang-swing {
+  from { rotate: -4deg; }
+  to   { rotate: 4deg; }
+}
+
+/* ── Hooked on a headline letter ── */
+
+.letter {
+  position: relative;
+  z-index: 6;
+  display: inline-block;
+}
+
+/* In Conthrax at line-height ~.95 the baseline sits ~.8em down the letter
+   box, so the bottom stroke's middle is ~.74em: the clasp threads there. */
+.fromLetter {
+  left: 50%;
+  top: calc(var(--stroke-mid, .74em) - var(--hook));
+}
+
+@media (max-width: 620px) {
+  .hanger {
+    --size: 58px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swing { animation: none; rotate: -2deg; }
+}

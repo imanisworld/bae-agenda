@@ -7,6 +7,7 @@
  * turntable. Audio runs through the site-wide PlayerProvider so it keeps
  * playing after the visitor leaves the Lab.
  */
+import { HangFrom } from '@/components/public/brand/HangingLogo'
 import Image from 'next/image'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { permalinkFor, usePlayer } from '@/components/public/player/PlayerProvider'
@@ -190,7 +191,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
     <header className={styles.header}>
       <div>
         <p>Bae&apos;s in the Lab</p>
-        <h1>On wax.</h1>
+        <h1><HangFrom finish="chrome">O</HangFrom>n wax.</h1>
       </div>
       {crates.length > 1 ? (
         <div className={styles.crateSwitch} role="group" aria-label="Choose a crate">

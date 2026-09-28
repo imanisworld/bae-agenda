@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import LogoSpinVideo from '@/components/public/LogoSpinVideo'
 import styles from './PortfolioArchiveHero.module.css'
 
 export type ArchivePrint = {
@@ -56,7 +55,8 @@ export default function PortfolioArchiveHero({
       {prints.length === 0 ? (
         // Fills the open side of the hero until portfolio photos are added in admin.
         <div className={styles.logoSpin} aria-hidden="true">
-          <LogoSpinVideo />
+          <Image src="/brand/dj-bae-logo.png" alt="" width={900} height={659} sizes="(max-width: 760px) 78vw, 42vw" className={styles.logoBounce} />
+          <span className={styles.logoShadow} />
         </div>
       ) : null}
 

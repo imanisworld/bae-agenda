@@ -86,11 +86,11 @@
 
 .copy h1 {
   margin: 0;
-  font-family: DM Sans, sans-serif;
-  font-size: clamp(64px, 7.8vw, 124px);
-  font-weight: 400;
-  line-height: .82;
-  letter-spacing: -.065em;
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(39px, 4.8vw, 75.6px);
+  font-weight: 600;
+  line-height: .95;
+  letter-spacing: -.02em;
   color: #f6f1e8;
 }
 
@@ -204,7 +204,7 @@
   }
 
   .copy h1 {
-    font-size: clamp(58px, 14vw, 104px);
+    font-size: clamp(35.4px, 8.5vw, 63.4px);
   }
 
   .phone {
@@ -241,9 +241,9 @@
   }
 
   .copy h1 {
-    font-size: clamp(38px, 11.5vw, 52px);
+    font-size: clamp(23.2px, 7vw, 31.7px);
     line-height: .95;
-    letter-spacing: -.05em;
+    letter-spacing: -.02em;
   }
 
   .copy h1 br {

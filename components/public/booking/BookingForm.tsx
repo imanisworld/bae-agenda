@@ -1,5 +1,6 @@
 'use client'
 
+import { HangFrom } from '@/components/public/brand/HangingLogo'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import {
@@ -612,18 +613,19 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
   return (
     <div className={embedded ? 'booking-form-embedded' : undefined} style={{ background: 'var(--off-black)', paddingTop: embedded ? 0 : '68px' }}>
       <div className="section-container" style={{ maxWidth: '680px', paddingTop: embedded ? '24px' : 0, paddingBottom: embedded ? '36px' : '64px' }}>
-        <div style={{ marginBottom: '36px' }}>
+        {/* Extra room under the title for the tag hanging off the "o". */}
+        <div style={{ marginBottom: 'clamp(78px, 8vw, 112px)' }}>
           <span className="section-label">Booking Inquiry</span>
           <h1 style={{
-            fontFamily: 'DM Sans, sans-serif',
-            fontSize: 'clamp(44px, 6vw, 84px)',
-            fontWeight: 400,
+            fontFamily: 'Conthrax, sans-serif',
+            fontSize: 'clamp(30px, 4vw, 54px)',
+            fontWeight: 600,
             color: 'var(--white)',
-            lineHeight: 0.9,
-            letterSpacing: '-0.055em',
+            lineHeight: 0.95,
+            letterSpacing: '-0.02em',
             margin: '12px 0 0',
           }}>
-            Book DJ B.A.E<span style={{ color: 'var(--gold)' }}>.</span>
+            B<HangFrom>o</HangFrom>ok DJ B.A.E<span style={{ color: 'var(--gold)' }}>.</span>
           </h1>
         </div>
 
@@ -806,7 +808,7 @@ function BookingSuccess({ summary, embedded = false }: { summary: BookingSuccess
         <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '22px', color: 'var(--violet)', marginBottom: '16px' }}>◈</div>
           <div>
             <div className="section-label" style={{ marginBottom: '10px' }}>Inquiry Sent</div>
-            <h1 style={{ fontFamily: 'DM Sans, sans-serif', fontSize: 'clamp(36px, 5vw, 56px)', fontWeight: 400, lineHeight: 0.92, letterSpacing: '-0.05em', color: 'var(--white)', margin: 0 }}>Request Received</h1>
+            <h1 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(24px, 3.3vw, 38px)', fontWeight: 600, lineHeight: 1, letterSpacing: '-0.02em', color: 'var(--white)', margin: 0 }}>Request Received</h1>
             <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.75, margin: '16px 0 0' }}>
               We&apos;ll review your details and reach back within 24–48 hours. Keep an eye on <span style={{ color: 'var(--white)' }}>{summary?.email || 'your inbox'}</span> for the first follow-up.
             </p>

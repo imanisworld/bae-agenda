@@ -11,6 +11,8 @@ export default function BookExperienceStage({
 }) {
   const [panel, setPanel] = useState<'inquiry' | 'contact'>('inquiry')
 
+  // #contact deliberately matches no element id: the browser's own jump to a
+  // hash target scrolled the Inquiry/Contact switch off screen on phones.
   useEffect(() => {
     const syncHash = () => {
       if (window.location.hash === '#contact') setPanel('contact')

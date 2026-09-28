@@ -41,11 +41,11 @@
 
 .header h1 {
   margin: 8px 0 0;
-  font-family: DM Sans, sans-serif;
-  font-size: clamp(44px, 6vw, 80px);
-  font-weight: 400;
-  line-height: .9;
-  letter-spacing: -.055em;
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(27.7px, 3.8vw, 50.4px);
+  font-weight: 600;
+  line-height: .95;
+  letter-spacing: -.02em;
 }
 
 /* ── Crate switch (Mixes / Mashups / Edits) ── */
@@ -484,11 +484,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-family: DM Sans, sans-serif;
-  font-size: clamp(24px, 3vw, 38px);
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -.035em;
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(16.8px, 2.1vw, 26.6px);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -.01em;
 }
 
 .readout p {
@@ -655,9 +655,9 @@
 
 .empty h2 {
   margin: 0;
-  font-size: clamp(36px, 6vw, 72px);
-  font-weight: 400;
-  letter-spacing: -.05em;
+  font-size: clamp(23.4px, 3.9vw, 46.8px);
+  font-weight: 600;
+  letter-spacing: -.02em;
 }
 
 .empty a {
@@ -695,7 +695,7 @@
   }
 
   .header h1 {
-    font-size: 44px;
+    font-size: 27.7px;
   }
 
   .crate {
@@ -735,7 +735,7 @@
   }
 
   .readout h2 {
-    font-size: 22px;
+    font-size: 15.4px;
   }
 
   .readout p {
@@ -767,13 +767,13 @@
 /* Short laptop windows */
 @media (min-width: 621px) and (max-height: 760px) {
   .station { --deck: min(22vh, 200px); gap: 10px; }
-  .header h1 { font-size: 52px; }
+  .header h1 { font-size: 32.8px; }
 }
 
 /* Short phones (iPhone SE-size): tighten so everything stays above the dock. */
 @media (max-width: 620px) and (max-height: 720px) {
   .header p { display: none; }
-  .header h1 { margin-top: 0; font-size: 38px; }
+  .header h1 { margin-top: 0; font-size: 23.9px; }
   .crateCaption span { display: none; }
   .readout p { -webkit-line-clamp: 1; }
 }
