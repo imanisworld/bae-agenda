@@ -85,7 +85,7 @@ export default function PortfolioMediaLightbox({
   const location = [entry.venue, entry.city].filter(Boolean).join(' · ')
 
   return (
-    <div className={styles.backdrop} role="presentation" onMouseDown={onClose}>
+    <div className={styles.backdrop} data-route-swipe-block role="presentation" onMouseDown={onClose}>
       <section
         className={styles.dialog}
         role="dialog"
