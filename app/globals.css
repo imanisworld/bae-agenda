@@ -7241,3 +7241,162 @@ body.has-custom-cursor * { cursor: none !important; }
   font-size: 11px;
 }
 
+/* Admin operational summary cards */
+.admin-ops-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.admin-ops-card,
+.admin-money-card,
+.admin-portfolio-stat {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+  border: 1px solid rgba(196,165,116,.14);
+  border-radius: 14px;
+  background:
+    linear-gradient(145deg, rgba(246,241,232,.025), transparent 44%),
+    #15110f;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.018);
+}
+
+.admin-ops-card {
+  padding: 17px 18px;
+}
+
+.admin-ops-card span,
+.admin-money-card span,
+.admin-portfolio-stat span {
+  color: rgba(246,241,232,.5);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+}
+
+.admin-ops-card strong {
+  color: #f6f1e8;
+  font-family: DM Sans, sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.admin-ops-card p {
+  margin: 0;
+  color: rgba(246,241,232,.56);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.admin-money-card {
+  padding: 20px 22px;
+}
+
+.admin-money-card strong {
+  color: var(--admin-money-color, #f6f1e8);
+  font-family: DM Sans, sans-serif;
+  font-size: 29px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.admin-portfolio-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.admin-portfolio-stat {
+  padding: 15px 17px;
+}
+
+.admin-portfolio-stat strong {
+  color: #f6f1e8;
+  font-family: DM Sans, sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+/* Reviews */
+.admin-review-card {
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+  border: 1px solid rgba(196,165,116,.12);
+  border-radius: 13px;
+  background:
+    linear-gradient(145deg, rgba(246,241,232,.018), transparent 42%),
+    #120f0e;
+}
+
+.admin-review-card--pending {
+  border-color: rgba(196,165,116,.3);
+  box-shadow: inset 3px 0 0 rgba(143,45,60,.52);
+}
+
+.admin-review-stars {
+  color: #c4a574;
+  letter-spacing: 2px;
+}
+
+.admin-btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 18px;
+  border: 1px solid rgba(232,93,117,.38);
+  border-radius: 10px;
+  background: rgba(232,93,117,.035);
+  color: #ff8da0;
+  font: 500 10px/1 DM Sans, sans-serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.admin-btn-danger:hover {
+  border-color: rgba(232,93,117,.58);
+  background: rgba(232,93,117,.08);
+}
+
+@media (max-width: 720px) {
+  .admin-ops-grid {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+
+  .admin-ops-card {
+    min-height: 124px;
+  }
+
+  .admin-ops-card strong,
+  .admin-money-card strong,
+  .admin-portfolio-stat strong {
+    font-size: 26px;
+  }
+
+  .admin-ops-card p {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 460px) {
+  .admin-ops-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-summary-grid,
+  .admin-portfolio-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
