@@ -6,6 +6,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
+import { logError } from '@/lib/monitoring'
 import { getPortfolioStats } from '@/app/actions/portfolio'
 
 interface PortfolioEntry {
@@ -27,14 +28,19 @@ function contextualLabel(entry: PortfolioEntry) {
 async function getFeatured(): Promise<PortfolioEntry[]> {
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('portfolio_entries')
       .select('id, event_name, city, year, tags, featured, photo_url, notes')
       .eq('featured', true)
       .order('year', { ascending: false })
       .limit(3)
+    if (error) {
+      logError('Featured portfolio query failed', error, { operation: 'getFeaturedPortfolioTeaser' })
+      return []
+    }
     return (data ?? []) as PortfolioEntry[]
-  } catch {
+  } catch (error) {
+    logError('Featured portfolio load failed', error, { operation: 'getFeaturedPortfolioTeaser' })
     return []
   }
 }
