@@ -168,8 +168,8 @@ export default async function PortalBookingDetailPage({
   })
 
   return (
-    <section className="section-container" style={{ maxWidth: '960px', paddingTop: '104px', paddingBottom: '80px' }}>
-      <div style={{ display: 'grid', gap: '18px' }}>
+    <section className="section-container portal-detail-page" style={{ maxWidth: '960px', paddingTop: '104px', paddingBottom: '80px' }}>
+      <div className="portal-page-stack" style={{ display: 'grid', gap: '18px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
           <Link href="/portal" className="inline-link">
             Back To Portal
@@ -177,7 +177,7 @@ export default async function PortalBookingDetailPage({
           <Badge variant={toPaymentBadgeVariant(paymentStatus)} label={paymentStatus.replaceAll('_', ' ')} />
         </div>
 
-        <div style={{ border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '28px', display: 'grid', gap: '18px' }}>
+        <div className="portal-card" style={{ border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '28px', display: 'grid', gap: '18px' }}>
           <div style={{ display: 'grid', gap: '10px' }}>
             <span className="section-label" style={{ marginBottom: 0 }}>Booking Details</span>
             <h1 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(28px, 5vw, 40px)', lineHeight: 1.05 }}>
@@ -198,7 +198,7 @@ export default async function PortalBookingDetailPage({
               { label: 'Paid So Far', value: formatCurrency(receivedTotal) },
               { label: 'Remaining', value: formatCurrency(outstandingBalance) },
             ].map((item) => (
-              <div key={item.label} style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'var(--bg-sunken)', padding: '14px 16px' }}>
+              <div key={item.label} className="portal-metric-card" style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'var(--bg-sunken)', padding: '14px 16px' }}>
                 <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
                   {item.label}
                 </div>
@@ -233,7 +233,7 @@ export default async function PortalBookingDetailPage({
           </div>
         )}
 
-        <div style={{ border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '28px', display: 'grid', gap: '16px' }}>
+        <div className="portal-card" style={{ border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '28px', display: 'grid', gap: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'center', flexWrap: 'wrap' }}>
             <h2 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '22px' }}>Payment Activity</h2>
             <Link href={`/pay/${booking.id}`} className="btn-primary">
@@ -271,7 +271,7 @@ export default async function PortalBookingDetailPage({
           )}
         </div>
 
-        <div style={{ border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '28px', display: 'grid', gap: '18px' }}>
+        <div className="portal-card" style={{ border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '28px', display: 'grid', gap: '18px' }}>
           <div style={{ display: 'grid', gap: '8px' }}>
             <h2 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '22px' }}>Request An Update</h2>
             <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: 1.75, margin: 0 }}>
@@ -288,6 +288,7 @@ export default async function PortalBookingDetailPage({
                 <select
                   name="request_type"
                   defaultValue="update"
+                  className="portal-input"
                   style={{ width: '100%', background: 'var(--bg-sunken)', border: '1px solid var(--border)', color: 'var(--white)', padding: '12px 14px', fontSize: '14px' }}
                 >
                   <option value="update">Update Request</option>
@@ -300,6 +301,7 @@ export default async function PortalBookingDetailPage({
                 <select
                   name="preferred_contact"
                   defaultValue={client.phone ? 'phone' : 'email'}
+                  className="portal-input"
                   style={{ width: '100%', background: 'var(--bg-sunken)', border: '1px solid var(--border)', color: 'var(--white)', padding: '12px 14px', fontSize: '14px' }}
                 >
                   <option value="phone">Text Or Call Me</option>
@@ -312,6 +314,7 @@ export default async function PortalBookingDetailPage({
               <span className="section-label" style={{ marginBottom: 0 }}>What Do You Need?</span>
               <textarea
                 name="message"
+                className="portal-input"
                 rows={5}
                 minLength={12}
                 required
