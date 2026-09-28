@@ -5,19 +5,51 @@
  * "Leave a Review" button that opens a bottom drawer on mobile,
  * centered modal on desktop. Contains ReviewForm.
  */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useBodyScrollLock } from '@/components/hooks/useBodyScrollLock'
 import ReviewForm from '@/components/public/ReviewForm'
 
 export default function ReviewDrawer() {
   const [open, setOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const dialogRef = useRef<HTMLDivElement>(null)
+  const closeRef = useRef<HTMLButtonElement>(null)
 
   useBodyScrollLock(open)
 
-  // Close on Escape
+  function closeDrawer() {
+    setOpen(false)
+    window.requestAnimationFrame(() => triggerRef.current?.focus())
+  }
+
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false) }
+    closeRef.current?.focus()
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        closeDrawer()
+        return
+      }
+      if (e.key !== 'Tab') return
+
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+      if (!focusable?.length) return
+
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [open])
@@ -25,6 +57,7 @@ export default function ReviewDrawer() {
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
         className="btn-ghost"
@@ -37,7 +70,7 @@ export default function ReviewDrawer() {
       {open && (
         <div
           aria-hidden="true"
-          onClick={() => setOpen(false)}
+          onClick={closeDrawer}
           style={{
             position: 'fixed',
             inset: 0,
@@ -49,68 +82,66 @@ export default function ReviewDrawer() {
       )}
 
       {/* Drawer / Modal */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Leave a Review"
-        aria-hidden={!open}
-        className={`review-drawer-shell${open ? ' is-open' : ''}`}
-        style={{
-          position: 'fixed',
-          zIndex: 201,
-          background: 'var(--surface)',
-          border: '1px solid var(--border)',
-          // Desktop: centered modal
-          top: '50%',
-          left: '50%',
-          transform: open
-            ? 'translate(-50%, -50%)'
-            : 'translate(-50%, calc(-50% + 20px))',
-          width: 'min(520px, calc(100vw - 32px))',
-          maxHeight: '90vh',
-          overflowY: 'auto',
-          overscrollBehavior: 'contain',
-          WebkitOverflowScrolling: 'touch',
-          padding: 'clamp(20px, 4vw, 32px)',
-          opacity: open ? 1 : 0,
-          pointerEvents: open ? 'auto' : 'none',
-          transition: 'transform 0.25s cubic-bezier(0.4,0,0.2,1), opacity 0.2s ease',
-        }}
-      >
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: '20px',
-        }}>
-          <span className="section-label" style={{ marginBottom: 0 }}>Leave a Review</span>
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            aria-label="Close"
-            style={{
-              background: 'none',
-              border: 'none',
-              color: 'var(--muted)',
-              fontSize: '18px',
-              cursor: 'pointer',
-              width: '44px',
-              height: '44px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: 0,
-              lineHeight: 1,
-            }}
-          >
-            ✕
-          </button>
+      {open ? (
+        <div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Leave a Review"
+          className="review-drawer-shell is-open"
+          style={{
+            position: 'fixed',
+            zIndex: 201,
+            background: 'var(--surface)',
+            border: '1px solid var(--border)',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 'min(520px, calc(100vw - 32px))',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            overscrollBehavior: 'contain',
+            WebkitOverflowScrolling: 'touch',
+            padding: 'clamp(20px, 4vw, 32px)',
+          }}
+        >
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginBottom: '20px',
+          }}>
+            <span className="section-label" style={{ marginBottom: 0 }}>Leave a Review</span>
+            <button
+              ref={closeRef}
+              type="button"
+              onClick={closeDrawer}
+              aria-label="Close"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'var(--muted)',
+                fontSize: '18px',
+                cursor: 'pointer',
+                width: '44px',
+                height: '44px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 0,
+                lineHeight: 1,
+              }}
+            >
+              ✕
+            </button>
+          </div>
+          <p style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.6, margin: '0 0 20px' }}>
+            Share your experience. It stays private until approved.
+          </p>
+          <ReviewForm compact />
         </div>
-        <p style={{ fontSize: '11px', color: 'var(--muted)', lineHeight: 1.6, margin: '0 0 20px' }}>
-          Share your experience. It stays private until approved.
-        </p>
-        <ReviewForm compact />
-      </div>
+      ) : null}
+
     </>
   )
 }
