@@ -1072,7 +1072,7 @@ export async function createEventFromBookingAction(formData: FormData) {
 
   const { data: existingEvent, error: existingEventError } = await admin
     .from('events')
-    .select('id')
+    .select('id, booking_id')
     .eq('title', source.event_name)
     .eq('event_date', source.event_date)
     .limit(1)
@@ -1083,12 +1083,24 @@ export async function createEventFromBookingAction(formData: FormData) {
   }
 
   if (existingEvent?.id) {
+    if (!existingEvent.booking_id) {
+      const { error: linkError } = await admin
+        .from('events')
+        .update({ booking_id: source.id })
+        .eq('id', existingEvent.id)
+
+      if (linkError) {
+        redirectWithError('/admin/bookings', linkError.message || 'Unable to link the existing event to this booking.')
+      }
+    }
+
     redirect(`/admin/events/${existingEvent.id}`)
   }
 
   const { data: createdEvent, error: createError } = await admin
     .from('events')
     .insert({
+      booking_id: source.id,
       title: source.event_name,
       event_date: source.event_date,
       event_timezone: source.event_timezone,
