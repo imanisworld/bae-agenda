@@ -5,6 +5,8 @@ import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+export const dynamic = 'force-dynamic'
+
 type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'void'
 
 interface InvoiceRow {
