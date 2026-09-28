@@ -265,6 +265,27 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['site_content']['Insert']>
       }
 
+      // ── portfolio_media ─────────────────────────────────────────
+      portfolio_media: {
+        Row: {
+          id:                 string
+          portfolio_entry_id: string
+          media_type:         'image' | 'video'
+          media_url:          string
+          storage_path:       string | null
+          poster_url:         string | null
+          caption:            string | null
+          sort_order:         number
+          public:             boolean
+          created_at:         string
+          updated_at:         string
+        }
+        Insert: Omit<Database['public']['Tables']['portfolio_media']['Row'],
+          'id' | 'created_at' | 'updated_at'
+        > & { id?: string }
+        Update: Partial<Database['public']['Tables']['portfolio_media']['Insert']>
+      }
+
       // ── notes ───────────────────────────────────────────────────
       // Internal admin notes tied to a booking or client (or both).
       notes: {
