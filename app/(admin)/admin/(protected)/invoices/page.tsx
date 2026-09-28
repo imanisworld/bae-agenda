@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
@@ -95,11 +96,11 @@ export default async function InvoicesPage({
 
       {invoices.length > 0 && (
         <div className="admin-summary-grid">
-          <div className="admin-money-card" style={{ '--admin-money-color': '#d9bc89' } as React.CSSProperties}>
+          <div className="admin-money-card" style={{ '--admin-money-color': '#d9bc89' } as CSSProperties}>
             <span>Outstanding</span>
             <strong>{fmtCurrency(outstanding)}</strong>
           </div>
-          <div className="admin-money-card" style={{ '--admin-money-color': '#86d8a8' } as React.CSSProperties}>
+          <div className="admin-money-card" style={{ '--admin-money-color': '#86d8a8' } as CSSProperties}>
             <span>Paid</span>
             <strong>{fmtCurrency(paidTotal)}</strong>
           </div>
