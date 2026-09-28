@@ -25,6 +25,7 @@ export function HangingLogo({ finish = 'red', className }: Props) {
   const timerRef = useRef<number | null>(null)
   const pointerRef = useRef<number | null>(null)
   const startXRef = useRef(0)
+  const dragAngleRef = useRef(0)
 
   useEffect(() => {
     return () => {
@@ -37,6 +38,7 @@ export function HangingLogo({ finish = 'red', className }: Props) {
     pointerRef.current = event.pointerId
     startXRef.current = event.clientX
     setDragging(true)
+    dragAngleRef.current = 0
     setDragAngle(0)
 
     if (timerRef.current) window.clearTimeout(timerRef.current)
@@ -47,6 +49,7 @@ export function HangingLogo({ finish = 'red', className }: Props) {
   function drag(event: PointerEvent<HTMLSpanElement>) {
     if (pointerRef.current !== event.pointerId) return
     const angle = Math.max(-32, Math.min(32, (event.clientX - startXRef.current) * .28))
+    dragAngleRef.current = angle
     setDragAngle(angle)
   }
 
@@ -59,13 +62,15 @@ export function HangingLogo({ finish = 'red', className }: Props) {
 
     pointerRef.current = null
     setDragging(false)
-    setReleaseAngle(dragAngle)
+    const finalAngle = dragAngleRef.current
+    setReleaseAngle(finalAngle)
 
-    const nextDirection: 1 | -1 = Math.abs(dragAngle) > 2
-      ? (dragAngle >= 0 ? 1 : -1)
+    const nextDirection: 1 | -1 = Math.abs(finalAngle) > 2
+      ? (finalAngle >= 0 ? 1 : -1)
       : (direction === 1 ? -1 : 1)
 
     setDirection(nextDirection)
+    dragAngleRef.current = 0
     setDragAngle(0)
     setKicked(false)
 
