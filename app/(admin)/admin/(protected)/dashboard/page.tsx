@@ -91,13 +91,13 @@ async function getDashboardData() {
     const now = new Date().toISOString()
 
     const [
-      { count: upcomingEvents   },
-      { count: activeBookings   },
-      { count: pendingInquiries },
-      { count: totalClients     },
-      { data: bookingRows       },
-      { data: eventRows         },
-      { data: paymentRows       },
+      { count: upcomingEvents, error: upcomingEventsError   },
+      { count: activeBookings, error: activeBookingsError   },
+      { count: pendingInquiries, error: pendingInquiriesError },
+      { count: totalClients, error: totalClientsError     },
+      { data: bookingRows, error: bookingRowsError       },
+      { data: eventRows, error: eventRowsError         },
+      { data: paymentRows, error: paymentRowsError       },
     ] = await Promise.all([
       supabase.from('events').select('*', { count: 'exact', head: true })
         .eq('public', true).gte('event_date', now),
@@ -118,6 +118,19 @@ async function getDashboardData() {
         .eq('status', 'pending')
         .order('created_at', { ascending: false }).limit(5),
     ])
+
+    const loadError =
+      upcomingEventsError ||
+      activeBookingsError ||
+      pendingInquiriesError ||
+      totalClientsError ||
+      bookingRowsError ||
+      eventRowsError ||
+      paymentRowsError
+
+    if (loadError) {
+      throw new Error(loadError.message || 'Unable to load dashboard data.')
+    }
 
     return {
       connected: true,
