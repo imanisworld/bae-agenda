@@ -730,12 +730,21 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
             )}
           </div>
 
+          {step === 3 && (
+            <p className="booking-policy-note">
+              Submitting sends the booking details you entered so I can review the request.{' '}
+              <Link href="/privacy">Privacy</Link>
+              <span aria-hidden="true"> · </span>
+              <Link href="/terms">Booking Terms</Link>
+            </p>
+          )}
+
           <div style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '12px',
-            marginTop: '16px',
+            marginTop: step === 3 ? '8px' : '16px',
             flexWrap: 'wrap',
           }}>
             {step > 1 ? (
