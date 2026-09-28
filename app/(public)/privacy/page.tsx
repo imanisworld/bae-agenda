@@ -27,8 +27,7 @@ export default function PrivacyPage() {
             Privacy &amp; Cookies
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.8, margin: 0 }}>
-            This site keeps data collection light. The main purpose of any information collected here is to respond to booking requests,
-            manage mix notifications, and understand basic site traffic.
+            This site keeps data collection limited to what is needed for bookings, client access and payments, and basic site analytics.
           </p>
         </section>
 
@@ -36,8 +35,8 @@ export default function PrivacyPage() {
           <div>
             <h2 style={{ fontSize: '15px', color: 'var(--white)', marginBottom: '8px' }}>What gets collected</h2>
             <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.8, margin: 0 }}>
-              Booking forms collect the details you submit, such as your name, email, event information, and any notes you provide.
-              Mix notification signups collect your email address. Basic analytics may collect aggregated usage information such as page visits
+              Booking forms collect the details you submit, including your name, email, phone number if provided, event information, and notes.
+              The client portal uses your phone number to send one-time sign-in codes. Basic analytics may collect aggregated usage information such as page visits
               and device/browser patterns.
             </p>
           </div>
@@ -45,7 +44,7 @@ export default function PrivacyPage() {
           <div>
             <h2 style={{ fontSize: '15px', color: 'var(--white)', marginBottom: '8px' }}>How it is used</h2>
             <p style={{ fontSize: '15px', color: 'var(--muted)', lineHeight: 1.8, margin: 0 }}>
-              Information is used to respond to inquiries, manage client communication, send requested updates, reduce spam, and improve site performance.
+              Information is used to respond to inquiries, manage bookings, provide client portal access, process and track payments, reduce spam, and improve site performance.
               It is not sold.
             </p>
           </div>
