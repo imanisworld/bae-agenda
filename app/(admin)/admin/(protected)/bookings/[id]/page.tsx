@@ -135,7 +135,7 @@ function toDateInputValue(iso: string | null) {
 
 async function getBooking(id: string): Promise<BookingDetailRow | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('bookings')
     .select(`
       id,
@@ -168,28 +168,31 @@ async function getBooking(id: string): Promise<BookingDetailRow | null> {
     .eq('id', id)
     .maybeSingle()
 
+  if (error) throw new Error(error.message || 'Unable to load booking.')
   return (data as BookingDetailRow | null) ?? null
 }
 
 async function getBookingInvoiceState(id: string): Promise<BookingInvoiceState | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('invoices')
     .select('status, invoice_number, sent_at')
     .eq('booking_id', id)
     .maybeSingle()
 
+  if (error) throw new Error(error.message || 'Unable to load booking invoice state.')
   return (data as BookingInvoiceState | null) ?? null
 }
 
 async function getLinkedEventState(id: string): Promise<LinkedEventState | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('events')
     .select('id, title, public')
     .eq('booking_id', id)
     .maybeSingle()
 
+  if (error) throw new Error(error.message || 'Unable to load linked event state.')
   return (data as LinkedEventState | null) ?? null
 }
 
