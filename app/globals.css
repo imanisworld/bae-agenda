@@ -4740,6 +4740,8 @@ body.has-custom-cursor * { cursor: none !important; }
   height: 100%;
   object-fit: cover;
   display: block;
+  filter: brightness(1.02) saturate(1.03) contrast(1.05);
+  backface-visibility: hidden;
   transition: transform var(--motion-slow) var(--ease-out);
 }
 
