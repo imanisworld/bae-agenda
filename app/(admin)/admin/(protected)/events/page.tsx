@@ -148,7 +148,7 @@ export default async function EventsPage({
                           style={{
                             padding: '4px 8px',
                             fontSize: '9px',
-                            color: ev.featured ? 'var(--violet)' : 'var(--muted)',
+                            color: ev.featured ? 'var(--gold)' : 'var(--muted)',
                           }}
                         >
                           {ev.featured ? '★ Featured' : 'Not Featured'}
