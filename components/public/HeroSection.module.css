@@ -24,14 +24,6 @@
   opacity: .96;
 }
 
-.wordmarkOutline {
-  z-index: 3;
-  color: transparent;
-  -webkit-text-stroke: 1.5px rgba(184,90,102,.72);
-  opacity: 1;
-  pointer-events: none;
-}
-
 .photo {
   position: absolute;
   z-index: 2;
@@ -161,16 +153,17 @@
 
 /* Hooked over the slanted bottom edge, a little left of centre. */
 .photoTag {
+  --clip-color: #15100f;
   left: 30%;
   top: calc(96% - var(--hook));
 }
 
 @keyframes hero-photo-gravity {
   0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(1.2deg);
+    transform: translate3d(0, 0, 0) rotate(.8deg);
   }
   50% {
-    transform: translate3d(12px, -14px, 0) rotate(3.6deg);
+    transform: translate3d(8px, -10px, 0) rotate(1.8deg);
   }
 }
 
@@ -386,10 +379,10 @@
 
 @keyframes hero-photo-gravity-mobile {
   0%, 100% {
-    transform: translate3d(0, 0, 0) rotate(0.4deg);
+    transform: translate3d(0, 0, 0) rotate(.3deg);
   }
   50% {
-    transform: translate3d(7px, -9px, 0) rotate(2.4deg);
+    transform: translate3d(5px, -7px, 0) rotate(1.4deg);
   }
 }
 
