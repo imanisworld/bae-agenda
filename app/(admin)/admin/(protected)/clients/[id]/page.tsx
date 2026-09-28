@@ -14,7 +14,7 @@ type ClientDetail = {
   id: string
   first_name: string
   last_name: string | null
-  email: string | null
+  email: string
   phone: string | null
   notes: string | null
   created_at: string
@@ -128,7 +128,7 @@ export default async function ClientDetailPage({
         <div className="admin-form-grid-two" style={{ marginBottom: '14px' }}>
           <label style={{ display: 'grid', gap: '7px' }}>
             <span className="admin-section-title">Email</span>
-            <input name="email" type="email" defaultValue={client.email ?? ''} style={inputStyle()} />
+            <input name="email" type="email" required defaultValue={client.email} style={inputStyle()} />
           </label>
           <label style={{ display: 'grid', gap: '7px' }}>
             <span className="admin-section-title">Phone</span>
