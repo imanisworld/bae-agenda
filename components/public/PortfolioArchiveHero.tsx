@@ -14,10 +14,12 @@ export type ArchivePrint = {
 export default function PortfolioArchiveHero({
   prints,
   onExplore,
+  onOpenEntry,
   instagramUrl,
 }: {
   prints: ArchivePrint[]
   onExplore?: () => void
+  onOpenEntry?: (entryId: string) => void
   instagramUrl?: string
 }) {
   return (
@@ -63,7 +65,14 @@ export default function PortfolioArchiveHero({
       <div className={styles.printField} aria-label="Selected past work">
         {prints.slice(0, 3).map((entry, index) => (
           <article key={entry.id} className={styles.print} data-index={index + 1}>
-            <div className={styles.printImage}>
+            <button
+              type="button"
+              className={styles.printOpen}
+              onClick={() => onOpenEntry?.(entry.id)}
+              disabled={!onOpenEntry}
+              aria-label={`Open photos and video for ${entry.event_name}`}
+            >
+              <div className={styles.printImage}>
               <Image
                 src={entry.photo_url}
                 alt={entry.event_name}
@@ -71,11 +80,12 @@ export default function PortfolioArchiveHero({
                 sizes="(max-width: 760px) 44vw, 300px"
                 quality={90}
               />
-            </div>
-            <div className={styles.printMeta}>
-              <small>{String(index + 1).padStart(3, '0')} · {entry.year}</small>
-              <strong>{entry.event_name}</strong>
-            </div>
+              </div>
+              <div className={styles.printMeta}>
+                <small>{String(index + 1).padStart(3, '0')} · {entry.year}</small>
+                <strong>{entry.event_name}</strong>
+              </div>
+            </button>
           </article>
         ))}
       </div>
