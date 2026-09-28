@@ -36,7 +36,7 @@ export async function GET(
     .maybeSingle(),
     supabase
       .from('invoices')
-      .select('invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due')
+      .select('invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, due_date, payment_terms, line_items')
       .eq('booking_id', id)
       .maybeSingle(),
   ])
@@ -49,7 +49,7 @@ export async function GET(
 
   const invoice = (invoiceData as InvoiceSnapshotData | null) ?? null
   const effectiveBooking = applyInvoiceSnapshot(booking, invoice)
-  const pdfBytes = await generateInvoicePdf(effectiveBooking)
+  const pdfBytes = await generateInvoicePdf(effectiveBooking, invoice)
   const filename = invoice?.pdf_filename || invoiceFilename(effectiveBooking)
 
   return new NextResponse(Buffer.from(pdfBytes), {
