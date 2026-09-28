@@ -15,10 +15,12 @@ export type ArchivePrint = {
 export default function PortfolioArchiveHero({
   prints,
   onExplore,
+  onOpenEntry,
   instagramUrl,
 }: {
   prints: ArchivePrint[]
   onExplore?: () => void
+  onOpenEntry?: (entryId: string) => void
   instagramUrl?: string
 }) {
   const [logoKicked, setLogoKicked] = useState(false)
@@ -39,27 +41,18 @@ export default function PortfolioArchiveHero({
     })
   }
 
-  function movePrint(event: PointerEvent<HTMLElement>) {
-    const node = event.currentTarget
-    if (event.pointerType === 'mouse') {
-      const rect = node.getBoundingClientRect()
-      const px = (event.clientX - rect.left) / rect.width - .5
-      const py = (event.clientY - rect.top) / rect.height - .5
-      node.style.setProperty('--print-ry', `${px * 5}deg`)
-      node.style.setProperty('--print-rx', `${py * -4}deg`)
-    }
+  function tiltPrint(event: PointerEvent<HTMLButtonElement>) {
+    if (event.pointerType !== 'mouse') return
+    const rect = event.currentTarget.getBoundingClientRect()
+    const px = (event.clientX - rect.left) / rect.width - .5
+    const py = (event.clientY - rect.top) / rect.height - .5
+    event.currentTarget.style.setProperty('--print-ry', `${px * 5}deg`)
+    event.currentTarget.style.setProperty('--print-rx', `${py * -4}deg`)
   }
 
-  function pressPrint(event: PointerEvent<HTMLElement>) {
-    event.currentTarget.style.setProperty('--print-scale', '.98')
-    event.currentTarget.style.setProperty('--print-lift', '3px')
-  }
-
-  function settlePrint(event: PointerEvent<HTMLElement>) {
-    event.currentTarget.style.setProperty('--print-rx', '0deg')
+  function settlePrint(event: PointerEvent<HTMLButtonElement>) {
     event.currentTarget.style.setProperty('--print-ry', '0deg')
-    event.currentTarget.style.setProperty('--print-scale', '1')
-    event.currentTarget.style.setProperty('--print-lift', '0px')
+    event.currentTarget.style.setProperty('--print-rx', '0deg')
   }
 
   return (
@@ -109,17 +102,18 @@ export default function PortfolioArchiveHero({
 
       <div className={styles.printField} aria-label="Selected past work">
         {prints.slice(0, 3).map((entry, index) => (
-          <article
-            key={entry.id}
-            className={styles.print}
-            data-index={index + 1}
-            onPointerMove={movePrint}
-            onPointerDown={pressPrint}
-            onPointerUp={settlePrint}
-            onPointerCancel={settlePrint}
-            onPointerLeave={settlePrint}
-          >
-            <div className={styles.printImage}>
+          <article key={entry.id} className={styles.print} data-index={index + 1}>
+            <button
+              type="button"
+              className={styles.printOpen}
+              onClick={() => onOpenEntry?.(entry.id)}
+              disabled={!onOpenEntry}
+              aria-label={`Open photos and video for ${entry.event_name}`}
+              onPointerMove={tiltPrint}
+              onPointerLeave={settlePrint}
+              onPointerUp={settlePrint}
+            >
+              <div className={styles.printImage}>
               <Image
                 src={entry.photo_url}
                 alt={entry.event_name}
@@ -127,11 +121,12 @@ export default function PortfolioArchiveHero({
                 sizes="(max-width: 760px) 44vw, 300px"
                 quality={90}
               />
-            </div>
-            <div className={styles.printMeta}>
-              <small>{String(index + 1).padStart(3, '0')} · {entry.year}</small>
-              <strong>{entry.event_name}</strong>
-            </div>
+              </div>
+              <div className={styles.printMeta}>
+                <small>{String(index + 1).padStart(3, '0')} · {entry.year}</small>
+                <strong>{entry.event_name}</strong>
+              </div>
+            </button>
           </article>
         ))}
       </div>
