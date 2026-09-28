@@ -82,6 +82,57 @@ export async function getPastEvents(limit = 20): Promise<Event[]> {
 }
 
 /**
+ * One public event by slug for the indexable event detail route.
+ * Internal booking linkage is deliberately excluded by PUBLIC_EVENT_COLUMNS.
+ */
+export async function getPublicEventBySlug(slug: string): Promise<Event | null> {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('events')
+      .select(PUBLIC_EVENT_COLUMNS)
+      .eq('public', true)
+      .eq('slug', slug)
+      .maybeSingle()
+
+    if (error) {
+      console.error('[getPublicEventBySlug] unable to load event:', error.message)
+      return null
+    }
+
+    return (data as Event | null) ?? null
+  } catch (err) {
+    console.error('[getPublicEventBySlug] unexpected error:', err)
+    return null
+  }
+}
+
+/**
+ * Public event URLs for sitemap discovery. Keep only public-safe fields.
+ */
+export async function getPublicEventSitemapEntries(): Promise<Array<{ slug: string; updated_at: string }>> {
+  try {
+    const supabase = await createClient()
+    const { data, error } = await supabase
+      .from('events')
+      .select('slug,updated_at')
+      .eq('public', true)
+      .order('event_date', { ascending: false })
+      .limit(500)
+
+    if (error) {
+      console.error('[getPublicEventSitemapEntries] unable to load events:', error.message)
+      return []
+    }
+
+    return (data ?? []).filter((event): event is { slug: string; updated_at: string } => Boolean(event.slug))
+  } catch (err) {
+    console.error('[getPublicEventSitemapEntries] unexpected error:', err)
+    return []
+  }
+}
+
+/**
  * Featured public events for the homepage — up to 3.
  * Falls back to the next 3 upcoming events if none are marked featured.
  */
