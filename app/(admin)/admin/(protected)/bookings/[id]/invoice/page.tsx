@@ -48,7 +48,7 @@ interface BookingRow {
 
 async function getBooking(id: string): Promise<BookingRow | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('bookings')
     .select(`
       id, event_name, event_type, event_date, event_end_time, event_timezone, venue, city,
@@ -57,6 +57,7 @@ async function getBooking(id: string): Promise<BookingRow | null> {
     `)
     .eq('id', id)
     .maybeSingle()
+  if (error) throw new Error(error.message || 'Unable to load booking.')
   return (data as BookingRow | null) ?? null
 }
 
@@ -68,6 +69,7 @@ async function getInvoiceState(id: string): Promise<InvoiceState | null> {
     .eq('booking_id', id)
     .maybeSingle()
 
+  if (error) throw new Error(error.message || 'Unable to load invoice.')
   return (data as InvoiceState | null) ?? null
 }
 
