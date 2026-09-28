@@ -46,13 +46,117 @@
   animation: hero-photo-gravity 12s ease-in-out infinite;
   /* Own compositor layer: the drift moves a cached bitmap instead of repainting. */
   will-change: transform;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  overflow: visible;
+}
+
+.albumStack {
+  position: absolute;
+  inset: 0;
+  display: block;
+  transform:
+    perspective(1200px)
+    rotateX(var(--photo-rx, 0deg))
+    rotateY(var(--photo-ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 260ms cubic-bezier(.2,.7,.2,1);
 }
 
 .photoFrame {
   position: absolute;
   inset: 0;
+  z-index: 2;
   overflow: hidden;
   clip-path: polygon(7% 0, 100% 5%, 94% 100%, 0 94%);
+  background: #15100f;
+  box-shadow: 0 24px 54px rgba(0,0,0,.28);
+}
+
+.photoSheen {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      112deg,
+      transparent 18%,
+      rgba(255,255,255,.08) var(--shine-x, 50%),
+      transparent 72%
+    );
+  mix-blend-mode: screen;
+  opacity: .65;
+  transition: background-position 180ms ease;
+}
+
+.vinyl {
+  position: absolute;
+  z-index: 1;
+  top: 12%;
+  right: -6%;
+  width: 76%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at center, #b88a57 0 5%, #16100f 5.4% 16%, transparent 16.4%),
+    repeating-radial-gradient(circle at center, rgba(255,255,255,.045) 0 1px, rgba(0,0,0,.1) 1px 3px),
+    radial-gradient(circle at 35% 30%, #292220, #0b0909 64%);
+  box-shadow: 0 24px 42px rgba(0,0,0,.48);
+  transform: translate3d(10%, 0, -12px) rotate(-12deg);
+  transform-origin: center;
+  transition: transform 720ms cubic-bezier(.16,.8,.18,1), filter 360ms ease;
+  filter: brightness(.8);
+}
+
+.vinylGrooves {
+  position: absolute;
+  inset: 4%;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle, transparent 0 3px, rgba(255,255,255,.035) 3px 4px),
+    linear-gradient(118deg, transparent 22%, rgba(255,255,255,.1) 40%, transparent 58%);
+}
+
+.vinylLabel {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  width: 31%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, #8f2d3c, #59202a);
+  color: #f6f1e8;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
+}
+
+.vinylLabel small {
+  font-size: clamp(4px, .44vw, 7px);
+  letter-spacing: .12em;
+}
+
+.vinylLabel strong {
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(5px, .58vw, 9px);
+  letter-spacing: .05em;
+}
+
+.photoOpen .vinyl {
+  transform: translate3d(54%, -2%, 24px) rotate(28deg);
+  filter: brightness(1);
+}
+
+.photo:focus-visible {
+  outline: 2px solid rgba(196,165,116,.82);
+  outline-offset: 8px;
 }
 
 /* Hooked over the slanted bottom edge, a little left of centre. */
@@ -136,9 +240,13 @@
 }
 
 @media (hover: hover) {
-  .hero:hover .photoImage {
+  .photo:hover .photoImage {
     transform: scale(1.018);
     filter: saturate(.98) contrast(1.04);
+  }
+
+  .photo:hover .vinyl {
+    filter: brightness(.94);
   }
 }
 
@@ -287,8 +395,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .photo { animation: none; }
-  .photoImage { transition: none; }
-  .hero:hover .photoImage { transform: none; }
+  .photoImage,
+  .albumStack,
+  .vinyl { transition: none; }
+  .photo:hover .photoImage { transform: none; }
 }
 
 
