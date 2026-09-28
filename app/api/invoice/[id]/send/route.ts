@@ -39,6 +39,8 @@ export async function POST(
   }
 
   const { id } = await params
+  const body = await request.json().catch(() => null) as { mode?: string } | null
+  const mode = body?.mode === 'reminder' ? 'reminder' : 'invoice'
   const supabase = await createClient()
   const { data: auth } = await supabase.auth.getUser()
 
@@ -114,6 +116,14 @@ export async function POST(
     return NextResponse.json({ error: 'Paid invoices cannot be sent again from the invoice workflow.' }, { status: 400 })
   }
 
+  if (mode === 'reminder' && !invoice) {
+    return NextResponse.json({ error: 'Create and send the invoice before sending a reminder.' }, { status: 400 })
+  }
+
+  if (mode === 'reminder' && invoice?.status !== 'sent') {
+    return NextResponse.json({ error: 'Only sent invoices can receive a payment reminder.' }, { status: 400 })
+  }
+
   const effectiveBooking = applyInvoiceSnapshot(booking, invoice)
   const clientEmail = effectiveBooking.clients?.email?.trim()
   if (!clientEmail) {
@@ -130,6 +140,10 @@ export async function POST(
   const invoiceNumber = invoice?.invoice_number || invoiceNumberOf(effectiveBooking)
   const pdfFilename = invoice?.pdf_filename || invoiceFilename(effectiveBooking)
 
+  if (mode === 'reminder' && balance <= 0) {
+    return NextResponse.json({ error: 'This invoice does not have an outstanding balance.' }, { status: 400 })
+  }
+
   const result = await sendInvoiceNotification({
     to: clientEmail,
     clientName,
@@ -138,6 +152,7 @@ export async function POST(
     balanceDue: formatCurrency(balance),
     pdfBase64,
     pdfFilename,
+    mode,
   })
 
   if (!result.ok) {
@@ -155,31 +170,35 @@ export async function POST(
 
   try {
     const admin = createAdminClient()
-    const sentAt = new Date().toISOString()
 
-    const { error: invoiceError } = await admin
-      .from('invoices')
-      .upsert({
-        booking_id: booking.id,
-        status: 'sent',
-        invoice_number: invoiceNumber,
-        pdf_filename: pdfFilename,
-        event_name: effectiveBooking.event_name,
-        client_name: clientName,
-        client_email: clientEmail,
-        total_amount: effectiveBooking.quote ?? 0,
-        deposit_amount: effectiveBooking.deposit_amount ?? 0,
-        balance_due: balance,
-        sent_at: sentAt,
-      }, { onConflict: 'booking_id' })
+    if (mode === 'invoice') {
+      const sentAt = new Date().toISOString()
+      const { error: invoiceError } = await admin
+        .from('invoices')
+        .upsert({
+          booking_id: booking.id,
+          status: 'sent',
+          invoice_number: invoiceNumber,
+          pdf_filename: pdfFilename,
+          event_name: effectiveBooking.event_name,
+          client_name: clientName,
+          client_email: clientEmail,
+          total_amount: effectiveBooking.quote ?? 0,
+          deposit_amount: effectiveBooking.deposit_amount ?? 0,
+          balance_due: balance,
+          sent_at: sentAt,
+        }, { onConflict: 'booking_id' })
 
-    if (invoiceError) {
-      console.error('[invoice-send] unable to save invoice state:', invoiceError)
+      if (invoiceError) {
+        console.error('[invoice-send] unable to save invoice state:', invoiceError)
+      }
     }
 
     await admin.from('notes').insert({
       booking_id: booking.id,
-      body: `Invoice email sent to ${clientEmail}.`,
+      body: mode === 'reminder'
+        ? `Invoice #${invoiceNumber} payment reminder sent to ${clientEmail}.`
+        : `Invoice email sent to ${clientEmail}.`,
     })
   } catch (error) {
     console.error('[invoice-send] post-send bookkeeping failed:', error)
