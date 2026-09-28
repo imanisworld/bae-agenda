@@ -85,11 +85,11 @@ export default function MeetIdentityHero() {
 
       <div className={styles.copy}>
         <div className={styles.title}>
-          <p>Indianapolis</p>
           <h1 id="meet-title">Meet</h1>
         </div>
 
         <div className={styles.details}>
+          <p className={styles.location}>Indianapolis</p>
           <div className={styles.summary}>
             Open-format, not random. I move across genres with intention, read the room, and build the set around the people in front of me.
           </div>
