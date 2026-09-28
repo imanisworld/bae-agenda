@@ -158,10 +158,10 @@ export default async function InvoicesPage({
           <div className="admin-list-tools">
             <form method="GET" action="/admin/invoices" className="admin-search-form">
               {activeStatus !== 'all' ? <input type="hidden" name="status" value={activeStatus} /> : null}
-              <label htmlFor="invoice-search" className="sr-only">Search invoices</label>
               <input
                 id="invoice-search"
                 type="search"
+                aria-label="Search invoices"
                 name="q"
                 defaultValue={query}
                 className="admin-search-input"
