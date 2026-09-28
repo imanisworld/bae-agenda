@@ -3,6 +3,7 @@ import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
+import { restoreInvoiceDraftAction, voidInvoiceAction } from '@/app/actions/invoices'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 export const dynamic = 'force-dynamic'
@@ -198,12 +199,28 @@ export default async function InvoicesPage({
                           PDF
                         </a>
                         {invoice.status !== 'paid' && invoice.status !== 'void' && (
-                          <SendInvoiceButton
-                            bookingId={invoice.booking_id}
-                            clientEmail={invoice.client_email}
-                            className="admin-btn-ghost"
-                            label={invoice.sent_at ? 'Resend' : 'Send'}
-                          />
+                          <>
+                            <SendInvoiceButton
+                              bookingId={invoice.booking_id}
+                              clientEmail={invoice.client_email}
+                              className="admin-btn-ghost"
+                              label={invoice.sent_at ? 'Resend' : 'Send'}
+                            />
+                            <form action={voidInvoiceAction}>
+                              <input type="hidden" name="booking_id" value={invoice.booking_id} />
+                              <button type="submit" className="admin-btn-danger">
+                                Void
+                              </button>
+                            </form>
+                          </>
+                        )}
+                        {invoice.status === 'void' && (
+                          <form action={restoreInvoiceDraftAction}>
+                            <input type="hidden" name="booking_id" value={invoice.booking_id} />
+                            <button type="submit" className="admin-btn-ghost">
+                              Restore
+                            </button>
+                          </form>
                         )}
                       </div>
                     </td>
