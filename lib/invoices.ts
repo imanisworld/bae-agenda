@@ -44,7 +44,7 @@ export interface InvoiceSnapshotData {
   balance_due: number
   due_date?: string | null
   payment_terms?: string | null
-  line_items?: unknown
+  line_items?: InvoiceLineItem[]
 }
 
 function roundCurrency(value: number) {
