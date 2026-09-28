@@ -50,8 +50,13 @@ export async function POST(
   }
 
   const { id } = await params
-  const body = await request.json().catch(() => null) as { mode?: string } | null
+  const body = await request.json().catch(() => null) as { mode?: string; attemptId?: string } | null
   const mode = body?.mode === 'reminder' ? 'reminder' : 'invoice'
+  const attemptId =
+    typeof body?.attemptId === 'string' &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(body.attemptId)
+      ? body.attemptId
+      : null
   const supabase = await createClient()
   const { data: auth } = await supabase.auth.getUser()
 
@@ -171,6 +176,8 @@ export async function POST(
     pdfFilename,
     dueDate: formatInvoiceDueDate(invoice?.due_date),
     mode,
+  }, {
+    idempotencyKey: attemptId ? `invoice-${mode}-${booking.id}-${attemptId}` : undefined,
   })
 
   if (!result.ok) {
