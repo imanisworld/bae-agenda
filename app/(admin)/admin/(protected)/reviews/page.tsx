@@ -20,14 +20,15 @@ function Stars({ n }: { n: number }) {
 async function getReviews() {
   try {
     const supabase = createAdminClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('reviews')
       .select('id, name, event_type, rating, message, approved, created_at')
       .order('created_at', { ascending: false })
 
+    if (error) throw new Error(error.message || 'Unable to load reviews.')
     return (data ?? []) as Review[]
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load reviews.')
   }
 }
 
