@@ -52,7 +52,7 @@ export default function HeroSection({ content = {} }: Props) {
 
         <div className={styles.actions}>
           <Link href="/book" className="btn-primary">Book DJ B.A.E. →</Link>
-          <Link href="/portfolio" className="btn-ghost">See the Work</Link>
+          <Link href="/portfolio" className="btn-ghost">Past Work</Link>
         </div>
       </div>
 
