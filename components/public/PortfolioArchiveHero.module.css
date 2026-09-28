@@ -66,6 +66,22 @@
   gap: 14px 20px;
 }
 
+/* Solid cream so it stands out over the blurred photo. */
+.actions .archive {
+  background: #f6f1e8;
+  color: #111;
+  border-color: #f6f1e8;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,.35);
+}
+
+.actions .archive:hover,
+.actions .archive:focus-visible {
+  background: #fff;
+  border-color: #fff;
+  color: #111;
+}
+
 /* White with a soft shadow so it reads over the blurred photo. */
 .instagram {
   color: #f6f1e8;
