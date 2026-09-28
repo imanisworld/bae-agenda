@@ -39,6 +39,16 @@ export async function updateClientAction(formData: FormData) {
   const { id, first_name, last_name, email, phone, notes } = parsed.data
   const admin = createAdminClient()
 
+  const { data: previousClient, error: previousClientError } = await admin
+    .from('clients')
+    .select('first_name, last_name, email')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (previousClientError || !previousClient) {
+    redirectWithError(id, 'Could not load the current client record before saving changes.')
+  }
+
   const { error } = await admin
     .from('clients')
     .update({
@@ -65,18 +75,42 @@ export async function updateClientAction(formData: FormData) {
 
   const bookingIds = (clientBookings ?? []).map((booking) => booking.id)
   if (bookingIds.length > 0) {
-    const clientName = [first_name, last_name].filter(Boolean).join(' ')
-    const { error: invoiceSyncError } = await admin
+    const previousName = [previousClient.first_name, previousClient.last_name].filter(Boolean).join(' ')
+    const nextName = [first_name, last_name].filter(Boolean).join(' ')
+    const previousEmail = previousClient.email?.trim() || null
+    const nextEmail = email || null
+
+    const { data: draftInvoices, error: draftLookupError } = await admin
       .from('invoices')
-      .update({
-        client_name: clientName,
-        client_email: email,
-      })
+      .select('id, client_name, client_email')
       .in('booking_id', bookingIds)
       .eq('status', 'draft')
 
-    if (invoiceSyncError) {
-      redirectWithError(id, 'Client details were saved, but draft invoices could not be synced. Review any draft invoice before sending.')
+    if (draftLookupError) {
+      redirectWithError(id, 'Client details were saved, but draft invoices could not be checked. Review any draft invoice before sending.')
+    }
+
+    for (const invoice of draftInvoices ?? []) {
+      const patch: { client_name?: string; client_email?: string | null } = {}
+
+      if (!invoice.client_name || invoice.client_name === previousName) {
+        patch.client_name = nextName
+      }
+      if (!invoice.client_email || invoice.client_email === previousEmail) {
+        patch.client_email = nextEmail
+      }
+
+      if (Object.keys(patch).length === 0) continue
+
+      const { error: invoiceSyncError } = await admin
+        .from('invoices')
+        .update(patch)
+        .eq('id', invoice.id)
+        .eq('status', 'draft')
+
+      if (invoiceSyncError) {
+        redirectWithError(id, 'Client details were saved, but one or more draft invoices could not be synced. Review draft invoices before sending.')
+      }
     }
   }
 
