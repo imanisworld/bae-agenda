@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { applyInvoiceSnapshot, balanceDueOf, generateInvoicePdf, invoiceFilename, invoiceNumberOf, type InvoiceBookingData, type InvoiceSnapshotData } from '@/lib/invoices'
+import { applyInvoiceSnapshot, balanceDueOf, formatInvoiceDueDate, generateInvoicePdf, invoiceFilename, invoiceNumberOf, type InvoiceBookingData, type InvoiceSnapshotData } from '@/lib/invoices'
 import { sendInvoiceNotification } from '@/lib/notifications'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
 import { limitInvoiceSend } from '@/lib/ratelimit'
@@ -95,7 +95,7 @@ export async function POST(
       .maybeSingle(),
     supabase
       .from('invoices')
-      .select('status, invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due')
+      .select('status, invoice_number, pdf_filename, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, due_date, payment_terms, line_items')
       .eq('booking_id', id)
       .maybeSingle(),
   ])
@@ -135,7 +135,7 @@ export async function POST(
     .join(' ')
     .trim() || 'Client'
 
-  const pdfBase64 = Buffer.from(await generateInvoicePdf(effectiveBooking)).toString('base64')
+  const pdfBase64 = Buffer.from(await generateInvoicePdf(effectiveBooking, invoice)).toString('base64')
   const balance = invoice ? Number(invoice.balance_due ?? 0) : balanceDueOf(effectiveBooking)
   const invoiceNumber = invoice?.invoice_number || invoiceNumberOf(effectiveBooking)
   const pdfFilename = invoice?.pdf_filename || invoiceFilename(effectiveBooking)
@@ -152,6 +152,7 @@ export async function POST(
     balanceDue: formatCurrency(balance),
     pdfBase64,
     pdfFilename,
+    dueDate: formatInvoiceDueDate(invoice?.due_date),
     mode,
   })
 
