@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import type { InvoiceLineItem } from '@/lib/invoices'
 
 interface Props {
@@ -17,9 +17,9 @@ interface EditableLineItem {
 
 const MAX_ITEMS = 8
 
-function makeEditable(item?: InvoiceLineItem, index = 0): EditableLineItem {
+function makeEditable(item?: InvoiceLineItem, id = 'item-0'): EditableLineItem {
   return {
-    id: `${Date.now()}-${index}-${Math.random().toString(36).slice(2)}`,
+    id,
     description: item?.description ?? '',
     quantity: String(item?.quantity ?? 1),
     unitAmount: String(item?.unit_amount ?? 0),
@@ -36,8 +36,9 @@ function formatCurrency(value: number) {
 export default function InvoiceLineItemsEditor({ initialItems, disabled = false }: Props) {
   const [items, setItems] = useState<EditableLineItem[]>(() => {
     const source = initialItems.length ? initialItems : [{ description: '', quantity: 1, unit_amount: 0 }]
-    return source.map((item, index) => makeEditable(item, index))
+    return source.map((item, index) => makeEditable(item, `item-${index}`))
   })
+  const nextId = useRef(initialItems.length || 1)
 
   const total = useMemo(
     () => items.reduce((sum, item) => {
@@ -58,7 +59,9 @@ export default function InvoiceLineItemsEditor({ initialItems, disabled = false 
   function addItem() {
     setItems((current) => {
       if (current.length >= MAX_ITEMS) return current
-      return [...current, makeEditable(undefined, current.length)]
+      const id = `item-${nextId.current}`
+      nextId.current += 1
+      return [...current, makeEditable(undefined, id)]
     })
   }
 
