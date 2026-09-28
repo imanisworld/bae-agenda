@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
@@ -230,6 +231,7 @@ export default async function EditBookingPage({
 
   const errorMessage = getMessage(resolvedSearchParams?.error)
   const successMessage = getMessage(resolvedSearchParams?.success)
+  const manualDepositConfirmationId = randomUUID()
 
   const clientName = booking.clients
     ? `${booking.clients.first_name ?? ''} ${booking.clients.last_name ?? ''}`.trim()
@@ -651,6 +653,7 @@ export default async function EditBookingPage({
 
           <form action={confirmManualDepositAction} style={{ border: '1px solid var(--border)', background: 'var(--bg-sunken)', padding: '16px', display: 'grid', gap: '12px' }}>
             <input type="hidden" name="booking_id" value={booking.id} />
+            <input type="hidden" name="confirmation_id" value={manualDepositConfirmationId} />
             <div className="admin-section-title">Manual Deposit Confirm</div>
             <div className="admin-form-grid-two">
               <label style={{ display: 'grid', gap: '7px' }}>
