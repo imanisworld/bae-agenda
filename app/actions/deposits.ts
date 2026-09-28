@@ -17,11 +17,11 @@ function optionalString(value: FormDataEntryValue | null) {
   return trimmed.length ? trimmed : null
 }
 
-function redirectToPay(bookingId: string, message: string, key: 'error' | 'success' = 'error') {
+function redirectToPay(bookingId: string, message: string, key: 'error' | 'success' = 'error'): never {
   redirect(`/pay/${bookingId}?${key}=${encodeURIComponent(message)}`)
 }
 
-function redirectToAdmin(bookingId: string, message: string, key: 'error' | 'success' = 'error') {
+function redirectToAdmin(bookingId: string, message: string, key: 'error' | 'success' = 'error'): never {
   redirect(`/admin/bookings/${bookingId}?${key}=${encodeURIComponent(message)}`)
 }
 
