@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deletePortfolioEntryAction, updatePortfolioEntryAction } from '@/app/actions/portfolio'
 
@@ -164,13 +165,13 @@ export default async function EditPortfolioEntryPage({
 
       <form action={deletePortfolioEntryAction}>
         <input type="hidden" name="id" value={entry.id} />
-        <button
-          type="submit"
+        <ConfirmSubmitButton
+          message="Delete this portfolio entry? This cannot be undone."
           className="admin-btn-ghost"
           style={{ color: '#e85d75', borderColor: 'rgba(232,93,117,0.35)' }}
         >
           Delete Entry
-        </button>
+        </ConfirmSubmitButton>
       </form>
     </div>
   )
