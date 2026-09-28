@@ -37,10 +37,11 @@ function fmtDate(iso: string) {
 async function getClients(): Promise<ClientRow[]> {
   try {
     const supabase = createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('clients')
       .select('id, first_name, last_name, email, phone, created_at, bookings(id)')
       .order('created_at', { ascending: false })
+    if (error) throw new Error(error.message || 'Unable to load clients.')
     const rows = (data ?? []) as ClientQueryRow[]
     return rows.map((c) => ({
       id:            c.id,
@@ -51,8 +52,8 @@ async function getClients(): Promise<ClientRow[]> {
       booking_count: Array.isArray(c.bookings) ? c.bookings.length : 0,
       created_at:    c.created_at,
     }))
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load clients.')
   }
 }
 
@@ -95,7 +96,7 @@ export default async function ClientsPage() {
                     <td data-label="Name" style={{ fontWeight: 400 }}>
                       {c.first_name}{c.last_name ? ` ${c.last_name}` : ''}
                     </td>
-                    <td data-label="Email" className="muted">{c.email ?? '—'}</td>
+                    <td data-label="Email" className="muted">{c.email}</td>
                     <td data-label="Phone" className="muted">{c.phone ?? '—'}</td>
                     <td data-label="Bookings" className="muted">{c.booking_count}</td>
                     <td data-label="Added" className="muted">{fmtDate(c.created_at)}</td>
