@@ -7200,3 +7200,44 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 }
 
+.admin-preview-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 32px;
+  padding: 15px 18px;
+  border: 1px solid rgba(196,165,116,.18);
+  border-radius: 12px;
+  background:
+    linear-gradient(90deg, rgba(143,45,60,.14), rgba(143,45,60,.035)),
+    #15110f;
+}
+
+.admin-preview-mark {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: #c4a574;
+  font-size: 13px;
+}
+
+.admin-preview-title {
+  margin-bottom: 4px;
+  color: #d5b780;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+
+.admin-preview-banner p {
+  margin: 0;
+  color: rgba(246,241,232,.62);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.admin-preview-banner code {
+  color: #f6f1e8;
+  font-size: 11px;
+}
+
