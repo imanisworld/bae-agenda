@@ -2,9 +2,8 @@
  * Approved homepage hero — Editorial Cutout.
  * One performance image, oversized BAE typography, and restrained brand copy.
  */
-import Image from 'next/image'
 import Link from 'next/link'
-import { HangingLogo } from '@/components/public/brand/HangingLogo'
+import HeroInteractivePhoto from '@/components/public/HeroInteractivePhoto'
 import styles from './HeroSection.module.css'
 
 interface HeroContent {
@@ -29,21 +28,7 @@ export default function HeroSection({ content = {} }: Props) {
       {/* Outline copy sits above the photo so the letters still read where the photo covers them. */}
       <div className={`${styles.wordmark} ${styles.wordmarkOutline}`} aria-hidden="true">BAE</div>
 
-      <div className={styles.photo}>
-        <div className={styles.photoFrame}>
-          <Image
-            src="/photos/images/outside.jpg"
-            alt="DJ B.A.E. performing"
-            fill
-            priority
-            sizes="(max-width: 760px) 82vw, 46vw"
-            quality={95}
-            className={styles.photoImage}
-          />
-        </div>
-        {/* Clipped to the bottom edge; rides the photo's float. */}
-        <HangingLogo finish="gold" className={styles.photoTag} />
-      </div>
+      <HeroInteractivePhoto />
 
       <div className={styles.copy}>
         <p className={styles.eyebrow}>Selector · Genre Bender</p>
