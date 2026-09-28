@@ -36,11 +36,13 @@ function inputStyle(): React.CSSProperties {
 
 async function getEvent(id: string): Promise<EventRow | null> {
   const supabase = createClient()
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('events')
     .select('id, title, event_date, event_timezone, venue, city, description, public, featured, show_description, booking_id')
     .eq('id', id)
     .maybeSingle()
+
+  if (error) throw new Error(error.message || 'Unable to load event.')
 
   return (data as EventRow | null) ?? null
 }
