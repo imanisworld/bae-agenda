@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { balanceDueOf, invoiceFilename, invoiceNumberOf, type InvoiceBookingData } from './invoices'
+import {
+  balanceDueOf,
+  formatInvoiceDueDate,
+  invoiceFilename,
+  invoiceLineItemsTotal,
+  invoiceNumberOf,
+  normalizeInvoiceLineItems,
+  type InvoiceBookingData,
+} from './invoices'
 
 const booking: InvoiceBookingData = {
   id: 'c2ef72b0-629e-4fb8-8830-0a5c380f888e',
@@ -34,5 +42,28 @@ describe('invoice helpers', () => {
 
   it('computes the remaining balance from quote minus deposit', () => {
     expect(balanceDueOf(booking)).toBe(900)
+  })
+
+  it('normalizes multiple invoice line items and totals them', () => {
+    const items = normalizeInvoiceLineItems([
+      { description: 'DJ set', quantity: 2, unit_amount: 400 },
+      { description: 'Travel', quantity: 1, unit_amount: 125.5 },
+    ])
+
+    expect(items).toEqual([
+      { description: 'DJ set', quantity: 2, unit_amount: 400 },
+      { description: 'Travel', quantity: 1, unit_amount: 125.5 },
+    ])
+    expect(invoiceLineItemsTotal(items)).toBe(925.5)
+  })
+
+  it('falls back to one service line when stored line items are invalid', () => {
+    expect(normalizeInvoiceLineItems(null, 'House Music Brunch', 1200)).toEqual([
+      { description: 'House Music Brunch', quantity: 1, unit_amount: 1200 },
+    ])
+  })
+
+  it('formats a date-only invoice due date without timezone drift', () => {
+    expect(formatInvoiceDueDate('2026-07-04')).toBe('July 4, 2026')
   })
 })
