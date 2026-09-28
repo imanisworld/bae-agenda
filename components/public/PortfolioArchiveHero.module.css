@@ -198,10 +198,6 @@
 }
 
 .print {
-  --print-rx: 0deg;
-  --print-ry: 0deg;
-  --print-scale: 1;
-  --print-lift: 0px;
   position: absolute;
   width: min(31%, 310px);
   margin: 0;
@@ -209,27 +205,24 @@
   color: #171210;
   box-shadow: 0 28px 60px rgba(0,0,0,.4);
   transform-origin: center;
-  transform-style: preserve-3d;
-  transition: transform 220ms cubic-bezier(.2,.7,.2,1), box-shadow 220ms ease;
-  touch-action: pan-y;
 }
 
 .print:nth-child(1) {
   left: 7%;
   top: 20%;
-  transform: translateY(var(--print-lift)) scale(var(--print-scale)) perspective(900px) rotateX(var(--print-rx)) rotateY(var(--print-ry)) rotate(-5deg);
+  transform: rotate(-5deg);
 }
 
 .print:nth-child(2) {
   left: 35%;
   top: 10%;
-  transform: translateY(var(--print-lift)) scale(var(--print-scale)) perspective(900px) rotateX(var(--print-rx)) rotateY(var(--print-ry)) rotate(2deg);
+  transform: rotate(2deg);
 }
 
 .print:nth-child(3) {
   right: 2%;
   top: 27%;
-  transform: translateY(var(--print-lift)) scale(var(--print-scale)) perspective(900px) rotateX(var(--print-rx)) rotateY(var(--print-ry)) rotate(6deg);
+  transform: rotate(6deg);
 }
 
 .printImage {
@@ -367,9 +360,46 @@
 }
 
 
+.printOpen {
+  --print-rx: 0deg;
+  --print-ry: 0deg;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transform:
+    perspective(900px)
+    rotateX(var(--print-rx))
+    rotateY(var(--print-ry));
+  transform-style: preserve-3d;
+  transition: transform 220ms cubic-bezier(.2,.7,.2,1);
+}
+
+.printOpen:active {
+  scale: .975;
+  translate: 0 4px;
+}
+
+.printOpen:disabled {
+  cursor: default;
+}
+
+.printOpen:focus-visible {
+  outline: 2px solid rgba(196,165,116,.82);
+  outline-offset: 4px;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .print:hover {
-    box-shadow: 0 34px 74px rgba(0,0,0,.46);
+    z-index: 6;
+  }
+
+  .printOpen:hover {
+    translate: 0 -5px;
   }
 
   .logoSpin:hover .logoBounce {
@@ -383,7 +413,8 @@
     animation: none;
   }
 
-  .print {
+  .printOpen {
+    transform: none;
     transition: none;
   }
 }
