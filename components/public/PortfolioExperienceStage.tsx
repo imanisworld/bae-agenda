@@ -1,18 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PortfolioArchive from '@/components/public/PortfolioArchive'
 import PortfolioArchiveHero, { type ArchivePrint } from '@/components/public/PortfolioArchiveHero'
-
-type ArchiveEntry = {
-  id: string
-  event_name: string
-  venue: string | null
-  city: string
-  year: number
-  tags: string[]
-  featured: boolean
-}
+import PortfolioMediaLightbox, {
+  type PortfolioArchiveEntry,
+  type PortfolioArchiveMedia,
+} from '@/components/public/PortfolioMediaLightbox'
 
 type PortfolioStats = {
   total: number
@@ -23,38 +17,61 @@ type PortfolioStats = {
 export default function PortfolioExperienceStage({
   prints,
   entries,
+  media,
   stats,
   instagramUrl,
 }: {
   prints: ArchivePrint[]
-  entries: ArchiveEntry[]
+  entries: PortfolioArchiveEntry[]
+  media: PortfolioArchiveMedia[]
   stats: PortfolioStats
   instagramUrl?: string
 }) {
   const [archiveOpen, setArchiveOpen] = useState(false)
+  const [selectedEntry, setSelectedEntry] = useState<PortfolioArchiveEntry | null>(null)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
 
-  function closeArchive() {
+  const mediaByEntry = useMemo(() => {
+    const grouped = new Map<string, PortfolioArchiveMedia[]>()
+    media.forEach((item) => {
+      const list = grouped.get(item.portfolio_entry_id) ?? []
+      list.push(item)
+      grouped.set(item.portfolio_entry_id, list)
+    })
+    return grouped
+  }, [media])
+
+  const closeArchive = useCallback(() => {
     setArchiveOpen(false)
     window.requestAnimationFrame(() => {
       document.getElementById('portfolio-explore-archive')?.focus()
     })
-  }
+  }, [])
+
+  const openEntry = useCallback((entryId: string) => {
+    const entry = entries.find((item) => item.id === entryId)
+    if (entry) setSelectedEntry(entry)
+  }, [entries])
 
   useEffect(() => {
     if (!archiveOpen) return
     closeButtonRef.current?.focus()
 
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') closeArchive()
+      if (event.key === 'Escape' && !selectedEntry) closeArchive()
     }
     window.addEventListener('keydown', onKeyDown)
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [archiveOpen])
+  }, [archiveOpen, closeArchive, selectedEntry])
 
   return (
     <section className="portfolio-experience" aria-label="Portfolio and past work">
-      <PortfolioArchiveHero prints={prints} onExplore={() => setArchiveOpen(true)} instagramUrl={instagramUrl} />
+      <PortfolioArchiveHero
+        prints={prints}
+        onExplore={() => setArchiveOpen(true)}
+        onOpenEntry={openEntry}
+        instagramUrl={instagramUrl}
+      />
 
       <div className="portfolio-experience-stats" aria-label="Portfolio summary">
         <span><strong>{stats.total || '—'}</strong> events</span>
@@ -77,9 +94,18 @@ export default function PortfolioExperienceStage({
             <button ref={closeButtonRef} type="button" onClick={closeArchive} aria-label="Close archive">Close ×</button>
           </div>
           <div className="experience-drawer-scroll">
-            <PortfolioArchive entries={entries} />
+            <PortfolioArchive entries={entries} media={media} onOpenEntry={openEntry} />
           </div>
         </div>
+      ) : null}
+
+      {selectedEntry ? (
+        <PortfolioMediaLightbox
+          key={selectedEntry.id}
+          entry={selectedEntry}
+          media={mediaByEntry.get(selectedEntry.id) ?? []}
+          onClose={() => setSelectedEntry(null)}
+        />
       ) : null}
     </section>
   )
