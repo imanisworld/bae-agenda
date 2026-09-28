@@ -119,3 +119,44 @@
   .image { transition: none; }
   .poster:hover .image { transform: none; }
 }
+
+
+/* Readability pass — strengthen metadata over photography. */
+.topline,
+.date {
+  color: #d8ba88;
+  font-weight: 500;
+  text-shadow: 0 2px 14px rgba(0,0,0,.68);
+}
+
+.location {
+  color: rgba(246,241,232,.9);
+  text-shadow: 0 2px 14px rgba(0,0,0,.62);
+}
+
+.description {
+  color: rgba(246,241,232,.74);
+}
+
+@media (max-width: 600px) {
+  .shade {
+    background:
+      linear-gradient(180deg, rgba(14,11,10,.42) 0%, transparent 30%),
+      linear-gradient(0deg, rgba(14,11,10,.98) 0%, rgba(14,11,10,.68) 30%, rgba(14,11,10,.12) 64%),
+      linear-gradient(90deg, rgba(14,11,10,.48) 0%, transparent 58%);
+  }
+
+  .topline {
+    font-size: 11px;
+    letter-spacing: .15em;
+  }
+
+  .date {
+    font-size: 12px;
+  }
+
+  .location {
+    font-size: 15px;
+    line-height: 1.45;
+  }
+}

@@ -191,3 +191,39 @@
 @media (prefers-reduced-motion: reduce) {
   .printImage img { transition:none; }
 }
+
+
+/* Readability pass — lift supporting copy without changing the archive composition. */
+.copy > span {
+  color: #d6b681;
+  font-weight: 500;
+}
+
+.copy p {
+  color: rgba(246,241,232,.8);
+  text-shadow: 0 2px 16px rgba(0,0,0,.56);
+}
+
+.footerLine {
+  color: rgba(246,241,232,.58);
+}
+
+@media (max-width: 560px) {
+  .copy > span {
+    font-size: 11px;
+  }
+
+  .copy p {
+    max-width: 30ch;
+    color: rgba(246,241,232,.88);
+    font-size: 15px;
+    line-height: 1.58;
+  }
+
+  .footerLine {
+    color: rgba(246,241,232,.68);
+    font-size: 10px;
+    letter-spacing: .12em;
+    text-shadow: 0 2px 14px rgba(0,0,0,.6);
+  }
+}
