@@ -23,36 +23,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Dependency audit diagnostic
-        shell: bash
-        run: |
-          npm audit --json > /tmp/npm-audit.json || true
-          node <<'NODE'
-          const fs = require('node:fs')
-          const audit = JSON.parse(fs.readFileSync('/tmp/npm-audit.json', 'utf8'))
-          console.log('AUDIT_METADATA ' + JSON.stringify(audit.metadata?.vulnerabilities ?? {}))
-          for (const [name, item] of Object.entries(audit.vulnerabilities ?? {})) {
-            console.log('AUDIT_VULN ' + JSON.stringify({
-              name,
-              severity: item.severity,
-              isDirect: item.isDirect,
-              range: item.range,
-              via: (item.via ?? []).map((entry) => typeof entry === 'string'
-                ? entry
-                : {
-                    source: entry.source,
-                    name: entry.name,
-                    title: entry.title,
-                    severity: entry.severity,
-                    range: entry.range,
-                    url: entry.url,
-                  }),
-              effects: item.effects,
-              fixAvailable: item.fixAvailable,
-            }))
-          }
-          NODE
-
       - name: Test
         run: npm test
 
