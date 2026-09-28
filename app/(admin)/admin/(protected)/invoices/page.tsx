@@ -56,14 +56,15 @@ function fmtDate(value: string | null) {
 async function getInvoices(): Promise<InvoiceRow[]> {
   try {
     const admin = createAdminClient()
-    const { data } = await admin
+    const { data, error } = await admin
       .from('invoices')
       .select('id, booking_id, status, invoice_number, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, due_date, sent_at, created_at, updated_at')
       .order('created_at', { ascending: false })
 
+    if (error) throw new Error(error.message || 'Unable to load invoices.')
     return (data ?? []) as InvoiceRow[]
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load invoices.')
   }
 }
 
