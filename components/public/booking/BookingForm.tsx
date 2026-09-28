@@ -633,7 +633,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
             letterSpacing: '-0.02em',
             margin: '12px 0 0',
           }}>
-            B<HangFrom>o</HangFrom>ok DJ B.A.E<span style={{ color: 'var(--gold)' }}>.</span>
+            B<HangFrom finish="red">o</HangFrom>ok
           </h1>
         </div>
 
