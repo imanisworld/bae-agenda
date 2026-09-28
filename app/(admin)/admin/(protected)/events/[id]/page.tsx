@@ -348,6 +348,11 @@ export default async function EditEventPage({
             </label>
           </div>
 
+          <label style={{ display: 'flex', gap: '9px', alignItems: 'flex-start', color: 'var(--muted)', fontSize: '12px', lineHeight: 1.5 }}>
+            <input type="checkbox" name="rights_confirmed" required style={{ marginTop: '2px' }} />
+            I own this media or have permission from the copyright owner to publish it on The Bae Agenda.
+          </label>
+
           <label style={{ display: 'flex', gap: '9px', alignItems: 'center', color: 'var(--muted)', fontSize: '12px' }}>
             <input type="checkbox" name="public" defaultChecked />
             Publish this media in the event archive
