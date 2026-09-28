@@ -4302,6 +4302,70 @@ body.has-custom-cursor * { cursor: none !important; }
 }
 .admin-btn-primary:hover { background: var(--violet-light); }
 
+/* Shared search + filter controls above admin registers */
+.admin-list-tools {
+  display: grid;
+  gap: 14px;
+  padding: 16px 20px 0;
+}
+
+.admin-search-form {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+}
+
+.admin-search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  background: var(--off-black);
+  color: var(--white);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  transition: border-color var(--motion-fast) var(--ease-standard),
+              box-shadow var(--motion-fast) var(--ease-standard);
+}
+
+.admin-search-input::placeholder {
+  color: var(--muted);
+}
+
+.admin-search-input:focus {
+  border-color: rgba(143,45,60,.72);
+  box-shadow: 0 0 0 2px rgba(143,45,60,.14);
+}
+
+.admin-search-submit,
+.admin-search-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.admin-search-submit:hover,
+.admin-search-submit:focus-visible,
+.admin-search-clear:hover,
+.admin-search-clear:focus-visible {
+  color: var(--white);
+  border-color: rgba(245,245,240,.3);
+}
+
 /* Status filter chips above admin tables */
 .admin-filter-chips {
   display: flex;
@@ -4382,6 +4446,23 @@ body.has-custom-cursor * { cursor: none !important; }
 }
 
 @media (max-width: 960px) {
+  .admin-list-tools {
+    padding: 14px 14px 0;
+  }
+
+  .admin-search-form {
+    flex-wrap: wrap;
+  }
+
+  .admin-search-input {
+    flex-basis: 100%;
+  }
+
+  .admin-search-submit,
+  .admin-search-clear {
+    flex: 1 1 0;
+  }
+
   .admin-page {
     padding: 32px 24px 36px;
   }

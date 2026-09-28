@@ -11,6 +11,7 @@ import { formatInvoiceDueDate } from '@/lib/invoices'
 export const dynamic = 'force-dynamic'
 
 type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'void'
+type InvoiceFilterKey = 'all' | InvoiceStatus
 
 interface InvoiceRow {
   id: string
@@ -29,7 +30,7 @@ interface InvoiceRow {
   updated_at: string
 }
 
-const FILTERS: Array<{ key: 'all' | InvoiceStatus; label: string }> = [
+const FILTERS: Array<{ key: InvoiceFilterKey; label: string }> = [
   { key: 'all', label: 'All' },
   { key: 'draft', label: 'Draft' },
   { key: 'sent', label: 'Sent' },
@@ -53,6 +54,33 @@ function fmtDate(value: string | null) {
   })
 }
 
+function singleParam(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] ?? '' : value ?? ''
+}
+
+function matchesInvoiceSearch(invoice: InvoiceRow, query: string) {
+  if (!query) return true
+  const haystack = [
+    invoice.invoice_number,
+    invoice.client_name,
+    invoice.client_email,
+    invoice.event_name,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+
+  return haystack.includes(query.toLowerCase())
+}
+
+function invoiceListHref(status: InvoiceFilterKey, query = '') {
+  const params = new URLSearchParams()
+  if (status !== 'all') params.set('status', status)
+  if (query) params.set('q', query)
+  const suffix = params.toString()
+  return `/admin/invoices${suffix ? `?${suffix}` : ''}`
+}
+
 async function getInvoices(): Promise<InvoiceRow[]> {
   try {
     const admin = createAdminClient()
@@ -71,18 +99,20 @@ async function getInvoices(): Promise<InvoiceRow[]> {
 export default async function InvoicesPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ status?: string }>
+  searchParams?: Promise<{ status?: string | string[]; q?: string | string[] }>
 }) {
   const invoices = await getInvoices()
   const params = searchParams ? await searchParams : undefined
-  const requestedStatus = params?.status
-  const activeStatus = FILTERS.some((filter) => filter.key === requestedStatus)
-    ? requestedStatus as 'all' | InvoiceStatus
+  const requestedStatus = singleParam(params?.status)
+  const query = singleParam(params?.q).trim()
+  const activeStatus: InvoiceFilterKey = FILTERS.some((filter) => filter.key === requestedStatus)
+    ? requestedStatus as InvoiceFilterKey
     : 'all'
 
+  const searchedInvoices = invoices.filter((invoice) => matchesInvoiceSearch(invoice, query))
   const visibleInvoices = activeStatus === 'all'
-    ? invoices
-    : invoices.filter((invoice) => invoice.status === activeStatus)
+    ? searchedInvoices
+    : searchedInvoices.filter((invoice) => invoice.status === activeStatus)
 
   const outstanding = invoices
     .filter((invoice) => invoice.status !== 'paid' && invoice.status !== 'void')
@@ -119,30 +149,53 @@ export default async function InvoicesPage({
 
       <div className="admin-section" style={{ marginBottom: 0 }}>
         <div className="admin-section-header">
-          <span className="admin-section-title">Invoice Register</span>
+          <span className="admin-section-title">
+            {query ? `Invoice Register · ${visibleInvoices.length} matching` : 'Invoice Register'}
+          </span>
         </div>
 
         {invoices.length > 0 && (
-          <nav aria-label="Filter invoices by status" className="admin-filter-chips">
-            {FILTERS.map((filter) => {
-              const count = filter.key === 'all'
-                ? invoices.length
-                : invoices.filter((invoice) => invoice.status === filter.key).length
-              const active = filter.key === activeStatus
-
-              return (
-                <Link
-                  key={filter.key}
-                  href={filter.key === 'all' ? '/admin/invoices' : `/admin/invoices?status=${filter.key}`}
-                  className={active ? 'admin-filter-chip admin-filter-chip-active' : 'admin-filter-chip'}
-                  aria-current={active ? 'true' : undefined}
-                >
-                  {filter.label}
-                  <span className="admin-filter-chip-count">{count}</span>
+          <div className="admin-list-tools">
+            <form method="GET" action="/admin/invoices" className="admin-search-form">
+              {activeStatus !== 'all' ? <input type="hidden" name="status" value={activeStatus} /> : null}
+              <input
+                id="invoice-search"
+                type="search"
+                aria-label="Search invoices"
+                name="q"
+                defaultValue={query}
+                className="admin-search-input"
+                placeholder="Search invoice, client, email, or event…"
+              />
+              <button type="submit" className="admin-search-submit">Search</button>
+              {query ? (
+                <Link href={invoiceListHref(activeStatus)} className="admin-search-clear">
+                  Clear
                 </Link>
-              )
-            })}
-          </nav>
+              ) : null}
+            </form>
+
+            <nav aria-label="Filter invoices by status" className="admin-filter-chips">
+              {FILTERS.map((filter) => {
+                const count = filter.key === 'all'
+                  ? searchedInvoices.length
+                  : searchedInvoices.filter((invoice) => invoice.status === filter.key).length
+                const active = filter.key === activeStatus
+
+                return (
+                  <Link
+                    key={filter.key}
+                    href={invoiceListHref(filter.key, query)}
+                    className={active ? 'admin-filter-chip admin-filter-chip-active' : 'admin-filter-chip'}
+                    aria-current={active ? 'true' : undefined}
+                  >
+                    {filter.label}
+                    <span className="admin-filter-chip-count">{count}</span>
+                  </Link>
+                )
+              })}
+            </nav>
+          </div>
         )}
 
         {invoices.length === 0 ? (
@@ -153,8 +206,8 @@ export default async function InvoicesPage({
           />
         ) : visibleInvoices.length === 0 ? (
           <AdminEmptyState
-            title={`No ${activeStatus} invoices`}
-            desc="Nothing matches this filter right now."
+            title={query ? 'No matching invoices' : `No ${activeStatus} invoices`}
+            desc={query ? `Nothing matches “${query}” in this view.` : 'Nothing matches this filter right now.'}
           />
         ) : (
           <div className="admin-table-wrap">
