@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import PageHeader from '@/components/admin/PageHeader'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { approveReview, rejectReview } from '@/app/actions/reviews'
 
 interface Review {
@@ -66,9 +67,12 @@ export default async function ReviewsPage() {
               </button>
             </form>
             <form action={rejectReview.bind(null, r.id)}>
-              <button type="submit" className="admin-btn-danger">
+              <ConfirmSubmitButton
+                message="Delete this review? This cannot be undone."
+                className="admin-btn-danger"
+              >
                 Delete
-              </button>
+              </ConfirmSubmitButton>
             </form>
           </div>
         )}
