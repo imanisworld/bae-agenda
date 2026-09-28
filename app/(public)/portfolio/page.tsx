@@ -5,13 +5,20 @@ import { SOCIALS } from '@/lib/constants'
 import { getContentMap } from '@/lib/db/content'
 
 export const metadata: Metadata = {
-  title: 'Portfolio | DJ BAE Gig History — Indianapolis & Chicago',
+  title: { absolute: 'DJ B.A.E. Portfolio | Indianapolis & Chicago' },
   alternates: { canonical: '/portfolio' },
   description: 'Full gig history, featured events, and press for DJ B.A.E. — Indianapolis & Chicago DJ. Club nights, festivals, private events, and more.',
   openGraph: {
-    title: 'DJ B.A.E. — Portfolio',
-    description: 'From basements to festivals. Every room, every crowd.',
+    title: 'DJ B.A.E. Portfolio | Indianapolis & Chicago',
+    description: 'DJ B.A.E. gig history, featured events, club nights, festivals, and private events.'
     url: 'https://thebaeagenda.com/portfolio',
+    images: [{ url: '/photos/PlexMix19-DJBAE.JPEG', width: 1637, height: 1411, alt: 'DJ B.A.E. performing live' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'DJ B.A.E. Portfolio | Indianapolis & Chicago',
+    description: 'DJ B.A.E. gig history, featured events, club nights, festivals, and private events.',
+    images: ['/photos/PlexMix19-DJBAE.JPEG'],
   },
 }
 
