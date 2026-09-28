@@ -27,7 +27,6 @@ function fmtCurrency(value: number | null) {
   return (value ?? 0).toLocaleString('en-US', {
     style: 'currency',
     currency: 'USD',
-    maximumFractionDigits: 0,
   })
 }
 
