@@ -57,7 +57,7 @@ function getMessage(value: string | string[] | undefined) {
 
 async function getClient(id: string): Promise<ClientDetail | null> {
   const admin = createAdminClient()
-  const { data } = await admin
+  const { data, error } = await admin
     .from('clients')
     .select(`
       id,
@@ -71,6 +71,8 @@ async function getClient(id: string): Promise<ClientDetail | null> {
     `)
     .eq('id', id)
     .maybeSingle()
+
+  if (error) throw new Error(error.message || 'Unable to load client.')
 
   return (data as ClientDetail | null) ?? null
 }
