@@ -13,7 +13,7 @@ interface Review {
 }
 
 function Stars({ n }: { n: number }) {
-  return <span style={{ color: 'var(--violet)', letterSpacing: '2px' }}>{'★'.repeat(n)}{'☆'.repeat(5 - n)}</span>
+  return <span className="admin-review-stars">{'★'.repeat(n)}{'☆'.repeat(5 - n)}</span>
 }
 
 async function getReviews() {
@@ -40,13 +40,7 @@ export default async function ReviewsPage() {
 
   function ReviewCard({ r, isPending }: { r: Review; isPending: boolean }) {
     return (
-      <div style={{
-        background: 'var(--surface)',
-        border: `1px solid ${isPending ? 'rgba(155,93,229,0.3)' : 'var(--border)'}`,
-        padding: '20px',
-        display: 'grid',
-        gap: '10px',
-      }}>
+      <div className={isPending ? 'admin-review-card admin-review-card--pending' : 'admin-review-card'}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px', flexWrap: 'wrap' }}>
           <div>
             <div style={{ fontWeight: 500, color: 'var(--white)', fontSize: '14px' }}>{r.name}</div>
@@ -67,31 +61,12 @@ export default async function ReviewsPage() {
         {isPending && (
           <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
             <form action={approveReview.bind(null, r.id)}>
-              <button type="submit" style={{
-                padding: '8px 18px',
-                background: 'var(--violet)',
-                color: 'var(--black)',
-                border: 'none',
-                fontSize: '11px',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                fontWeight: 500,
-                cursor: 'pointer',
-              }}>
+              <button type="submit" className="admin-btn-primary">
                 Approve
               </button>
             </form>
             <form action={rejectReview.bind(null, r.id)}>
-              <button type="submit" style={{
-                padding: '8px 18px',
-                background: 'none',
-                color: '#e85d75',
-                border: '1px solid rgba(232,93,117,0.4)',
-                fontSize: '11px',
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                cursor: 'pointer',
-              }}>
+              <button type="submit" className="admin-btn-danger">
                 Delete
               </button>
             </form>
