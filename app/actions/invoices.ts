@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { requireAdminUser } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
+import { invoiceLineItemsTotal, type InvoiceLineItem } from '@/lib/invoices'
 
 function optionalString(value: FormDataEntryValue | null) {
   if (typeof value !== 'string') return null
@@ -18,6 +19,49 @@ function parseOptionalNumber(value: FormDataEntryValue | null) {
   if (!trimmed) return null
   const parsed = Number(trimmed)
   return Number.isFinite(parsed) ? parsed : null
+}
+
+function parseInvoiceLineItems(formData: FormData): InvoiceLineItem[] | null {
+  const descriptions = formData.getAll('line_description')
+  const quantities = formData.getAll('line_quantity')
+  const unitAmounts = formData.getAll('line_unit_amount')
+
+  if (
+    descriptions.length === 0 ||
+    descriptions.length > 8 ||
+    descriptions.length !== quantities.length ||
+    descriptions.length !== unitAmounts.length
+  ) {
+    return null
+  }
+
+  const items: InvoiceLineItem[] = []
+
+  for (let index = 0; index < descriptions.length; index += 1) {
+    const description = typeof descriptions[index] === 'string'
+      ? descriptions[index].trim()
+      : ''
+    const quantity = Number(quantities[index])
+    const unitAmount = Number(unitAmounts[index])
+
+    if (
+      !description ||
+      !Number.isFinite(quantity) ||
+      quantity <= 0 ||
+      !Number.isFinite(unitAmount) ||
+      unitAmount < 0
+    ) {
+      return null
+    }
+
+    items.push({
+      description,
+      quantity: Math.round((quantity + Number.EPSILON) * 100) / 100,
+      unit_amount: Math.round((unitAmount + Number.EPSILON) * 100) / 100,
+    })
+  }
+
+  return items
 }
 
 function redirectWithError(path: string, message: string): never {
@@ -202,20 +246,46 @@ export async function updateInvoiceDetailsAction(formData: FormData) {
   const eventName = optionalString(formData.get('event_name'))
   const clientName = optionalString(formData.get('client_name'))
   const clientEmail = optionalString(formData.get('client_email'))
-  const totalAmount = parseOptionalNumber(formData.get('total_amount'))
   const depositAmount = parseOptionalNumber(formData.get('deposit_amount'))
+  const dueDate = optionalString(formData.get('due_date'))
+  const paymentTerms = optionalString(formData.get('payment_terms'))
+  const lineItems = parseInvoiceLineItems(formData)
+  const totalAmount = lineItems ? invoiceLineItemsTotal(lineItems) : null
 
-  if (!bookingId || !eventName || !clientName || !clientEmail || totalAmount === null || depositAmount === null) {
+  if (
+    !bookingId ||
+    !eventName ||
+    !clientName ||
+    !clientEmail ||
+    depositAmount === null ||
+    !paymentTerms ||
+    !lineItems ||
+    totalAmount === null
+  ) {
     redirectWithError(
       bookingId ? `/admin/bookings/${bookingId}/invoice/edit` : '/admin/invoices',
-      'Client, event, email, total, and deposit are required.'
+      'Client, event, email, payment terms, deposit, and at least one valid line item are required.'
     )
   }
 
-  if (totalAmount < 0 || depositAmount < 0 || depositAmount > totalAmount) {
+  if (dueDate && !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
     redirectWithError(
       `/admin/bookings/${bookingId}/invoice/edit`,
-      'Invoice amounts must be valid, and the deposit cannot exceed the total.'
+      'Enter a valid invoice due date.'
+    )
+  }
+
+  if (paymentTerms.length > 1000) {
+    redirectWithError(
+      `/admin/bookings/${bookingId}/invoice/edit`,
+      'Payment terms must be 1,000 characters or fewer.'
+    )
+  }
+
+  if (totalAmount <= 0 || depositAmount < 0 || depositAmount > totalAmount) {
+    redirectWithError(
+      `/admin/bookings/${bookingId}/invoice/edit`,
+      'Line items must total more than $0, and the deposit cannot exceed the invoice total.'
     )
   }
 
@@ -251,6 +321,9 @@ export async function updateInvoiceDetailsAction(formData: FormData) {
     total_amount: totalAmount,
     deposit_amount: depositAmount,
     balance_due: totalAmount - depositAmount,
+    due_date: dueDate,
+    payment_terms: paymentTerms,
+    line_items: lineItems,
     pdf_filename: `invoice-${filenameClient}-${bookingId.slice(0, 8)}.pdf`,
     status: resetToDraft ? 'draft' as const : invoice.status,
     ...(resetToDraft ? { sent_at: null } : {}),
