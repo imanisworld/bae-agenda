@@ -44,6 +44,26 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['events']['Insert']>
       }
 
+      // ── event_media ─────────────────────────────────────────────
+      event_media: {
+        Row: {
+          id:         string
+          event_id:   string
+          media_type: 'image' | 'video'
+          media_url:  string
+          poster_url: string | null
+          caption:    string | null
+          sort_order: number
+          public:     boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: Omit<Database['public']['Tables']['event_media']['Row'],
+          'id' | 'created_at' | 'updated_at'
+        > & { id?: string }
+        Update: Partial<Database['public']['Tables']['event_media']['Insert']>
+      }
+
       // ── clients ─────────────────────────────────────────────────
       clients: {
         Row: {

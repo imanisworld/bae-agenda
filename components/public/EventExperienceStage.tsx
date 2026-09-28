@@ -1,23 +1,37 @@
 'use client'
 
 import { HangFrom } from '@/components/public/brand/HangingLogo'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import EventPoster from '@/components/public/EventPoster'
-import type { Event } from '@/lib/db/events'
+import EventMediaLightbox from '@/components/public/EventMediaLightbox'
+import type { Event, EventMedia } from '@/lib/db/events'
 
 type View = 'upcoming' | 'past'
 
 export default function EventExperienceStage({
   events,
   pastEvents = [],
+  pastEventMedia = [],
 }: {
   events: Event[]
   pastEvents?: Event[]
+  pastEventMedia?: EventMedia[]
 }) {
   const [view, setView] = useState<View>(events.length === 0 && pastEvents.length > 0 ? 'past' : 'upcoming')
   const [index, setIndex] = useState(0)
+  const [archiveEvent, setArchiveEvent] = useState<Event | null>(null)
   const trackRef = useRef<HTMLDivElement>(null)
+
+  const mediaByEvent = useMemo(() => {
+    const grouped = new Map<string, EventMedia[]>()
+    pastEventMedia.forEach((item) => {
+      const existing = grouped.get(item.event_id) ?? []
+      existing.push(item)
+      grouped.set(item.event_id, existing)
+    })
+    return grouped
+  }, [pastEventMedia])
 
   const list = view === 'upcoming' ? events : pastEvents
   const isPast = view === 'past'
@@ -124,7 +138,14 @@ export default function EventExperienceStage({
                 aria-roledescription="slide"
                 aria-label={`${i + 1} of ${list.length}`}
               >
-                <EventPoster event={event} priority={i === 0} past={isPast} showDetailsLink />
+                <EventPoster
+                  event={event}
+                  priority={i === 0}
+                  past={isPast}
+                  showDetailsLink
+                  onArchiveClick={isPast ? () => setArchiveEvent(event) : undefined}
+                  mediaCount={mediaByEvent.get(event.id)?.length ?? 0}
+                />
               </div>
             ))}
           </div>
@@ -136,6 +157,14 @@ export default function EventExperienceStage({
           </div>
         )}
       </div>
+
+      {archiveEvent ? (
+        <EventMediaLightbox
+          event={archiveEvent}
+          media={mediaByEvent.get(archiveEvent.id) ?? []}
+          onClose={() => setArchiveEvent(null)}
+        />
+      ) : null}
     </section>
   )
 }

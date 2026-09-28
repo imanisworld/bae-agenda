@@ -36,6 +36,31 @@ function optionalString(value: FormDataEntryValue | null): string | null {
   return trimmed.length ? trimmed : null
 }
 
+
+function requiredHttpUrl(value: FormDataEntryValue | null): string | null {
+  const raw = optionalString(value)
+  if (!raw) return null
+
+  try {
+    const url = new URL(raw)
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null
+  } catch {
+    return null
+  }
+}
+
+function optionalHttpUrl(value: FormDataEntryValue | null): string | null {
+  const raw = optionalString(value)
+  if (!raw) return null
+  return requiredHttpUrl(raw)
+}
+
+function parseSortOrder(value: FormDataEntryValue | null) {
+  if (typeof value !== 'string' || !value.trim()) return 0
+  const parsed = Number.parseInt(value, 10)
+  return Number.isFinite(parsed) ? parsed : 0
+}
+
 export async function createEventAction(formData: FormData) {
   await requireAdminUser()
   const admin = createAdminClient()
@@ -173,4 +198,97 @@ export async function toggleEventFeaturedAction(formData: FormData) {
   revalidatePath('/events')
   revalidatePath('/')
   redirect('/admin/events')
+}
+
+
+export async function addEventMediaAction(formData: FormData) {
+  await requireAdminUser()
+  const admin = createAdminClient()
+
+  const eventId = optionalString(formData.get('event_id'))
+  const mediaType = optionalString(formData.get('media_type'))
+  const mediaUrl = requiredHttpUrl(formData.get('media_url'))
+  const posterUrl = optionalHttpUrl(formData.get('poster_url'))
+
+  if (!eventId || (mediaType !== 'image' && mediaType !== 'video') || !mediaUrl) {
+    redirectWithError(
+      eventId ? `/admin/events/${eventId}` : '/admin/events',
+      'Event, media type, and a valid http(s) media URL are required.'
+    )
+  }
+
+  const { error } = await admin.from('event_media').insert({
+    event_id: eventId,
+    media_type: mediaType,
+    media_url: mediaUrl,
+    poster_url: posterUrl,
+    caption: optionalString(formData.get('caption')),
+    sort_order: parseSortOrder(formData.get('sort_order')),
+    public: formData.get('public') === 'on',
+  })
+
+  if (error) {
+    redirectWithError(`/admin/events/${eventId}`, error.message || 'Unable to add event media.')
+  }
+
+  revalidatePath(`/admin/events/${eventId}`)
+  revalidatePath('/events')
+  redirect(`/admin/events/${eventId}?success=Media%20added`)
+}
+
+export async function updateEventMediaAction(formData: FormData) {
+  await requireAdminUser()
+  const admin = createAdminClient()
+
+  const eventId = optionalString(formData.get('event_id'))
+  const mediaId = optionalString(formData.get('media_id'))
+  const posterUrl = optionalHttpUrl(formData.get('poster_url'))
+
+  if (!eventId || !mediaId) {
+    redirectWithError('/admin/events', 'Missing event media id.')
+  }
+
+  const { error } = await admin
+    .from('event_media')
+    .update({
+      poster_url: posterUrl,
+      caption: optionalString(formData.get('caption')),
+      sort_order: parseSortOrder(formData.get('sort_order')),
+      public: formData.get('public') === 'on',
+    })
+    .eq('id', mediaId)
+    .eq('event_id', eventId)
+
+  if (error) {
+    redirectWithError(`/admin/events/${eventId}`, error.message || 'Unable to update event media.')
+  }
+
+  revalidatePath(`/admin/events/${eventId}`)
+  revalidatePath('/events')
+  redirect(`/admin/events/${eventId}?success=Media%20updated`)
+}
+
+export async function deleteEventMediaAction(formData: FormData) {
+  await requireAdminUser()
+  const admin = createAdminClient()
+
+  const eventId = optionalString(formData.get('event_id'))
+  const mediaId = optionalString(formData.get('media_id'))
+  if (!eventId || !mediaId) {
+    redirectWithError('/admin/events', 'Missing event media id.')
+  }
+
+  const { error } = await admin
+    .from('event_media')
+    .delete()
+    .eq('id', mediaId)
+    .eq('event_id', eventId)
+
+  if (error) {
+    redirectWithError(`/admin/events/${eventId}`, error.message || 'Unable to delete event media.')
+  }
+
+  revalidatePath(`/admin/events/${eventId}`)
+  revalidatePath('/events')
+  redirect(`/admin/events/${eventId}?success=Media%20deleted`)
 }
