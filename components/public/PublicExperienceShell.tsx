@@ -7,7 +7,7 @@ import PublicPageStage from '@/components/public/PublicPageStage'
 import PlayerProvider from '@/components/public/player/PlayerProvider'
 
 const EXPERIENCE_ROUTES = new Set(['/', '/events', '/lab', '/portfolio', '/meet', '/book'])
-const EXIT_DELAY_MS = 120
+const EXIT_DELAY_MS = 180
 
 export default function PublicExperienceShell({ children, footer, sticky }: { children: React.ReactNode; footer: React.ReactNode; sticky: React.ReactNode }) {
   const pathname = usePathname()
@@ -62,6 +62,10 @@ export default function PublicExperienceShell({ children, footer, sticky }: { ch
         }
         onClickCapture={handleRouteClick}
       >
+        <div className="public-route-transition" aria-hidden="true">
+          <span className="public-route-transition-disc" />
+          <span className="public-route-transition-streak" />
+        </div>
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <Nav />
         {!experienceMode ? sticky : null}
