@@ -56,6 +56,7 @@ export default function MeetIdentityHero() {
 
       <div
         className={`${styles.portraitWrap}${interacting ? ` ${styles.portraitInteracting}` : ''}`}
+        data-route-swipe-block
         onPointerDown={pointerDown}
         onPointerMove={pointerMove}
         onPointerUp={finish}
