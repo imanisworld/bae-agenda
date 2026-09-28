@@ -33,14 +33,15 @@ function formatDate(iso: string | null): string {
 async function getMixes(): Promise<MixRow[]> {
   try {
     const supabase = createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('mixes')
       .select('id, title, genre, duration, is_featured, sort_order, published_at')
       .order('published_at', { ascending: false })
       .order('sort_order', { ascending: true })
+    if (error) throw new Error(error.message || 'Unable to load mixes.')
     return (data ?? []) as MixRow[]
-  } catch {
-    return []
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('Unable to load mixes.')
   }
 }
 
