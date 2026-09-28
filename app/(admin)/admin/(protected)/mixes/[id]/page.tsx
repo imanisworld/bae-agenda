@@ -4,6 +4,7 @@ import PageHeader from '@/components/admin/PageHeader'
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { deleteMixAction, updateMixAction } from '@/app/actions/mixes'
+import { getEventInputDateTime } from '@/lib/date-time'
 
 interface MixRow {
   id: string
@@ -32,10 +33,8 @@ function inputStyle(): React.CSSProperties {
 
 function toDateTimeLocal(iso: string | null): string {
   if (!iso) return ''
-  const d = new Date(iso)
-  if (Number.isNaN(d.getTime())) return ''
-  const offsetMs = d.getTimezoneOffset() * 60_000
-  return new Date(d.getTime() - offsetMs).toISOString().slice(0, 16)
+  const parts = getEventInputDateTime(iso, 'America/Indiana/Indianapolis')
+  return parts ? `${parts.date}T${parts.time}` : ''
 }
 
 async function getMix(id: string): Promise<MixRow | null> {
