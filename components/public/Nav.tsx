@@ -37,6 +37,11 @@ export default function Nav() {
       </div>
 
       <div className={styles.dockWrap}>
+        <div className={styles.dockCue} aria-hidden="true">
+          <span className={styles.cueDesktop}>Click a section</span>
+          <span className={styles.cueMobile}>Tap a section</span>
+          <span className={styles.cueArrow}>↓</span>
+        </div>
         <nav className={styles.dock} aria-label="Primary navigation">
           {PUBLIC_NAV.map((item, index) => {
             const active = isActive(item.href)
