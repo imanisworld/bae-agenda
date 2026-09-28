@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -117,6 +118,7 @@ export default async function PayBookingPage({
   const errorMessage = getMessage(resolvedSearchParams?.error)
   const successMessage = getMessage(resolvedSearchParams?.success)
   const checkoutState = getMessage(resolvedSearchParams?.checkout)
+  const stripeCheckoutAttemptId = randomUUID()
 
   return (
     <section
@@ -220,6 +222,7 @@ export default async function PayBookingPage({
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
               <form action={startStripeDepositCheckoutAction} style={{ border: '1px solid var(--border)', background: 'var(--bg-sunken)', padding: '20px', display: 'grid', gap: '12px' }}>
                 <input type="hidden" name="booking_id" value={booking.id} />
+                <input type="hidden" name="checkout_attempt_id" value={stripeCheckoutAttemptId} />
                 <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '18px' }}>Pay with Stripe</div>
                 <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7 }}>
                   Pay the deposit online now. Stripe confirms the payment before the booking is marked paid.
