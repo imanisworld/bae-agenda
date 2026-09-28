@@ -129,6 +129,23 @@ export async function toggleEventPublicAction(formData: FormData) {
   if (!id) redirectWithError('/admin/events', 'Missing event id.')
 
   const nextValue = formData.get('next_public') === 'true'
+
+  if (nextValue) {
+    const { data: event, error: lookupError } = await admin
+      .from('events')
+      .select('event_timezone')
+      .eq('id', id)
+      .maybeSingle()
+
+    if (lookupError || !event) {
+      redirectWithError('/admin/events', 'Could not verify this event before publishing.')
+    }
+
+    if (!event.event_timezone || !isValidTimeZone(event.event_timezone)) {
+      redirectWithError('/admin/events', 'Add a valid event time zone before publishing this event.')
+    }
+  }
+
   const { error } = await admin.from('events').update({ public: nextValue }).eq('id', id)
   if (error) {
     redirectWithError('/admin/events', error.message || 'Unable to update event visibility.')
