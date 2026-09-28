@@ -124,7 +124,7 @@ export default function EventExperienceStage({
                 aria-roledescription="slide"
                 aria-label={`${i + 1} of ${list.length}`}
               >
-                <EventPoster event={event} priority={i === 0} past={isPast} />
+                <EventPoster event={event} priority={i === 0} past={isPast} showDetailsLink />
               </div>
             ))}
           </div>
