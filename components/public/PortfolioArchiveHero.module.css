@@ -66,21 +66,24 @@
   gap: 14px 20px;
 }
 
+/* White with a soft shadow so it reads over the blurred photo. */
 .instagram {
-  color: #d8ba88;
+  color: #f6f1e8;
   font-size: 11px;
+  font-weight: 600;
   letter-spacing: .14em;
   text-transform: uppercase;
   text-decoration: none;
-  border-bottom: 1px solid rgba(196,165,116,.35);
+  text-shadow: 0 1px 10px rgba(0,0,0,.7);
+  border-bottom: 1px solid rgba(246,241,232,.7);
   padding-bottom: 3px;
   transition: color 150ms ease, border-color 150ms ease;
 }
 
 .instagram:hover,
 .instagram:focus-visible {
-  color: #f6f1e8;
-  border-color: rgba(246,241,232,.6);
+  color: #fff;
+  border-color: #fff;
 }
 
 .logoSpin {
