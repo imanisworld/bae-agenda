@@ -5,6 +5,7 @@
   isolation: isolate;
   border: 1px solid rgba(246,241,232,.14);
   background: #0e0b0a;
+  transition: transform 180ms ease, border-color 180ms ease;
 }
 
 .image {
@@ -234,4 +235,21 @@
 .archiveReady .archiveButton,
 .archiveReady .detailsLink {
   pointer-events: auto;
+}
+
+
+.archiveReady:active {
+  transform: scale(.992);
+  border-color: rgba(196,165,116,.28);
+}
+
+.archiveButton:active,
+.detailsLink:active {
+  translate: 0 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster {
+    transition: none;
+  }
 }
