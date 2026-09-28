@@ -11,7 +11,7 @@ interface ClientRow {
   id:             string
   first_name:     string
   last_name:      string | null
-  email:          string
+  email:          string | null
   phone:          string | null
   booking_count:  number
   created_at:     string
@@ -21,7 +21,7 @@ interface ClientQueryRow {
   id: string
   first_name: string
   last_name: string | null
-  email: string
+  email: string | null
   phone: string | null
   created_at: string
   bookings: Array<{ id: string }> | null
@@ -95,7 +95,7 @@ export default async function ClientsPage() {
                     <td data-label="Name" style={{ fontWeight: 400 }}>
                       {c.first_name}{c.last_name ? ` ${c.last_name}` : ''}
                     </td>
-                    <td data-label="Email" className="muted">{c.email}</td>
+                    <td data-label="Email" className="muted">{c.email ?? '—'}</td>
                     <td data-label="Phone" className="muted">{c.phone ?? '—'}</td>
                     <td data-label="Bookings" className="muted">{c.booking_count}</td>
                     <td data-label="Added" className="muted">{fmtDate(c.created_at)}</td>
