@@ -75,7 +75,11 @@ async function getReviewRequestSource(admin: AdminClient, bookingId: string) {
   return data as BookingReviewRequestSource & { review_request_sent_at: string | null }
 }
 
-export async function sendBookingPostEventFollowUpEmail(admin: AdminClient, bookingId: string, options?: { force?: boolean; nowIso?: string; mode?: BookingEmailMode }): Promise<DispatchResult> {
+export async function sendBookingPostEventFollowUpEmail(
+  admin: AdminClient,
+  bookingId: string,
+  options?: { force?: boolean; nowIso?: string; mode?: BookingEmailMode; idempotencyKey?: string }
+): Promise<DispatchResult> {
   const booking = await getPostEventFollowUpSource(admin, bookingId)
   if (!booking) return { status: 'skipped', reason: 'not_found' }
   if (!options?.force && booking.post_event_follow_up_sent_at) return { status: 'skipped', reason: 'already_sent' }
@@ -84,7 +88,7 @@ export async function sendBookingPostEventFollowUpEmail(admin: AdminClient, book
   if (!payload) return { status: 'skipped', reason: 'not_ready' }
 
   const result = await sendBookingPostEventFollowUp(payload, {
-    idempotencyKey: options?.force ? undefined : `booking-post-event-${bookingId}`,
+    idempotencyKey: options?.idempotencyKey ?? (options?.force ? undefined : `booking-post-event-${bookingId}`),
   })
   if (!result.ok) return { status: 'failed', detail: result.detail || 'Unable to send post-event follow-up email.' }
 
@@ -95,7 +99,11 @@ export async function sendBookingPostEventFollowUpEmail(admin: AdminClient, book
   return { status: 'sent', email: payload.email }
 }
 
-export async function sendBookingReviewRequestEmail(admin: AdminClient, bookingId: string, options?: { force?: boolean; nowIso?: string; mode?: BookingEmailMode }): Promise<DispatchResult> {
+export async function sendBookingReviewRequestEmail(
+  admin: AdminClient,
+  bookingId: string,
+  options?: { force?: boolean; nowIso?: string; mode?: BookingEmailMode; idempotencyKey?: string }
+): Promise<DispatchResult> {
   const booking = await getReviewRequestSource(admin, bookingId)
   if (!booking) return { status: 'skipped', reason: 'not_found' }
   if (!options?.force && booking.review_request_sent_at) return { status: 'skipped', reason: 'already_sent' }
@@ -104,7 +112,7 @@ export async function sendBookingReviewRequestEmail(admin: AdminClient, bookingI
   if (!payload) return { status: 'skipped', reason: 'not_ready' }
 
   const result = await sendBookingReviewRequest(payload, {
-    idempotencyKey: options?.force ? undefined : `booking-review-request-${bookingId}`,
+    idempotencyKey: options?.idempotencyKey ?? (options?.force ? undefined : `booking-review-request-${bookingId}`),
   })
   if (!result.ok) return { status: 'failed', detail: result.detail || 'Unable to send review request email.' }
 
