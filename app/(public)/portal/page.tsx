@@ -88,8 +88,8 @@ export default async function PortalHomePage() {
   const bookings = await getPortalBookings(client.id)
 
   return (
-    <section className="section-container" style={{ maxWidth: '1100px', paddingTop: '104px', paddingBottom: '80px' }}>
-      <div style={{ display: 'grid', gap: '20px' }}>
+    <section className="section-container portal-home-page" style={{ maxWidth: '1100px', paddingTop: '104px', paddingBottom: '80px' }}>
+      <div className="portal-page-stack" style={{ display: 'grid', gap: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
           <div style={{ display: 'grid', gap: '10px' }}>
             <span className="section-label" style={{ marginBottom: 0 }}>Client Portal</span>
@@ -109,7 +109,7 @@ export default async function PortalHomePage() {
         </div>
 
         {bookings.length === 0 ? (
-          <div style={{ border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '24px', color: 'var(--muted)', fontSize: '14px', lineHeight: 1.7 }}>
+          <div className="portal-card portal-empty-card" style={{ border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '24px', color: 'var(--muted)', fontSize: '14px', lineHeight: 1.7 }}>
             No bookings are linked to this account yet. If that looks wrong, contact me and I&apos;ll help match the right number.
           </div>
         ) : (
@@ -127,6 +127,7 @@ export default async function PortalHomePage() {
               return (
                 <article
                   key={booking.id}
+                  className="portal-card portal-booking-card"
                   style={{
                     border: '1px solid var(--border)',
                     background: 'rgba(10,10,14,0.92)',
@@ -156,7 +157,7 @@ export default async function PortalHomePage() {
                       { label: 'Paid So Far', value: formatCurrency(receivedTotal) },
                       { label: 'Remaining', value: formatCurrency(outstandingBalance) },
                     ].map((item) => (
-                      <div key={item.label} style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'var(--bg-sunken)', padding: '14px 16px' }}>
+                      <div key={item.label} className="portal-metric-card" style={{ border: '1px solid rgba(255,255,255,0.08)', background: 'var(--bg-sunken)', padding: '14px 16px' }}>
                         <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '8px' }}>
                           {item.label}
                         </div>

@@ -22,11 +22,11 @@ export default async function PortalLoginPage({
   const errorMessage = getMessage(resolvedSearchParams?.error)
 
   return (
-    <section className="section-container" style={{ maxWidth: '720px', paddingTop: '104px', paddingBottom: '80px' }}>
-      <div style={{ display: 'grid', gap: '18px', border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '28px' }}>
+    <section className="section-container portal-auth-page" style={{ maxWidth: '720px', paddingTop: '104px', paddingBottom: '80px' }}>
+      <div className="portal-card portal-auth-card" style={{ display: 'grid', gap: '18px', border: '1px solid var(--border)', background: 'rgba(10,10,14,0.92)', padding: '28px' }}>
         <div style={{ display: 'grid', gap: '10px' }}>
           <span className="section-label" style={{ marginBottom: 0 }}>Client Portal</span>
-          <h1 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(28px, 6vw, 44px)', lineHeight: 1.05 }}>
+          <h1 className="portal-title" style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(28px, 6vw, 44px)', lineHeight: 1.05 }}>
             Sign in with your phone number
           </h1>
           <p style={{ color: 'var(--muted)', fontSize: '14px', lineHeight: 1.75, maxWidth: '34rem' }}>
@@ -52,6 +52,7 @@ export default async function PortalLoginPage({
               inputMode="tel"
               placeholder="(555) 555-5555…"
               required
+              className="portal-input"
               style={{
                 width: '100%',
                 background: 'var(--off-black)',

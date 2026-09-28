@@ -85,9 +85,29 @@ export default function Footer() {
         <p style={{ margin: 0, fontSize: '10px', color: 'var(--muted)', letterSpacing: '0.04em' }}>
           © {CURRENT_YEAR} DJ B.A.E. · The Bae Agenda. All rights reserved.
         </p>
-        <Link href="/privacy" className="inline-link" style={{ display: 'inline-flex', alignItems: 'center', minHeight: '44px', fontSize: '10px', letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-          Privacy
-        </Link>
+        <nav aria-label="Legal and accessibility" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+          {[
+            { label: 'Privacy', href: '/privacy' },
+            { label: 'Terms', href: '/terms' },
+            { label: 'Accessibility', href: '/accessibility' },
+          ].map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="inline-link"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                minHeight: '44px',
+                fontSize: '10px',
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
       </div>
 
     </footer>
