@@ -1,23 +1,9 @@
-/**
- * The DJ B.A.E. tag, hooked by its own carabiner onto something on the page
- * and swinging gently. Purely decorative: it never takes clicks or focus.
- *
- * The tag is drawn twice with the same swing: a full copy behind the thing it
- * hangs from, and a front copy with the clasp's gate cut away — so the letter
- * stroke (or photo edge) reads as threaded through the clasp's slot.
- *
- * <HangingLogo /> hangs from the top-left corner of its nearest positioned
- * parent (place it with CSS; that parent needs its own stacking context).
- * <HangFrom> wraps one letter of a headline and hooks onto its bottom stroke.
- */
+'use client'
+
 import Image from 'next/image'
-import type { CSSProperties, ReactNode } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
 import styles from './HangingLogo.module.css'
 
-/**
- * Each finish of the tag. `clasp` is the top of the clasp and `slot` the middle
- * of its opening, both as a share of the image's width.
- */
 const FINISHES = {
   red: { src: '/brand/dj-bae-logo.png', height: 659, clasp: '15.5%', slot: '14.8%' },
   gold: { src: '/brand/dj-bae-logo-gold.png', height: 660, clasp: '15.8%', slot: '14.8%' },
@@ -31,11 +17,39 @@ type Props = { finish?: LogoFinish; className?: string }
 
 export function HangingLogo({ finish = 'red', className }: Props) {
   const tag = FINISHES[finish]
-  const copy = (layer: string) => (
-    <span className={`${styles.swing} ${layer}`}>
+  const [kicked, setKicked] = useState(false)
+  const [direction, setDirection] = useState<1 | -1>(1)
+  const timerRef = useRef<number | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) window.clearTimeout(timerRef.current)
+    }
+  }, [])
+
+  function kick(event: PointerEvent<HTMLSpanElement>) {
+    event.stopPropagation()
+    setDirection((value) => value === 1 ? -1 : 1)
+
+    if (timerRef.current) window.clearTimeout(timerRef.current)
+    setKicked(false)
+
+    window.requestAnimationFrame(() => {
+      setKicked(true)
+      timerRef.current = window.setTimeout(() => setKicked(false), 1350)
+    })
+  }
+
+  const copy = (layer: string, interactive = false) => (
+    <span
+      className={`${styles.swing} ${layer}${kicked ? ` ${styles.kicked}` : ''}`}
+      style={{ '--kick-dir': direction } as CSSProperties}
+      onPointerDown={interactive ? kick : undefined}
+    >
       <Image src={tag.src} alt="" width={900} height={tag.height} sizes="120px" className={styles.logo} />
     </span>
   )
+
   return (
     <span
       className={`${styles.hanger} ${className ?? ''}`}
@@ -43,7 +57,7 @@ export function HangingLogo({ finish = 'red', className }: Props) {
       aria-hidden="true"
     >
       {copy(styles.back)}
-      {copy(styles.front)}
+      {copy(styles.front, true)}
     </span>
   )
 }
