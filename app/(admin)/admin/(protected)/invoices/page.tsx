@@ -195,6 +195,11 @@ export default async function InvoicesPage({
                         <Link href={`/admin/bookings/${invoice.booking_id}/invoice`} className="admin-btn-ghost">
                           Open
                         </Link>
+                        {invoice.status !== 'paid' && invoice.status !== 'void' && (
+                          <Link href={`/admin/bookings/${invoice.booking_id}/invoice/edit`} className="admin-btn-ghost">
+                            Edit
+                          </Link>
+                        )}
                         <a href={`/api/invoice/${invoice.booking_id}`} download className="admin-btn-ghost">
                           PDF
                         </a>
