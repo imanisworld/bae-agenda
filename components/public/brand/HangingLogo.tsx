@@ -44,6 +44,7 @@ export function HangingLogo({ finish = 'red', className }: Props) {
     <span
       className={`${styles.swing} ${layer}${kicked ? ` ${styles.kicked}` : ''}`}
       style={{ '--kick-dir': direction } as CSSProperties}
+      data-route-swipe-block={interactive ? true : undefined}
       onPointerDown={interactive ? kick : undefined}
     >
       <Image src={tag.src} alt="" width={900} height={tag.height} sizes="120px" className={styles.logo} />
