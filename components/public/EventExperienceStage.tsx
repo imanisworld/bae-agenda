@@ -123,6 +123,7 @@ export default function EventExperienceStage({
             key={view}
             ref={trackRef}
             className={`events-carousel${list.length > 1 ? ' events-carousel--multi' : ''}`}
+            data-route-swipe-block
             role="region"
             aria-roledescription="carousel"
             aria-label={isPast ? 'Past events' : 'Upcoming events'}
