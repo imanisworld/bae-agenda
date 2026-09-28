@@ -5,6 +5,7 @@ import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import { restoreInvoiceDraftAction, voidInvoiceAction } from '@/app/actions/invoices'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { formatInvoiceDueDate } from '@/lib/invoices'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,6 +22,7 @@ interface InvoiceRow {
   total_amount: number
   deposit_amount: number
   balance_due: number
+  due_date: string | null
   sent_at: string | null
   created_at: string
   updated_at: string
@@ -56,7 +58,7 @@ async function getInvoices(): Promise<InvoiceRow[]> {
     const admin = createAdminClient()
     const { data } = await admin
       .from('invoices')
-      .select('id, booking_id, status, invoice_number, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, sent_at, created_at, updated_at')
+      .select('id, booking_id, status, invoice_number, event_name, client_name, client_email, total_amount, deposit_amount, balance_due, due_date, sent_at, created_at, updated_at')
       .order('created_at', { ascending: false })
 
     return (data ?? []) as InvoiceRow[]
@@ -163,6 +165,7 @@ export default async function InvoicesPage({
                   <th>Total</th>
                   <th>Balance</th>
                   <th>Status</th>
+                  <th>Due</th>
                   <th>Sent</th>
                   <th>Actions</th>
                 </tr>
@@ -188,6 +191,9 @@ export default async function InvoicesPage({
                       <span className={`invoice-status invoice-status--${invoice.status}`}>
                         {invoice.status}
                       </span>
+                    </td>
+                    <td data-label="Due" className="muted">
+                      {formatInvoiceDueDate(invoice.due_date) ?? '—'}
                     </td>
                     <td data-label="Sent" className="muted">{fmtDate(invoice.sent_at)}</td>
                     <td data-label="Actions">
