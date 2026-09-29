@@ -1,5 +1,6 @@
 'use client'
 
+import { HangFrom } from '@/components/public/brand/HangingLogo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRef, useState, type CSSProperties, type PointerEvent } from 'react'
@@ -80,7 +81,7 @@ export default function MeetIdentityHero() {
       <div className={styles.copy}>
         <div className={styles.title}>
           <div className={styles.titleRow}>
-            <h1 id="meet-title">Meet</h1>
+            <h1 id="meet-title">Get to kn<HangFrom finish="gold" className={styles.knowHook}>o</HangFrom>w</h1>
             <div className={styles.phone} aria-hidden="true">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/brand/phone-3d.webp" alt="" width={241} height={420} />

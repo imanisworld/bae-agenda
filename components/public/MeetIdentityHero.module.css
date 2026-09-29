@@ -135,6 +135,17 @@
   margin-top: 20px;
 }
 
+.title {
+  position: relative;
+  z-index: 5;
+}
+
+/* Pin sits in the O, so the clasp gate threads the letter. */
+.title .knowHook {
+  left: 42%;
+  top: calc(.28em - var(--hook));
+}
+
 .titleRow {
   display: flex;
   align-items: center;

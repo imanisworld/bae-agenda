@@ -1,6 +1,5 @@
 'use client'
 
-import { HangFrom } from '@/components/public/brand/HangingLogo'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import EventPoster from '@/components/public/EventPoster'
@@ -81,13 +80,8 @@ export default function EventExperienceStage({
   }
 
   return (
-    <section className="events-experience" aria-labelledby="events-stage-title">
+    <section className="events-experience" aria-label="Events">
       <div className="events-experience-head">
-        <div>
-          <h1 id="events-stage-title">
-            {isPast ? <>Past Event<HangFrom finish="silver">s</HangFrom></> : <>Upcoming <HangFrom finish="silver">E</HangFrom>vents</>}
-          </h1>
-        </div>
         <div className="events-experience-tools">
           {pastEvents.length > 0 ? (
             <div className="events-view-switch" role="group" aria-label="Show events">

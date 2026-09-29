@@ -80,12 +80,6 @@ export default function EventPoster({
         />
       ) : null}
 
-      {event.featured && !past ? (
-        <div className={styles.topline}>
-          <span className={styles.status}>Featured</span>
-        </div>
-      ) : null}
-
       <div className={styles.info}>
         <p className={styles.date}>{dateLabel}{timeLabel ? ` · ${timeLabel}` : ''}</p>
         <Heading>{event.title}</Heading>

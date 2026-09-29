@@ -7,7 +7,7 @@
  * turntable. Audio runs through the site-wide PlayerProvider so it keeps
  * playing after the visitor leaves the Lab.
  */
-import { HangingLogo } from '@/components/public/brand/HangingLogo'
+import { HangFrom } from '@/components/public/brand/HangingLogo'
 import Image from 'next/image'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { permalinkFor, usePlayer } from '@/components/public/player/PlayerProvider'
@@ -282,8 +282,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
     <header className={styles.header}>
       <div className={styles.headerIdentity}>
         <p>Bae&apos;s in the Lab · Listening Room</p>
-        <h1>On wax.</h1>
-        <HangingLogo finish="chrome" className={styles.headerTag} />
+        <h1><HangFrom finish="chrome">O</HangFrom>n wax.</h1>
       </div>
       {crates.length > 1 ? (
         <div className={styles.crateSwitch} role="group" aria-label="Choose a crate">
@@ -347,10 +346,6 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
 
       {/* ── Crate: 3D cover carousel ── */}
       <div className={styles.crate}>
-        <div className={styles.crateLabelRow} aria-hidden="true">
-          <span>The crate</span>
-          <span>Swipe · drag · tap</span>
-        </div>
         <div
           key={crate?.key}
           className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}`}
