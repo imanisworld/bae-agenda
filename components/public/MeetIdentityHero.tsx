@@ -6,7 +6,7 @@ import styles from './MeetIdentityHero.module.css'
 
 export default function MeetIdentityHero() {
   return (
-    <section className={styles.hero} aria-labelledby="meet-title">
+    <section className={styles.hero} aria-label="DJ B.A.E. profile">
       <div className={styles.glow} aria-hidden="true" />
 
       <div className={styles.portraitWrap}>
@@ -27,7 +27,6 @@ export default function MeetIdentityHero() {
         <div className={styles.title}>
           <p>Indianapolis</p>
           <div className={styles.titleRow}>
-            <h1 id="meet-title">Meet<br /> DJ B.A.E.</h1>
             <div className={styles.phone} aria-hidden="true">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src="/brand/phone-3d.webp" alt="" width={241} height={420} />
