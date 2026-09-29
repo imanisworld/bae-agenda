@@ -7,6 +7,7 @@ import {
 } from '@/lib/booking-email-payloads'
 import { getScheduledReminderQueryWindow, isCalendarDaysOut } from '@/lib/date-time'
 import { sendBookingBalanceReminder } from '@/lib/notifications'
+import { logEvent } from '@/lib/monitoring'
 
 function isAuthorizedCron(request: NextRequest) {
   const secret = process.env.CRON_SECRET
@@ -27,7 +28,11 @@ async function appendBookingTimelineNote(
     })
 
   if (error) {
-    console.error('[cron-payment-reminders] note insert failed:', error.message)
+    logEvent('error', 'Scheduled reminder timeline note failed', {
+      operation: 'cron_timeline_note',
+      bookingId,
+      errorMessage: error.message,
+    })
   }
 }
 
@@ -60,7 +65,12 @@ async function sendScheduledBalanceReminder(
     idempotencyKey: `booking-balance-reminder-${booking.id}`,
   })
   if (!result.ok) {
-    console.error('[cron-payment-reminders] balance email failed:', booking.id, result.reason, result.detail ?? '')
+    logEvent('error', 'Scheduled balance reminder failed', {
+      operation: 'cron_balance_reminder',
+      bookingId: booking.id,
+      reason: result.reason,
+      detail: result.detail,
+    })
     return false
   }
 
@@ -100,7 +110,11 @@ async function sendScheduledPostEventFollowUp(
 
   const result = await sendBookingPostEventFollowUpEmail(admin, booking.id, { nowIso, mode: 'scheduled' })
   if (result.status === 'failed') {
-    console.error('[cron-payment-reminders] post-event email failed:', booking.id, result.detail)
+    logEvent('error', 'Scheduled post-event email failed', {
+      operation: 'cron_post_event_follow_up',
+      bookingId: booking.id,
+      detail: result.detail,
+    })
     return false
   }
 
@@ -129,7 +143,11 @@ async function sendScheduledReviewRequest(
 
   const result = await sendBookingReviewRequestEmail(admin, booking.id, { nowIso, mode: 'scheduled' })
   if (result.status === 'failed') {
-    console.error('[cron-payment-reminders] review request failed:', booking.id, result.detail)
+    logEvent('error', 'Scheduled review request failed', {
+      operation: 'cron_review_request',
+      bookingId: booking.id,
+      detail: result.detail,
+    })
     return false
   }
 
@@ -168,6 +186,10 @@ export async function GET(request: NextRequest) {
     .gte('event_date', windowStart.toISOString())
 
   if (error) {
+    logEvent('error', 'Scheduled reminder booking query failed', {
+      operation: 'cron_booking_query',
+      errorMessage: error.message,
+    })
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 

@@ -7,6 +7,7 @@ import { limitBookingSubmission } from "@/lib/ratelimit";
 import { sendBookingNotifications } from "@/lib/notifications";
 import { stampBookingEmailSentAt } from "@/lib/booking-email-tracking";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { logError, logEvent } from "@/lib/monitoring";
 
 const ALLOWED_ORIGINS = new Set([
   "https://thebaeagenda.com",
@@ -257,7 +258,11 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (clientError || !client?.id) {
-      console.error("[booking] client upsert error:", clientError);
+      logEvent("error", "Booking client upsert failed", {
+        operation: "booking_client_upsert",
+        errorCode: clientError?.code,
+        errorMessage: clientError?.message,
+      });
       return NextResponse.json({ error: "Unable to save your contact details. Please try again." }, { status: 500 });
     }
 
@@ -304,7 +309,12 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      console.error("[booking] booking insert error:", bookingError);
+      logEvent("error", "Booking insert failed", {
+        operation: "booking_insert",
+        errorCode: bookingError?.code,
+        errorMessage: bookingError?.message,
+        hasSubmissionKey: Boolean(submissionKey),
+      });
       return NextResponse.json({ error: "Unable to save your booking request. Please try again." }, { status: 500 });
     }
 
@@ -327,7 +337,9 @@ export async function POST(req: NextRequest) {
       await stampBookingEmailSentAt(admin, booking.id, "inquiry_receipt_sent_at");
     }
   } catch (error) {
-    console.error("[booking] unexpected save error:", error);
+    logError("Booking request save failed", error, {
+      operation: "booking_save",
+    });
     return NextResponse.json({ error: "Unable to process your booking request. Please try again." }, { status: 500 });
   }
 

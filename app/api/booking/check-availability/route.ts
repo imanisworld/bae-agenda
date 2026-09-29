@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { checkBookingAvailability } from "@/lib/booking-availability";
+import { limitAvailabilityCheck } from "@/lib/ratelimit";
 
 const CheckSchema = z.object({
   eventDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Invalid date format (use YYYY-MM-DD)"),
@@ -10,6 +11,20 @@ const CheckSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const rateLimit = await limitAvailabilityCheck(req.headers);
+  if (!rateLimit.success) {
+    return NextResponse.json(
+      {
+        error: "Too many availability checks. Please wait a moment and try again.",
+        retryAfter: rateLimit.retryAfter,
+      },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rateLimit.retryAfter) },
+      }
+    );
+  }
+
   let body: unknown;
   try {
     body = await req.json();

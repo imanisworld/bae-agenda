@@ -16,6 +16,7 @@ import {
 import { sendInvoiceNotification } from '@/lib/notifications'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
 import { limitInvoiceSend } from '@/lib/ratelimit'
+import { logError, logEvent } from '@/lib/monitoring'
 
 function isAllowedOrigin(origin: string, requestHost: string) {
   if (!origin) return true
@@ -181,6 +182,13 @@ export async function POST(
   })
 
   if (!result.ok) {
+    logEvent('error', 'Invoice email send failed', {
+      operation: 'invoice_send',
+      bookingId: booking.id,
+      mode,
+      reason: result.reason,
+      detail: result.detail,
+    })
     return NextResponse.json(
       { error: result.detail || 'Invoice email failed to send.' },
       {
@@ -218,7 +226,11 @@ export async function POST(
         }, { onConflict: 'booking_id' })
 
       if (invoiceError) {
-        console.error('[invoice-send] unable to save invoice state:', invoiceError)
+        logEvent('error', 'Invoice state save failed after email send', {
+          operation: 'invoice_state_save',
+          bookingId: booking.id,
+          errorMessage: invoiceError.message,
+        })
       }
     }
 
@@ -229,7 +241,11 @@ export async function POST(
         : `Invoice email sent to ${clientEmail}.`,
     })
   } catch (error) {
-    console.error('[invoice-send] post-send bookkeeping failed:', error)
+    logError('Invoice post-send bookkeeping failed', error, {
+      operation: 'invoice_post_send_bookkeeping',
+      bookingId: booking.id,
+      mode,
+    })
   }
 
   return NextResponse.json(

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
@@ -119,6 +120,7 @@ export default async function InvoicePage({
   const total = effectiveBooking.quote ?? 0
   const deposit = effectiveBooking.deposit_amount ?? 0
   const balance = invoiceState ? Number(invoiceState.balance_due ?? total - deposit) : total - deposit
+  const paymentAttemptId = randomUUID()
   const lineItems = normalizeInvoiceLineItems(
     invoiceState?.line_items,
     effectiveBooking.event_name ?? 'DJ Services',
@@ -326,6 +328,7 @@ export default async function InvoicePage({
 
           <form action={createBookingPaymentAction} className="invoice-payment-form">
             <input type="hidden" name="booking_id" value={id} />
+            <input type="hidden" name="payment_attempt_id" value={paymentAttemptId} />
             <input type="hidden" name="type" value="balance" />
             <input type="hidden" name="status" value="received" />
             <input type="hidden" name="return_to" value={`/admin/bookings/${id}/invoice`} />
