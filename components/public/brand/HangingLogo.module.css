@@ -23,7 +23,7 @@
   width: var(--size);
   translate: calc(var(--clasp) * -1) 0;
   transform-origin: var(--clasp) 0;
-  animation: hang-swing 3.6s ease-in-out infinite alternate;
+  animation: hang-swing 3.9s ease-in-out infinite alternate;
 }
 
 /* Behind the letter/photo. Only the clasp's gate shows from this copy, so the
@@ -45,7 +45,7 @@
 
 .front {
   pointer-events: auto;
-  touch-action: manipulation;
+  touch-action: none;
   cursor: grab;
 }
 
@@ -74,16 +74,22 @@
   to   { rotate: 4deg; }
 }
 
+.dragging {
+  animation: none;
+  rotate: var(--drag-angle);
+  transition: rotate 45ms linear;
+}
+
 .kicked {
-  animation: hang-kick 1.35s cubic-bezier(.18,.76,.2,1) both;
+  animation: hang-kick 900ms cubic-bezier(.18,.76,.2,1) both;
 }
 
 @keyframes hang-kick {
-  0%   { rotate: 0deg; }
-  18%  { rotate: calc(var(--kick-dir) * 22deg); }
-  40%  { rotate: calc(var(--kick-dir) * -13deg); }
-  61%  { rotate: calc(var(--kick-dir) * 8deg); }
-  78%  { rotate: calc(var(--kick-dir) * -4deg); }
+  0%   { rotate: var(--release-angle, 0deg); }
+  22%  { rotate: calc(var(--kick-dir) * 18deg); }
+  46%  { rotate: calc(var(--kick-dir) * -10deg); }
+  68%  { rotate: calc(var(--kick-dir) * 5deg); }
+  84%  { rotate: calc(var(--kick-dir) * -2deg); }
   100% { rotate: 0deg; }
 }
 
@@ -110,5 +116,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .swing { animation: none; rotate: -2deg; }
-  .kicked { animation: none; }
+  .dragging { rotate: var(--drag-angle); transition: none; }
+  .kicked { animation: none; rotate: -2deg; }
 }

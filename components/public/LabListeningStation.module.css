@@ -146,7 +146,7 @@
     translateZ(calc(var(--z) * 60px))
     rotateY(var(--ry));
   transform-style: preserve-3d;
-  transition: transform 480ms cubic-bezier(.2,.8,.2,1), filter 480ms ease, opacity 300ms ease;
+  transition: transform 320ms cubic-bezier(.2,.8,.2,1), filter 240ms ease, opacity 220ms ease;
   filter: brightness(.5) saturate(.8);
   box-shadow: 0 22px 44px rgba(0,0,0,.45);
 }
@@ -315,7 +315,7 @@
     radial-gradient(circle at 10% 20%, rgba(143,45,60,.16), transparent 40%),
     #151110;
   box-shadow: 0 24px 60px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.04);
-  transition: box-shadow 320ms ease, border-color 320ms ease, background 320ms ease;
+  transition: box-shadow 240ms ease, border-color 240ms ease, background 240ms ease;
 }
 
 .deckPlaying {
@@ -367,7 +367,7 @@
   border-radius: 50%;
   transform: rotate(var(--scratch-angle));
   transform-origin: center;
-  transition: transform 520ms cubic-bezier(.16,.8,.2,1);
+  transition: transform 360ms cubic-bezier(.16,.8,.2,1);
   cursor: grab;
   touch-action: none;
   user-select: none;
@@ -439,7 +439,7 @@
   height: 72%;
   transform-origin: 50% 7%;
   transform: rotate(calc(-8deg + var(--scratch-react, 0deg)));
-  transition: transform 700ms cubic-bezier(.3,.7,.2,1);
+  transition: transform 420ms cubic-bezier(.3,.7,.2,1);
   pointer-events: none;
 }
 

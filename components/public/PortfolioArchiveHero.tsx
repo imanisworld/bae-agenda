@@ -35,7 +35,7 @@ export default function PortfolioArchiveHero({
     setLogoKicked(false)
     window.requestAnimationFrame(() => {
       setLogoKicked(true)
-      logoTimer.current = window.setTimeout(() => setLogoKicked(false), 900)
+      logoTimer.current = window.setTimeout(() => setLogoKicked(false), 720)
     })
   }
 

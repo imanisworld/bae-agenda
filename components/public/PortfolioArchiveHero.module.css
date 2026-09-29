@@ -146,11 +146,11 @@
 }
 
 .logoKicked .logoBounce {
-  animation: logo-kick .9s cubic-bezier(.18,.8,.22,1) both;
+  animation: logo-kick 720ms cubic-bezier(.18,.8,.22,1) both;
 }
 
 .logoKicked .logoShadow {
-  animation: logo-kick-shadow .9s cubic-bezier(.18,.8,.22,1) both;
+  animation: logo-kick-shadow 720ms cubic-bezier(.18,.8,.22,1) both;
 }
 
 @keyframes logo-kick {
@@ -241,7 +241,7 @@
 
 .printImage img {
   object-fit: cover;
-  transition: transform 600ms cubic-bezier(.2,.7,.2,1);
+  transition: transform 320ms cubic-bezier(.2,.7,.2,1);
 }
 
 .printMeta {

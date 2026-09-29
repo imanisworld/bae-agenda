@@ -161,6 +161,10 @@ button,
 
 /* ---- Reduced Motion -------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
@@ -5654,19 +5658,17 @@ body.has-custom-cursor * { cursor: none !important; }
 }
 
 .public-page-stage--experience .public-page-stage-inner {
-  animation: public-experience-enter 460ms cubic-bezier(.2,.8,.2,1) both;
+  animation: public-experience-enter 240ms cubic-bezier(.2,.8,.2,1) both;
 }
 
 @keyframes public-experience-enter {
   from {
     opacity: 0;
-    transform: translateY(10px) scale(.992);
-    filter: blur(3px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0);
+    transform: translateY(0);
   }
 }
 
@@ -5820,7 +5822,7 @@ body.has-custom-cursor * { cursor: none !important; }
   visibility: hidden;
   transform: translateX(32px) scale(.985);
   pointer-events: none;
-  transition: opacity 220ms ease, transform 260ms cubic-bezier(.2,.8,.2,1), visibility 220ms ease;
+  transition: opacity 180ms ease, transform 220ms cubic-bezier(.2,.8,.2,1), visibility 180ms ease;
 }
 
 .experience-drawer--open {

@@ -63,7 +63,7 @@
     rotateX(var(--photo-rx, 0deg))
     rotateY(var(--photo-ry, 0deg));
   transform-style: preserve-3d;
-  transition: transform 260ms cubic-bezier(.2,.7,.2,1);
+  transition: transform 180ms cubic-bezier(.2,.7,.2,1);
 }
 
 .photoFrame {
@@ -108,7 +108,7 @@
   box-shadow: 0 24px 42px rgba(0,0,0,.48);
   transform: translate3d(10%, 0, -12px) rotate(-12deg);
   transform-origin: center;
-  transition: transform 720ms cubic-bezier(.16,.8,.18,1), filter 360ms ease;
+  transition: transform 480ms cubic-bezier(.16,.8,.18,1), filter 240ms ease;
   filter: brightness(.8);
 }
 
@@ -178,7 +178,7 @@
   object-fit: cover;
   object-position: center 46%;
   filter: saturate(.9) contrast(1.04);
-  transition: transform 900ms cubic-bezier(.2,.7,.2,1), filter 900ms ease;
+  transition: transform 320ms cubic-bezier(.2,.7,.2,1), filter 320ms ease;
 }
 
 .copy {
