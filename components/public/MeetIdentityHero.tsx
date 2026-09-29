@@ -80,13 +80,7 @@ export default function MeetIdentityHero() {
 
       <div className={styles.copy}>
         <div className={styles.title}>
-          <div className={styles.titleRow}>
-            <h1 id="meet-title">Get to kn<HangFrom finish="gold" className={styles.knowHook}>o</HangFrom>w</h1>
-            <div className={styles.phone} aria-hidden="true">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brand/phone-3d.webp" alt="" width={241} height={420} />
-            </div>
-          </div>
+          <h1 id="meet-title">Get to kn<HangFrom finish="gold">o</HangFrom>w</h1>
         </div>
 
         <div className={styles.details}>

@@ -140,31 +140,6 @@
   z-index: 5;
 }
 
-/* Pin sits in the O, so the clasp gate threads the letter. */
-.title .knowHook {
-  left: 42%;
-  top: calc(.28em - var(--hook));
-}
-
-.titleRow {
-  display: flex;
-  align-items: center;
-  gap: clamp(12px, 3vw, 56px);
-}
-
-.phone {
-  flex-shrink: 0;
-  height: clamp(120px, 13vw, 210px);
-  transform: rotateZ(7deg);
-  filter: drop-shadow(0 24px 24px rgba(0,0,0,.4));
-}
-
-.phone img {
-  width: auto;
-  height: 100%;
-  display: block;
-}
-
 .rule {
   position: absolute;
   left: 5%;
@@ -220,9 +195,6 @@
     font-size: clamp(35.4px, 8.5vw, 63.4px);
   }
 
-  .phone {
-    height: clamp(110px, 18vw, 170px);
-  }
 }
 
 @media (max-width: 560px) {
@@ -268,18 +240,6 @@
     text-shadow: 0 2px 18px rgba(0,0,0,.68);
   }
 
-  /* Small phone at the end of the one-line headline. */
-  .titleRow {
-    align-items: flex-end;
-    gap: 12px;
-  }
-
-  .phone {
-    height: clamp(48px, 15vw, 66px);
-    margin-bottom: -2px;
-    transform: rotate(10deg);
-  }
-
   /* Side by side instead of stacked: one row of buttons, more portrait. */
   .actions {
     flex-wrap: nowrap;
@@ -321,10 +281,6 @@
   .portrait {
     transform: rotateZ(-1deg);
     transition: none;
-  }
-
-  .phone {
-    display: none;
   }
 }
 

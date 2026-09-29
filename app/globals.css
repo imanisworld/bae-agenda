@@ -5939,6 +5939,27 @@ body.has-custom-cursor * { cursor: none !important; }
   padding-bottom: 62px;
 }
 
+.book-experience-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.book-experience-phone {
+  flex-shrink: 0;
+  height: clamp(88px, 11vw, 128px);
+  margin-bottom: 2px;
+  transform: rotate(7deg);
+  filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .4));
+}
+
+.book-experience-phone img {
+  display: block;
+  width: auto;
+  height: 100%;
+}
+
 .book-experience-rail-inner header > span,
 .book-experience-faq > span,
 .book-experience-contact small,
@@ -6131,6 +6152,10 @@ body.has-custom-cursor * { cursor: none !important; }
 @media (max-width: 620px) {
   .book-experience-rail-inner header {
     padding-bottom: 54px;
+  }
+
+  .book-experience-phone {
+    height: 72px;
   }
 
   .events-experience {

@@ -22,7 +22,13 @@ export default async function BookExperienceRail() {
   return (
     <div className="book-experience-rail-inner">
       <header>
-        <h2>C<HangFrom finish="gold">o</HangFrom>ntact</h2>
+        <div className="book-experience-title-row">
+          <h2>C<HangFrom finish="gold">o</HangFrom>ntact</h2>
+          <div className="book-experience-phone" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/phone-3d.webp" alt="" width={241} height={420} />
+          </div>
+        </div>
       </header>
 
       <div className="book-experience-contact">
