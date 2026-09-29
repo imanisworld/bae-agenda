@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { PUBLIC_NAV } from '@/lib/constants'
-import NowPlayingPill from '@/components/public/player/NowPlayingPill'
 import styles from './Nav.module.css'
 
 // Short, readable dock labels — full names still go to aria-label and the hover tip.
@@ -56,8 +55,8 @@ export default function Nav() {
       <div className={styles.topbar}>
         {/* The logo now hangs from each page's own art (see brand/HangingLogo). */}
         <span aria-hidden="true" />
+        <span aria-hidden="true" />
         <span className={styles.route}>{routeLabel}</span>
-        <NowPlayingPill fallback={null} />
       </div>
 
       <div className={styles.dockWrap}>
