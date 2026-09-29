@@ -24,7 +24,21 @@
   left: 7%;
   top: 17%;
   width: min(42vw, 540px);
+  perspective: 1100px;
+  touch-action: pan-y;
   user-select: none;
+  cursor: grab;
+}
+
+.portraitWrap:active {
+  cursor: grabbing;
+}
+
+.portraitInteracting .portrait {
+  transition: transform 80ms linear, box-shadow 160ms ease;
+  box-shadow:
+    7px 10px 0 rgba(45,35,31,.9),
+    0 28px 56px rgba(0,0,0,.48);
 }
 
 .portrait {
@@ -33,6 +47,12 @@
   aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 26px;
+  transform:
+    rotateX(var(--tilt-y))
+    rotateY(var(--tilt-x))
+    rotateZ(-1.6deg);
+  transform-style: preserve-3d;
+  transition: transform 420ms cubic-bezier(.2,.7,.2,1), box-shadow 420ms ease;
   box-shadow:
     10px 12px 0 rgba(45,35,31,.82),
     0 30px 60px rgba(0,0,0,.38);
@@ -123,15 +143,8 @@
 
 .phone {
   flex-shrink: 0;
-  /* Sized by height so it matches the two-line headline. */
   height: clamp(120px, 13vw, 210px);
-  transform:
-    perspective(620px)
-    rotateX(var(--tilt-y, 0deg))
-    rotateY(var(--tilt-x, 0deg))
-    rotateZ(7deg);
-  transform-style: preserve-3d;
-  transition: transform 360ms cubic-bezier(.2,.7,.2,1);
+  transform: rotateZ(7deg);
   filter: drop-shadow(0 24px 24px rgba(0,0,0,.4));
 }
 
@@ -294,6 +307,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .portrait {
+    transform: rotateZ(-1deg);
+    transition: none;
+  }
+
   .phone {
     display: none;
   }
