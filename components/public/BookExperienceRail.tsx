@@ -1,4 +1,5 @@
 import ReviewDrawer from '@/components/public/ReviewDrawer'
+import { HangFrom } from '@/components/public/brand/HangingLogo'
 import { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
 import { SOCIALS } from '@/lib/constants'
 import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
@@ -21,9 +22,13 @@ export default async function BookExperienceRail() {
   return (
     <div className="book-experience-rail-inner">
       <header>
-        <span>Contact</span>
-        <h2>Prefer email or DM?</h2>
-        <p>That works too. Quick answers are below.</p>
+        <div className="book-experience-title-row">
+          <h2>C<HangFrom finish="gold">o</HangFrom>ntact</h2>
+          <div className="book-experience-phone" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/phone-3d.webp" alt="" width={241} height={420} />
+          </div>
+        </div>
       </header>
 
       <div className="book-experience-contact">
@@ -44,6 +49,10 @@ export default async function BookExperienceRail() {
           </a>
         ))}
       </div>
+
+      <p className="book-experience-contact-note">
+        Prefer email or DM? That works too. Quick answers are below.
+      </p>
 
       <section className="book-experience-faq" aria-label="Booking questions">
         <span>Quick Answers</span>

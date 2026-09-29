@@ -346,10 +346,6 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
 
       {/* ── Crate: 3D cover carousel ── */}
       <div className={styles.crate}>
-        <div className={styles.crateLabelRow} aria-hidden="true">
-          <span>The crate</span>
-          <span>Swipe · drag · tap</span>
-        </div>
         <div
           key={crate?.key}
           className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}`}
@@ -383,7 +379,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                 <span className={styles.coverArt}>
                   {/* Only covers near the front load an image; far ones are invisible anyway. */}
                   {mix.cover_url && Math.abs(offset) <= 3 ? (
-                    <Image src={mix.cover_url} alt="" fill sizes="(max-width: 620px) 50vw, 280px" quality={90} draggable={false} />
+                    <Image src={mix.cover_url} alt="" fill sizes="(max-width: 620px) 50vw, 280px" quality={95} draggable={false} />
                   ) : (
                     <span className={styles.coverFallback}>DJ B.A.E.</span>
                   )}
@@ -435,7 +431,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
             >
               <span className={`${styles.record}${playing ? ` ${styles.spinning}` : ''}`}>
                 {loaded.cover_url ? (
-                  <Image src={loaded.cover_url} alt="" fill sizes="(max-width: 620px) 40vw, 320px" quality={90} draggable={false} />
+                  <Image src={loaded.cover_url} alt="" fill sizes="(max-width: 620px) 40vw, 320px" quality={95} draggable={false} />
                 ) : null}
                 <span className={styles.grooves} aria-hidden="true" />
                 <span className={styles.hole} aria-hidden="true" />

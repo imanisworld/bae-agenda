@@ -44,7 +44,7 @@
 .portrait {
   position: relative;
   width: 100%;
-  aspect-ratio: 1.03 / 1;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
   border-radius: 26px;
   transform:
@@ -52,10 +52,10 @@
     rotateY(var(--tilt-x))
     rotateZ(-1.6deg);
   transform-style: preserve-3d;
-  transition: transform 240ms cubic-bezier(.2,.7,.2,1), box-shadow 240ms ease;
+  transition: transform 420ms cubic-bezier(.2,.7,.2,1), box-shadow 420ms ease;
   box-shadow:
-    12px 16px 0 rgba(45,35,31,.82),
-    0 38px 72px rgba(0,0,0,.38);
+    10px 12px 0 rgba(45,35,31,.82),
+    0 30px 60px rgba(0,0,0,.38);
 }
 
 .portrait::after {
@@ -70,18 +70,11 @@
 
 .portrait img {
   object-fit: cover;
-  object-position: center;
+  object-position: center 38%;
+  filter: brightness(1.02) saturate(1.03) contrast(1.05);
+  backface-visibility: hidden;
   pointer-events: none;
   user-select: none;
-}
-
-.portraitLabel {
-  display: block;
-  margin-top: 52px;
-  text-align: center;
-  color: rgba(246,241,232,.42);
-  font-size: 10px;
-  letter-spacing: .18em;
 }
 
 .copy {
@@ -142,30 +135,9 @@
   margin-top: 20px;
 }
 
-.titleRow {
-  display: flex;
-  align-items: center;
-  gap: clamp(12px, 3vw, 56px);
-}
-
-.phone {
-  flex-shrink: 0;
-  /* Sized by height so it matches the two-line headline. */
-  height: clamp(120px, 13vw, 210px);
-  transform:
-    perspective(620px)
-    rotateX(var(--tilt-y, 0deg))
-    rotateY(var(--tilt-x, 0deg))
-    rotateZ(7deg);
-  transform-style: preserve-3d;
-  transition: transform 240ms cubic-bezier(.2,.7,.2,1);
-  filter: drop-shadow(0 24px 24px rgba(0,0,0,.4));
-}
-
-.phone img {
-  width: auto;
-  height: 100%;
-  display: block;
+.title {
+  position: relative;
+  z-index: 5;
 }
 
 .rule {
@@ -191,16 +163,14 @@
     position: relative;
     left: auto;
     top: auto;
-    flex: 1 1 auto;
-    min-height: 150px;
-    max-height: 520px;
-    width: 70%;
+    flex: none;
+    width: min(86%, 620px);
     margin-left: 7%;
   }
 
   .portrait {
-    height: 100%;
-    aspect-ratio: auto;
+    width: 100%;
+    aspect-ratio: 4 / 3;
   }
 
   /* Darken the portrait's lower edge where the eyebrow crosses it. */
@@ -209,10 +179,6 @@
       linear-gradient(180deg, transparent 58%, rgba(14,11,10,.78)),
       linear-gradient(110deg, rgba(255,255,255,.08), transparent 26%, transparent 72%, rgba(196,132,74,.08));
     mix-blend-mode: normal;
-  }
-
-  .portraitLabel {
-    display: none;
   }
 
   .copy {
@@ -229,9 +195,6 @@
     font-size: clamp(35.4px, 8.5vw, 63.4px);
   }
 
-  .phone {
-    height: clamp(110px, 18vw, 170px);
-  }
 }
 
 @media (max-width: 560px) {
@@ -277,18 +240,6 @@
     text-shadow: 0 2px 18px rgba(0,0,0,.68);
   }
 
-  /* Small phone at the end of the one-line headline. */
-  .titleRow {
-    align-items: flex-end;
-    gap: 12px;
-  }
-
-  .phone {
-    height: clamp(48px, 15vw, 66px);
-    margin-bottom: -2px;
-    transform: rotate(10deg);
-  }
-
   /* Side by side instead of stacked: one row of buttons, more portrait. */
   .actions {
     flex-wrap: nowrap;
@@ -330,10 +281,6 @@
   .portrait {
     transform: rotateZ(-1deg);
     transition: none;
-  }
-
-  .phone {
-    display: none;
   }
 }
 

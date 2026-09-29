@@ -1,5 +1,6 @@
 'use client'
 
+import { HangFrom } from '@/components/public/brand/HangingLogo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRef, useState, type CSSProperties, type PointerEvent } from 'react'
@@ -66,28 +67,20 @@ export default function MeetIdentityHero() {
       >
         <div className={styles.portrait}>
           <Image
-            src="/photos/images/logo.JPG"
+            src="/photos/images/portrait.jpg"
             alt="DJ B.A.E. portrait"
             fill
             priority
-            sizes="(max-width: 760px) 82vw, 44vw"
+            sizes="(max-width: 760px) 88vw, 44vw"
             quality={95}
             draggable={false}
           />
         </div>
-        <span className={styles.portraitLabel}>DJ B.A.E. · drag / tilt</span>
       </div>
 
       <div className={styles.copy}>
         <div className={styles.title}>
-          <p>Indianapolis</p>
-          <div className={styles.titleRow}>
-            <h1 id="meet-title">Meet<br /> DJ B.A.E.</h1>
-            <div className={styles.phone} aria-hidden="true">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/brand/phone-3d.webp" alt="" width={241} height={420} />
-            </div>
-          </div>
+          <h1 id="meet-title">Get to kn<HangFrom finish="gold">o</HangFrom>w</h1>
         </div>
 
         <div className={styles.details}>

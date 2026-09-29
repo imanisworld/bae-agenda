@@ -21,6 +21,8 @@
 /* ── Header ── */
 
 .header {
+  position: relative;
+  z-index: 3;
   display: flex;
   align-items: end;
   justify-content: space-between;
@@ -173,6 +175,8 @@
 
 .coverArt img {
   object-fit: cover;
+  filter: saturate(1.04) contrast(1.05);
+  backface-visibility: hidden;
   pointer-events: none;
 }
 
@@ -396,6 +400,8 @@
 
 .record img {
   object-fit: cover;
+  filter: saturate(1.04) contrast(1.05);
+  backface-visibility: hidden;
 }
 
 /* Picture-disc look: grooves, rim and a sheen over the cover art. */
@@ -1003,23 +1009,6 @@
     linear-gradient(90deg, rgba(246,241,232,.018), transparent 10% 90%, rgba(246,241,232,.018));
 }
 
-.crateLabelRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 0 6px 2px;
-  color: rgba(246,241,232,.34);
-  font-size: 8px;
-  font-weight: 500;
-  letter-spacing: .18em;
-  text-transform: uppercase;
-}
-
-.crateLabelRow span:first-child {
-  color: #b99869;
-}
-
 .coverflow {
   border-radius: 18px;
   background:
@@ -1293,11 +1282,6 @@
     padding: 9px 8px 8px;
   }
 
-  .crateLabelRow {
-    padding: 0 4px;
-    font-size: 7px;
-  }
-
   .crateBar {
     padding: 7px 8px;
   }
@@ -1321,8 +1305,7 @@
 }
 
 @media (max-width: 620px) and (max-height: 720px) {
-  .headerNote,
-  .crateLabelRow {
+  .headerNote {
     display: none;
   }
 

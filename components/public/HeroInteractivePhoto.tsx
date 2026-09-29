@@ -57,13 +57,12 @@ export default function HeroInteractivePhoto() {
             alt="DJ B.A.E. performing"
             fill
             priority
-            sizes="(max-width: 760px) 82vw, 46vw"
+            sizes="(max-width: 900px) 72vw, 40vw"
             quality={95}
             className={styles.photoImage}
           />
           <span className={styles.photoSheen} aria-hidden="true" />
         </span>
-
       </span>
     </button>
   )
