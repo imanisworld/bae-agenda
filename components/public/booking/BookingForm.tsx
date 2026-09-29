@@ -623,7 +623,6 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
       <div className="section-container" style={{ maxWidth: '680px', paddingTop: embedded ? '24px' : 0, paddingBottom: embedded ? '36px' : '64px' }}>
         {/* Extra room under the title for the tag hanging off the "o". */}
         <div style={{ marginBottom: 'clamp(78px, 8vw, 112px)' }}>
-          <span className="section-label">Booking Inquiry</span>
           <h1 style={{
             fontFamily: 'Conthrax, sans-serif',
             fontSize: 'clamp(30px, 4vw, 54px)',
