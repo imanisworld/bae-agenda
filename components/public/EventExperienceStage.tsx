@@ -85,7 +85,7 @@ export default function EventExperienceStage({
       <div className="events-experience-head">
         <div>
           <h1 id="events-stage-title">
-            {isPast ? <>Past Events</> : <>Upcoming <HangFrom finish="silver">E</HangFrom>vents</>}
+            {isPast ? <>Past Event<HangFrom finish="silver">s</HangFrom></> : <>Upcoming <HangFrom finish="silver">E</HangFrom>vents</>}
           </h1>
         </div>
         <div className="events-experience-tools">
@@ -146,7 +146,6 @@ export default function EventExperienceStage({
                   showDetailsLink
                   onArchiveClick={isPast ? () => setArchiveEvent(event) : undefined}
                   mediaCount={mediaByEvent.get(event.id)?.length ?? 0}
-                  showHangingLogo={isPast}
                 />
               </div>
             ))}

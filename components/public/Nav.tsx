@@ -56,8 +56,8 @@ export default function Nav() {
       <div className={styles.topbar}>
         {/* The logo now hangs from each page's own art (see brand/HangingLogo). */}
         <span aria-hidden="true" />
-        <span className={styles.route}>{routeLabel}</span>
-        <NowPlayingPill fallback={null} />
+        <span aria-hidden="true" />
+        <NowPlayingPill fallback={<span className={styles.route}>{routeLabel}</span>} />
       </div>
 
       <div className={styles.dockWrap}>

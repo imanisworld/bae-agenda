@@ -25,7 +25,7 @@
 }
 
 .route {
-  justify-self: center;
+  justify-self: end;
   color: rgba(246,241,232,.5);
 }
 
