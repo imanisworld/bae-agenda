@@ -68,6 +68,17 @@ export const CONTENT_GROUPS: ContentGroup[] = [
         default: 'https://www.instagram.com/dj_b.a.e/',
       },
       {
+        key:     'instagram_posts',
+        label:   'Instagram Posts',
+        hint:    'Paste Instagram post or reel links, one per line (up to 12). They show at the top of the Work page archive.',
+        type:    'textarea',
+        default: [
+          'https://www.instagram.com/p/C4BWw6SO7Y_/',
+          'https://www.instagram.com/p/DKuKiJ4MTns/',
+          'https://www.instagram.com/p/DEcfsLaM9E9/',
+        ].join('\n'),
+      },
+      {
         key:     'soundcloud_url',
         label:   'SoundCloud URL',
         type:    'url',
