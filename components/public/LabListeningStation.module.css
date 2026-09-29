@@ -190,30 +190,8 @@
   color: #c4a574;
 }
 
-.coverBadge {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  display: grid;
-  place-items: center;
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: rgba(143,45,60,.92);
-  color: #f6f1e8;
-  box-shadow: 0 8px 18px rgba(0,0,0,.4);
-  transition: transform 180ms ease;
-}
 
-.coverBadge svg {
-  width: 14px;
-  height: 14px;
-  fill: currentColor;
-}
 
-.coverFront:hover .coverBadge {
-  transform: scale(1.08);
-}
 
 .crateBar {
   display: flex;
@@ -1080,20 +1058,6 @@
     0 32px 72px rgba(0,0,0,.6),
     0 0 0 1px rgba(216,186,136,.2),
     0 0 42px rgba(143,45,60,.1);
-}
-
-.coverBadge {
-  right: 12px;
-  bottom: 12px;
-  width: 42px;
-  height: 42px;
-  border: 1px solid rgba(255,255,255,.12);
-  background:
-    radial-gradient(circle at 34% 28%, rgba(255,255,255,.11), transparent 28%),
-    #81293a;
-  box-shadow:
-    0 10px 22px rgba(0,0,0,.42),
-    inset 0 1px 0 rgba(255,255,255,.09);
 }
 
 .crateBar {
