@@ -2,7 +2,6 @@
 
 import Image from 'next/image'
 import { useState, type CSSProperties, type PointerEvent } from 'react'
-import { HangingLogo } from '@/components/public/brand/HangingLogo'
 import styles from './HeroSection.module.css'
 
 function clamp(value: number, min: number, max: number) {
@@ -65,7 +64,6 @@ export default function HeroInteractivePhoto() {
           <span className={styles.photoSheen} aria-hidden="true" />
         </span>
 
-        <HangingLogo finish="gold" className={styles.photoTag} />
       </span>
     </button>
   )
