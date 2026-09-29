@@ -6293,11 +6293,16 @@ body.has-custom-cursor * { cursor: none !important; }
 
 .book-contact-heading {
   position: relative;
-  padding-bottom: clamp(48px, 5.5vw, 70px);
+  padding-bottom: clamp(30px, 3.4vw, 46px);
 }
 
 .book-contact-heading h2 {
   margin-top: 0;
+  font-size: clamp(30px, 4.2vw, 58px);
+}
+
+.book-contact-heading p {
+  margin-top: clamp(58px, 6vw, 82px);
 }
 
 .book-experience-rail-inner header p {
@@ -6369,6 +6374,14 @@ body.has-custom-cursor * { cursor: none !important; }
 @media (max-width: 900px) {
   .book-experience-switch button {
     font-size: 10px;
+  }
+
+  .book-contact-heading h2 {
+    font-size: clamp(30px, 9vw, 46px);
+  }
+
+  .book-contact-heading p {
+    margin-top: 64px;
   }
 }
 
