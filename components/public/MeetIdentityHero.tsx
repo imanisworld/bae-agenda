@@ -79,7 +79,6 @@ export default function MeetIdentityHero() {
 
       <div className={styles.copy}>
         <div className={styles.title}>
-          <p>Indianapolis</p>
           <div className={styles.titleRow}>
             <h1 id="meet-title">Meet</h1>
             <div className={styles.phone} aria-hidden="true">
