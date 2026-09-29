@@ -283,7 +283,6 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
       <div className={styles.headerIdentity}>
         <p>Bae&apos;s in the Lab · Listening Room</p>
         <h1>On wax.</h1>
-        <span className={styles.headerNote}>Pick a sleeve. Drop the needle. Drag the record.</span>
         <HangingLogo finish="chrome" className={styles.headerTag} />
       </div>
       {crates.length > 1 ? (
