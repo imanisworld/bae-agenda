@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import { trackEvent } from '@/lib/analytics'
 
@@ -40,7 +41,7 @@ export default function MixesTeaserForm() {
         letterSpacing: '0.06em',
         padding: '14px 0',
       }}>
-        You&apos;re in 🎧
+        Notification request received.
       </p>
     )
   }
@@ -78,6 +79,10 @@ export default function MixesTeaserForm() {
       >
         {status === 'loading' ? '...' : status === 'error' ? 'Try Again' : 'Notify Me'}
       </button>
+      <span style={{ gridColumn: '1 / -1', fontSize: '10px', lineHeight: 1.5, color: 'rgba(250,248,243,0.5)' }}>
+        This sends your email to DJ B.A.E. so your mix-notification request can be managed. No account is created.{' '}
+        <Link href="/privacy">Privacy</Link>
+      </span>
     </form>
   )
 }
