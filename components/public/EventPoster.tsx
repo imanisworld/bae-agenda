@@ -18,7 +18,7 @@ const POSTER_PHOTOS = [
 // Flyers for specific events, keyed by slug. These show whole, beside the
 // event info, instead of the rotating photo.
 const FLYERS: Record<string, string> = {
-  'chi-chis-oct-3-2026': '/photos/flyers/chi-chis.jpg',
+  'chi-chis-oct-3-2026': '/photos/flyers/chi-chis-original.jpg',
   'dy2k-sep-11-2026': '/photos/flyers/dy2k-lineup.jpg',
 }
 
