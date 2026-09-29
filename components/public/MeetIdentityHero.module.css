@@ -13,17 +13,17 @@
   content: '';
   position: absolute;
   z-index: 0;
-  left: 3%;
+  left: 0;
   top: 12%;
-  width: 49%;
-  height: 72%;
-  opacity: .22;
+  width: 58%;
+  height: 70%;
+  opacity: .34;
   background:
-    linear-gradient(180deg, rgba(14,11,10,.08), rgba(14,11,10,.56)),
+    linear-gradient(180deg, rgba(14,11,10,.02), rgba(14,11,10,.46)),
     url('/photos/images/outside.jpg') center / cover no-repeat;
   clip-path: polygon(2% 5%, 94% 0, 100% 92%, 8% 100%);
   transform: rotate(-1.4deg);
-  filter: saturate(.72) contrast(1.05);
+  filter: saturate(.78) contrast(1.05);
   pointer-events: none;
 }
 
@@ -39,9 +39,9 @@
 .portraitWrap {
   position: absolute;
   z-index: 3;
-  left: 7%;
-  top: 17%;
-  width: min(42vw, 540px);
+  left: 9%;
+  top: 15%;
+  width: min(34vw, 430px);
   perspective: 1100px;
   touch-action: pan-y;
   user-select: none;
@@ -62,18 +62,18 @@
 .portrait {
   position: relative;
   width: 100%;
-  aspect-ratio: 1.03 / 1;
+  aspect-ratio: .79 / 1;
   overflow: hidden;
-  border-radius: 26px;
+  border-radius: 3px;
   transform:
     rotateX(var(--tilt-y))
     rotateY(var(--tilt-x))
-    rotateZ(-1.6deg);
+    rotateZ(-2.2deg);
   transform-style: preserve-3d;
   transition: transform 420ms cubic-bezier(.2,.7,.2,1), box-shadow 420ms ease;
   box-shadow:
-    12px 16px 0 rgba(45,35,31,.82),
-    0 38px 72px rgba(0,0,0,.38);
+    7px 10px 0 rgba(80,31,43,.72),
+    0 28px 58px rgba(0,0,0,.4);
 }
 
 .portrait::after {
@@ -88,14 +88,14 @@
 
 .portrait img {
   object-fit: cover;
-  object-position: center;
+  object-position: center 35%;
   pointer-events: none;
   user-select: none;
 }
 
 .portraitLabel {
   display: block;
-  margin-top: 52px;
+  margin-top: 30px;
   text-align: center;
   color: rgba(246,241,232,.42);
   font-size: 10px;
@@ -105,9 +105,9 @@
 .copy {
   position: absolute;
   z-index: 4;
-  left: calc(7% + min(42vw, 540px) + max(40px, 4vw));
+  left: calc(9% + min(34vw, 430px) + max(54px, 5vw));
   right: 6%;
-  top: 25%;
+  top: 22%;
 }
 
 .location {
@@ -193,137 +193,140 @@
 }
 
 @media (max-width: 860px) {
-  /* Stacked layout: the page is locked to one screen, so the portrait flexes
-     to the space left and the copy always sits below it. */
   .hero {
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    padding: 84px 0 104px;
+    min-height: 900px;
+  }
+
+  .hero::before {
+    left: 2%;
+    top: 17%;
+    width: 82%;
+    height: 56%;
+    opacity: .32;
   }
 
   .portraitWrap {
-    position: relative;
-    left: auto;
-    top: auto;
-    flex: 1 1 auto;
-    min-height: 150px;
-    max-height: 520px;
-    width: 70%;
-    margin-left: 7%;
-  }
-
-  .portrait {
-    height: 100%;
-    aspect-ratio: auto;
-  }
-
-  /* Darken the portrait's lower edge where the eyebrow crosses it. */
-  .portrait::after {
-    background:
-      linear-gradient(180deg, transparent 58%, rgba(14,11,10,.78)),
-      linear-gradient(110deg, rgba(255,255,255,.08), transparent 26%, transparent 72%, rgba(196,132,74,.08));
-    mix-blend-mode: normal;
-  }
-
-  .portraitLabel {
-    display: none;
+    left: 15%;
+    top: 17%;
+    width: 56%;
   }
 
   .copy {
-    position: relative;
-    left: auto;
-    right: auto;
-    top: auto;
-    flex: none;
-    width: auto;
-    margin: 28px 6% 0 26%;
+    left: 58%;
+    right: 5%;
+    top: 28%;
   }
 
   .copy h1 {
-    font-size: clamp(35.4px, 8.5vw, 63.4px);
+    font-size: clamp(34px, 7vw, 58px);
   }
 
-  .phone {
-    height: clamp(110px, 18vw, 170px);
+  .summary {
+    font-size: 14px;
+  }
+
+  .phoneTop {
+    top: 72px;
+    right: 7%;
+    height: 78px;
   }
 }
 
 @media (max-width: 560px) {
   .hero {
-    padding: 72px 0 96px;
+    min-height: 860px;
+    padding: 0;
+  }
+
+  .hero::before {
+    left: 0;
+    top: 18%;
+    width: 100%;
+    height: 48%;
+    opacity: .36;
+    clip-path: polygon(0 8%, 100% 0, 94% 96%, 0 100%);
   }
 
   .portraitWrap {
-    flex: none;
-    width: 78%;
-    height: clamp(300px, 48dvh, 440px);
+    left: 16%;
+    top: 15%;
+    width: 61%;
+    height: auto;
     max-height: none;
-    margin-left: 10%;
+    margin: 0;
   }
 
   .portrait {
-    height: 100%;
-    aspect-ratio: auto;
-    border-radius: 20px;
+    height: auto;
+    aspect-ratio: .79 / 1;
+    border-radius: 2px;
   }
 
   .portraitLabel {
     display: block;
-    margin-top: 16px;
+    margin-top: 24px;
     color: #c4a574;
     font-size: 9px;
     letter-spacing: .19em;
   }
 
-  .hero::before {
-    left: 3%;
-    top: 22%;
-    width: 92%;
-    height: 44%;
-    opacity: .2;
-  }
-
-  /* Phone: title moves above the portrait on one line; details stay below. */
   .copy {
+    position: static;
     display: contents;
   }
 
   .title {
-    order: -1;
-    margin: 0 16px 18px 6%;
-  }
-
-  .location {
-    margin-bottom: 8px;
+    position: absolute;
+    z-index: 6;
+    left: 6%;
+    top: 24px;
+    margin: 0;
   }
 
   .copy h1 {
-    font-size: clamp(23.2px, 7vw, 31.7px);
+    font-size: clamp(30px, 9vw, 42px);
     line-height: .95;
-    letter-spacing: -.02em;
-  }
-
-  .copy h1 br {
-    display: none;
   }
 
   .details {
-    margin: 22px 16px 0 6%;
+    position: absolute;
+    z-index: 5;
+    left: 6%;
+    right: 6%;
+    top: 68%;
+    margin: 0;
     text-shadow: 0 2px 18px rgba(0,0,0,.68);
   }
 
-  .phoneTop {
-    top: 70px;
-    right: 7%;
-    height: clamp(48px, 15vw, 66px);
-    transform: rotate(10deg);
+  .location {
+    margin-bottom: 10px;
+    color: #d8ba88;
+    font-size: 10px;
   }
 
-  /* Side by side instead of stacked: one row of buttons, more portrait. */
+  .summary {
+    max-width: 34ch;
+    margin-top: 0;
+    color: rgba(246,241,232,.88);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .signals {
+    margin-top: 14px;
+  }
+
+  .signals span {
+    color: rgba(246,241,232,.84);
+    border-color: rgba(196,165,116,.34);
+    background: rgba(14,11,10,.45);
+    font-size: 9px;
+  }
+
   .actions {
     flex-wrap: nowrap;
     gap: 8px;
+    margin-top: 16px;
   }
 
   .actions > * {
@@ -332,28 +335,36 @@
     padding-inline: 10px;
     white-space: nowrap;
   }
+
+  .phoneTop {
+    top: 20px;
+    right: 6%;
+    height: 58px;
+    transform: rotate(10deg);
+  }
 }
 
-/* Short phone screens (Safari/Brave bars showing): give the space to the portrait. */
 @media (max-width: 560px) and (max-height: 760px) {
   .hero {
-    padding: 60px 0 88px;
+    min-height: 790px;
   }
 
-  .title {
-    margin-bottom: 14px;
+  .hero::before {
+    top: 17%;
+    height: 46%;
+  }
+
+  .portraitWrap {
+    top: 14%;
+    width: 57%;
   }
 
   .details {
-    margin-top: 16px;
+    top: 66%;
   }
 
   .signals {
     display: none;
-  }
-
-  .actions {
-    margin-top: 14px;
   }
 }
 
