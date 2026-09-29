@@ -20,11 +20,23 @@ export default function Nav() {
   const [showDockCue, setShowDockCue] = useState(false)
 
   useEffect(() => {
+    let hideTimer: number | undefined
     const frame = requestAnimationFrame(() => {
-      setShowDockCue(sessionStorage.getItem(NAV_CUE_SESSION_KEY) !== '1')
+      const shouldShow = sessionStorage.getItem(NAV_CUE_SESSION_KEY) !== '1'
+      setShowDockCue(shouldShow)
+
+      if (shouldShow) {
+        hideTimer = window.setTimeout(() => {
+          setShowDockCue(false)
+          sessionStorage.setItem(NAV_CUE_SESSION_KEY, '1')
+        }, 2200)
+      }
     })
 
-    return () => cancelAnimationFrame(frame)
+    return () => {
+      cancelAnimationFrame(frame)
+      if (hideTimer) window.clearTimeout(hideTimer)
+    }
   }, [])
 
   function dismissDockCue() {
@@ -45,7 +57,7 @@ export default function Nav() {
         {/* The logo now hangs from each page's own art (see brand/HangingLogo). */}
         <span aria-hidden="true" />
         <span className={styles.route}>{routeLabel}</span>
-        <NowPlayingPill fallback={<span className={styles.status}>Indianapolis</span>} />
+        <NowPlayingPill fallback={null} />
       </div>
 
       <div className={styles.dockWrap}>

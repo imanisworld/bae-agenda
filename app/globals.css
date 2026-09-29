@@ -4744,6 +4744,8 @@ body.has-custom-cursor * { cursor: none !important; }
   height: 100%;
   object-fit: cover;
   display: block;
+  filter: brightness(1.02) saturate(1.03) contrast(1.05);
+  backface-visibility: hidden;
   transition: transform var(--motion-slow) var(--ease-out);
 }
 
@@ -5934,14 +5936,7 @@ body.has-custom-cursor * { cursor: none !important; }
 
 .book-experience-rail-inner header {
   position: relative;
-  min-height: 104px;
-  padding-right: 108px;
-}
-
-.book-experience-contact-logo {
-  right: 52px;
-  top: calc(0% - var(--hook));
-  z-index: 2;
+  padding-bottom: 62px;
 }
 
 .book-experience-rail-inner header > span,
@@ -6128,12 +6123,7 @@ body.has-custom-cursor * { cursor: none !important; }
 
 @media (max-width: 620px) {
   .book-experience-rail-inner header {
-    min-height: 92px;
-    padding-right: 86px;
-  }
-
-  .book-experience-contact-logo {
-    right: 38px;
+    padding-bottom: 54px;
   }
 
   .events-experience {

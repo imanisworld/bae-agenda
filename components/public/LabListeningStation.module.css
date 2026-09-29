@@ -21,6 +21,7 @@
 /* ── Header ── */
 
 .header {
+  position: relative;
   display: flex;
   align-items: end;
   justify-content: space-between;
@@ -173,6 +174,8 @@
 
 .coverArt img {
   object-fit: cover;
+  filter: saturate(1.04) contrast(1.05);
+  backface-visibility: hidden;
   pointer-events: none;
 }
 
@@ -396,6 +399,8 @@
 
 .record img {
   object-fit: cover;
+  filter: saturate(1.04) contrast(1.05);
+  backface-visibility: hidden;
 }
 
 /* Picture-disc look: grooves, rim and a sheen over the cover art. */
@@ -752,6 +757,10 @@
     font-size: 27.7px;
   }
 
+  .headerTag {
+    left: 78%;
+  }
+
   .crate {
     gap: 8px;
   }
@@ -957,6 +966,12 @@
 
 .headerIdentity {
   min-width: 0;
+}
+
+.headerTag {
+  left: 60%;
+  top: calc(100% - var(--hook));
+  z-index: 5;
 }
 
 .headerIdentity p {

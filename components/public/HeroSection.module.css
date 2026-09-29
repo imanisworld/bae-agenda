@@ -162,7 +162,9 @@
 /* Hooked over the slanted bottom edge, a little left of centre. */
 .photoTag {
   left: 30%;
-  top: calc(96% - var(--hook));
+  top: calc(86% - var(--hook));
+  z-index: 5;
+  transform: translateZ(42px);
 }
 
 @keyframes hero-photo-gravity {
@@ -177,7 +179,8 @@
 .photoImage {
   object-fit: cover;
   object-position: center 46%;
-  filter: saturate(.9) contrast(1.04);
+  filter: brightness(1.02) saturate(1.02) contrast(1.07);
+  backface-visibility: hidden;
   transition: transform 320ms cubic-bezier(.2,.7,.2,1), filter 320ms ease;
 }
 
@@ -320,7 +323,7 @@
   /* Right-hand end of the edge, clear of the eyebrow and headline below. */
   .photoTag {
     left: 80%;
-    top: calc(99% - var(--hook));
+    top: calc(88% - var(--hook));
   }
 
   .photo {
