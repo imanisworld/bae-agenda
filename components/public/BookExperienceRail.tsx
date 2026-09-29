@@ -44,6 +44,10 @@ export default async function BookExperienceRail() {
         ))}
       </div>
 
+      <p className="book-experience-contact-note">
+        Prefer email or DM? That works too. Quick answers are below.
+      </p>
+
       <section className="book-experience-faq" aria-label="Booking questions">
         <span>Quick Answers</span>
         {BOOKING_FAQ.map((item) => (
