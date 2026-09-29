@@ -67,7 +67,7 @@ export default function MeetIdentityHero() {
       >
         <div className={styles.portrait}>
           <Image
-            src="/photos/images/logo.JPG"
+            src="/photos/images/portrait.jpg"
             alt="DJ B.A.E. portrait"
             fill
             priority

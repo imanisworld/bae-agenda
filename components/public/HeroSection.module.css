@@ -38,11 +38,11 @@
   top: clamp(96px, 11vh, 138px);
   left: 23%;
   width: min(38vw, 580px);
-  height: min(72vh, 760px);
-  min-height: 540px;
+  /* Short windows: leave room under the photo for the hanging tag and dock. */
+  height: min(72dvh, calc(100dvh - 220px), 760px);
+  min-height: 360px;
   transform: rotate(1.8deg);
   transform-origin: 50% 58%;
-  box-shadow: 0 38px 90px rgba(0,0,0,.38);
   animation: hero-photo-gravity 12s ease-in-out infinite;
   /* Own compositor layer: the drift moves a cached bitmap instead of repainting. */
   will-change: transform;
@@ -52,12 +52,18 @@
   color: inherit;
   cursor: pointer;
   overflow: visible;
+  container-type: size;
 }
 
+/* A square record sleeve, as big as the photo box allows. */
 .albumStack {
   position: absolute;
-  inset: 0;
+  inset: 0 auto 0 0;
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
+  margin-block: auto;
   display: block;
+  container-type: size;
   transform:
     perspective(1200px)
     rotateX(var(--photo-rx, 0deg))
@@ -71,9 +77,13 @@
   inset: 0;
   z-index: 2;
   overflow: hidden;
-  clip-path: polygon(7% 0, 100% 5%, 94% 100%, 0 94%);
+  /* Printed sleeve: a thin cream border around the photo. */
+  border: max(5px, 2.4cqw) solid #efe8dc;
+  border-radius: 2px;
   background: #15100f;
-  box-shadow: 0 24px 54px rgba(0,0,0,.28);
+  box-shadow:
+    0 30px 60px rgba(0,0,0,.45),
+    0 2px 6px rgba(0,0,0,.3);
 }
 
 .photoSheen {
@@ -88,6 +98,7 @@
       rgba(255,255,255,.08) var(--shine-x, 50%),
       transparent 72%
     );
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.18), inset 0 0 28px rgba(0,0,0,.28);
   mix-blend-mode: screen;
   opacity: .65;
   transition: background-position 180ms ease;
@@ -96,20 +107,25 @@
 .vinyl {
   position: absolute;
   z-index: 1;
-  top: 12%;
-  right: -6%;
-  width: 76%;
+  /* Tucked in the sleeve, peeking out of its right edge. */
+  top: 4%;
+  left: 30%;
+  width: 92%;
   aspect-ratio: 1;
+  container-type: inline-size;
   border-radius: 50%;
   background:
-    radial-gradient(circle at center, #b88a57 0 5%, #16100f 5.4% 16%, transparent 16.4%),
-    repeating-radial-gradient(circle at center, rgba(255,255,255,.045) 0 1px, rgba(0,0,0,.1) 1px 3px),
-    radial-gradient(circle at 35% 30%, #292220, #0b0909 64%);
-  box-shadow: 0 24px 42px rgba(0,0,0,.48);
-  transform: translate3d(10%, 0, -12px) rotate(-12deg);
+    radial-gradient(circle at center, #0e0b0a 0 2.2%, transparent 2.5%),
+    repeating-radial-gradient(circle at center, rgba(255,255,255,.05) 0 1px, rgba(0,0,0,.12) 1px 3px),
+    radial-gradient(circle at 34% 28%, #c8475a, #9b2f40 42%, #5a1a25 80%);
+  /* Dark rim so the red disc still reads against the red BAE behind it. */
+  box-shadow:
+    inset 0 0 0 2px rgba(20,8,10,.55),
+    0 24px 42px rgba(0,0,0,.48);
+  transform: translate3d(0, 0, -12px) rotate(-12deg);
   transform-origin: center;
   transition: transform 480ms cubic-bezier(.16,.8,.18,1), filter 240ms ease;
-  filter: brightness(.8);
+  filter: brightness(.95) saturate(1.08);
 }
 
 .vinylGrooves {
@@ -132,39 +148,31 @@
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: radial-gradient(circle, #8f2d3c, #59202a);
-  color: #f6f1e8;
+  background: radial-gradient(circle, #f6f1e8, #e4dacb);
+  color: #3a1a1f;
   text-align: center;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,.12);
 }
 
 .vinylLabel small {
-  font-size: clamp(4px, .44vw, 7px);
+  font-size: max(4px, 1.6cqw);
   letter-spacing: .12em;
 }
 
 .vinylLabel strong {
   font-family: Conthrax, sans-serif;
-  font-size: clamp(5px, .58vw, 9px);
+  font-size: max(5px, 2.05cqw);
   letter-spacing: .05em;
 }
 
 .photoOpen .vinyl {
-  transform: translate3d(54%, -2%, 24px) rotate(28deg);
+  transform: translate3d(34%, 0, 24px) rotate(40deg);
   filter: brightness(1);
 }
 
 .photo:focus-visible {
   outline: 2px solid rgba(196,165,116,.82);
   outline-offset: 8px;
-}
-
-/* Hooked over the slanted bottom edge, a little left of centre. */
-.photoTag {
-  left: 30%;
-  top: calc(86% - var(--hook));
-  z-index: 5;
-  transform: translateZ(42px);
 }
 
 @keyframes hero-photo-gravity {
@@ -249,7 +257,7 @@
   }
 
   .photo:hover .vinyl {
-    filter: brightness(.94);
+    filter: brightness(1.05) saturate(1.1);
   }
 }
 
@@ -280,6 +288,13 @@
     margin-left: 9%;
   }
 
+  /* The photo box flexes to the leftover height; the square sleeve sits at
+     its top so the copy below stays close. */
+  .albumStack {
+    margin-block: 0 auto;
+  }
+
+
   .copy {
     --overhang: 0px;
     position: relative;
@@ -303,6 +318,57 @@
   }
 }
 
+/* Tablet widths: keep the buttons clear of the dock, and on short screens
+   size the BAE by height too so the photo keeps its room. */
+@media (min-width: 561px) and (max-width: 900px) {
+  .hero {
+    padding-bottom: calc(96px + var(--safe-bottom, 0px));
+  }
+}
+
+@media (min-width: 561px) and (max-width: 900px) and (max-height: 820px) {
+  .hero {
+    --wm-top: clamp(62px, 11dvh, 104px);
+    --wm: min(43vw, 30dvh);
+    padding-top: calc(var(--wm-top) + var(--wm) * .3);
+  }
+
+  .wordmark {
+    top: var(--wm-top);
+    font-size: var(--wm);
+  }
+
+  .copy {
+    margin-top: 18px;
+  }
+
+  .eyebrow {
+    margin-bottom: 8px;
+  }
+
+  .copy h1 {
+    font-size: clamp(30px, 7dvh, 56px);
+  }
+
+  .meta {
+    display: none;
+  }
+
+  .actions {
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin-top: 14px;
+    max-width: 440px;
+  }
+
+  .actions > * {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: 10px;
+    white-space: nowrap;
+  }
+}
+
 @media (max-width: 560px) {
   /* Sized by the screen's height as well as its width: with Safari/Brave's
      bars showing, a width-only BAE ate the space the photo needed. */
@@ -318,12 +384,6 @@
     left: 12px;
     top: var(--wm-top);
     font-size: var(--wm);
-  }
-
-  /* Right-hand end of the edge, clear of the eyebrow and headline below. */
-  .photoTag {
-    left: 80%;
-    top: calc(88% - var(--hook));
   }
 
   .photo {

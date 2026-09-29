@@ -173,7 +173,7 @@ export default function MixesSection({ sectionId = 'lab', variant = 'teaser', mi
           >
             <InteractiveMediaDisc
               className="mixes-teaser-disc-button"
-              imageSrc="/photos/images/logo.JPG"
+              imageSrc="/photos/images/portrait.jpg"
             />
 
             <div className="mixes-teaser-copy">

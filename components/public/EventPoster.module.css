@@ -175,9 +175,68 @@
   }
 }
 
+/* ── Events with a flyer: the flyer shows whole beside the info, over a
+   blurred copy of itself. ── */
+.hasFlyer .image {
+  filter: blur(28px) brightness(.42) saturate(1.1);
+  transform: scale(1.15);
+}
+
+.flyer {
+  position: absolute;
+  z-index: 2;
+  top: clamp(22px, 4vw, 48px);
+  bottom: clamp(22px, 4vw, 48px);
+  right: clamp(22px, 5vw, 66px);
+  width: auto;
+  max-width: 42%;
+  aspect-ratio: 3 / 4;
+  filter: drop-shadow(0 24px 40px rgba(0,0,0,.55));
+}
+
+.flyer img {
+  object-fit: contain;
+}
+
+.hasFlyer .info {
+  right: calc(42% + clamp(40px, 7vw, 100px));
+}
+
+@media (hover: hover) {
+  .hasFlyer:hover .image {
+    transform: scale(1.15);
+    filter: blur(28px) brightness(.5) saturate(1.15);
+  }
+}
+
+@media (max-width: 600px) {
+  .hasFlyer {
+    min-height: 600px;
+  }
+
+  /* Phone: flyer on top, info underneath. */
+  .flyer {
+    top: 20px;
+    bottom: auto;
+    left: 50%;
+    right: auto;
+    height: 52%;
+    max-width: calc(100% - 44px);
+    translate: -50% 0;
+  }
+
+  .hasFlyer .info {
+    right: 22px;
+  }
+}
+
 /* Past events read as archive: desaturated photo. */
 .past .image {
   filter: brightness(.72) saturate(.58) contrast(1.06);
+}
+
+.past.hasFlyer .image {
+  filter: blur(28px) brightness(.36) saturate(.6);
 }
 
 
