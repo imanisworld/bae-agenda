@@ -6010,8 +6010,15 @@ body.has-custom-cursor * { cursor: none !important; }
   font-size: 8px;
 }
 
+.book-experience-contact-note {
+  margin: 34px 0 0;
+  color: rgba(246,241,232,.55);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
 .book-experience-faq {
-  margin-top: 24px;
+  margin-top: 14px;
   padding-top: 20px;
   border-top: 1px solid rgba(246,241,232,.1);
 }
