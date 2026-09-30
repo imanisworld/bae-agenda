@@ -3,6 +3,8 @@ import { getPortfolioEntries, getFeaturedPortfolioEntries, getPortfolioStats } f
 import PortfolioExperienceStage from '@/components/public/PortfolioExperienceStage'
 import { SOCIALS } from '@/lib/constants'
 import { getContentMap } from '@/lib/db/content'
+import { parseInstagramPosts } from '@/lib/instagram'
+import { CONTENT_DEFAULTS } from '@/lib/content-schema'
 
 export const metadata: Metadata = {
   title: { absolute: 'DJ B.A.E. Portfolio | Indianapolis & Chicago' },
@@ -27,10 +29,12 @@ export default async function PortfolioPage() {
     getPortfolioEntries(),
     getFeaturedPortfolioEntries(),
     getPortfolioStats(),
-    getContentMap(['instagram_url']),
+    getContentMap(['instagram_url', 'instagram_posts']),
   ])
   const instagramUrl =
     content.instagram_url || SOCIALS.find((social) => social.label === 'Instagram')!.url
+
+  const instagramPosts = parseInstagramPosts(content.instagram_posts ?? CONTENT_DEFAULTS.instagram_posts)
 
   const featuredWithPhotos = featured.filter((entry) => Boolean(entry.photo_url))
   const featuredIds = new Set(featuredWithPhotos.map((entry) => entry.id))
@@ -58,6 +62,7 @@ export default async function PortfolioPage() {
       }))}
       stats={stats}
       instagramUrl={instagramUrl}
+      instagramPosts={instagramPosts}
     />
   )
 }

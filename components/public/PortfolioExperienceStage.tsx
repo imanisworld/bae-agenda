@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import InstagramEmbeds from '@/components/public/InstagramEmbeds'
 import PortfolioArchive from '@/components/public/PortfolioArchive'
 import PortfolioArchiveHero, { type ArchivePrint } from '@/components/public/PortfolioArchiveHero'
 
@@ -25,11 +26,13 @@ export default function PortfolioExperienceStage({
   entries,
   stats,
   instagramUrl,
+  instagramPosts = [],
 }: {
   prints: ArchivePrint[]
   entries: ArchiveEntry[]
   stats: PortfolioStats
   instagramUrl?: string
+  instagramPosts?: string[]
 }) {
   const [archiveOpen, setArchiveOpen] = useState(false)
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
@@ -77,6 +80,7 @@ export default function PortfolioExperienceStage({
             <button ref={closeButtonRef} type="button" onClick={closeArchive} aria-label="Close archive">Close ×</button>
           </div>
           <div className="experience-drawer-scroll">
+            <InstagramEmbeds posts={instagramPosts} profileUrl={instagramUrl} />
             <PortfolioArchive entries={entries} />
           </div>
         </div>

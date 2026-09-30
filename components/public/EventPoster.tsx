@@ -18,11 +18,20 @@ const POSTER_PHOTOS = [
 // Flyers for specific events, keyed by slug. These show whole, beside the
 // event info, instead of the rotating photo.
 const FLYERS: Record<string, string> = {
-  'chi-chis-oct-3-2026': '/photos/flyers/chi-chis.jpg',
+  'chi-chis-oct-3-2026': '/photos/flyers/chi-chis-original.jpg',
   'dy2k-sep-11-2026': '/photos/flyers/dy2k-lineup.jpg',
 }
 
+// Hand-picked photos for events where the automatic pick doubled up.
+const PHOTO_BY_SLUG: Record<string, (typeof POSTER_PHOTOS)[number]> = {
+  'open-decks-oct-15-2026': POSTER_PHOTOS[1],
+  '1st-annual-level-up-walkathon': POSTER_PHOTOS[0],
+}
+
 function posterPhoto(event: Event) {
+  const picked = PHOTO_BY_SLUG[event.slug]
+  if (picked) return picked
+
   let hash = 0
   for (const char of event.id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0
   return POSTER_PHOTOS[hash % POSTER_PHOTOS.length]

@@ -384,11 +384,6 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                     <span className={styles.coverFallback}>DJ B.A.E.</span>
                   )}
                 </span>
-                {offset === 0 ? (
-                  <span className={styles.coverBadge} aria-hidden="true">
-                    {isLoaded && playing ? <PauseIcon /> : <PlayIcon />}
-                  </span>
-                ) : null}
               </button>
             )
           })}
