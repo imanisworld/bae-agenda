@@ -58,7 +58,7 @@ export default function HeroInteractivePhoto() {
             fill
             priority
             sizes="(max-width: 900px) 72vw, 40vw"
-            quality={95}
+            quality={90}
             className={styles.photoImage}
           />
           <span className={styles.photoSheen} aria-hidden="true" />

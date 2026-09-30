@@ -77,7 +77,7 @@ export default function Nav() {
                 href={item.href}
                 prefetch
                 aria-current={active ? 'page' : undefined}
-                aria-label={item.label}
+                aria-label={DOCK_LABELS[item.label] ? `${DOCK_LABELS[item.label]} (${item.label})` : item.label}
                 className={`${styles.item} ${active ? styles.active : ''}`}
                 data-tone={TONES[index % TONES.length]}
                 onClick={dismissDockCue}

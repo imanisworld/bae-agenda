@@ -11,7 +11,7 @@
 /* ---- Local Fonts ----------------------------------------- */
 @font-face {
   font-family: 'Conthrax';
-  src: url('/fonts/Conthrax-SemiBold.otf') format('opentype');
+  src: url('/fonts/Conthrax-SemiBold.woff2') format('woff2');
   font-weight: 600;
   font-style: normal;
   font-display: swap;

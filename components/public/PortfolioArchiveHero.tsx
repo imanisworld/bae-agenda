@@ -70,7 +70,7 @@ export default function PortfolioArchiveHero({
         fill
         priority
         sizes="(max-width: 760px) 100vw, 60vw"
-        quality={80}
+        quality={75}
         aria-hidden="true"
         className={styles.background}
       />
@@ -107,7 +107,7 @@ export default function PortfolioArchiveHero({
         </button>
       ) : null}
 
-      <div className={styles.printField} aria-label="Selected past work">
+      <div className={styles.printField} role="group" aria-label="Selected past work">
         {prints.slice(0, 3).map((entry, index) => (
           <article
             key={entry.id}
@@ -125,7 +125,7 @@ export default function PortfolioArchiveHero({
                 alt={entry.event_name}
                 fill
                 sizes="(max-width: 760px) 44vw, 300px"
-                quality={95}
+                quality={75}
               />
             </div>
             <div className={styles.printMeta}>

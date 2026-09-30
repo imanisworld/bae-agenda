@@ -46,7 +46,7 @@ export default function Footer() {
         <div className="footer-brand" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
           <Link href="/" style={{ textDecoration: 'none' }}>
             <span style={{ fontFamily: 'Conthrax, sans-serif', fontSize: '14px', fontWeight: 600, letterSpacing: '0.18em', color: 'var(--white)' }}>
-              DJ <span style={{ color: 'var(--violet)' }}>B.A.E.</span>
+              DJ <span style={{ color: '#d4687a' }}>B.A.E.</span>
             </span>
           </Link>
           <p style={{ margin: '6px 0 0', fontSize: '13px', color: 'var(--muted)', fontFamily: 'DM Sans, sans-serif', lineHeight: 1.55 }}>
