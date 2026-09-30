@@ -37,6 +37,11 @@ function posterPhoto(event: Event) {
   return POSTER_PHOTOS[hash % POSTER_PHOTOS.length]
 }
 
+// The picture that stands for an event anywhere else (link previews, search).
+export function eventArtwork(event: Event) {
+  return FLYERS[event.slug] ?? posterPhoto(event).src
+}
+
 function parts(event: Event) {
   const validZone = event.event_timezone && isValidTimeZone(event.event_timezone)
   const timeZone = validZone ? event.event_timezone! : 'UTC'
