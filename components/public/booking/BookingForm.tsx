@@ -621,11 +621,18 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
   return (
     <div className={embedded ? 'booking-form-embedded' : undefined} style={{ background: 'var(--off-black)', paddingTop: embedded ? 0 : '68px' }}>
       <div className="section-container" style={{ maxWidth: '680px', paddingTop: embedded ? '24px' : 0, paddingBottom: embedded ? '36px' : '64px' }}>
-        {/* Extra room under the title for the tag hanging off the "o". */}
-        <div style={{ marginBottom: 'clamp(78px, 8vw, 112px)' }}>
+        {/* Title with the step tracker beside it; extra room underneath for the
+            tag hanging off the "o". */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '16px',
+          marginBottom: 'clamp(78px, 8vw, 112px)',
+        }}>
           <h1 style={{
             fontFamily: 'Conthrax, sans-serif',
-            fontSize: 'clamp(30px, 4vw, 54px)',
+            fontSize: 'clamp(40px, 6vw, 72px)',
             fontWeight: 600,
             color: 'var(--white)',
             lineHeight: 0.95,
@@ -634,6 +641,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
           }}>
             B<HangFrom>o</HangFrom>ok
           </h1>
+          <BookingProgress step={step} />
         </div>
 
         {draftRestored && (
@@ -669,8 +677,6 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
             </button>
           </div>
         )}
-
-        <BookingProgress step={step} />
 
         <input
           tabIndex={-1}
@@ -901,10 +907,10 @@ function BookingSuccess({ summary, embedded = false }: { summary: BookingSuccess
 
 function BookingProgress({ step }: { step: Step }) {
   return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '28px' }}>
-      {([1, 2, 3] as Step[]).map((value) => (
-        <div key={value} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{
+    <div style={{ display: 'grid', justifyItems: 'end', gap: '8px', flexShrink: 0 }}>
+      <div style={{ display: 'flex', gap: '8px' }}>
+        {([1, 2, 3] as Step[]).map((value) => (
+          <div key={value} style={{
             width: '28px',
             height: '28px',
             borderRadius: '50%',
@@ -921,22 +927,14 @@ function BookingProgress({ step }: { step: Step }) {
           }}>
             {value < step ? '✓' : value}
           </div>
-          {value < 3 && (
-            <div style={{
-              width: '32px',
-              height: '1px',
-              background: value < step ? 'var(--violet)' : 'var(--border)',
-              transition: 'background 200ms ease',
-            }} />
-          )}
-        </div>
-      ))}
+        ))}
+      </div>
       <span style={{
-        marginLeft: '8px',
-        fontSize: '12px',
+        fontSize: '10px',
         letterSpacing: '0.16em',
         textTransform: 'uppercase',
         color: 'var(--muted)',
+        whiteSpace: 'nowrap',
       }}>
         {step} of 3 — {STEP_LABELS[step]}
       </span>

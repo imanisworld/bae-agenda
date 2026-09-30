@@ -5934,21 +5934,24 @@ body.has-custom-cursor * { cursor: none !important; }
 
 .book-experience-rail-inner header {
   position: relative;
-  padding-bottom: 16px;
+  /* Room for the tag hanging off the "o". */
+  padding-bottom: 40px;
 }
 
-.book-experience-title-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
+/* The phone sits at the right end of the Bookings row. */
+.book-experience-contact-bookings {
+  position: relative;
+  padding-right: 96px !important;
 }
 
 .book-experience-phone {
-  flex-shrink: 0;
-  height: 108px;
-  margin-top: -8px;
-  transform: rotate(7deg);
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  height: 96px;
+  transform: translateY(-56%) rotate(7deg);
   filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .4));
+  pointer-events: none;
 }
 
 .book-experience-phone img {
@@ -6148,7 +6151,7 @@ body.has-custom-cursor * { cursor: none !important; }
 
 @media (max-width: 620px) {
   .book-experience-rail-inner header {
-    padding-bottom: 12px;
+    padding-bottom: 34px;
   }
 
   .book-experience-phone {
