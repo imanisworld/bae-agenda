@@ -31,7 +31,7 @@ export default async function BookExperienceRail() {
           <a href={`mailto:${bookingEmail}`}>{bookingEmail}</a>
           <div className="book-experience-phone" aria-hidden="true">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/brand/phone-3d.webp" alt="" width={241} height={420} />
+            <img src="/brand/phone-3d.webp" alt="" width={172} height={300} loading="lazy" decoding="async" />
           </div>
         </div>
         <div>

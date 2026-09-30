@@ -66,9 +66,9 @@ export default function RootLayout({
         {/* Preload local Conthrax font to prevent layout shift */}
         <link
           rel="preload"
-          href="/fonts/Conthrax-SemiBold.otf"
+          href="/fonts/Conthrax-SemiBold.woff2"
           as="font"
-          type="font/otf"
+          type="font/woff2"
           crossOrigin="anonymous"
         />
       </head>

@@ -36,7 +36,7 @@ export default function PhotoStrip() {
               alt={alt}
               fill
               sizes="(max-width: 800px) 33vw, 20vw"
-              quality={95}
+              quality={75}
               className="photo-strip-image"
               style={{ objectFit: 'cover', display: 'block' }}
             />

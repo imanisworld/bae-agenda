@@ -379,7 +379,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                 <span className={styles.coverArt}>
                   {/* Only covers near the front load an image; far ones are invisible anyway. */}
                   {mix.cover_url && Math.abs(offset) <= 3 ? (
-                    <Image src={mix.cover_url} alt="" fill sizes="(max-width: 620px) 50vw, 280px" quality={95} draggable={false} />
+                    <Image src={mix.cover_url} alt="" fill sizes="(max-width: 620px) 50vw, 280px" quality={75} draggable={false} />
                   ) : (
                     <span className={styles.coverFallback}>DJ B.A.E.</span>
                   )}
@@ -426,7 +426,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
             >
               <span className={`${styles.record}${playing ? ` ${styles.spinning}` : ''}`}>
                 {loaded.cover_url ? (
-                  <Image src={loaded.cover_url} alt="" fill sizes="(max-width: 620px) 40vw, 320px" quality={95} draggable={false} />
+                  <Image src={loaded.cover_url} alt="" fill sizes="(max-width: 620px) 40vw, 320px" quality={75} draggable={false} />
                 ) : null}
                 <span className={styles.grooves} aria-hidden="true" />
                 <span className={styles.hole} aria-hidden="true" />

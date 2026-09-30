@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import EventPoster from '@/components/public/EventPoster'
+import EventPoster, { eventArtwork } from '@/components/public/EventPoster'
 import { getPublicEventBySlug } from '@/lib/db/events'
 import { isValidTimeZone } from '@/lib/date-time'
 import { isUpcomingEventRecord } from '@/lib/event-schedule'
@@ -42,6 +42,7 @@ export async function generateMetadata({
       ? event.description
       : `${event.title} — ${[date, location].filter(Boolean).join(' · ')}. DJ B.A.E.`
   const title = `${event.title} | DJ B.A.E.`
+  const image = `${SITE_URL}${eventArtwork(event)}`
 
   return {
     title: { absolute: title },
@@ -54,11 +55,13 @@ export async function generateMetadata({
       title,
       description,
       url: `${SITE_URL}${canonical}`,
+      images: [{ url: image, alt: `${event.title} — DJ B.A.E.` }],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title,
       description,
+      images: [image],
     },
   }
 }
@@ -86,6 +89,7 @@ export default async function EventDetailPage({
           startDate: event.event_date,
           eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
           url: canonicalUrl,
+          image: [`${SITE_URL}${eventArtwork(event)}`],
           ...(event.show_description && event.description ? { description: event.description } : {}),
           location: {
             '@type': 'Place',

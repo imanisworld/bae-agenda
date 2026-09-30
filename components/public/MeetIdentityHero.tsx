@@ -72,7 +72,7 @@ export default function MeetIdentityHero() {
             fill
             priority
             sizes="(max-width: 760px) 88vw, 44vw"
-            quality={95}
+            quality={90}
             draggable={false}
           />
         </div>

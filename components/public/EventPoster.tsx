@@ -37,6 +37,11 @@ function posterPhoto(event: Event) {
   return POSTER_PHOTOS[hash % POSTER_PHOTOS.length]
 }
 
+// The picture that stands for an event anywhere else (link previews, search).
+export function eventArtwork(event: Event) {
+  return FLYERS[event.slug] ?? posterPhoto(event).src
+}
+
 function parts(event: Event) {
   const validZone = event.event_timezone && isValidTimeZone(event.event_timezone)
   const timeZone = validZone ? event.event_timezone! : 'UTC'
@@ -94,10 +99,11 @@ export default function EventPoster({
         src={flyer ?? photo.src}
         alt=""
         fill
-        priority={priority}
-        loading={priority ? undefined : 'lazy'}
-        sizes="(max-width: 760px) 100vw, 1100px"
-        quality={95}
+        priority={priority && !flyer}
+        loading={priority && !flyer ? undefined : 'lazy'}
+        // Behind a flyer this copy is blurred to a wash, so a tiny one is enough.
+        sizes={flyer ? '96px' : '(max-width: 760px) 100vw, 1100px'}
+        quality={75}
         className={styles.image}
         style={flyer ? undefined : { objectPosition: photo.position }}
         aria-hidden="true"
@@ -112,7 +118,7 @@ export default function EventPoster({
             priority={priority}
             loading={priority ? undefined : 'lazy'}
             sizes="(max-width: 600px) 80vw, 460px"
-            quality={95}
+            quality={90}
           />
         </div>
       ) : null}
