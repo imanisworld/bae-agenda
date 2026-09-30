@@ -1973,29 +1973,6 @@ export async function deleteBookingAction(formData: FormData) {
     )
   }
 
-  const { error: eventUnlinkError } = await admin
-    .from('events')
-    .update({ booking_id: null })
-    .eq('booking_id', bookingId)
-
-  if (eventUnlinkError) {
-    redirectWithError(`/admin/bookings/${bookingId}`, eventUnlinkError.message || 'Could not unlink the public event.')
-  }
-
-  const cleanupSteps = [
-    admin.from('booking_portal_requests').delete().eq('booking_id', bookingId),
-    admin.from('booking_activity').delete().eq('booking_id', bookingId),
-    admin.from('notes').delete().eq('booking_id', bookingId),
-    admin.from('invoices').delete().eq('booking_id', bookingId),
-    admin.from('payments').delete().eq('booking_id', bookingId),
-  ]
-
-  const cleanupResults = await Promise.all(cleanupSteps)
-  const cleanupError = cleanupResults.find((result) => result.error)?.error
-  if (cleanupError) {
-    redirectWithError(`/admin/bookings/${bookingId}`, cleanupError.message || 'Could not remove related test records.')
-  }
-
   const { error: deleteError } = await admin
     .from('bookings')
     .delete()
