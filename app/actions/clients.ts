@@ -150,18 +150,6 @@ export async function deleteClientAction(formData: FormData) {
     redirectWithError(id, 'Delete or preserve the linked bookings first. Clients with booking history cannot be permanently deleted.')
   }
 
-  const cleanupResults = await Promise.all([
-    admin.from('booking_portal_requests').delete().eq('client_id', id),
-    admin.from('client_portal_codes').delete().eq('client_id', id),
-    admin.from('client_portal_sessions').delete().eq('client_id', id),
-    admin.from('notes').delete().eq('client_id', id),
-  ])
-
-  const cleanupError = cleanupResults.find((result) => result.error)?.error
-  if (cleanupError) {
-    redirectWithError(id, cleanupError.message || 'Could not remove related client records.')
-  }
-
   const { error } = await admin
     .from('clients')
     .delete()
