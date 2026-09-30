@@ -124,3 +124,55 @@ export async function updateClientAction(formData: FormData) {
   }
   redirect(`/admin/clients/${id}?success=${encodeURIComponent('Client details saved. Draft invoice recipients were synced; sent invoices were left unchanged.')}`)
 }
+
+export async function deleteClientAction(formData: FormData) {
+  await requireAdminUser()
+
+  const parsedId = z.string().uuid().safeParse(formData.get('id'))
+  if (!parsedId.success) {
+    redirect('/admin/clients')
+  }
+
+  const id = parsedId.data
+  const admin = createAdminClient()
+
+  const { data: bookings, error: bookingError } = await admin
+    .from('bookings')
+    .select('id')
+    .eq('client_id', id)
+    .limit(1)
+
+  if (bookingError) {
+    redirectWithError(id, bookingError.message || 'Could not verify linked bookings.')
+  }
+
+  if ((bookings ?? []).length > 0) {
+    redirectWithError(id, 'Delete or preserve the linked bookings first. Clients with booking history cannot be permanently deleted.')
+  }
+
+  const cleanupResults = await Promise.all([
+    admin.from('booking_portal_requests').delete().eq('client_id', id),
+    admin.from('client_portal_codes').delete().eq('client_id', id),
+    admin.from('client_portal_sessions').delete().eq('client_id', id),
+    admin.from('notes').delete().eq('client_id', id),
+  ])
+
+  const cleanupError = cleanupResults.find((result) => result.error)?.error
+  if (cleanupError) {
+    redirectWithError(id, cleanupError.message || 'Could not remove related client records.')
+  }
+
+  const { error } = await admin
+    .from('clients')
+    .delete()
+    .eq('id', id)
+
+  if (error) {
+    redirectWithError(id, error.message || 'Could not delete the client.')
+  }
+
+  revalidatePath('/admin/clients')
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/dashboard')
+  redirect('/admin/clients')
+}
