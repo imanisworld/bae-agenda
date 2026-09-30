@@ -1917,3 +1917,76 @@ export async function updatePortalRequestStatusAction(formData: FormData) {
   revalidatePath('/admin/dashboard')
   redirect(`/admin/bookings/${resolvedBookingId}?success=${encodeURIComponent('Portal request updated.')}`)
 }
+
+export async function deleteBookingAction(formData: FormData) {
+  await requireAdminUser()
+
+  const admin = createAdminClient()
+  const bookingId = optionalString(formData.get('booking_id'))
+  if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+
+  const { data: booking, error: bookingError } = await admin
+    .from('bookings')
+    .select('id, status, lifecycle_status')
+    .eq('id', bookingId)
+    .maybeSingle()
+
+  if (bookingError || !booking) {
+    redirectWithError('/admin/bookings', bookingError?.message || 'Could not find that booking.')
+  }
+
+  const lifecycleStatus = getBookingLifecycleStatus(
+    booking.lifecycle_status as BookingLifecycleStatus | null | undefined,
+    booking.status as BookingStatus | null | undefined,
+  )
+
+  if (lifecycleStatus === 'confirmed' || lifecycleStatus === 'completed') {
+    redirectWithError(
+      `/admin/bookings/${bookingId}`,
+      'Confirmed and completed bookings are protected business records. Mark the booking lost/cancelled only when appropriate; do not hard-delete real work.'
+    )
+  }
+
+  const [{ data: payments, error: paymentsError }, { data: invoices, error: invoicesError }] = await Promise.all([
+    admin.from('payments').select('id, status').eq('booking_id', bookingId),
+    admin.from('invoices').select('id, status').eq('booking_id', bookingId),
+  ])
+
+  if (paymentsError || invoicesError) {
+    redirectWithError(
+      `/admin/bookings/${bookingId}`,
+      paymentsError?.message || invoicesError?.message || 'Could not verify related financial records.'
+    )
+  }
+
+  if ((payments ?? []).some((payment) => payment.status === 'received' || payment.status === 'refunded')) {
+    redirectWithError(
+      `/admin/bookings/${bookingId}`,
+      'This booking has received or refunded payment history and cannot be permanently deleted.'
+    )
+  }
+
+  if ((invoices ?? []).some((invoice) => invoice.status === 'sent' || invoice.status === 'paid')) {
+    redirectWithError(
+      `/admin/bookings/${bookingId}`,
+      'This booking has a sent or paid invoice and cannot be permanently deleted.'
+    )
+  }
+
+  const { error: deleteError } = await admin
+    .from('bookings')
+    .delete()
+    .eq('id', bookingId)
+
+  if (deleteError) {
+    redirectWithError(`/admin/bookings/${bookingId}`, deleteError.message || 'Could not delete the booking.')
+  }
+
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/clients')
+  revalidatePath('/admin/invoices')
+  revalidatePath('/admin/payments')
+  revalidatePath('/admin/events')
+  revalidatePath('/admin/dashboard')
+  redirect('/admin/bookings')
+}

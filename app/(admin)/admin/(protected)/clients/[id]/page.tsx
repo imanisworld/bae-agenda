@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation'
 import PageHeader from '@/components/admin/PageHeader'
 import AdminNotice from '@/components/admin/AdminNotice'
 import Badge from '@/components/admin/Badge'
-import { updateClientAction } from '@/app/actions/clients'
+import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
+import { deleteClientAction, updateClientAction } from '@/app/actions/clients'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { BOOKING_LIFECYCLE_STATUS_LABELS } from '@/lib/constants'
@@ -191,6 +192,30 @@ export default async function ClientDetailPage({
           </div>
         )}
       </section>
+      <div className="admin-section" style={{ padding: '24px', marginTop: '16px', marginBottom: 0, borderColor: 'rgba(232, 93, 117, 0.32)' }}>
+        <div className="admin-section-title" style={{ marginBottom: '10px', color: '#e85d75' }}>Delete Client</div>
+        {bookings.length === 0 ? (
+          <>
+            <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: '0 0 18px' }}>
+              Permanently remove this unused or test client and any inactive portal records. This cannot be undone.
+            </p>
+            <form action={deleteClientAction}>
+              <input type="hidden" name="id" value={client.id} />
+              <ConfirmSubmitButton
+                message={`Permanently delete ${[client.first_name, client.last_name].filter(Boolean).join(' ')}? This cannot be undone.`}
+                className="admin-btn-danger"
+              >
+                Delete Client
+              </ConfirmSubmitButton>
+            </form>
+          </>
+        ) : (
+          <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: 0 }}>
+            This client still has {bookings.length} booking{bookings.length === 1 ? '' : 's'}. Preserve those records or delete eligible test bookings first.
+          </p>
+        )}
+      </div>
+
     </div>
   )
 }

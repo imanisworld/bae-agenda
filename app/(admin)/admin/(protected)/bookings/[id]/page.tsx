@@ -11,7 +11,7 @@ import { getBookingFinancialSnapshot } from '@/lib/booking-finance'
 import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } from '@/lib/booking-deposit'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, createEventFromBookingAction, updateBookingPaymentAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
+import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, createEventFromBookingAction, updateBookingPaymentAction, deleteBookingAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { createInvoiceFromBookingAction } from '@/app/actions/invoices'
 import { getEventInputDateTime } from '@/lib/date-time'
@@ -1197,6 +1197,24 @@ export default async function EditBookingPage({
           </div>
         </form>
       </div>
+      {lifecycleStatus !== 'confirmed' && lifecycleStatus !== 'completed' && (
+        <div className="admin-section" style={{ padding: '24px', marginBottom: 0, borderColor: 'rgba(232, 93, 117, 0.32)' }}>
+          <div className="admin-section-title" style={{ marginBottom: '10px', color: '#e85d75' }}>Delete Booking</div>
+          <p style={{ color: 'var(--muted)', fontSize: '13px', lineHeight: 1.7, margin: '0 0 18px' }}>
+            Permanently remove a test, lost, or unused booking. Confirmed/completed bookings, received/refunded payments, and sent/paid invoices are protected.
+          </p>
+          <form action={deleteBookingAction}>
+            <input type="hidden" name="booking_id" value={booking.id} />
+            <ConfirmSubmitButton
+              message={`Permanently delete “${booking.event_name}”? This removes its unsent draft invoice, pending payment, notes, and portal activity. This cannot be undone.`}
+              className="admin-btn-danger"
+            >
+              Delete Booking
+            </ConfirmSubmitButton>
+          </form>
+        </div>
+      )}
+
     </div>
   )
 }
