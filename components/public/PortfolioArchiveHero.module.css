@@ -232,6 +232,19 @@
   transform: translateY(var(--print-lift)) scale(var(--print-scale)) perspective(900px) rotateX(var(--print-rx)) rotateY(var(--print-ry)) rotate(6deg);
 }
 
+/* Below the bouncing mark, on its floor shadow. */
+.logoCue {
+  left: 50%;
+  bottom: -6px;
+  translate: -50% 0;
+}
+
+/* Top-right corner of the first print only. */
+.printCue {
+  top: 8px;
+  right: 8px;
+}
+
 .printImage {
   position: relative;
   aspect-ratio: 3 / 4;

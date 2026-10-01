@@ -199,6 +199,19 @@ export async function fetchPlaylists(
   }
 }
 
+/**
+ * Tracks without their own artwork carry the account's default card: black
+ * `<dj_b.a.e>` type baked onto a white JPEG. That white can't be made
+ * transparent, so the site shows the transparent brand mark instead.
+ * Other artwork (including the black Mashups card) is left alone.
+ */
+const BRAND_CARD_ARTWORK = ['artworks-N0S3aX1KSXvz9Knz-mV9b3Q']
+export const BRAND_MARK_SRC = '/brand/dj-bae-logo.png'
+
+export function isBrandCardArtwork(url: string | null | undefined) {
+  return Boolean(url && BRAND_CARD_ARTWORK.some((id) => url.includes(id)))
+}
+
 /** SoundCloud serves small artwork by default; ask for the 500px version. */
 export function largeArtwork(url: string | null | undefined) {
   return url ? url.replace('-large.', '-t500x500.') : null

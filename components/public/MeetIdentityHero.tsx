@@ -1,6 +1,7 @@
 'use client'
 
 import { HangFrom } from '@/components/public/brand/HangingLogo'
+import InteractionCue, { markCueUsed } from '@/components/public/InteractionCue'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRef, useState, type CSSProperties, type PointerEvent } from 'react'
@@ -23,6 +24,7 @@ export default function MeetIdentityHero() {
   }
 
   function pointerDown(event: PointerEvent<HTMLDivElement>) {
+    markCueUsed('meet-portrait')
     pointerRef.current = event.pointerId
     setInteracting(true)
     updateTilt(event)
@@ -76,6 +78,7 @@ export default function MeetIdentityHero() {
             draggable={false}
           />
         </div>
+        <InteractionCue id="meet-portrait" label="Drag to tilt" className={styles.portraitCue} />
       </div>
 
       <div className={styles.copy}>

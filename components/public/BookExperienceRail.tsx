@@ -22,7 +22,7 @@ export default async function BookExperienceRail() {
   return (
     <div className="book-experience-rail-inner">
       <header>
-        <h2>C<HangFrom finish="gold">o</HangFrom>ntact</h2>
+        <h2>C<HangFrom finish="gold" cue={false}>o</HangFrom>ntact</h2>
       </header>
 
       <div className="book-experience-contact">

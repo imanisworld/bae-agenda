@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { usePlayer } from './PlayerProvider'
+import { BRAND_MARK_SRC, isBrandCardArtwork } from './soundcloud'
 import styles from './NowPlayingPill.module.css'
 
 /**
@@ -22,7 +23,11 @@ export default function NowPlayingPill({ fallback }: { fallback: React.ReactNode
     <div className={styles.pill}>
       <Link href="/lab" className={styles.track} aria-label={`Now playing: ${current.title}. Open the Lab`}>
         <span className={`${styles.disc}${playing ? ` ${styles.spinning}` : ''}`} aria-hidden="true">
-          {current.cover_url ? <Image src={current.cover_url} alt="" fill sizes="24px" /> : null}
+          {current.cover_url ? (
+            isBrandCardArtwork(current.cover_url)
+              ? <Image src={BRAND_MARK_SRC} alt="" fill sizes="24px" className={styles.brandArt} />
+              : <Image src={current.cover_url} alt="" fill sizes="24px" />
+          ) : null}
         </span>
         <span className={styles.title}>{current.title}</span>
       </Link>

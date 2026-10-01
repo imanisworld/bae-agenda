@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import InteractionCue, { markCueUsed } from '@/components/public/InteractionCue'
 import { useEffect, useRef, useState, type PointerEvent } from 'react'
 import styles from './PortfolioArchiveHero.module.css'
 
@@ -31,6 +32,7 @@ export default function PortfolioArchiveHero({
   }, [])
 
   function kickLogo() {
+    markCueUsed('portfolio-logo')
     if (logoTimer.current) window.clearTimeout(logoTimer.current)
     setLogoKicked(false)
     window.requestAnimationFrame(() => {
@@ -41,7 +43,8 @@ export default function PortfolioArchiveHero({
 
   function movePrint(event: PointerEvent<HTMLElement>) {
     const node = event.currentTarget
-    if (event.pointerType === 'mouse') {
+    // Mouse tilts on hover; a finger tilts while it's pressed on the print.
+    if (event.pointerType === 'mouse' || event.buttons > 0) {
       const rect = node.getBoundingClientRect()
       const px = (event.clientX - rect.left) / rect.width - .5
       const py = (event.clientY - rect.top) / rect.height - .5
@@ -51,6 +54,7 @@ export default function PortfolioArchiveHero({
   }
 
   function pressPrint(event: PointerEvent<HTMLElement>) {
+    markCueUsed('portfolio-prints')
     event.currentTarget.style.setProperty('--print-scale', '.98')
     event.currentTarget.style.setProperty('--print-lift', '3px')
   }
@@ -104,6 +108,7 @@ export default function PortfolioArchiveHero({
         >
           <Image src="/brand/dj-bae-logo.png" alt="" width={900} height={659} sizes="(max-width: 760px) 78vw, 42vw" className={styles.logoBounce} />
           <span className={styles.logoShadow} aria-hidden="true" />
+          <InteractionCue id="portfolio-logo" label="Tap" className={styles.logoCue} />
         </button>
       ) : null}
 
@@ -128,6 +133,7 @@ export default function PortfolioArchiveHero({
                 quality={75}
               />
             </div>
+            {index === 0 ? <InteractionCue id="portfolio-prints" label="Drag to tilt" className={styles.printCue} /> : null}
             <div className={styles.printMeta}>
               <small>{String(index + 1).padStart(3, '0')} · {entry.year}</small>
               <strong>{entry.event_name}</strong>

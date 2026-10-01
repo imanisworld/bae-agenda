@@ -8,16 +8,20 @@
  * playing after the visitor leaves the Lab.
  */
 import { HangFrom } from '@/components/public/brand/HangingLogo'
+import InteractionCue, { markCueUsed } from '@/components/public/InteractionCue'
 import Image from 'next/image'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { permalinkFor, usePlayer } from '@/components/public/player/PlayerProvider'
 import { useLabCrates, type CrateMix } from '@/components/public/player/useLabCrates'
+import { BRAND_MARK_SRC, isBrandCardArtwork } from '@/components/public/player/soundcloud'
 import styles from './LabListeningStation.module.css'
 
 export type ListeningMix = CrateMix
 
 const SOUNDCLOUD_PROFILE = 'https://soundcloud.com/deejaybae'
 const SWIPE_THRESHOLD = 40
+const COVERS_CUE = 'lab-covers'
+const RECORD_CUE = 'lab-record'
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value))
@@ -52,6 +56,14 @@ function coverStyle(offset: number): CSSProperties {
     opacity: abs > 3 ? 0 : 1,
     pointerEvents: abs > 3 ? 'none' : undefined,
   } as CSSProperties
+}
+
+/** Cover art, or the transparent brand mark where SoundCloud only has the white default card. */
+function MixArt({ url, sizes }: { url: string; sizes: string }) {
+  if (isBrandCardArtwork(url)) {
+    return <Image src={BRAND_MARK_SRC} alt="" fill sizes={sizes} className={styles.brandArt} draggable={false} />
+  }
+  return <Image src={url} alt="" fill sizes={sizes} quality={75} draggable={false} />
 }
 
 function PlayIcon() {
@@ -176,9 +188,9 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
 
-    if (!cancelled) {
-      if (dx > SWIPE_THRESHOLD) move(-1)
-      else if (dx < -SWIPE_THRESHOLD) move(1)
+    if (!cancelled && Math.abs(dx) > SWIPE_THRESHOLD) {
+      markCueUsed(COVERS_CUE)
+      move(dx > 0 ? -1 : 1)
     }
 
     window.setTimeout(() => { drag.current = null }, 0)
@@ -210,7 +222,10 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
     const angle = recordPointerAngle(event)
     const delta = shortestAngleDelta(angle, current.lastAngle) * .82
     current.lastAngle = angle
-    if (Math.abs(delta) > .7) current.moved = true
+    if (Math.abs(delta) > .7 && !current.moved) {
+      current.moved = true
+      markCueUsed(RECORD_CUE)
+    }
 
     scratchAngle.current += delta
     event.currentTarget.style.setProperty('--scratch-angle', `${scratchAngle.current}deg`)
@@ -246,6 +261,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
     const now = Date.now()
     if (now - wheelLock.current < 320) return
     wheelLock.current = now
+    markCueUsed(COVERS_CUE)
     move(event.deltaX > 0 ? 1 : -1)
   }
 
@@ -376,10 +392,10 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
                 style={coverStyle(offset)}
                 onClick={() => onCoverClick(index)}
               >
-                <span className={styles.coverArt}>
+                <span className={`${styles.coverArt}${isBrandCardArtwork(mix.cover_url) ? ` ${styles.brandSleeve}` : ''}`}>
                   {/* Only covers near the front load an image; far ones are invisible anyway. */}
                   {mix.cover_url && Math.abs(offset) <= 3 ? (
-                    <Image src={mix.cover_url} alt="" fill sizes="(max-width: 620px) 50vw, 280px" quality={75} draggable={false} />
+                    <MixArt url={mix.cover_url} sizes="(max-width: 620px) 50vw, 280px" />
                   ) : (
                     <span className={styles.coverFallback}>DJ B.A.E.</span>
                   )}
@@ -387,6 +403,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
               </button>
             )
           })}
+          {list.length > 1 ? <InteractionCue id={COVERS_CUE} label="Swipe / drag" className={styles.coversCue} /> : null}
         </div>
 
         <div className={styles.crateBar}>
@@ -426,7 +443,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
             >
               <span className={`${styles.record}${playing ? ` ${styles.spinning}` : ''}`}>
                 {loaded.cover_url ? (
-                  <Image src={loaded.cover_url} alt="" fill sizes="(max-width: 620px) 40vw, 320px" quality={75} draggable={false} />
+                  <MixArt url={loaded.cover_url} sizes="(max-width: 620px) 40vw, 320px" />
                 ) : null}
                 <span className={styles.grooves} aria-hidden="true" />
                 <span className={styles.hole} aria-hidden="true" />
@@ -436,6 +453,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
           <span className={`${styles.tonearm}${onPlatter ? ` ${styles.tonearmOn}` : ''}`} aria-hidden="true">
             <i />
           </span>
+          <InteractionCue id={RECORD_CUE} label="Drag record" className={styles.recordCue} />
         </button>
 
         <div className={styles.console}>

@@ -170,6 +170,13 @@
   filter: brightness(1);
 }
 
+/* Inside the sleeve's lower-right corner, above the print. */
+.sleeveCue {
+  z-index: 3;
+  right: calc(max(5px, 2.4cqw) + 8px);
+  bottom: calc(max(5px, 2.4cqw) + 8px);
+}
+
 .photo:focus-visible {
   outline: 2px solid rgba(196,165,116,.82);
   outline-offset: 8px;

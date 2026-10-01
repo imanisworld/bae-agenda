@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import InteractionCue, { markCueUsed } from '@/components/public/InteractionCue'
 import { useState, type CSSProperties, type PointerEvent } from 'react'
 import styles from './HeroSection.module.css'
 
@@ -33,7 +34,10 @@ export default function HeroInteractivePhoto() {
       className={`${styles.photo}${recordOut ? ` ${styles.photoOpen}` : ''}`}
       onPointerMove={tilt}
       onPointerLeave={settle}
-      onClick={() => setRecordOut((value) => !value)}
+      onClick={() => {
+        markCueUsed('home-sleeve')
+        setRecordOut((value) => !value)
+      }}
       aria-pressed={recordOut}
       aria-label={recordOut ? 'Slide the vinyl record back into the DJ B.A.E. sleeve' : 'Slide the vinyl record out of the DJ B.A.E. sleeve'}
       style={{
@@ -63,6 +67,7 @@ export default function HeroInteractivePhoto() {
           />
           <span className={styles.photoSheen} aria-hidden="true" />
         </span>
+        <InteractionCue id="home-sleeve" label="Tap" className={styles.sleeveCue} />
       </span>
     </button>
   )

@@ -1,0 +1,61 @@
+/* One visual language for every interaction hint: tiny uppercase, champagne
+   border, dark translucent backing. Callers only set the position. */
+.cue {
+  position: absolute;
+  z-index: 8;
+  display: none;
+  align-items: center;
+  padding: 4px 7px 3px;
+  border: 1px solid rgba(196,165,116,.45);
+  border-radius: 999px;
+  background: rgba(14,11,10,.66);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: #d8ba88;
+  font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  text-shadow: none;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Phones and tablets: arrive just after the page settles, hold, then quiet
+   down to a subtle reminder instead of disappearing on their own. */
+@media (pointer: coarse) {
+  .cue {
+    display: inline-flex;
+    animation: cue-arrive 6.4s ease .9s both;
+  }
+}
+
+@keyframes cue-arrive {
+  0%   { opacity: 0; translate: 0 3px; }
+  8%   { opacity: 1; translate: 0 0; }
+  70%  { opacity: 1; }
+  100% { opacity: .55; }
+}
+
+/* Used: fade from wherever the arrival left it. */
+.done {
+  animation: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .35s ease, visibility 0s linear .35s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cue {
+    animation: none;
+    opacity: .8;
+  }
+
+  .done {
+    opacity: 0;
+    transition: none;
+  }
+}
