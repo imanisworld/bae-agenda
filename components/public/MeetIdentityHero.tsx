@@ -26,6 +26,7 @@ export default function MeetIdentityHero() {
 
   function pointerDown(event: PointerEvent<HTMLDivElement>) {
     markCueUsed('meet-portrait')
+    hint.finish()
     pointerRef.current = event.pointerId
     setInteracting(true)
     updateTilt(event)
