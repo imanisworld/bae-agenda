@@ -3,7 +3,8 @@
 /**
  * A tiny editorial hint ("DRAG", "TAP") that tells phone visitors a piece of
  * artwork is interactive. Touch screens only — on desktop the cursor does the
- * work. Once the visitor uses that interaction, the cue fades out and stays
+ * work, plus the cue on hover over its `data-cue-host` element. Once the
+ * visitor uses that interaction, the cue fades out and stays
  * hidden for the rest of the visit (shared by every cue with the same id).
  *
  * useMotionHint pairs with it: a one-time movement that shows what the

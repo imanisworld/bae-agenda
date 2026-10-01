@@ -93,6 +93,7 @@ export function HangingLogo({ finish = 'red', className, cue = true }: Props) {
         '--drag-angle': `${dragAngle}deg`,
         '--release-angle': `${releaseAngle}deg`,
       } as CSSProperties}
+      data-route-swipe-block={interactive || undefined}
       onPointerDown={interactive ? startDrag : undefined}
       onPointerMove={interactive ? drag : undefined}
       onPointerUp={interactive ? finishDrag : undefined}
@@ -105,6 +106,7 @@ export function HangingLogo({ finish = 'red', className, cue = true }: Props) {
   return (
     <span
       className={`${styles.hanger} ${className ?? ''}`}
+      data-cue-host={cue || undefined}
       style={{ '--clasp': tag.clasp, '--slot': tag.slot } as CSSProperties}
       aria-hidden="true"
     >

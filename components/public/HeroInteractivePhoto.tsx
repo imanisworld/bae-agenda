@@ -43,6 +43,7 @@ export default function HeroInteractivePhoto() {
         setRecordOut((value) => !value)
       }}
       aria-pressed={recordOut}
+      data-cue-host
       aria-label={recordOut ? 'Slide the vinyl record back into the DJ B.A.E. sleeve' : 'Slide the vinyl record out of the DJ B.A.E. sleeve'}
       style={{
         '--photo-rx': '0deg',
