@@ -1,7 +1,7 @@
 'use client'
 
 import { HangFrom } from '@/components/public/brand/HangingLogo'
-import InteractionCue, { markCueUsed } from '@/components/public/InteractionCue'
+import InteractionCue, { markCueUsed, useMotionHint } from '@/components/public/InteractionCue'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRef, useState, type CSSProperties, type PointerEvent } from 'react'
@@ -15,6 +15,7 @@ export default function MeetIdentityHero() {
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
   const [interacting, setInteracting] = useState(false)
   const pointerRef = useRef<number | null>(null)
+  const hint = useMotionHint('meet-portrait')
 
   function updateTilt(event: PointerEvent<HTMLDivElement>) {
     const rect = event.currentTarget.getBoundingClientRect()
@@ -25,6 +26,7 @@ export default function MeetIdentityHero() {
 
   function pointerDown(event: PointerEvent<HTMLDivElement>) {
     markCueUsed('meet-portrait')
+    hint.finish()
     pointerRef.current = event.pointerId
     setInteracting(true)
     updateTilt(event)
@@ -58,11 +60,14 @@ export default function MeetIdentityHero() {
       <div className={styles.glow} aria-hidden="true" />
 
       <div
-        className={`${styles.portraitWrap}${interacting ? ` ${styles.portraitInteracting}` : ''}`}
+        className={`${styles.portraitWrap}${interacting ? ` ${styles.portraitInteracting}` : ''}${hint.active ? ` ${styles.portraitHint}` : ''}`}
         onPointerDown={pointerDown}
         onPointerMove={pointerMove}
         onPointerUp={finish}
         onPointerCancel={finish}
+        onAnimationEnd={(event) => {
+          if ((event.target as HTMLElement).classList.contains(styles.portrait)) hint.finish()
+        }}
         onPointerLeave={(event) => {
           if (event.pointerType === 'mouse' && pointerRef.current === null) finish()
         }}

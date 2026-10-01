@@ -170,6 +170,20 @@
   filter: brightness(1);
 }
 
+/* One-time hint (see useMotionHint): the record slides partway out of the
+   sleeve and tucks back in, so the tap has an obvious payoff. */
+@media (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+  .photoHint:not(.photoOpen) .vinyl {
+    animation: sleeve-peek 1.3s cubic-bezier(.3,.7,.3,1) 1.6s backwards;
+  }
+}
+
+@keyframes sleeve-peek {
+  0%   { translate: 0 0; }
+  45%  { translate: 16% 0; }
+  100% { translate: 0 0; }
+}
+
 /* Inside the sleeve's lower-right corner, above the print. */
 .sleeveCue {
   z-index: 3;
