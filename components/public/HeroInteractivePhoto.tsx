@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import InteractionCue, { markCueUsed } from '@/components/public/InteractionCue'
+import InteractionCue, { markCueUsed, useMotionHint } from '@/components/public/InteractionCue'
 import { useState, type CSSProperties, type PointerEvent } from 'react'
 import styles from './HeroSection.module.css'
 
@@ -11,6 +11,7 @@ function clamp(value: number, min: number, max: number) {
 
 export default function HeroInteractivePhoto() {
   const [recordOut, setRecordOut] = useState(false)
+  const hint = useMotionHint('home-sleeve')
 
   function tilt(event: PointerEvent<HTMLButtonElement>) {
     if (event.pointerType !== 'mouse') return
@@ -31,9 +32,12 @@ export default function HeroInteractivePhoto() {
   return (
     <button
       type="button"
-      className={`${styles.photo}${recordOut ? ` ${styles.photoOpen}` : ''}`}
+      className={`${styles.photo}${recordOut ? ` ${styles.photoOpen}` : ''}${hint.active ? ` ${styles.photoHint}` : ''}`}
       onPointerMove={tilt}
       onPointerLeave={settle}
+      onAnimationEnd={(event) => {
+        if ((event.target as HTMLElement).classList.contains(styles.vinyl)) hint.finish()
+      }}
       onClick={() => {
         markCueUsed('home-sleeve')
         setRecordOut((value) => !value)

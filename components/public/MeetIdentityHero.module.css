@@ -34,6 +34,21 @@
   cursor: grabbing;
 }
 
+/* One-time hint (see useMotionHint): the print tips one way, then the other,
+   the way it moves under a finger. */
+@media (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+  .portraitHint .portrait {
+    animation: portrait-peek 1.4s ease-in-out 1.4s backwards;
+  }
+}
+
+@keyframes portrait-peek {
+  0%   { rotate: y 0deg; }
+  35%  { rotate: y 9deg; }
+  70%  { rotate: y -5deg; }
+  100% { rotate: y 0deg; }
+}
+
 /* Lower-right corner, on the portrait's darker edge and away from the face. */
 .portraitCue {
   right: 14px;

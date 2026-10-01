@@ -8,7 +8,7 @@
  * playing after the visitor leaves the Lab.
  */
 import { HangFrom } from '@/components/public/brand/HangingLogo'
-import InteractionCue, { markCueUsed } from '@/components/public/InteractionCue'
+import InteractionCue, { markCueUsed, useMotionHint } from '@/components/public/InteractionCue'
 import Image from 'next/image'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { permalinkFor, usePlayer } from '@/components/public/player/PlayerProvider'
@@ -89,6 +89,8 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
   const suppressDeckClick = useRef(false)
   const wheelLock = useRef(0)
   const turntableRef = useRef<HTMLButtonElement | null>(null)
+  const coversHint = useMotionHint(COVERS_CUE)
+  const recordHint = useMotionHint(RECORD_CUE)
 
   const crate = crates.find((item) => item.key === crateKey) ?? crates[0] ?? null
   const list = crate?.mixes ?? []
@@ -364,7 +366,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
       <div className={styles.crate}>
         <div
           key={crate?.key}
-          className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}`}
+          className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}${coversHint.active && list.length > 1 ? ` ${styles.coverflowHint}` : ''}`}
           role="listbox"
           aria-label={`${crate?.label ?? 'Mixes'} — use arrow keys or swipe to browse`}
           aria-activedescendant={focused ? `lab-cover-${focused.id}` : undefined}
@@ -375,6 +377,9 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
           onPointerUp={(event) => finishCoverDrag(event)}
           onPointerCancel={(event) => finishCoverDrag(event, true)}
           onWheel={onWheel}
+          onAnimationEnd={(event) => {
+            if ((event.target as HTMLElement).classList.contains(styles.cover)) coversHint.finish()
+          }}
         >
           {list.map((mix, index) => {
             const offset = index - focus
@@ -434,7 +439,10 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
           <span className={styles.platter}>
             <span
               key={loaded.id}
-              className={styles.recordGrip}
+              className={`${styles.recordGrip}${recordHint.active ? ` ${styles.recordHint}` : ''}`}
+              onAnimationEnd={(event) => {
+                if (event.target === event.currentTarget) recordHint.finish()
+              }}
               onPointerDown={onRecordPointerDown}
               onPointerMove={onRecordPointerMove}
               onPointerUp={finishRecordDrag}
