@@ -54,6 +54,10 @@ These are the strongest automation opportunities once the manual workflow feels 
 - Twilio env vars present if SMS alerts are expected
 - `ADMIN_EMAILS` populated in production
 
+## Deployment Discipline
+
+Vercel builds are limited QA checkpoints, not per-commit feedback. Batch related changes, get GitHub CI green first, and follow the deployment-budget rules in `docs/staging-preview.md` before triggering preview or production deployments.
+
 ## Verification
 
 Before shipping changes, run:

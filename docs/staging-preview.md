@@ -28,6 +28,18 @@ Hobby fallback:
 1. Keep a long-lived `staging` branch and assign a stable branch domain to it.
 2. Add branch-specific Preview environment variables for the `staging` branch, including `NEXT_PUBLIC_DEPLOYMENT_ENV=staging` and the staging service credentials.
 
+## Vercel deployment budget / rate-limit discipline
+
+Treat Vercel builds as a limited deployment budget, especially on the Hobby plan. Preview deployments are QA checkpoints, not feedback for every small edit.
+
+- Batch related code and content changes before pushing a preview checkpoint.
+- Run GitHub CI first and get tests, lint, and build green before spending a Vercel build on QA.
+- Avoid many small pushes or commits whose only purpose is to see an incremental preview.
+- Prefer one Vercel preview for each meaningful, testable checkpoint.
+- Check recent Vercel deployment volume before starting a large preview-heavy work session.
+- If Vercel reports a build-rate limit, stop triggering new deployments. Continue work on the branch and use GitHub CI until deployment capacity returns.
+- Keep production deployments deliberate: promote only a reviewed, tested checkpoint rather than using production to test unfinished work.
+
 ## Normal debugging workflow
 
 ```bash
