@@ -164,6 +164,8 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
   }
 
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
+    // A hint still sliding the covers would fight the finger: end it now.
+    coversHint.finish()
     drag.current = { x: event.clientX, moved: false, pointerId: event.pointerId }
     setDraggingCovers(true)
     event.currentTarget.setPointerCapture(event.pointerId)
@@ -207,6 +209,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
 
   function onRecordPointerDown(event: React.PointerEvent<HTMLSpanElement>) {
     event.stopPropagation()
+    recordHint.finish()
     scratchAngle.current = 0
     scratch.current = {
       pointerId: event.pointerId,
