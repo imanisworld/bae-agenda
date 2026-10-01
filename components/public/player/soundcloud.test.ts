@@ -140,3 +140,14 @@ describe('loadSoundCloudApi', () => {
     await assertion
   })
 })
+
+describe('isBrandCardArtwork', () => {
+  it('flags only the white default <dj_b.a.e> card', async () => {
+    const { isBrandCardArtwork } = await import('./soundcloud')
+    expect(isBrandCardArtwork('https://i1.sndcdn.com/artworks-N0S3aX1KSXvz9Knz-mV9b3Q-t500x500.jpg')).toBe(true)
+    // The black Mashups card and real mix artwork keep their own covers.
+    expect(isBrandCardArtwork('https://i1.sndcdn.com/artworks-yA01qhtHmkHczBJ2-0TmQCw-t500x500.jpg')).toBe(false)
+    expect(isBrandCardArtwork('https://i1.sndcdn.com/artworks-000305096802-u6124s-t500x500.jpg')).toBe(false)
+    expect(isBrandCardArtwork(null)).toBe(false)
+  })
+})

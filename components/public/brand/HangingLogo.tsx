@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent, type ReactNode } from 'react'
+import InteractionCue, { markCueUsed } from '@/components/public/InteractionCue'
 import styles from './HangingLogo.module.css'
 
 const FINISHES = {
@@ -11,11 +12,14 @@ const FINISHES = {
   chrome: { src: '/brand/dj-bae-logo-chrome.png', height: 645, clasp: '17.1%', slot: '17.3%' },
 } as const
 
+const CUE_ID = 'hanging-logo'
+
 export type LogoFinish = keyof typeof FINISHES
 
-type Props = { finish?: LogoFinish; className?: string }
+/** `cue` shows the phone-only DRAG hint; turn it off where a page has a second tag. */
+type Props = { finish?: LogoFinish; className?: string; cue?: boolean }
 
-export function HangingLogo({ finish = 'red', className }: Props) {
+export function HangingLogo({ finish = 'red', className, cue = true }: Props) {
   const tag = FINISHES[finish]
   const [kicked, setKicked] = useState(false)
   const [dragging, setDragging] = useState(false)
@@ -35,6 +39,7 @@ export function HangingLogo({ finish = 'red', className }: Props) {
 
   function startDrag(event: PointerEvent<HTMLSpanElement>) {
     event.stopPropagation()
+    markCueUsed(CUE_ID)
     pointerRef.current = event.pointerId
     startXRef.current = event.clientX
     setDragging(true)
@@ -105,15 +110,16 @@ export function HangingLogo({ finish = 'red', className }: Props) {
     >
       {copy(styles.back)}
       {copy(styles.front, true)}
+      {cue ? <InteractionCue id={CUE_ID} label="Drag" className={styles.cue} /> : null}
     </span>
   )
 }
 
-export function HangFrom({ children, finish, className }: Props & { children: ReactNode }) {
+export function HangFrom({ children, finish, className, cue }: Props & { children: ReactNode }) {
   return (
     <span className={styles.letter}>
       {children}
-      <HangingLogo finish={finish} className={`${styles.fromLetter} ${className ?? ''}`} />
+      <HangingLogo finish={finish} cue={cue} className={`${styles.fromLetter} ${className ?? ''}`} />
     </span>
   )
 }

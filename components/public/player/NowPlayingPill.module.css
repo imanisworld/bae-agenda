@@ -38,6 +38,12 @@
   object-fit: cover;
 }
 
+.disc .brandArt {
+  box-sizing: border-box;
+  padding: 3px;
+  object-fit: contain;
+}
+
 /* Spindle hole so the cover reads as a record. */
 .disc::after {
   content: '';

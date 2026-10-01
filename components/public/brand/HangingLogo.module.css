@@ -108,6 +108,13 @@
   top: calc(var(--stroke-mid, .74em) - var(--hook));
 }
 
+/* Sits off the tag's right shoulder, clear of the swing, so it never covers
+   the mark or the headline letter it hangs from. */
+.cue {
+  left: calc(var(--size) * .78);
+  top: calc(var(--size) * .5);
+}
+
 @media (max-width: 620px) {
   .hanger {
     --size: 68px;

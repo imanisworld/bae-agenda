@@ -180,6 +180,43 @@
   pointer-events: none;
 }
 
+/* SoundCloud's white default card, swapped for the transparent brand mark on
+   a dark sleeve (see isBrandCardArtwork). */
+.brandSleeve {
+  background:
+    radial-gradient(circle at 50% 46%, rgba(143,45,60,.34), transparent 62%),
+    #120e0d;
+}
+
+.coverArt .brandArt {
+  box-sizing: border-box;
+  padding: 13%;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,.55));
+}
+
+/* On the record it reads as the centre label of a black disc. */
+.record .brandArt {
+  box-sizing: border-box;
+  padding: 21%;
+  object-fit: contain;
+  filter: none;
+}
+
+/* Bottom-centre of the crate, under the front cover's lower edge. */
+.coversCue {
+  z-index: 30;
+  left: 50%;
+  bottom: 1px;
+  translate: -50% 0;
+}
+
+/* Bottom-left corner of the deck, clear of the tonearm and play button. */
+.recordCue {
+  left: 6px;
+  bottom: 6px;
+}
+
 .coverFallback {
   display: grid;
   place-items: center;
