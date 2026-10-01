@@ -91,6 +91,8 @@ export async function createEventAction(formData: FormData) {
 
   revalidatePath('/admin/events')
   revalidatePath('/events')
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/sitemap.xml')
   revalidatePath('/')
   redirect('/admin/events')
 }
@@ -128,6 +130,8 @@ export async function updateEventAction(formData: FormData) {
   revalidatePath('/admin/events')
   revalidatePath(`/admin/events/${id}`)
   revalidatePath('/events')
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/sitemap.xml')
   revalidatePath('/')
   redirect('/admin/events')
 }
@@ -158,6 +162,8 @@ export async function deleteEventAction(formData: FormData) {
 
   revalidatePath('/admin/events')
   revalidatePath('/events')
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/sitemap.xml')
   revalidatePath('/')
   redirect('/admin/events')
 }
@@ -193,6 +199,8 @@ export async function toggleEventPublicAction(formData: FormData) {
 
   revalidatePath('/admin/events')
   revalidatePath('/events')
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/sitemap.xml')
   revalidatePath('/')
   redirect('/admin/events')
 }
@@ -211,6 +219,8 @@ export async function toggleEventFeaturedAction(formData: FormData) {
 
   revalidatePath('/admin/events')
   revalidatePath('/events')
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/sitemap.xml')
   revalidatePath('/')
   redirect('/admin/events')
 }
@@ -249,6 +259,8 @@ export async function addEventMediaAction(formData: FormData) {
 
   revalidatePath(`/admin/events/${eventId}`)
   revalidatePath('/events')
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/sitemap.xml')
   redirect(`/admin/events/${eventId}?success=Media%20added`)
 }
 
@@ -281,6 +293,8 @@ export async function updateEventMediaAction(formData: FormData) {
 
   revalidatePath(`/admin/events/${eventId}`)
   revalidatePath('/events')
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/sitemap.xml')
   redirect(`/admin/events/${eventId}?success=Media%20updated`)
 }
 
@@ -317,5 +331,7 @@ export async function deleteEventMediaAction(formData: FormData) {
 
   revalidatePath(`/admin/events/${eventId}`)
   revalidatePath('/events')
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/sitemap.xml')
   redirect(`/admin/events/${eventId}?success=Media%20deleted`)
 }

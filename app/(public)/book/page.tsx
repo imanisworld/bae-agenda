@@ -3,6 +3,9 @@ import { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
 import BookExperienceRail from '@/components/public/BookExperienceRail'
 import BookExperienceStage from '@/components/public/BookExperienceStage'
 
+/** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
+export const revalidate = 300
+
 const SITE_URL = 'https://thebaeagenda.com'
 
 const faqJsonLd = {

@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import EventExperienceStage from '@/components/public/EventExperienceStage'
 import { getPastEvents, getPublicEventMedia, getUpcomingEvents } from '@/lib/db/events'
 
-export const dynamic = 'force-dynamic'
+/** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
+export const revalidate = 300
 
 const EVENTS_OG_IMAGE = '/photos/PlexMix19-DJBAE.JPEG'
 const EVENTS_TITLE = 'DJ B.A.E. Events | Indianapolis DJ'

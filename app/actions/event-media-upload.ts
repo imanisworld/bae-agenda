@@ -81,6 +81,8 @@ export async function registerEventUploadAction(
 
   revalidatePath(`/admin/events/${input.eventId}`)
   revalidatePath('/events')
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/sitemap.xml')
   revalidatePath('/')
   return { ok: true }
 }

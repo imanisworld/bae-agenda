@@ -1209,6 +1209,8 @@ export async function createEventFromBookingAction(formData: FormData) {
   revalidatePath('/admin/events')
   revalidatePath('/admin/dashboard')
   revalidatePath('/events')
+  revalidatePath('/events/[slug]', 'page')
+  revalidatePath('/sitemap.xml')
   revalidatePath('/')
   redirect(`/admin/events/${createdEvent.id}`)
 }

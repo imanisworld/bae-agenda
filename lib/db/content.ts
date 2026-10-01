@@ -3,6 +3,7 @@
  * Server-side only. Public read policy covers unauthenticated reads.
  */
 import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import { logError } from '@/lib/monitoring'
 
 export type ContentItem = {
@@ -46,7 +47,7 @@ export async function getContentMap(
   keys: string[]
 ): Promise<Record<string, string>> {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('site_content')
       .select('key, value')
