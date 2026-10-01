@@ -104,6 +104,7 @@ export default function PortfolioArchiveHero({
           type="button"
           className={`${styles.logoSpin}${logoKicked ? ` ${styles.logoKicked}` : ''}`}
           onPointerDown={kickLogo}
+          data-cue-host
           aria-label="Bounce the DJ B.A.E. logo"
         >
           <Image src="/brand/dj-bae-logo.png" alt="" width={900} height={659} sizes="(max-width: 760px) 78vw, 42vw" className={styles.logoBounce} />
@@ -117,6 +118,8 @@ export default function PortfolioArchiveHero({
           <article
             key={entry.id}
             className={styles.print}
+            data-route-swipe-block
+            data-cue-host
             data-index={index + 1}
             onPointerMove={movePrint}
             onPointerDown={pressPrint}

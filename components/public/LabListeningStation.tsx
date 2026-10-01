@@ -368,6 +368,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
           key={crate?.key}
           className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}${coversHint.active && list.length > 1 ? ` ${styles.coverflowHint}` : ''}`}
           role="listbox"
+          data-cue-host
           aria-label={`${crate?.label ?? 'Mixes'} — use arrow keys or swipe to browse`}
           aria-activedescendant={focused ? `lab-cover-${focused.id}` : undefined}
           tabIndex={0}
@@ -430,6 +431,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
         </div>
         <button
           ref={turntableRef}
+          data-cue-host
           type="button"
           className={`${styles.turntable}${scratching ? ` ${styles.turntableScratching}` : ''}`}
           onClick={onTurntableClick}
@@ -439,6 +441,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
           <span className={styles.platter}>
             <span
               key={loaded.id}
+              data-route-swipe-block
               className={`${styles.recordGrip}${recordHint.active ? ` ${styles.recordHint}` : ''}`}
               onAnimationEnd={(event) => {
                 if (event.target === event.currentTarget) recordHint.finish()

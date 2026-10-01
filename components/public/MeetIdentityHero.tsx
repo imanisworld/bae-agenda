@@ -59,6 +59,8 @@ export default function MeetIdentityHero() {
       <div className={styles.glow} aria-hidden="true" />
 
       <div
+        data-route-swipe-block
+        data-cue-host
         className={`${styles.portraitWrap}${interacting ? ` ${styles.portraitInteracting}` : ''}${hint.active ? ` ${styles.portraitHint}` : ''}`}
         onPointerDown={pointerDown}
         onPointerMove={pointerMove}
