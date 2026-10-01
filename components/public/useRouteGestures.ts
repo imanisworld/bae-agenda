@@ -73,12 +73,34 @@ function scrolledDown(target: Element, root: Element) {
   return false
 }
 
+/** The page itself is at its top (phones get a small root scroll runway). */
+function pageAtTop() {
+  return (document.scrollingElement?.scrollTop ?? window.scrollY) <= 0
+}
+
+/** Has the visitor typed or chosen anything in a form on this page? A reload would lose it. */
+function hasUnsavedInput(root: Element) {
+  return Array.from(root.querySelectorAll('input, textarea, select')).some((field) => {
+    if (field instanceof HTMLSelectElement) {
+      return Array.from(field.options).some((option) => option.selected !== option.defaultSelected)
+    }
+    if (field instanceof HTMLInputElement && (field.type === 'checkbox' || field.type === 'radio')) {
+      return field.checked !== field.defaultChecked
+    }
+    if (field instanceof HTMLInputElement && (field.type === 'hidden' || field.type === 'range')) return false
+    const text = field as HTMLInputElement | HTMLTextAreaElement
+    return text.value !== text.defaultValue
+  })
+}
+
 type Gesture = {
   x: number
   y: number
   at: number
   target: Element
   fromEdge: boolean
+  /** Pull-to-refresh only from the very top, and never over unsent form input. */
+  canRefresh: boolean
   mode: 'pending' | 'swipe' | 'refresh' | 'none'
 }
 
@@ -126,7 +148,7 @@ export function useRouteGestures(shellRef: RefObject<HTMLDivElement | null>, pat
 
     function onStart(event: TouchEvent) {
       gesture = null
-      if (event.touches.length !== 1 || phaseRef.current === 'leaving') return
+      if (!shell || event.touches.length !== 1 || phaseRef.current === 'leaving') return
       const target = event.target
       if (!(target instanceof Element) || target.closest(OWN_GESTURE)) return
       const touch = event.touches[0]
@@ -136,6 +158,7 @@ export function useRouteGestures(shellRef: RefObject<HTMLDivElement | null>, pat
         at: performance.now(),
         target,
         fromEdge: touch.clientX < EDGE_PX || touch.clientX > window.innerWidth - EDGE_PX,
+        canRefresh: pageAtTop() && !hasUnsavedInput(shell),
         mode: 'pending',
       }
     }
@@ -153,7 +176,7 @@ export function useRouteGestures(shellRef: RefObject<HTMLDivElement | null>, pat
       const absY = Math.abs(dy)
 
       if (gesture.mode === 'pending') {
-        const pullingDown = dy > 0 && absY >= absX && !scrolledDown(gesture.target, shell)
+        const pullingDown = gesture.canRefresh && dy > 0 && absY >= absX && !scrolledDown(gesture.target, shell)
         // Claim a downward pull straight away, before the browser scrolls or
         // starts its own refresh.
         if (pullingDown && event.cancelable) event.preventDefault()
