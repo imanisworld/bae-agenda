@@ -5,7 +5,7 @@
  * Reviewed events (event_timezone != null) use their real UTC instant for
  * upcoming/past checks. Legacy rows keep date-only behavior until reviewed.
  */
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import { getEventCandidateFloorIso, isUpcomingEventRecord } from '@/lib/event-schedule'
 import type { Database } from '@/types/database'
 
@@ -22,7 +22,7 @@ const PUBLIC_EVENT_COLUMNS =
   'id,title,slug,event_date,event_timezone,venue,city,description,public,featured,show_description,created_at,updated_at' as const
 
 async function loadUpcomingCandidates(limit: number, featuredOnly = false): Promise<Event[]> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   let query = supabase
     .from('events')
     .select(PUBLIC_EVENT_COLUMNS)
@@ -62,7 +62,7 @@ export async function getUpcomingEvents(limit = 10): Promise<Event[]> {
  */
 export async function getPastEvents(limit = 20): Promise<Event[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     // Include the last couple of days so same-day events that already ended are caught;
     // isUpcomingEventRecord makes the final call.
     const ceiling = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString()
@@ -95,7 +95,7 @@ export async function getPublicEventMedia(eventIds: string[]): Promise<EventMedi
   if (uniqueIds.length === 0) return []
 
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('event_media')
       .select('id,event_id,media_type,media_url,poster_url,caption,sort_order')
@@ -122,7 +122,7 @@ export async function getPublicEventMedia(eventIds: string[]): Promise<EventMedi
  */
 export async function getPublicEventBySlug(slug: string): Promise<Event | null> {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('events')
       .select(PUBLIC_EVENT_COLUMNS)
@@ -147,7 +147,7 @@ export async function getPublicEventBySlug(slug: string): Promise<Event | null> 
  */
 export async function getPublicEventSitemapEntries(): Promise<Array<{ slug: string; updated_at: string }>> {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('events')
       .select('slug,updated_at')

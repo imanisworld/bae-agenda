@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import { logError } from '@/lib/monitoring'
 import type { Database } from '@/types/database'
 
@@ -10,7 +10,7 @@ export type Mix = Database['public']['Tables']['mixes']['Row']
  */
 export async function getFeaturedMixes(limit = 3): Promise<Mix[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
 
     const { data: featured, error: featuredError } = await supabase
       .from('mixes')
@@ -58,7 +58,7 @@ export async function getFeaturedMixes(limit = 3): Promise<Mix[]> {
  */
 export async function getPublishedMixes(limit = 50): Promise<Mix[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('mixes')
       .select('*')

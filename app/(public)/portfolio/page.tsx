@@ -6,6 +6,9 @@ import { getContentMap } from '@/lib/db/content'
 import { parseInstagramPosts } from '@/lib/instagram'
 import { CONTENT_DEFAULTS } from '@/lib/content-schema'
 
+/** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
+export const revalidate = 300
+
 export const metadata: Metadata = {
   title: { absolute: 'DJ B.A.E. Portfolio | Indianapolis & Chicago' },
   alternates: { canonical: '/portfolio' },

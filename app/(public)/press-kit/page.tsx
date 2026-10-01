@@ -5,6 +5,9 @@ import PrintPressKitButton from '@/components/public/PrintPressKitButton'
 import { SELECTED_WORK } from '@/lib/portfolio-data'
 import { getContentMap } from '@/lib/db/content'
 
+/** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
+export const revalidate = 300
+
 export const metadata: Metadata = {
   title: 'Press Kit',
   alternates: {

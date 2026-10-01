@@ -2,6 +2,9 @@ import type { Metadata } from 'next'
 import LabListeningStation, { type ListeningMix } from '@/components/public/LabListeningStation'
 import { getPublishedMixes } from '@/lib/db/mixes'
 
+/** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
+export const revalidate = 300
+
 const LAB_OG_IMAGE = '/photos/images/outside.jpg'
 const LAB_TITLE = 'DJ B.A.E. Mixes | Bae’s in the Lab'
 

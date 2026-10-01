@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import { requireAdminUser } from '@/lib/admin-auth'
 import { logError } from '@/lib/monitoring'
 
@@ -47,7 +47,7 @@ function parseTags(value: FormDataEntryValue | null): string[] {
 
 export async function getPortfolioEntries(): Promise<PortfolioEntry[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('portfolio_entries')
       .select('*')
@@ -66,7 +66,7 @@ export async function getPortfolioEntries(): Promise<PortfolioEntry[]> {
 
 export async function getFeaturedPortfolioEntries(): Promise<PortfolioEntry[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('portfolio_entries')
       .select('*')
@@ -86,7 +86,7 @@ export async function getFeaturedPortfolioEntries(): Promise<PortfolioEntry[]> {
 
 export async function getPortfolioStats() {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('portfolio_entries')
       .select('year, city, featured')

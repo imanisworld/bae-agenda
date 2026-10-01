@@ -7,6 +7,14 @@ import { isValidTimeZone } from '@/lib/date-time'
 import { isUpcomingEventRecord } from '@/lib/event-schedule'
 import styles from './page.module.css'
 
+/** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
+export const revalidate = 300
+
+/** None prebuilt: each event page is built on its first visit, then cached like the others. */
+export function generateStaticParams() {
+  return []
+}
+
 const SITE_URL = 'https://thebaeagenda.com'
 
 function eventDateLabel(eventDate: string, timeZone: string | null) {
