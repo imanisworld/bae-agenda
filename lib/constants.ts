@@ -16,6 +16,7 @@ export const PUBLIC_NAV = [
 
 export const ADMIN_NAV = [
   { label: 'Dashboard', href: '/admin/dashboard', icon: '⊞'  },
+  { label: 'Manager',   href: '/admin/manager',   icon: 'MG' },
   { label: 'Bookings',  href: '/admin/bookings',  icon: '📋' },
   { label: 'Invoices',  href: '/admin/invoices',  icon: 'INV' },
   { label: 'Events',    href: '/admin/events',    icon: '📅' },
