@@ -42,6 +42,8 @@ export interface ManagerOpportunityFormValue {
   why_fit?: string | null
   risk_notes?: string | null
   internal_notes?: string | null
+  recommended_demo?: string | null
+  recommended_demo_reason?: string | null
   fit_score?: number | null
   next_action?: string | null
   next_action_at?: string | null
@@ -388,6 +390,27 @@ export default function ManagerOpportunityForm({
           </div>
 
           <label style={{ display: 'grid', gap: 7, marginBottom: 14 }}>
+            <FieldLabel>Recommended Demo Mix</FieldLabel>
+            <input
+              name="recommended_demo"
+              defaultValue={value.recommended_demo ?? ''}
+              placeholder="Open Format / Nightlife, Lounge / House, Clean Event..."
+              style={inputStyle()}
+            />
+          </label>
+
+          <label style={{ display: 'grid', gap: 7, marginBottom: 14 }}>
+            <FieldLabel>Why This Mix</FieldLabel>
+            <textarea
+              name="recommended_demo_reason"
+              rows={3}
+              defaultValue={value.recommended_demo_reason ?? ''}
+              placeholder="Why this demo best matches the audience, venue, or opportunity..."
+              style={textAreaStyle()}
+            />
+          </label>
+
+          <label style={{ display: 'grid', gap: 7, marginBottom: 14 }}>
             <FieldLabel>Why It Fits</FieldLabel>
             <textarea name="why_fit" rows={4} defaultValue={value.why_fit ?? ''} style={textAreaStyle()} />
           </label>
@@ -420,6 +443,8 @@ export default function ManagerOpportunityForm({
           <input type="hidden" name="why_fit" value="" />
           <input type="hidden" name="risk_notes" value="" />
           <input type="hidden" name="internal_notes" value="" />
+          <input type="hidden" name="recommended_demo" value="" />
+          <input type="hidden" name="recommended_demo_reason" value="" />
           <input type="hidden" name="fit_score" value="" />
           <input type="hidden" name="next_action" value="" />
           <input type="hidden" name="next_action_at" value="" />

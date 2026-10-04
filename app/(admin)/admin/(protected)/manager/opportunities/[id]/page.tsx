@@ -115,6 +115,7 @@ export default async function ManagerOpportunityDetailPage({
           {[
             ['Type', MANAGER_OPPORTUNITY_TYPE_LABELS[opportunityType]],
             ['Source', MANAGER_SOURCE_TYPE_LABELS[sourceType]],
+            ['Demo', opportunity.recommended_demo ?? 'Not selected'],
             ['Fit', opportunity.fit_score === null || opportunity.fit_score === undefined ? 'Not scored' : `${opportunity.fit_score}/100`],
             ['Added', fmtTimestamp(opportunity.created_at)],
             ['Applied', fmtTimestamp(opportunity.applied_at)],

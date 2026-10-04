@@ -23,6 +23,7 @@ interface OpportunityRow {
   application_deadline: string | null
   compensation_min: number | null
   compensation_max: number | null
+  recommended_demo: string | null
   fit_score: number | null
   next_action: string | null
   next_action_at: string | null
@@ -73,7 +74,7 @@ async function getManagerData(): Promise<ManagerData> {
     ] = await Promise.all([
       admin
         .from('manager_opportunities')
-        .select('id, title, organization, opportunity_type, status, location_city, location_state, event_date, application_deadline, compensation_min, compensation_max, fit_score, next_action, next_action_at, created_at')
+        .select('id, title, organization, opportunity_type, status, location_city, location_state, event_date, application_deadline, compensation_min, compensation_max, recommended_demo, fit_score, next_action, next_action_at, created_at')
         .order('created_at', { ascending: false })
         .limit(100),
       admin
@@ -214,6 +215,7 @@ export default async function ManagerPage() {
                   <th>Deadline</th>
                   <th>Pay</th>
                   <th>Location</th>
+                  <th>Demo</th>
                   <th>Fit</th>
                   <th>Action</th>
                 </tr>
@@ -236,6 +238,7 @@ export default async function ManagerPage() {
                     <td data-label="Deadline" className="muted">{fmtDate(item.application_deadline)}</td>
                     <td data-label="Pay">{fmtPay(item.compensation_min, item.compensation_max)}</td>
                     <td data-label="Location" className="muted">{locationLabel(item)}</td>
+                    <td data-label="Demo" className="muted">{item.recommended_demo ?? '—'}</td>
                     <td data-label="Fit">
                       {item.fit_score === null ? '—' : `${item.fit_score}/100`}
                     </td>
