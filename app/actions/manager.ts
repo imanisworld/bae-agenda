@@ -204,7 +204,10 @@ async function scoringProfile(admin: ReturnType<typeof createAdminClient>) {
   return data
 }
 
-function scoredFields(profile: Record<string, unknown> | null, payload: Record<string, unknown>) {
+function scoredFields(
+  profile: Parameters<typeof scoreManagerOpportunity>[0] | null,
+  payload: Parameters<typeof scoreManagerOpportunity>[1]
+) {
   if (!profile) return {}
   const result = scoreManagerOpportunity(profile, payload)
   return {
@@ -296,7 +299,7 @@ export async function updateManagerOpportunityAction(formData: FormData) {
   }
 
   const id = parsed.data.id
-  const payload: Record<string, unknown> = opportunityPayload(parsed.data)
+  const payload = opportunityPayload(parsed.data)
   const admin = createAdminClient()
   const profile = await scoringProfile(admin)
   Object.assign(payload, scoredFields(profile, payload))
