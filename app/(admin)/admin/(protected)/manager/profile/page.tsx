@@ -30,7 +30,7 @@ const DEFAULT_PROFILE: ManagerProfile = {
   display_name: 'DJ B.A.E.',
   home_market: 'Indianapolis, IN',
   minimum_fee: null,
-  target_hourly_rate: 300,
+  target_hourly_rate: null,
   max_drive_minutes: null,
   max_one_way_miles: null,
   minimum_notice_days: null,
