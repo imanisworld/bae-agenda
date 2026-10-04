@@ -299,10 +299,13 @@ export async function updateManagerOpportunityAction(formData: FormData) {
   }
 
   const id = parsed.data.id
-  const payload = opportunityPayload(parsed.data)
+  const basePayload = opportunityPayload(parsed.data)
   const admin = createAdminClient()
   const profile = await scoringProfile(admin)
-  Object.assign(payload, scoredFields(profile, payload))
+  const payload: Record<string, unknown> = {
+    ...basePayload,
+    ...scoredFields(profile, basePayload),
+  }
 
   const { data: current, error: currentError } = await admin
     .from('manager_opportunities')
