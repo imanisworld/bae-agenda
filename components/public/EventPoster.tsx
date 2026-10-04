@@ -23,6 +23,7 @@ const FLYERS: Record<string, string> = {
   'cat-calls-oct-16-2026': '/photos/flyers/cat-calls-oct-16-2026.jpg',
   'club-cunt-oct-31-2026': '/photos/flyers/club-cunt-oct-31-2026.jpg',
   'innaspace-radio-nov-1-2026': '/photos/flyers/innaspace-radio-nov-1-2026.jpg',
+  'room-to-bloom-jun-25-2026': '/photos/flyers/room-to-bloom-jun-25-2026.jpg',
 }
 
 // Hand-picked photos for events where the automatic pick doubled up.
