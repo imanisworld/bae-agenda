@@ -132,7 +132,6 @@ insert into public.manager_profiles (
   profile_key,
   display_name,
   home_market,
-  target_hourly_rate,
   website_url,
   instagram_url
 )
@@ -140,7 +139,6 @@ values (
   'dj_bae',
   'DJ B.A.E.',
   'Indianapolis, IN',
-  300,
   'https://thebaeagenda.com',
   'https://www.instagram.com/dj_b.a.e/'
 )
