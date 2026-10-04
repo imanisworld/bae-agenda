@@ -24,6 +24,60 @@ export const MANAGER_SOURCE_TYPES = [
 
 export type ManagerSourceType = typeof MANAGER_SOURCE_TYPES[number]
 
+export const MANAGER_WATCH_SOURCE_KINDS = [
+  'venue',
+  'dj',
+  'promoter',
+  'event_brand',
+  'brand',
+  'agency',
+  'other',
+] as const
+
+export type ManagerWatchSourceKind = typeof MANAGER_WATCH_SOURCE_KINDS[number]
+
+export const MANAGER_WATCH_PLATFORMS = [
+  'instagram',
+  'website',
+  'x',
+  'linkedin',
+  'facebook',
+  'other',
+] as const
+
+export type ManagerWatchPlatform = typeof MANAGER_WATCH_PLATFORMS[number]
+
+export const MANAGER_SIGNAL_TYPES = [
+  'post',
+  'event',
+  'booking_call',
+  'job',
+  'application',
+  'venue_programming',
+  'other',
+] as const
+
+export type ManagerSignalType = typeof MANAGER_SIGNAL_TYPES[number]
+
+export const MANAGER_WATCH_SOURCE_KIND_LABELS: Record<ManagerWatchSourceKind, string> = {
+  venue: 'Venue',
+  dj: 'DJ',
+  promoter: 'Promoter',
+  event_brand: 'Event Brand',
+  brand: 'Brand',
+  agency: 'Agency',
+  other: 'Other',
+}
+
+export const MANAGER_WATCH_PLATFORM_LABELS: Record<ManagerWatchPlatform, string> = {
+  instagram: 'Instagram',
+  website: 'Website',
+  x: 'X',
+  linkedin: 'LinkedIn',
+  facebook: 'Facebook',
+  other: 'Other',
+}
+
 export const MANAGER_OPPORTUNITY_STATUSES = [
   'found',
   'qualified',
