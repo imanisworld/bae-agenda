@@ -11,6 +11,7 @@ import {
   splitManagerList,
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { scoreManagerOpportunity } from '@/lib/manager-scoring'
 
 const OptionalDate = z
   .string()
@@ -194,6 +195,26 @@ function opportunityInput(formData: FormData) {
   }
 }
 
+async function scoringProfile(admin: ReturnType<typeof createAdminClient>) {
+  const { data } = await admin
+    .from('manager_profiles')
+    .select('home_market, minimum_fee, max_drive_minutes, preferred_event_types, excluded_event_types, genres')
+    .eq('profile_key', 'dj_bae')
+    .maybeSingle()
+  return data
+}
+
+function scoredFields(profile: Record<string, unknown> | null, payload: Record<string, unknown>) {
+  if (!profile) return {}
+  const result = scoreManagerOpportunity(profile, payload)
+  return {
+    fit_score: result.score,
+    fit_score_breakdown: result.breakdown,
+    fit_score_version: result.version,
+    fit_scored_at: new Date().toISOString(),
+  }
+}
+
 function opportunityPayload(data: z.infer<typeof OpportunitySchema>) {
   return {
     title: data.title,
@@ -246,9 +267,11 @@ export async function createManagerOpportunityAction(formData: FormData) {
   }
 
   const admin = createAdminClient()
+  const payload = opportunityPayload(parsed.data)
+  const profile = await scoringProfile(admin)
   const { data, error } = await admin
     .from('manager_opportunities')
-    .insert(opportunityPayload(parsed.data))
+    .insert({ ...payload, ...scoredFields(profile, payload) })
     .select('id')
     .single()
 
@@ -275,6 +298,8 @@ export async function updateManagerOpportunityAction(formData: FormData) {
   const id = parsed.data.id
   const payload: Record<string, unknown> = opportunityPayload(parsed.data)
   const admin = createAdminClient()
+  const profile = await scoringProfile(admin)
+  Object.assign(payload, scoredFields(profile, payload))
 
   const { data: current, error: currentError } = await admin
     .from('manager_opportunities')
