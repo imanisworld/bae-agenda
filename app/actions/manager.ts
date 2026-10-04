@@ -91,6 +91,8 @@ const OpportunitySchema = z.object({
   why_fit: z.string().trim().max(5000).optional().default(''),
   risk_notes: z.string().trim().max(5000).optional().default(''),
   internal_notes: z.string().trim().max(8000).optional().default(''),
+  recommended_demo: z.string().trim().max(300).optional().default(''),
+  recommended_demo_reason: z.string().trim().max(3000).optional().default(''),
   fit_score: OptionalInteger.refine(
     (value) => value === null || value <= 100,
     'Fit score must be between 0 and 100.'
@@ -184,6 +186,8 @@ function opportunityInput(formData: FormData) {
     why_fit: formData.get('why_fit'),
     risk_notes: formData.get('risk_notes'),
     internal_notes: formData.get('internal_notes'),
+    recommended_demo: formData.get('recommended_demo'),
+    recommended_demo_reason: formData.get('recommended_demo_reason'),
     fit_score: formData.get('fit_score'),
     next_action: formData.get('next_action'),
     next_action_at: formData.get('next_action_at'),
@@ -222,6 +226,8 @@ function opportunityPayload(data: z.infer<typeof OpportunitySchema>) {
     why_fit: optionalString(data.why_fit),
     risk_notes: optionalString(data.risk_notes),
     internal_notes: optionalString(data.internal_notes),
+    recommended_demo: optionalString(data.recommended_demo),
+    recommended_demo_reason: optionalString(data.recommended_demo_reason),
     fit_score: data.fit_score,
     next_action: optionalString(data.next_action),
     next_action_at: data.next_action_at,
