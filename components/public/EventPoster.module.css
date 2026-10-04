@@ -210,23 +210,54 @@
 }
 
 @media (max-width: 600px) {
+  /* Phone: flyer on top, info underneath, stacked in flow so a long title or
+     description grows the card instead of running over the flyer. */
   .hasFlyer {
-    min-height: 600px;
+    /* Width still comes from the slot, not the now in-flow text. */
+    contain: inline-size;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px 22px 28px;
   }
 
-  /* Phone: flyer on top, info underneath. */
-  .flyer {
-    top: 20px;
-    bottom: auto;
-    left: 50%;
-    right: auto;
-    height: 52%;
-    max-width: calc(100% - 44px);
-    translate: -50% 0;
+  /* Takes what the info leaves; shrinks when the card is fit to the screen. */
+  .hasFlyer .flyer {
+    position: relative;
+    inset: auto;
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    height: min(52svh, 400px);
+    min-height: 150px;
+    aspect-ratio: auto;
   }
 
   .hasFlyer .info {
-    right: 22px;
+    flex: none;
+    position: relative;
+    left: auto;
+    right: auto;
+    bottom: auto;
+  }
+
+  /* List cards (h3): the flyer already carries the name and details, so the
+     text stays short enough to leave it room. The event page (h1) scrolls and
+     keeps the full description. */
+  .hasFlyer .info h3 {
+    font-size: clamp(24px, 7.2vw, 34px);
+  }
+
+  .hasFlyer h3 ~ .location {
+    margin-top: 12px;
+  }
+
+  .hasFlyer h3 ~ .description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
   }
 }
 
