@@ -404,6 +404,35 @@ export async function updateManagerProfileAction(formData: FormData) {
     redirectWithError('/admin/manager/profile', managerDbError(error))
   }
 
+  const { data: opportunities } = await admin
+    .from('manager_opportunities')
+    .select('id, title, organization, venue_name, location_city, location_state, compensation_min, compensation_max, travel_minutes, travel_covered, requirements, why_fit, recommended_demo, source_url, contact_name, contact_email, contact_phone, event_date, application_deadline')
+
+  if (opportunities?.length) {
+    const profileForScore = {
+      home_market: optionalString(data.home_market),
+      minimum_fee: data.minimum_fee,
+      max_drive_minutes: data.max_drive_minutes,
+      preferred_event_types: splitManagerList(data.preferred_event_types),
+      excluded_event_types: splitManagerList(data.excluded_event_types),
+      genres: splitManagerList(data.genres),
+    }
+    const scoredAt = new Date().toISOString()
+
+    await Promise.all(opportunities.map((opportunity) => {
+      const result = scoreManagerOpportunity(profileForScore, opportunity)
+      return admin
+        .from('manager_opportunities')
+        .update({
+          fit_score: result.score,
+          fit_score_breakdown: result.breakdown,
+          fit_score_version: result.version,
+          fit_scored_at: scoredAt,
+        })
+        .eq('id', opportunity.id)
+    }))
+  }
+
   revalidatePath('/admin/manager')
   revalidatePath('/admin/manager/profile')
   redirect(`/admin/manager/profile?success=${encodeURIComponent('Manager profile saved.')}`)
