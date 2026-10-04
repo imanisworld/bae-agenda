@@ -105,7 +105,7 @@ export default function EventPoster({
         priority={priority && !flyer}
         loading={priority && !flyer ? undefined : 'lazy'}
         // Behind a flyer this copy is blurred to a wash, so a tiny one is enough.
-        sizes={flyer ? '96px' : '(max-width: 760px) 100vw, 1100px'}
+        sizes={flyer ? '96px' : '(max-width: 760px) 90vw, 1100px'}
         quality={75}
         className={styles.image}
         style={flyer ? undefined : { objectPosition: photo.position }}
@@ -120,7 +120,9 @@ export default function EventPoster({
             fill
             priority={priority}
             loading={priority ? undefined : 'lazy'}
-            sizes="(max-width: 600px) 80vw, 460px"
+            // Phones: list cards show the flyer at most ~250px wide; the event
+            // page (h1) shows it nearly full width.
+            sizes={headingLevel === 'h1' ? '(max-width: 600px) 84vw, 460px' : '(max-width: 600px) 64vw, 460px'}
             quality={90}
           />
         </div>
