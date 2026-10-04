@@ -14,12 +14,24 @@ import {
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
 
+type ScoreComponent = { score?: number; max?: number; note?: string }
+
 type OpportunityDetail = ManagerOpportunityFormValue & {
   id: string
   created_at: string
   applied_at: string | null
   last_contacted_at: string | null
   booked_at: string | null
+  fit_score_breakdown?: {
+    pay?: ScoreComponent
+    travel?: ScoreComponent
+    eventFit?: ScoreComponent
+    musicFit?: ScoreComponent
+    readiness?: ScoreComponent
+    flags?: string[]
+  } | null
+  fit_score_version?: string | null
+  fit_scored_at?: string | null
 }
 
 function getMessage(value: string | string[] | undefined) {
@@ -117,6 +129,7 @@ export default async function ManagerOpportunityDetailPage({
             ['Source', MANAGER_SOURCE_TYPE_LABELS[sourceType]],
             ['Demo', opportunity.recommended_demo ?? 'Not selected'],
             ['Fit', opportunity.fit_score === null || opportunity.fit_score === undefined ? 'Not scored' : `${opportunity.fit_score}/100`],
+            ['Scored', fmtTimestamp(opportunity.fit_scored_at ?? null)],
             ['Added', fmtTimestamp(opportunity.created_at)],
             ['Applied', fmtTimestamp(opportunity.applied_at)],
             ['Last Contact', fmtTimestamp(opportunity.last_contacted_at)],
@@ -131,6 +144,39 @@ export default async function ManagerOpportunityDetailPage({
           ))}
         </div>
       </section>
+
+      {opportunity.fit_score_breakdown && (
+        <section className="admin-section" style={{ marginBottom: 16 }}>
+          <div className="admin-section-header">
+            <span className="admin-section-title">Why This Score</span>
+            <span className="muted">{opportunity.fit_score_version ?? 'v1'}</span>
+          </div>
+          <div style={{ display: 'grid', gap: 10, padding: '4px 0' }}>
+            {[
+              ['Pay', opportunity.fit_score_breakdown.pay],
+              ['Travel', opportunity.fit_score_breakdown.travel],
+              ['Event Fit', opportunity.fit_score_breakdown.eventFit],
+              ['Music Fit', opportunity.fit_score_breakdown.musicFit],
+              ['Readiness', opportunity.fit_score_breakdown.readiness],
+            ].map(([label, component]) => {
+              const item = component as ScoreComponent | undefined
+              if (!item) return null
+              return (
+                <div key={String(label)} style={{ display: 'grid', gridTemplateColumns: '110px 70px 1fr', gap: 12, alignItems: 'baseline' }}>
+                  <strong style={{ fontSize: 12, fontWeight: 500 }}>{String(label)}</strong>
+                  <span style={{ fontSize: 12 }}>{item.score ?? 0}/{item.max ?? '—'}</span>
+                  <span className="muted" style={{ fontSize: 12 }}>{item.note ?? '—'}</span>
+                </div>
+              )
+            })}
+            {(opportunity.fit_score_breakdown.flags?.length ?? 0) > 0 && (
+              <div className="muted" style={{ fontSize: 11 }}>
+                Flags: {opportunity.fit_score_breakdown.flags?.join(', ')}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {opportunity.source_url && (
         <div style={{ marginBottom: 16 }}>

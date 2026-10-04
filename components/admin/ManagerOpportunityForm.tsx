@@ -160,19 +160,22 @@ export default function ManagerOpportunityForm({
               </select>
             </label>
 
-            <label style={{ display: 'grid', gap: 7 }}>
+            <div style={{ display: 'grid', gap: 7 }}>
               <FieldLabel>Fit Score</FieldLabel>
-              <input
-                name="fit_score"
-                type="number"
-                min={0}
-                max={100}
-                step={1}
-                defaultValue={value.fit_score ?? ''}
-                placeholder="0–100"
-                style={inputStyle()}
-              />
-            </label>
+              <div
+                style={{
+                  ...inputStyle(),
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: value.fit_score === null || value.fit_score === undefined ? 'var(--muted)' : 'var(--white)',
+                }}
+              >
+                {value.fit_score === null || value.fit_score === undefined
+                  ? 'Calculated automatically'
+                  : `${value.fit_score}/100 · recalculates on save`}
+              </div>
+              <input type="hidden" name="fit_score" value={value.fit_score ?? ''} />
+            </div>
           </div>
         ) : (
           <input type="hidden" name="status" value="found" />

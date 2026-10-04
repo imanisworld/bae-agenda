@@ -9,6 +9,7 @@ import {
   MANAGER_WATCH_SOURCE_KINDS,
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { scoreManagerOpportunity } from '@/lib/manager-scoring'
 
 const SourceSchema = z.object({
   name: z.string().trim().min(1, 'Source name is required.').max(200),
@@ -152,20 +153,38 @@ export async function convertManagerSignalToOpportunityAction(formData: FormData
     source.platform === 'website' ? 'website' :
     'manual'
 
+  const payload = {
+    opportunity_type: 'dj_gig',
+    source_type: sourceType,
+    status: 'review',
+    title: signal.title,
+    organization: source.name,
+    source_url: signal.url || source.url,
+    source_reference: `Watchlist signal: ${signal.signal_type}`,
+    why_fit: signal.summary,
+    recommended_demo: source.recommended_demo,
+    recommended_demo_reason: source.recommended_demo_reason,
+    next_action: 'Review this watchlist signal and decide whether to contact/apply.',
+  }
+
+  const { data: profile } = await admin
+    .from('manager_profiles')
+    .select('home_market, minimum_fee, max_drive_minutes, preferred_event_types, excluded_event_types, genres')
+    .eq('profile_key', 'dj_bae')
+    .maybeSingle()
+
+  const score = profile ? scoreManagerOpportunity(profile, payload) : null
+
   const { data: opportunity, error: opportunityError } = await admin
     .from('manager_opportunities')
     .insert({
-      opportunity_type: 'dj_gig',
-      source_type: sourceType,
-      status: 'review',
-      title: signal.title,
-      organization: source.name,
-      source_url: signal.url || source.url,
-      source_reference: `Watchlist signal: ${signal.signal_type}`,
-      why_fit: signal.summary,
-      recommended_demo: source.recommended_demo,
-      recommended_demo_reason: source.recommended_demo_reason,
-      next_action: 'Review this watchlist signal and decide whether to contact/apply.',
+      ...payload,
+      ...(score ? {
+        fit_score: score.score,
+        fit_score_breakdown: score.breakdown,
+        fit_score_version: score.version,
+        fit_scored_at: new Date().toISOString(),
+      } : {}),
     })
     .select('id')
     .single()
