@@ -20,6 +20,9 @@ const POSTER_PHOTOS = [
 const FLYERS: Record<string, string> = {
   'chi-chis-oct-3-2026': '/photos/flyers/chi-chis-original.jpg',
   'dy2k-sep-11-2026': '/photos/flyers/dy2k-lineup.jpg',
+  'cat-calls-oct-16-2026': '/photos/flyers/cat-calls-oct-16-2026.jpg',
+  'club-cunt-oct-31-2026': '/photos/flyers/club-cunt-oct-31-2026.jpg',
+  'innaspace-radio-nov-1-2026': '/photos/flyers/innaspace-radio-nov-1-2026.jpg',
 }
 
 // Hand-picked photos for events where the automatic pick doubled up.
