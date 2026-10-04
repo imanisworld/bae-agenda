@@ -7,6 +7,7 @@ import {
 } from '@/lib/booking-email-payloads'
 import { getScheduledReminderQueryWindow, isCalendarDaysOut } from '@/lib/date-time'
 import { sendBookingBalanceReminder } from '@/lib/notifications'
+import { isEventInvoiceBooking } from '@/lib/event-invoice'
 import { logEvent } from '@/lib/monitoring'
 
 function isAuthorizedCron(request: NextRequest) {
@@ -38,6 +39,7 @@ async function appendBookingTimelineNote(
 
 type CronBookingReminderSource = BookingBalanceReminderSource & {
   status: 'confirmed' | 'completed'
+  event_type: string | null
   post_event_follow_up_sent_at: string | null
   review_request_sent_at: string | null
   last_balance_reminder_sent_at: string | null
@@ -169,6 +171,7 @@ export async function GET(request: NextRequest) {
     .select(`
       id,
       event_name,
+      event_type,
       event_date,
       event_timezone,
       status,
@@ -200,6 +203,12 @@ export async function GET(request: NextRequest) {
   let skipped = 0
 
   for (const booking of bookings) {
+    // Venue/promoter invoices made from an event are followed up by hand.
+    if (isEventInvoiceBooking(booking.event_type)) {
+      skipped += 1
+      continue
+    }
+
     const [balanceReminderSent, postEventFollowUpSent, reviewRequestEmailSent] = await Promise.all([
       sendScheduledBalanceReminder(admin, booking, nowIso),
       sendScheduledPostEventFollowUp(admin, booking, now, nowIso),

@@ -13,6 +13,7 @@ import {
   updateEventAction,
   updateEventMediaAction,
 } from '@/app/actions/events'
+import { createInvoiceForEventAction } from '@/app/actions/invoices'
 import { getEventInputDateTime } from '@/lib/date-time'
 import { suggestEventTimeZone } from '@/lib/event-form-options'
 
@@ -95,7 +96,7 @@ export default async function EditEventPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>
-  searchParams?: Promise<{ error?: string | string[]; success?: string | string[] }>
+  searchParams?: Promise<{ error?: string | string[]; success?: string | string[]; invoice?: string | string[] }>
 }) {
   const { id } = await params
   const resolvedSearchParams = searchParams ? await searchParams : undefined
@@ -133,11 +134,55 @@ export default async function EditEventPage({
             </div>
           </div>
           {event.booking_id && (
-            <Link href={`/admin/bookings/${event.booking_id}`} className="admin-btn-ghost">
-              View Booking
-            </Link>
+            <div className="admin-form-actions">
+              <Link href={`/admin/bookings/${event.booking_id}/invoice`} className="admin-btn-primary">
+                Invoice
+              </Link>
+              <Link href={`/admin/bookings/${event.booking_id}`} className="admin-btn-ghost">
+                View Booking
+              </Link>
+            </div>
           )}
         </div>
+
+        {!event.booking_id && (
+          <details id="invoice" open={Boolean(getMessage(resolvedSearchParams?.invoice))} style={{ marginTop: '14px', borderTop: '1px solid var(--border)', paddingTop: '14px' }}>
+            <summary className="admin-btn-ghost" style={{ display: 'inline-flex', cursor: 'pointer', listStyle: 'none' }}>
+              Invoice this event
+            </summary>
+            <form action={createInvoiceForEventAction} className="admin-form-grid" style={{ marginTop: '16px' }}>
+              <input type="hidden" name="event_id" value={event.id} />
+              <p className="muted" style={{ margin: 0, fontSize: '12px', lineHeight: 1.6 }}>
+                For a venue or promoter paying you. This adds them as a client, links a booking to this event,
+                and opens an invoice draft you can edit before sending. Nothing is emailed until you send it,
+                and automatic reminder and review emails stay off for this booking.
+              </p>
+              <div className="admin-form-grid-two">
+                <label style={{ display: 'grid', gap: '7px' }}>
+                  <span className="admin-field-label">Contact first name *</span>
+                  <input name="first_name" required autoComplete="off" style={inputStyle()} />
+                </label>
+                <label style={{ display: 'grid', gap: '7px' }}>
+                  <span className="admin-field-label">Last name or business</span>
+                  <input name="last_name" autoComplete="off" style={inputStyle()} />
+                </label>
+              </div>
+              <div className="admin-form-grid-two">
+                <label style={{ display: 'grid', gap: '7px' }}>
+                  <span className="admin-field-label">Email *</span>
+                  <input name="email" type="email" required autoComplete="off" style={inputStyle()} />
+                </label>
+                <label style={{ display: 'grid', gap: '7px' }}>
+                  <span className="admin-field-label">Amount (USD) *</span>
+                  <input name="amount" type="number" min="0.01" step="0.01" required inputMode="decimal" style={inputStyle()} />
+                </label>
+              </div>
+              <div className="admin-form-actions">
+                <button type="submit" className="admin-btn-primary">Create invoice draft</button>
+              </div>
+            </form>
+          </details>
+        )}
       </div>
 
       <form action={updateEventAction} className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
