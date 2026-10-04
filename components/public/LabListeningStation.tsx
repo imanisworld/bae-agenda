@@ -303,7 +303,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
     <header className={styles.header}>
       <div className={styles.headerIdentity}>
         <p>Bae&apos;s in the Lab · Listening Room</p>
-        <h1><HangFrom finish="chrome">O</HangFrom>n wax.</h1>
+        <h1>On wax<HangFrom finish="chrome" className={styles.titleTag}>.</HangFrom></h1>
       </div>
       {crates.length > 1 ? (
         <div className={styles.crateSwitch} role="group" aria-label="Choose a crate">
