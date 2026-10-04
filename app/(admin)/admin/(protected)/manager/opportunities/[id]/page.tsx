@@ -163,7 +163,7 @@ export default async function ManagerOpportunityDetailPage({
               if (!item) return null
               return (
                 <div key={String(label)} style={{ display: 'grid', gridTemplateColumns: '110px 70px 1fr', gap: 12, alignItems: 'baseline' }}>
-                  <strong style={{ fontSize: 12, fontWeight: 500 }}>{label}</strong>
+                  <strong style={{ fontSize: 12, fontWeight: 500 }}>{String(label)}</strong>
                   <span style={{ fontSize: 12 }}>{item.score ?? 0}/{item.max ?? '—'}</span>
                   <span className="muted" style={{ fontSize: 12 }}>{item.note ?? '—'}</span>
                 </div>
