@@ -455,7 +455,7 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
               onPointerCancel={finishRecordDrag}
               aria-hidden="true"
             >
-              <span className={`${styles.record}${playing ? ` ${styles.spinning}` : ''}`}>
+              <span className={`${styles.record}${playing ? ` ${styles.spinning}` : ''}${isBrandCardArtwork(loaded.cover_url) ? ` ${styles.brandRecord}` : ''}`}>
                 {loaded.cover_url ? (
                   <MixArt url={loaded.cover_url} sizes="(max-width: 620px) 40vw, 320px" />
                 ) : null}

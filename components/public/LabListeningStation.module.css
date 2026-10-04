@@ -184,8 +184,29 @@
    a dark sleeve (see isBrandCardArtwork). */
 .brandSleeve {
   background:
-    radial-gradient(circle at 50% 46%, rgba(143,45,60,.34), transparent 62%),
-    #120e0d;
+    radial-gradient(circle at 34% 40%, rgba(196,165,116,.14), transparent 55%),
+    linear-gradient(150deg, #3a161d 0%, #24100f 58%, #1a0c0c 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(196,165,116,.4),
+    inset 0 0 0 5px rgba(26,12,12,.9),
+    inset 0 0 0 6px rgba(196,165,116,.16);
+}
+
+/* Red vinyl sliding out of the sleeve's right edge, behind the mark. */
+.brandSleeve::before {
+  content: '';
+  position: absolute;
+  top: 8%;
+  right: -38%;
+  width: 84%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, #1a0c0c 0 3%, #d8ba88 3.5% 4.5%, #7a1b28 5% 15%, transparent 15.5%),
+    repeating-radial-gradient(circle, rgba(0,0,0,.2) 0 1px, transparent 1px 3px),
+    radial-gradient(circle at 35% 30%, rgba(255,214,214,.22), transparent 45%),
+    radial-gradient(circle, #b3283b 0%, #8f1f2e 70%, #5e131d 100%);
+  box-shadow: -10px 0 22px rgba(0,0,0,.55), inset 0 0 0 1px rgba(255,190,190,.18);
 }
 
 .coverArt .brandArt {
@@ -195,12 +216,18 @@
   filter: drop-shadow(0 10px 18px rgba(0,0,0,.55));
 }
 
-/* On the record it reads as the centre label of a black disc. */
+/* On the record it reads as the centre label of a red vinyl disc. */
 .record .brandArt {
   box-sizing: border-box;
   padding: 21%;
   object-fit: contain;
-  filter: none;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.45));
+}
+
+.record.brandRecord {
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,214,214,.2), transparent 42%),
+    radial-gradient(circle, #b3283b 0%, #8f1f2e 68%, #5e131d 100%);
 }
 
 /* Bottom-centre of the crate, under the front cover's lower edge. */
