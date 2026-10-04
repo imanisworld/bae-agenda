@@ -6,6 +6,8 @@ import { requireAdminUser } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
 import { invoiceLineItemsTotal, type InvoiceLineItem } from '@/lib/invoices'
+import { EVENT_INVOICE_EVENT_TYPE, eventInvoiceDueDate } from '@/lib/event-invoice'
+import { suggestEventTimeZone } from '@/lib/event-form-options'
 
 function optionalString(value: FormDataEntryValue | null) {
   if (typeof value !== 'string') return null
@@ -156,6 +158,161 @@ export async function createInvoiceFromBookingAction(formData: FormData) {
   revalidatePath(`/admin/bookings/${bookingId}/invoice`)
 
   redirect(`/admin/bookings/${bookingId}/invoice`)
+}
+
+/**
+ * Bill a venue or promoter for a standalone event: creates the payer as a
+ * client, a booking behind the event (linked to it), and an invoice draft.
+ * An event that already has a booking goes straight to that booking's invoice.
+ */
+export async function createInvoiceForEventAction(formData: FormData) {
+  await requireAdminUser()
+
+  const eventId = optionalString(formData.get('event_id'))
+  if (!eventId) {
+    redirectWithError('/admin/events', 'Missing event id.')
+  }
+
+  const returnPath = `/admin/events/${eventId}`
+  const firstName = optionalString(formData.get('first_name'))
+  const lastName = optionalString(formData.get('last_name'))
+  const email = optionalString(formData.get('email'))?.toLowerCase() ?? null
+  const amount = parseOptionalNumber(formData.get('amount'))
+
+  if (!firstName || !email || amount === null) {
+    redirectWithError(returnPath, 'Who is paying (name and email) and the amount are required to invoice this event.')
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email as string)) {
+    redirectWithError(returnPath, 'Enter a valid email address for who is paying.')
+  }
+
+  if ((amount as number) <= 0) {
+    redirectWithError(returnPath, 'The invoice amount must be greater than $0.')
+  }
+
+  const admin = createAdminClient()
+
+  const { data: event, error: eventError } = await admin
+    .from('events')
+    .select('id, title, event_date, event_timezone, venue, city, booking_id')
+    .eq('id', eventId as string)
+    .maybeSingle()
+
+  if (eventError || !event) {
+    redirectWithError('/admin/events', 'Could not find that event.')
+  }
+
+  if (event.booking_id) {
+    redirect(`/admin/bookings/${event.booking_id}/invoice`)
+  }
+
+  const { data: existingClient, error: existingClientError } = await admin
+    .from('clients')
+    .select('id')
+    .eq('email', email as string)
+    .maybeSingle()
+
+  if (existingClientError) {
+    redirectWithError(returnPath, existingClientError.message || 'Unable to check the client record.')
+  }
+
+  // An existing client keeps their saved details; only new payers are added.
+  let clientId = existingClient?.id as string | undefined
+  if (!clientId) {
+    const { data: createdClient, error: clientCreateError } = await admin
+      .from('clients')
+      .insert({ first_name: firstName, last_name: lastName, email })
+      .select('id')
+      .single()
+
+    if (clientCreateError || !createdClient?.id) {
+      redirectWithError(returnPath, clientCreateError?.message || 'Unable to create the client record.')
+    }
+
+    clientId = createdClient.id
+  }
+
+  const quote = Math.round(((amount as number) + Number.EPSILON) * 100) / 100
+  const status = new Date(event.event_date).getTime() < Date.now() ? 'completed' : 'confirmed'
+  const eventTimeZone = event.event_timezone || suggestEventTimeZone(event.city) || null
+
+  const { data: booking, error: bookingError } = await admin
+    .from('bookings')
+    .insert({
+      client_id: clientId,
+      event_name: event.title,
+      event_type: EVENT_INVOICE_EVENT_TYPE,
+      event_date: event.event_date,
+      event_timezone: eventTimeZone,
+      venue: event.venue,
+      city: event.city,
+      quote,
+      status,
+      lifecycle_status: status,
+      payment_status: 'unpaid',
+    })
+    .select(`
+      id,
+      status,
+      event_name,
+      event_type,
+      event_date,
+      event_end_time,
+      event_timezone,
+      venue,
+      city,
+      package,
+      hours,
+      quote,
+      deposit_amount,
+      notes,
+      clients(first_name, last_name, email, phone)
+    `)
+    .single()
+
+  if (bookingError || !booking?.id) {
+    redirectWithError(returnPath, bookingError?.message || 'Unable to create the booking for this event.')
+  }
+
+  // Link only while the event is still unlinked, so a double submit can't
+  // leave two bookings pointing at one event.
+  const { data: linked, error: linkError } = await admin
+    .from('events')
+    .update({ booking_id: booking.id })
+    .eq('id', event.id)
+    .is('booking_id', null)
+    .select('id')
+
+  if (linkError || !linked?.length) {
+    await admin.from('bookings').delete().eq('id', booking.id)
+    redirectWithError(returnPath, linkError?.message || 'This event was just linked to another booking. Refresh and try again.')
+  }
+
+  const source = booking as unknown as InvoiceDraftSource
+  const draft = buildInvoiceDraftRecord(source)
+  const { error: insertError } = await admin
+    .from('invoices')
+    .insert({ ...draft, due_date: eventInvoiceDueDate(draft.due_date) })
+
+  if (insertError) {
+    redirectWithError(`/admin/bookings/${booking.id}/invoice`, insertError.message || 'Booking created, but the invoice draft failed. Use Create Invoice to retry.')
+  }
+
+  await admin
+    .from('notes')
+    .insert({
+      booking_id: booking.id,
+      body: `Created from the event "${event.title}" to invoice ${email}. Automatic reminder, follow-up and review emails are off for this booking.`,
+    })
+
+  revalidatePath('/admin/invoices')
+  revalidatePath('/admin/bookings')
+  revalidatePath('/admin/events')
+  revalidatePath(returnPath)
+  revalidatePath(`/admin/bookings/${booking.id}`)
+
+  redirect(`/admin/bookings/${booking.id}/invoice/edit`)
 }
 
 export async function voidInvoiceAction(formData: FormData) {

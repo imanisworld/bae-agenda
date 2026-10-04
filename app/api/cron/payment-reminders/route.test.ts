@@ -34,6 +34,9 @@ vi.mock('@/lib/date-time', () => ({
 }))
 
 import { GET } from './route'
+import { EVENT_INVOICE_EVENT_TYPE } from '@/lib/event-invoice'
+
+let booking: Record<string, unknown>
 
 function requestWith(secret?: string) {
   return new NextRequest('https://thebaeagenda.com/api/cron/payment-reminders', {
@@ -65,7 +68,7 @@ beforeEach(() => {
   mocks.sendBookingPostEventFollowUpEmail.mockResolvedValue({ status: 'skipped' })
   mocks.sendBookingReviewRequestEmail.mockResolvedValue({ status: 'skipped' })
 
-  const booking = {
+  booking = {
     id: 'booking-1',
     event_name: 'Birthday Party',
     event_date: '2026-10-05T23:00:00.000Z',
@@ -145,5 +148,18 @@ describe('payment reminder cron endpoint', () => {
       balanceSent: 1,
       sent: 1,
     })
+  })
+
+  it('sends nothing for venue/promoter bookings made from an event', async () => {
+    booking.event_type = EVENT_INVOICE_EVENT_TYPE
+    booking.status = 'completed'
+
+    const response = await GET(requestWith('cron-secret'))
+
+    expect(response.status).toBe(200)
+    expect(mocks.sendBookingBalanceReminder).not.toHaveBeenCalled()
+    expect(mocks.sendBookingPostEventFollowUpEmail).not.toHaveBeenCalled()
+    expect(mocks.sendBookingReviewRequestEmail).not.toHaveBeenCalled()
+    await expect(response.json()).resolves.toMatchObject({ processed: 1, sent: 0 })
   })
 })

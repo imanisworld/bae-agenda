@@ -165,9 +165,18 @@ export default async function EventsPage({
                         <Link href={`/admin/events/${ev.id}`} className="admin-view-all">
                           Edit →
                         </Link>
-                        {ev.booking_id && (
-                          <Link href={`/admin/bookings/${ev.booking_id}`} className="admin-view-all">
-                            View Booking →
+                        {ev.booking_id ? (
+                          <>
+                            <Link href={`/admin/bookings/${ev.booking_id}/invoice`} className="admin-view-all">
+                              Invoice →
+                            </Link>
+                            <Link href={`/admin/bookings/${ev.booking_id}`} className="admin-view-all">
+                              View Booking →
+                            </Link>
+                          </>
+                        ) : (
+                          <Link href={`/admin/events/${ev.id}?invoice=1#invoice`} className="admin-view-all">
+                            Invoice this event →
                           </Link>
                         )}
                       </div>
