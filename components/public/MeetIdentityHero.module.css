@@ -350,3 +350,24 @@
     font-size: 9px;
   }
 }
+
+/* The gold tag hangs from the "o" of "know"; push the copy below its drop
+   so it never sits on top of the summary text. */
+.title .titleTag {
+  --size: clamp(60px, 5.6vw, 88px);
+}
+
+@media (min-width: 561px) {
+  .details {
+    padding-top: clamp(30px, 3.6vw, 54px);
+  }
+}
+
+/* Stacked layout on short windows: shrink the portrait so the copy and its
+   pills stay above the floating dock. */
+@media (max-width: 860px) and (min-width: 561px) and (max-height: 1000px) {
+  .portraitWrap {
+    width: min(86%, 620px, calc((100svh - 470px) * 4 / 3));
+    min-width: 240px;
+  }
+}

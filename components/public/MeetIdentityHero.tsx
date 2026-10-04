@@ -90,7 +90,7 @@ export default function MeetIdentityHero() {
 
       <div className={styles.copy}>
         <div className={styles.title}>
-          <h1 id="meet-title">Get to kn<HangFrom finish="gold">o</HangFrom>w</h1>
+          <h1 id="meet-title">Get to kn<HangFrom finish="gold" className={styles.titleTag}>o</HangFrom>w</h1>
         </div>
 
         <div className={styles.details}>

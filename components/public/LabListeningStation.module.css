@@ -1363,3 +1363,13 @@
     box-shadow: inherit;
   }
 }
+
+/* The chrome tag hangs off the full stop of "On wax." — scaled to the
+   headline so it reads as a charm, with room under the title for its drop. */
+.headerIdentity .titleTag {
+  --size: clamp(52px, 5.2vw, 80px);
+}
+
+.headerIdentity {
+  padding-bottom: clamp(32px, 3.8vw, 56px);
+}
