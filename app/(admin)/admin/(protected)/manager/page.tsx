@@ -147,6 +147,9 @@ export default async function ManagerPage() {
         <Link href="/admin/manager/profile" className="admin-btn-ghost">
           Manager Profile
         </Link>
+        <Link href="/admin/manager/sources" className="admin-btn-ghost">
+          Sources / Watchlist
+        </Link>
         <Link href="/admin/manager/opportunities/new" className="admin-btn-ghost">
           Manual Lead
         </Link>
