@@ -153,7 +153,7 @@ function managerDbError(error: { code?: string; message?: string } | null | unde
 
 function opportunityInput(formData: FormData) {
   return {
-    id: formData.get('id'),
+    id: formData.get('id') || undefined,
     title: formData.get('title'),
     organization: formData.get('organization'),
     venue_name: formData.get('venue_name'),
