@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calculateManagerEconomics } from './manager-economics'
+import { calculateManagerEconomics, managerEconomicsColumns } from './manager-economics'
 
 describe('calculateManagerEconomics', () => {
   it('calculates all-in net economics when time and costs are known', () => {
@@ -56,5 +56,17 @@ describe('calculateManagerEconomics', () => {
     expect(result.expected_total_hours).toBe(3)
     expect(result.effective_hourly_rate).toBeCloseTo(166.67)
     expect(result.economics_basis).toBe('all_in_net')
+  })
+})
+
+describe('managerEconomicsColumns', () => {
+  it('writes total hours to the estimated_total_hours column', () => {
+    const columns = managerEconomicsColumns(
+      calculateManagerEconomics({ compensation_min: 600, expected_work_hours: 3, travel_minutes: 30 })
+    )
+
+    expect(columns.estimated_total_hours).toBe(4)
+    expect(columns).not.toHaveProperty('expected_total_hours')
+    expect(columns.economics_breakdown.expected_total_hours).toBe(4)
   })
 })
