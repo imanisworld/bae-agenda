@@ -32,6 +32,11 @@ export interface ManagerOpportunityFormValue {
   compensation_min?: number | null
   compensation_max?: number | null
   compensation_notes?: string | null
+  expected_work_hours?: number | null
+  estimated_total_hours?: number | null
+  estimated_net_pay?: number | null
+  effective_hourly_rate?: number | null
+  economics_basis?: 'unknown' | 'on_site_gross' | 'all_in_gross' | 'all_in_net' | null
   travel_minutes?: number | null
   travel_miles?: number | null
   travel_cost_estimate?: number | null
@@ -299,6 +304,22 @@ export default function ManagerOpportunityForm({
           />
         </label>
 
+        <label style={{ display: 'grid', gap: 7, marginBottom: 14 }}>
+          <FieldLabel>Expected Work Hours</FieldLabel>
+          <input
+            name="expected_work_hours"
+            type="number"
+            min={0.25}
+            step="0.25"
+            defaultValue={value.expected_work_hours ?? ''}
+            placeholder="Setup + performance + teardown, excluding travel"
+            style={inputStyle()}
+          />
+          <span className="muted" style={{ fontSize: 11 }}>
+            Use the total time you expect to be working on-site. Travel is added separately.
+          </span>
+        </label>
+
         <div
           style={{
             display: 'grid',
@@ -308,7 +329,7 @@ export default function ManagerOpportunityForm({
           }}
         >
           <label style={{ display: 'grid', gap: 7 }}>
-            <FieldLabel>Travel Minutes</FieldLabel>
+            <FieldLabel>One-way Travel Minutes</FieldLabel>
             <input
               name="travel_minutes"
               type="number"
@@ -330,7 +351,7 @@ export default function ManagerOpportunityForm({
             />
           </label>
           <label style={{ display: 'grid', gap: 7 }}>
-            <FieldLabel>Travel Cost</FieldLabel>
+            <FieldLabel>Out-of-pocket Travel Cost</FieldLabel>
             <input
               name="travel_cost_estimate"
               type="number"

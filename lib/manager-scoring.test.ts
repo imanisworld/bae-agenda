@@ -4,6 +4,7 @@ import { scoreManagerOpportunity } from './manager-scoring'
 const profile = {
   home_market: 'Indianapolis, IN',
   minimum_fee: 150,
+  target_hourly_rate: 300,
   max_drive_minutes: 90,
   preferred_event_types: ['wedding', 'lounge'],
   excluded_event_types: ['unpaid showcase'],
@@ -11,13 +12,15 @@ const profile = {
 }
 
 describe('scoreManagerOpportunity', () => {
-  it('rewards a local paid preferred-format opportunity', () => {
+  it('rewards a local paid preferred-format opportunity that meets the hourly target', () => {
     const result = scoreManagerOpportunity(profile, {
       title: 'Wedding DJ',
       location_city: 'Indianapolis',
       location_state: 'IN',
-      compensation_min: 500,
-      compensation_max: 500,
+      compensation_min: 600,
+      compensation_max: 600,
+      effective_hourly_rate: 300,
+      economics_basis: 'all_in_net',
       requirements: 'Open format hip hop and R&B',
       source_url: 'https://example.com/gig',
       event_date: '2026-11-01',
@@ -40,6 +43,35 @@ describe('scoreManagerOpportunity', () => {
     expect(result.breakdown.pay.score).toBe(15)
     expect(result.breakdown.travel.score).toBe(12)
     expect(result.score).toBeGreaterThan(0)
+  })
+
+  it('keeps a fee-only lead positive but does not give full economics credit', () => {
+    const result = scoreManagerOpportunity(profile, {
+      title: 'Wedding DJ',
+      location_city: 'Indianapolis',
+      location_state: 'IN',
+      compensation_min: 500,
+      requirements: 'Open format',
+      source_url: 'https://example.com/gig',
+      event_date: '2026-11-01',
+    })
+
+    expect(result.breakdown.pay.score).toBe(20)
+    expect(result.breakdown.pay.note).toContain('hourly economics are incomplete')
+  })
+
+  it('reduces pay score when the hourly value is below target', () => {
+    const result = scoreManagerOpportunity(profile, {
+      title: 'Party DJ',
+      compensation_min: 825,
+      effective_hourly_rate: 165,
+      economics_basis: 'on_site_gross',
+      source_url: 'https://example.com/party',
+      event_date: '2026-10-23',
+    })
+
+    expect(result.breakdown.pay.score).toBe(22)
+    expect(result.breakdown.flags).toContain('below_target_hourly')
   })
 
   it('flags known pay below the minimum fee', () => {

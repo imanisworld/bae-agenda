@@ -1,8 +1,9 @@
-export const MANAGER_FIT_SCORE_VERSION = 'v1'
+export const MANAGER_FIT_SCORE_VERSION = 'v2'
 
 type ManagerProfileForScoring = {
   home_market?: string | null
   minimum_fee?: number | null
+  target_hourly_rate?: number | null
   max_drive_minutes?: number | null
   preferred_event_types?: string[] | null
   excluded_event_types?: string[] | null
@@ -19,6 +20,8 @@ type ManagerOpportunityForScoring = {
   compensation_max?: number | null
   travel_minutes?: number | null
   travel_covered?: boolean | null
+  effective_hourly_rate?: number | null
+  economics_basis?: string | null
   requirements?: string | null
   why_fit?: string | null
   recommended_demo?: string | null
@@ -57,31 +60,77 @@ function numberOrNull(value: unknown): number | null {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+function formatMoney(value: number) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value)
+}
+
+function hourlyBasisLabel(value: string | null | undefined) {
+  if (value === 'all_in_net') return 'all-in net'
+  if (value === 'all_in_gross') return 'all-in gross'
+  if (value === 'on_site_gross') return 'on-site gross'
+  return 'estimated'
+}
+
 export function scoreManagerOpportunity(
   profile: ManagerProfileForScoring,
   opportunity: ManagerOpportunityForScoring
 ): ManagerFitScoreResult {
   const minimumFee = numberOrNull(profile.minimum_fee)
+  const targetHourlyRate = numberOrNull(profile.target_hourly_rate)
   const maxDriveMinutes = numberOrNull(profile.max_drive_minutes)
   const compMin = numberOrNull(opportunity.compensation_min)
   const compMax = numberOrNull(opportunity.compensation_max)
+  const effectiveHourlyRate = numberOrNull(opportunity.effective_hourly_rate)
   const travelMinutes = numberOrNull(opportunity.travel_minutes)
   const flags: string[] = []
 
   let payScore = 15
   let payNote = 'Pay is unknown; neutral score.'
+
   if (minimumFee !== null && (compMin !== null || compMax !== null)) {
-    if (compMin !== null && compMin >= minimumFee) {
-      payScore = 30
-      payNote = `Guaranteed pay meets the $${minimumFee} minimum.`
-    } else if (compMax !== null && compMax >= minimumFee) {
-      payScore = 20
-      payNote = `Pay range can meet the $${minimumFee} minimum, but the floor is lower or unknown.`
-    } else {
+    if (compMax !== null && compMax < minimumFee) {
       payScore = 0
-      payNote = `Known pay is below the $${minimumFee} minimum.`
+      payNote = `Known pay is below the ${formatMoney(minimumFee)} minimum.`
       flags.push('below_minimum_fee')
+    } else if (compMin !== null && compMin < minimumFee) {
+      payScore = 12
+      payNote = `Pay can reach the ${formatMoney(minimumFee)} minimum, but the guaranteed floor is lower.`
+      flags.push('pay_floor_below_minimum')
+    } else if (compMin !== null && compMin >= minimumFee) {
+      payScore = 20
+      payNote = `Guaranteed pay meets the ${formatMoney(minimumFee)} minimum; hourly economics are incomplete.`
+
+      if (targetHourlyRate !== null && effectiveHourlyRate !== null) {
+        const ratio = targetHourlyRate === 0 ? 1 : effectiveHourlyRate / targetHourlyRate
+
+        if (ratio >= 1) payScore = 30
+        else if (ratio >= 0.75) payScore = 26
+        else if (ratio >= 0.5) payScore = 22
+        else if (ratio >= 0.33) payScore = 18
+        else payScore = 12
+
+        payNote =
+          `${formatMoney(effectiveHourlyRate)}/hr ${hourlyBasisLabel(opportunity.economics_basis)} vs ` +
+          `${formatMoney(targetHourlyRate)}/hr target; guaranteed fee still meets the ${formatMoney(minimumFee)} minimum.`
+
+        if (effectiveHourlyRate < targetHourlyRate) {
+          flags.push('below_target_hourly')
+        }
+      }
+    } else if (compMax !== null && compMax >= minimumFee) {
+      payScore = 12
+      payNote = `Pay may meet the ${formatMoney(minimumFee)} minimum, but no guaranteed floor is known.`
+      flags.push('pay_floor_unknown')
     }
+  } else if (targetHourlyRate !== null && effectiveHourlyRate !== null) {
+    const ratio = targetHourlyRate === 0 ? 1 : effectiveHourlyRate / targetHourlyRate
+    payScore = ratio >= 1 ? 30 : ratio >= 0.75 ? 26 : ratio >= 0.5 ? 22 : ratio >= 0.33 ? 18 : 12
+    payNote = `${formatMoney(effectiveHourlyRate)}/hr ${hourlyBasisLabel(opportunity.economics_basis)} vs ${formatMoney(targetHourlyRate)}/hr target.`
+    if (effectiveHourlyRate < targetHourlyRate) flags.push('below_target_hourly')
   }
 
   const homeMarket = normalize(profile.home_market)
@@ -96,13 +145,13 @@ export function scoreManagerOpportunity(
   } else if (travelMinutes !== null && maxDriveMinutes !== null) {
     if (travelMinutes <= maxDriveMinutes) {
       travelScore = 25
-      travelNote = `Travel is within the ${maxDriveMinutes}-minute limit.`
+      travelNote = `One-way travel is within the ${maxDriveMinutes}-minute limit.`
     } else if (opportunity.travel_covered) {
       travelScore = 15
-      travelNote = `Travel exceeds ${maxDriveMinutes} minutes, but travel is covered.`
+      travelNote = `One-way travel exceeds ${maxDriveMinutes} minutes, but travel is covered.`
     } else {
       travelScore = 0
-      travelNote = `Travel exceeds the ${maxDriveMinutes}-minute limit without confirmed coverage.`
+      travelNote = `One-way travel exceeds the ${maxDriveMinutes}-minute limit without confirmed coverage.`
       flags.push('travel_over_limit')
     }
   } else if (opportunity.travel_covered) {

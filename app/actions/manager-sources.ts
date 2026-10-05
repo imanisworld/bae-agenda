@@ -169,7 +169,7 @@ export async function convertManagerSignalToOpportunityAction(formData: FormData
 
   const { data: profile } = await admin
     .from('manager_profiles')
-    .select('home_market, minimum_fee, max_drive_minutes, preferred_event_types, excluded_event_types, genres')
+    .select('home_market, minimum_fee, target_hourly_rate, max_drive_minutes, preferred_event_types, excluded_event_types, genres')
     .eq('profile_key', 'dj_bae')
     .maybeSingle()
 
