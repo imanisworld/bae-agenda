@@ -11,6 +11,7 @@ import {
 import { logManagerOpportunityActivity } from '@/lib/manager-activity'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { toEventISO } from '@/lib/date-time'
+import { defaultManagerSecondFollowUpDate } from '@/lib/manager-follow-up'
 
 const ActivitySchema = z.object({
   opportunity_id: z.string().uuid(),
@@ -65,7 +66,7 @@ export async function addManagerOpportunityActivityAction(formData: FormData) {
   const admin = createAdminClient()
   const { data: opportunity, error: opportunityError } = await admin
     .from('manager_opportunities')
-    .select('id, applied_at, last_contacted_at')
+    .select('id, status, applied_at, last_contacted_at, next_action, next_action_at')
     .eq('id', data.opportunity_id)
     .maybeSingle()
 
@@ -88,7 +89,7 @@ export async function addManagerOpportunityActivityAction(formData: FormData) {
     redirectWithError(data.opportunity_id, 'Activity could not be saved.')
   }
 
-  const lifecycleUpdate: Record<string, string> = {}
+  const lifecycleUpdate: Record<string, string | null> = {}
 
   if (data.activity_type === 'application' && !opportunity.applied_at) {
     lifecycleUpdate.applied_at = occurredAt
@@ -103,6 +104,23 @@ export async function addManagerOpportunityActivityAction(formData: FormData) {
     }
   }
 
+  if (data.activity_type === 'response') {
+    lifecycleUpdate.next_action = null
+    lifecycleUpdate.next_action_at = null
+  }
+
+  if (data.activity_type === 'negotiation') {
+    lifecycleUpdate.status = 'negotiating'
+    lifecycleUpdate.next_action = 'Continue negotiation.'
+    lifecycleUpdate.next_action_at = null
+  }
+
+  if (data.activity_type === 'follow_up') {
+    lifecycleUpdate.status = 'follow_up'
+    lifecycleUpdate.next_action = 'Follow up again if there is still no response.'
+    lifecycleUpdate.next_action_at = defaultManagerSecondFollowUpDate(new Date(occurredAt))
+  }
+
   if (Object.keys(lifecycleUpdate).length > 0) {
     const { error } = await admin
       .from('manager_opportunities')
@@ -112,6 +130,23 @@ export async function addManagerOpportunityActivityAction(formData: FormData) {
     if (error) {
       console.error('[manager-activity] unable to sync lifecycle timestamp:', error.message)
     }
+  }
+
+  if (
+    (data.activity_type === 'negotiation' && opportunity.status !== 'negotiating') ||
+    (data.activity_type === 'follow_up' && opportunity.status !== 'follow_up')
+  ) {
+    const nextStatus = data.activity_type === 'negotiation' ? 'negotiating' : 'follow_up'
+    await logManagerOpportunityActivity(admin, {
+      opportunityId: data.opportunity_id,
+      activityType: 'status_change',
+      title: 'Pipeline status changed',
+      body: `${opportunity.status} → ${nextStatus}`,
+      occurredAt,
+      fromStatus: opportunity.status,
+      toStatus: nextStatus,
+      metadata: { reason: `manual_${data.activity_type}_activity` },
+    })
   }
 
   revalidatePath('/admin/manager')
