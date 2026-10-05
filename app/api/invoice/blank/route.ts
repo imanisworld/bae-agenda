@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
 import { createRequestId, logError } from '@/lib/monitoring'
 import { generateBlankInvoicePdf } from '@/lib/blank-invoice-pdf'
+import { getNextInvoiceNumber } from '@/lib/invoice-numbers'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function GET() {
   const requestId = createRequestId()
@@ -23,7 +25,16 @@ export async function GET() {
       )
     }
 
-    const pdf = await generateBlankInvoicePdf()
+    const invoiceDate = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'America/Indiana/Indianapolis',
+    })
+    const pdf = await generateBlankInvoicePdf({
+      invoiceNumber: await getNextInvoiceNumber(createAdminClient()),
+      invoiceDate,
+    })
     return new NextResponse(pdf, {
       headers: {
         'Content-Type':        'application/pdf',

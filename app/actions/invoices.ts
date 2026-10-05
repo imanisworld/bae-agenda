@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { requireAdminUser } from '@/lib/admin-auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
+import { getNextInvoiceNumber } from '@/lib/invoice-numbers'
 import { invoiceLineItemsTotal, type InvoiceLineItem } from '@/lib/invoices'
 import { EVENT_INVOICE_EVENT_TYPE, eventInvoiceDueDate } from '@/lib/event-invoice'
 import { suggestEventTimeZone } from '@/lib/event-form-options'
@@ -136,7 +137,7 @@ export async function createInvoiceFromBookingAction(formData: FormData) {
     redirect(`/admin/bookings/${bookingId}/invoice`)
   }
 
-  const draft = buildInvoiceDraftRecord(source)
+  const draft = buildInvoiceDraftRecord(source, await getNextInvoiceNumber(admin))
   const { error: insertError } = await admin
     .from('invoices')
     .insert(draft)
@@ -292,7 +293,7 @@ export async function createInvoiceForEventAction(formData: FormData) {
   }
 
   const source = booking as unknown as InvoiceDraftSource
-  const draft = buildInvoiceDraftRecord(source)
+  const draft = buildInvoiceDraftRecord(source, await getNextInvoiceNumber(admin))
   const { error: insertError } = await admin
     .from('invoices')
     .insert({ ...draft, due_date: eventInvoiceDueDate(draft.due_date) })
