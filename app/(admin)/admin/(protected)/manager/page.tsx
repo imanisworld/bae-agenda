@@ -232,6 +232,53 @@ export default async function ManagerPage() {
         ))}
       </div>
 
+      <section id="today" className="admin-section" style={{ marginBottom: 24 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Today</span>
+          <span className="muted">{todayQueue.length} actions</span>
+        </div>
+
+        {todayQueue.length === 0 ? (
+          <AdminEmptyState
+            title="Nothing needs action right now"
+            desc="New leads, ready outreach, negotiations, and due follow-ups will surface here automatically."
+          />
+        ) : (
+          <div style={{ display: 'grid', gap: 1, background: 'var(--border)' }}>
+            {todayQueue.map(({ item, label, priority }) => (
+              <Link
+                key={item.id}
+                href={`/admin/manager/opportunities/${item.id}`}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '36px minmax(0, 1fr) auto',
+                  gap: 14,
+                  alignItems: 'center',
+                  padding: '14px 16px',
+                  background: 'var(--surface)',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                }}
+              >
+                <div style={{ fontSize: 10, color: 'var(--gold)' }}>{priority}</div>
+                <div style={{ minWidth: 0 }}>
+                  <strong style={{ display: 'block', fontSize: 12, fontWeight: 500 }}>{label}</strong>
+                  <span className="muted" style={{ fontSize: 10 }}>
+                    {item.title}{item.organization ? ` · ${item.organization}` : ''}
+                  </span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <ManagerStatusBadge status={item.status as ManagerOpportunityStatus} />
+                  <div className="muted" style={{ marginTop: 4, fontSize: 10 }}>
+                    {item.fit_score === null ? 'Fit —' : `Fit ${item.fit_score}`}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
       {!data.profileReady && data.configured && (
         <div className="admin-preview-banner" style={{ marginBottom: 18 }}>
           <span className="admin-preview-mark" aria-hidden="true">!</span>
