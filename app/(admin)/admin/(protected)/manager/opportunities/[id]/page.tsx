@@ -7,6 +7,7 @@ import PageHeader from '@/components/admin/PageHeader'
 import { updateManagerOpportunityAction } from '@/app/actions/manager'
 import { addManagerOpportunityActivityAction } from '@/app/actions/manager-activity'
 import { prepareManagerOutreachAction, saveManagerOutreachDraftAction } from '@/app/actions/manager-outreach'
+import { dispatchManagerOutreachAction } from '@/app/actions/manager-dispatch'
 import {
   MANAGER_ACTIVITY_TYPES,
   MANAGER_ACTIVITY_TYPE_LABELS,
@@ -23,6 +24,7 @@ import {
   type ManagerOutreachAsset,
 } from '@/lib/manager-outreach'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { defaultManagerFollowUpDate, managerDispatchActionLabel } from '@/lib/manager-dispatch'
 
 type ScoreComponent = { score?: number; max?: number; note?: string }
 
@@ -450,6 +452,61 @@ export default async function ManagerOpportunityDetailPage({
                 <button type="submit" className="admin-btn-ghost">Refresh Prep</button>
               </form>
             </div>
+
+            {status === 'outreach_ready' && (opportunity.outreach_missing_items?.length ?? 0) === 0 && opportunity.outreach_channel && (
+              <div style={{ borderTop: '1px solid var(--border)', marginTop: 18, paddingTop: 18 }}>
+                <div className="admin-section-title" style={{ marginBottom: 8 }}>
+                  Send / Record Submission
+                </div>
+                <p className="muted" style={{ margin: '0 0 14px', fontSize: 11, lineHeight: 1.6 }}>
+                  {opportunity.outreach_channel === 'email'
+                    ? 'This will send the saved draft through the existing Resend mail transport. Review the recipient, subject, copy, and assets above first.'
+                    : 'Complete the DM/application/form/call outside Manager first, then use this button to record exactly what was submitted and advance the pipeline.'}
+                </p>
+
+                <form action={dispatchManagerOutreachAction}>
+                  <input type="hidden" name="opportunity_id" value={opportunity.id} />
+
+                  <div className="admin-form-grid-two" style={{ marginBottom: 12 }}>
+                    <div style={{ display: 'grid', gap: 7 }}>
+                      <span className="admin-field-label">Channel</span>
+                      <div className="admin-input" style={{ display: 'flex', alignItems: 'center' }}>
+                        {MANAGER_OUTREACH_CHANNEL_LABELS[opportunity.outreach_channel]}
+                      </div>
+                    </div>
+
+                    <label style={{ display: 'grid', gap: 7 }}>
+                      <span className="admin-field-label">Follow-up Date</span>
+                      <input
+                        name="follow_up_on"
+                        type="date"
+                        defaultValue={opportunity.next_action_at ?? defaultManagerFollowUpDate()}
+                        className="admin-input"
+                      />
+                    </label>
+                  </div>
+
+                  <label style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 14, color: 'var(--muted)', fontSize: 11, lineHeight: 1.5 }}>
+                    <input
+                      type="checkbox"
+                      name="confirm_dispatch"
+                      value="yes"
+                      required
+                      style={{ marginTop: 2 }}
+                    />
+                    <span>
+                      {opportunity.outreach_channel === 'email'
+                        ? 'I reviewed the saved recipient, subject, draft, and assets. Send this email now.'
+                        : 'I completed this outreach externally using the saved draft (or edited and saved it first). Record it now and schedule follow-up.'}
+                    </span>
+                  </label>
+
+                  <button type="submit" className="admin-btn-primary">
+                    {managerDispatchActionLabel(opportunity.outreach_channel)}
+                  </button>
+                </form>
+              </div>
+            )}
           </>
         )}
       </section>
