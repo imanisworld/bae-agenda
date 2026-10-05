@@ -8,10 +8,12 @@
 import Link from 'next/link'
 import PageHeader      from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
+import AdminPagination from '@/components/admin/AdminPagination'
 import AdminNotice     from '@/components/admin/AdminNotice'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { toggleEventFeaturedAction, toggleEventPublicAction } from '@/app/actions/events'
 import { isValidTimeZone } from '@/lib/date-time'
+import { normalizeAdminPage, paginateRows } from '@/lib/admin-pagination'
 
 interface EventRow {
   id:         string
@@ -64,14 +66,40 @@ function getErrorMessage(errorParam: string | string[] | undefined) {
   return Array.isArray(errorParam) ? errorParam[0] ?? null : errorParam
 }
 
+const EVENT_FILTERS = [
+  { key: 'upcoming', label: 'Upcoming' },
+  { key: 'past', label: 'Past' },
+  { key: 'all', label: 'All' },
+] as const
+
+type EventFilterKey = (typeof EVENT_FILTERS)[number]['key']
+
+function resolveEventFilter(value: string | string[] | undefined): EventFilterKey {
+  const raw = Array.isArray(value) ? value[0] : value
+  return EVENT_FILTERS.some((filter) => filter.key === raw) ? raw as EventFilterKey : 'upcoming'
+}
+
+function eventListHref(filter: EventFilterKey) {
+  return filter === 'upcoming' ? '/admin/events' : `/admin/events?filter=${filter}`
+}
+
 export default async function EventsPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ error?: string | string[] }>
+  searchParams?: Promise<{ error?: string | string[]; filter?: string | string[]; page?: string | string[] }>
 }) {
   const events = await getEvents()
   const resolvedSearchParams = searchParams ? await searchParams : undefined
   const errorMessage = getErrorMessage(resolvedSearchParams?.error)
+  const activeFilter = resolveEventFilter(resolvedSearchParams?.filter)
+  const requestedPage = normalizeAdminPage(resolvedSearchParams?.page)
+  const visibleEvents = events.filter((event) => {
+    if (activeFilter === 'all') return true
+    return activeFilter === 'past'
+      ? isPast(event.event_date, event.event_timezone)
+      : !isPast(event.event_date, event.event_timezone)
+  })
+  const eventPage = paginateRows(visibleEvents, requestedPage)
 
   return (
     <div className="admin-page">
@@ -85,16 +113,48 @@ export default async function EventsPage({
 
       <div className="admin-section" style={{ marginBottom: 0 }}>
         <div className="admin-section-header">
-          <span className="admin-section-title">All Events</span>
+          <span className="admin-section-title">{EVENT_FILTERS.find((filter) => filter.key === activeFilter)?.label} Events</span>
         </div>
+
+        {events.length > 0 && (
+          <nav aria-label="Filter events" className="admin-filter-chips" style={{ marginBottom: 18 }}>
+            {EVENT_FILTERS.map((filter) => {
+              const count = events.filter((event) => {
+                if (filter.key === 'all') return true
+                return filter.key === 'past'
+                  ? isPast(event.event_date, event.event_timezone)
+                  : !isPast(event.event_date, event.event_timezone)
+              }).length
+              const active = filter.key === activeFilter
+
+              return (
+                <Link
+                  key={filter.key}
+                  href={eventListHref(filter.key)}
+                  className={active ? 'admin-filter-chip admin-filter-chip-active' : 'admin-filter-chip'}
+                  aria-current={active ? 'true' : undefined}
+                >
+                  {filter.label}
+                  <span className="admin-filter-chip-count">{count}</span>
+                </Link>
+              )
+            })}
+          </nav>
+        )}
 
         {events.length === 0 ? (
           <AdminEmptyState
             title="No events yet"
             desc="Events you create will appear here and on the public site."
           />
+        ) : visibleEvents.length === 0 ? (
+          <AdminEmptyState
+            title={activeFilter === 'past' ? 'No past events' : 'No upcoming events'}
+            desc="Nothing matches this event view right now."
+          />
         ) : (
-          <div className="admin-table-wrap">
+          <>
+            <div className="admin-table-wrap">
             <table className="admin-table admin-table-stack">
               <thead>
                 <tr>
@@ -109,7 +169,7 @@ export default async function EventsPage({
                 </tr>
               </thead>
               <tbody>
-                {events.map((ev) => (
+                {eventPage.items.map((ev) => (
                   <tr key={ev.id}>
                     <td data-label="Title" style={{
                       fontWeight: 400,
@@ -185,7 +245,16 @@ export default async function EventsPage({
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+            <AdminPagination
+              pathname="/admin/events"
+              page={eventPage.page}
+              totalPages={eventPage.totalPages}
+              totalItems={eventPage.totalItems}
+              pageSize={eventPage.pageSize}
+              params={{ filter: activeFilter === 'upcoming' ? undefined : activeFilter }}
+            />
+          </>
         )}
       </div>
     </div>
