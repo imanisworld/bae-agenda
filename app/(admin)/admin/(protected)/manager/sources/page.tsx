@@ -17,6 +17,7 @@ import {
   type ManagerWatchSourceKind,
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { managerSourceHealthLabel, summarizeManagerSourceSignals } from '@/lib/manager-source-quality'
 
 interface SourceRow {
   id: string
@@ -83,6 +84,7 @@ export default async function ManagerSourcesPage({
   const [
     { data: sourceData, error: sourcesError },
     { data: signalData, error: signalsError },
+    { data: signalStatusData, error: signalStatusError },
   ] = await Promise.all([
     admin
       .from('manager_sources')
@@ -94,17 +96,36 @@ export default async function ManagerSourcesPage({
       .select('id, source_id, signal_type, status, title, url, published_at, discovered_at, summary, linked_opportunity_id')
       .order('discovered_at', { ascending: false })
       .limit(100),
+    admin
+      .from('manager_source_signals')
+      .select('source_id, status'),
   ])
 
   const unavailable =
     sourcesError?.code === '42P01' ||
     sourcesError?.code === 'PGRST205' ||
     signalsError?.code === '42P01' ||
-    signalsError?.code === 'PGRST205'
+    signalsError?.code === 'PGRST205' ||
+    signalStatusError?.code === '42P01' ||
+    signalStatusError?.code === 'PGRST205'
 
   const sources = (sourceData ?? []) as SourceRow[]
   const signals = (signalData ?? []) as SignalRow[]
   const sourceById = new Map(sources.map((source) => [source.id, source]))
+  const statusesBySource = new Map<string, SignalRow['status'][]>()
+
+  for (const row of signalStatusData ?? []) {
+    const statuses = statusesBySource.get(row.source_id) ?? []
+    statuses.push(row.status as SignalRow['status'])
+    statusesBySource.set(row.source_id, statuses)
+  }
+
+  const sourceQuality = new Map(
+    sources.map((source) => [
+      source.id,
+      summarizeManagerSourceSignals(statusesBySource.get(source.id) ?? []),
+    ])
+  )
   const activeSources = sources.filter((source) => source.active)
   const unchecked = activeSources.filter((source) => !source.last_checked_at)
   const actionableSignals = signals.filter((signal) => ['new', 'relevant'].includes(signal.status))
@@ -115,6 +136,9 @@ export default async function ManagerSourcesPage({
   )
   const networkSources = activeSources.filter(
     (source) => ['dj', 'promoter'].includes(source.source_kind)
+  )
+  const noisySources = activeSources.filter(
+    (source) => sourceQuality.get(source.id)?.health === 'noisy'
   )
 
   return (
@@ -156,6 +180,7 @@ export default async function ManagerSourcesPage({
           ['Indianapolis', localSources.length, 'Local discovery coverage'],
           ['DJ Network', networkSources.length, 'Venue / promoter relationship mining'],
           ['Never Checked', unchecked.length, 'Waiting for first scan'],
+          ['Noisy Sources', noisySources.length, 'Mostly ignored signals'],
           ['New Signals', actionableSignals.length, 'Need review'],
           ['Converted', signals.filter((signal) => signal.status === 'converted').length, 'Became opportunities'],
         ].map(([label, value, sub]) => (
@@ -203,12 +228,15 @@ export default async function ManagerSourcesPage({
                   <th>Cadence</th>
                   <th>Last Check</th>
                   <th>Latest Signal</th>
+                  <th>Yield</th>
                   <th>Demo</th>
                   <th>Watch</th>
                 </tr>
               </thead>
               <tbody>
-                {sources.map((source) => (
+                {sources.map((source) => {
+                  const quality = sourceQuality.get(source.id) ?? summarizeManagerSourceSignals([])
+                  return (
                   <tr key={source.id}>
                     <td data-label="Source">
                       <div style={{ display: 'grid', gap: 3 }}>
@@ -226,6 +254,16 @@ export default async function ManagerSourcesPage({
                     <td data-label="Cadence" className="muted">{source.check_frequency_hours}h</td>
                     <td data-label="Last Check" className="muted">{fmtTimestamp(source.last_checked_at)}</td>
                     <td data-label="Latest Signal" className="muted">{fmtTimestamp(source.latest_signal_at)}</td>
+                    <td data-label="Yield">
+                      <div style={{ display: 'grid', gap: 2 }}>
+                        <span>{managerSourceHealthLabel(quality.health)}</span>
+                        <span className="muted" style={{ fontSize: 10 }}>
+                          {quality.total === 0
+                            ? 'No signals'
+                            : `${quality.useful}/${quality.total} useful · ${quality.yieldPercent}%`}
+                        </span>
+                      </div>
+                    </td>
                     <td data-label="Demo" className="muted">{source.recommended_demo ?? '—'}</td>
                     <td data-label="Watch">
                       <form action={toggleManagerSourceAction}>
@@ -237,7 +275,8 @@ export default async function ManagerSourcesPage({
                       </form>
                     </td>
                   </tr>
-                ))}
+                  )
+                })}
               </tbody>
             </table>
           </div>
