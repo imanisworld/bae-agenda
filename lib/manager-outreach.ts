@@ -1,12 +1,24 @@
 export const MANAGER_OUTREACH_VERSION = 'v1'
 
-export type ManagerOutreachChannel =
-  | 'email'
-  | 'instagram_dm'
-  | 'application'
-  | 'web_form'
-  | 'phone'
-  | 'other'
+export const MANAGER_OUTREACH_CHANNELS = [
+  'email',
+  'instagram_dm',
+  'application',
+  'web_form',
+  'phone',
+  'other',
+] as const
+
+export type ManagerOutreachChannel = typeof MANAGER_OUTREACH_CHANNELS[number]
+
+export const MANAGER_OUTREACH_CHANNEL_LABELS: Record<ManagerOutreachChannel, string> = {
+  email: 'Email',
+  instagram_dm: 'Instagram DM',
+  application: 'Application',
+  web_form: 'Web Form',
+  phone: 'Phone',
+  other: 'Other',
+}
 
 type OutreachProfile = {
   display_name?: string | null
