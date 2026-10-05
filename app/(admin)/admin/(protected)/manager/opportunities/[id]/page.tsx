@@ -32,11 +32,46 @@ type OpportunityDetail = ManagerOpportunityFormValue & {
   } | null
   fit_score_version?: string | null
   fit_scored_at?: string | null
+  economics_breakdown?: {
+    note?: string
+    guaranteed_gross?: number | null
+    expected_work_hours?: number | null
+    one_way_travel_minutes?: number | null
+    round_trip_travel_hours?: number | null
+    expected_total_hours?: number | null
+    travel_cost_estimate?: number | null
+    estimated_net_pay?: number | null
+    on_site_gross_hourly_rate?: number | null
+    effective_hourly_rate?: number | null
+    effective_hourly_basis?: string | null
+    complete?: boolean
+  } | null
 }
 
 function getMessage(value: string | string[] | undefined) {
   if (!value) return null
   return Array.isArray(value) ? value[0] ?? null : value
+}
+
+function fmtMoney(value: number | null | undefined) {
+  if (value === null || value === undefined) return '—'
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 2,
+  }).format(value)
+}
+
+function fmtHours(value: number | null | undefined) {
+  if (value === null || value === undefined) return '—'
+  return `${Number(value).toFixed(Number(value) % 1 === 0 ? 0 : 2)} hr`
+}
+
+function economicsBasisLabel(value: string | null | undefined) {
+  if (value === 'all_in_net') return 'All-in net'
+  if (value === 'all_in_gross') return 'All-in gross'
+  if (value === 'on_site_gross') return 'On-site gross'
+  return 'Incomplete'
 }
 
 function fmtTimestamp(value: string | null) {
@@ -143,6 +178,43 @@ export default async function ManagerOpportunityDetailPage({
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="admin-section" style={{ marginBottom: 16 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Gig Economics</span>
+          <span className="muted">{economicsBasisLabel(opportunity.economics_basis)}</span>
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: 1,
+            background: 'var(--border)',
+          }}
+        >
+          {[
+            ['Guaranteed Pay', fmtMoney(opportunity.compensation_min)],
+            ['Work Hours', fmtHours(opportunity.expected_work_hours)],
+            ['Travel One-way', opportunity.travel_minutes === null || opportunity.travel_minutes === undefined ? '—' : `${opportunity.travel_minutes} min`],
+            ['Total Time', fmtHours(opportunity.estimated_total_hours)],
+            ['Travel Cost', fmtMoney(opportunity.travel_cost_estimate)],
+            ['Est. Net Pay', fmtMoney(opportunity.estimated_net_pay)],
+            ['Effective Rate', opportunity.effective_hourly_rate === null || opportunity.effective_hourly_rate === undefined ? '—' : `${fmtMoney(opportunity.effective_hourly_rate)}/hr`],
+          ].map(([label, value]) => (
+            <div key={String(label)} style={{ background: 'var(--surface)', padding: '14px 16px' }}>
+              <div style={{ color: 'var(--muted)', fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
+                {label}
+              </div>
+              <div style={{ color: 'var(--white)', fontSize: 12 }}>{value}</div>
+            </div>
+          ))}
+        </div>
+        {opportunity.economics_breakdown?.note && (
+          <p className="muted" style={{ fontSize: 11, margin: '12px 0 0' }}>
+            {opportunity.economics_breakdown.note}
+          </p>
+        )}
       </section>
 
       {opportunity.fit_score_breakdown && (
