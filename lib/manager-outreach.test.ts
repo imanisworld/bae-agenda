@@ -35,6 +35,7 @@ describe('prepareManagerOutreach', () => {
       title: 'Party DJ',
       organization: 'Example Events',
       contact_email: 'bookings@example.com',
+      requirements: 'Send a mix and availability.',
       recommended_demo: 'Open Format / Nightlife',
       why_fit: 'Strong open-format fit.',
     }, mixes)
@@ -79,5 +80,34 @@ describe('prepareManagerOutreach', () => {
     }, mixes)
 
     expect(result.missingItems).toContain('Press kit / EPK requested but no press-kit URL is saved.')
+  })
+
+  it('flags an unknown organizer, location, and missing asks instead of guessing', () => {
+    const result = prepareManagerOutreach(profile, {
+      title: 'Party DJ — Oct. 23',
+      contact_email: 'host@example.com',
+      event_date: '2026-10-23',
+      recommended_demo: 'Open Format',
+    }, mixes)
+
+    expect(result.missingItems.some((item) => item.startsWith("Who's running this is unknown"))).toBe(true)
+    expect(result.missingItems.some((item) => item.startsWith('Where the event is held is unknown'))).toBe(true)
+    expect(result.missingItems.some((item) => item.startsWith("What they asked for isn't recorded"))).toBe(true)
+    expect(result.ready).toBe(false)
+  })
+
+  it('accepts an anonymous poster with a known city', () => {
+    const result = prepareManagerOutreach(profile, {
+      title: 'Party DJ — Oct. 23',
+      organization: 'Anonymous poster',
+      location_city: 'Westfield',
+      event_date: '2026-10-23',
+      source_url: 'https://example.com/post',
+      requirements: 'Share experience and mixes.',
+      recommended_demo: 'Open Format',
+    }, mixes)
+
+    expect(result.missingItems).toEqual([])
+    expect(result.ready).toBe(true)
   })
 })

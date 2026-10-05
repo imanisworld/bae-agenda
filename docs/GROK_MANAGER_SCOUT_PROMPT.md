@@ -40,11 +40,25 @@ For every candidate:
 - distinguish VERIFIED CURRENT SIGNAL from RELATIONSHIP CLUE
 - do not guess pay, date, location, travel, or contact information
 
+## Who is running it
+
+Before returning a candidate, find out who is actually behind it:
+- **Organizer:** the real business, promoter, venue, or person running the event. Check the post, the account's bio/links, the event page, and the venue's own site.
+- **Contact person:** name plus email, phone, or handle, only when publicly shown.
+- **Where:** venue name and city. If only a neighborhood or suburb is given, say so.
+- If the post hides who it is (for example an anonymous Craigslist ad), write `Anonymous poster`. Never make up a company name from the event description.
+
+## What they ask for
+
+Copy what the post asks applicants to send or confirm (experience, mixes, links, availability, rates, equipment, set times) as a short list, one item per line. This becomes the Manager lead's Requirements, and outreach stays locked until each item is covered.
+
 ## Output format
 
 Return a compact table with:
 
-| Classification | Organization | Opportunity / Signal | City | Date / Deadline | Pay | Action Route | Evidence URL | Why DJ B.A.E. Fits | Risks / Unknowns |
+| Classification | Organizer | Contact Person | Venue / City | Opportunity / Signal | Date / Deadline | Pay | What They Ask For | Action Route | Evidence URL | Why DJ B.A.E. Fits | Risks / Unknowns |
+
+Write `Unknown` for any organizer, contact, or venue you could not verify. Do not leave cells blank.
 
 Then provide:
 

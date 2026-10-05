@@ -5,6 +5,7 @@
 - Prefer direct buyers: venues, promoters, festivals, brands, campuses, nonprofits, community-event organizers, and one-off event organizers.
 - Exclude DJ staffing companies, DJ agencies, wedding-DJ companies, roster-building companies, house-DJ employment, and entertainment collectives recruiting staff/roster DJs.
 - Do not invent pay, duration, travel time, contact information, application routes, or assets.
+- A lead can't be outreach-ready until it records who is running it (or `Anonymous poster`), where a dated event is held, and what they asked for.
 - Existing press kit: https://thebaeagenda.com/press-kit
 - Outreach remains controlled and reviewed.
 - Use the existing Manager scoring and economics rules.
