@@ -313,6 +313,107 @@ export default async function ManagerOpportunityDetailPage({
         )}
       </section>
 
+      {negotiation && (
+        <section className="admin-section" style={{ marginBottom: 16 }}>
+          <div className="admin-section-header">
+            <span className="admin-section-title">Negotiation Assistant</span>
+            <span className="muted">Recommendation: {negotiation.label}</span>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+              gap: 1,
+              background: 'var(--border)',
+              marginBottom: 14,
+            }}
+          >
+            {[
+              ['Current Offer', fmtMoney(opportunity.compensation_min)],
+              ['Minimum Fee', fmtMoney(negotiationProfile.minimum_fee)],
+              ['Effective Rate', opportunity.effective_hourly_rate == null ? '—' : `${fmtMoney(opportunity.effective_hourly_rate)}/hr`],
+              ['Target Rate', negotiationProfile.target_hourly_rate == null ? '—' : `${fmtMoney(negotiationProfile.target_hourly_rate)}/hr`],
+              ['Suggested Counter', fmtMoney(negotiation.suggested_counter_fee)],
+            ].map(([label, value]) => (
+              <div key={String(label)} style={{ background: 'var(--surface)', padding: '14px 16px' }}>
+                <div style={{ color: 'var(--muted)', fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
+                  {label}
+                </div>
+                <div style={{ color: 'var(--white)', fontSize: 12 }}>{value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'grid', gap: 6, marginBottom: 14 }}>
+            {negotiation.reasons.map((reason) => (
+              <div key={reason} className="muted" style={{ fontSize: 11, lineHeight: 1.55 }}>
+                {reason}
+              </div>
+            ))}
+            {negotiation.missing.length > 0 && (
+              <div className="muted" style={{ fontSize: 11 }}>
+                Missing: {negotiation.missing.join(', ')}
+              </div>
+            )}
+          </div>
+
+          <form action={recordManagerNegotiationDecisionAction}>
+            <input type="hidden" name="opportunity_id" value={opportunity.id} />
+
+            <div className="admin-form-grid-two" style={{ marginBottom: 12 }}>
+              <label style={{ display: 'grid', gap: 7 }}>
+                <span className="admin-field-label">Decision</span>
+                <select
+                  name="decision"
+                  defaultValue={negotiation.decision}
+                  className="admin-input"
+                >
+                  <option value="accept">Accept</option>
+                  <option value="counter">Counter</option>
+                  <option value="pass">Pass</option>
+                  <option value="needs_info">Needs Info</option>
+                </select>
+              </label>
+
+              <label style={{ display: 'grid', gap: 7 }}>
+                <span className="admin-field-label">Proposed Fee</span>
+                <input
+                  name="proposed_fee"
+                  type="number"
+                  min={0}
+                  step="25"
+                  defaultValue={negotiation.suggested_counter_fee ?? ''}
+                  className="admin-input"
+                  placeholder="Optional"
+                />
+              </label>
+            </div>
+
+            <label style={{ display: 'grid', gap: 7, marginBottom: 12 }}>
+              <span className="admin-field-label">Negotiation Note / Counter Draft</span>
+              <textarea
+                name="note"
+                rows={9}
+                defaultValue={negotiation.counter_draft ?? ''}
+                className="admin-input"
+                style={{ minHeight: 190, resize: 'vertical', lineHeight: 1.6 }}
+                placeholder="Add the terms, response, or editable counter message you want preserved in the timeline."
+              />
+            </label>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <span className="muted" style={{ fontSize: 10 }}>
+                Records the decision and terms only. It does not send a message or create a booking.
+              </span>
+              <button type="submit" className="admin-btn-primary">
+                Record Negotiation Decision
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
+
       {opportunity.fit_score_breakdown && (
         <section className="admin-section" style={{ marginBottom: 16 }}>
           <div className="admin-section-header">
