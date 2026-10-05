@@ -114,6 +114,16 @@ function fmtHours(value: number | null | undefined) {
   return `${Number(value).toFixed(Number(value) % 1 === 0 ? 0 : 2)} hr`
 }
 
+function fmtDay(value: string | null | undefined) {
+  if (!value) return null
+  return new Date(`${value.slice(0, 10)}T12:00:00`).toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
+}
+
 function economicsBasisLabel(value: string | null | undefined) {
   if (value === 'all_in_net') return 'All-in net'
   if (value === 'all_in_gross') return 'All-in gross'
@@ -217,6 +227,24 @@ export default async function ManagerOpportunityDetailPage({
   const followUpEligible = ['applied', 'contacted', 'follow_up'].includes(status)
   const followUpUrgency = managerFollowUpUrgency(opportunity.next_action_at)
   const asks = splitManagerAsks(opportunity.requirements)
+  const eventPlace = [
+    opportunity.venue_name,
+    [opportunity.location_city, opportunity.location_state].filter(Boolean).join(', '),
+  ].filter(Boolean).join(' — ')
+  const eventContact = [
+    opportunity.contact_name,
+    opportunity.contact_email,
+    opportunity.contact_phone,
+  ].filter(Boolean).join(' · ')
+  const eventDetails: [string, string | null][] = [
+    ['Who\'s Running It', opportunity.organization?.trim() || null],
+    ['Contact Person', eventContact || null],
+    ['Where', eventPlace || null],
+    ['Event Date', fmtDay(opportunity.event_date)],
+    ...(opportunity.application_deadline
+      ? [['Apply By', fmtDay(opportunity.application_deadline)] as [string, string | null]]
+      : []),
+  ]
   const followUpDraft = followUpEligible
     ? buildManagerFollowUpDraft(opportunity)
     : null
@@ -243,6 +271,36 @@ export default async function ManagerOpportunityDetailPage({
           <div><div className="admin-preview-title">{successMessage}</div></div>
         </div>
       )}
+
+      <section className="admin-section" style={{ marginBottom: 16 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Event Details</span>
+          {eventDetails.some(([, value]) => !value) && (
+            <a href="#edit-opportunity" className="muted" style={{ fontSize: 10, textDecoration: 'underline' }}>
+              Fill in missing details
+            </a>
+          )}
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: 1,
+            background: 'var(--border)',
+          }}
+        >
+          {eventDetails.map(([label, value]) => (
+            <div key={label} style={{ background: 'var(--surface)', padding: '14px 16px' }}>
+              <div style={{ color: 'var(--muted)', fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
+                {label}
+              </div>
+              <div style={{ color: value ? 'var(--white)' : 'var(--muted)', fontSize: 12, overflowWrap: 'anywhere' }}>
+                {value ?? 'Not found yet'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="admin-section" style={{ marginBottom: 16 }}>
         <div className="admin-section-header">
