@@ -44,7 +44,8 @@ type PortalRequestStatus = 'new' | 'reviewed' | 'resolved'
 
 function redirectWithError(path: string, message: string): never {
   const params = new URLSearchParams({ error: message })
-  redirect(`${path}?${params.toString()}`)
+  const separator = path.includes('?') ? '&' : '?'
+  redirect(`${path}${separator}${params.toString()}`)
 }
 
 function optionalString(value: FormDataEntryValue | null): string | null {
@@ -814,6 +815,44 @@ export async function createAdminBookingAction(formData: FormData) {
   await requireAdminUser()
 
   const admin = createAdminClient()
+  const managerOpportunityId = optionalString(formData.get('manager_opportunity_id'))
+
+  if (
+    managerOpportunityId &&
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(managerOpportunityId)
+  ) {
+    redirectWithError('/admin/bookings/new', 'Invalid Manager opportunity reference.')
+  }
+
+  let managerOpportunity: {
+    id: string
+    title: string
+    linked_booking_id: string | null
+  } | null = null
+
+  if (managerOpportunityId) {
+    const { data, error } = await admin
+      .from('manager_opportunities')
+      .select('id, title, linked_booking_id')
+      .eq('id', managerOpportunityId)
+      .maybeSingle()
+
+    if (error || !data) {
+      redirectWithError('/admin/manager', error?.message || 'Manager opportunity could not be found.')
+    }
+
+    managerOpportunity = data as {
+      id: string
+      title: string
+      linked_booking_id: string | null
+    }
+
+    if (managerOpportunity.linked_booking_id) {
+      redirect(
+        `/admin/bookings/${managerOpportunity.linked_booking_id}?success=${encodeURIComponent('This Manager opportunity is already linked to this booking.')}`
+      )
+    }
+  }
 
   const firstName = optionalString(formData.get('first_name'))
   const lastName = optionalString(formData.get('last_name'))
@@ -834,7 +873,9 @@ export async function createAdminBookingAction(formData: FormData) {
   const depositAmount = parseOptionalNumber(formData.get('deposit_amount'))
   const notes = optionalString(formData.get('notes'))
 
-  const returnPath = '/admin/bookings/new'
+  const returnPath = managerOpportunityId
+    ? `/admin/bookings/new?opportunity=${encodeURIComponent(managerOpportunityId)}`
+    : '/admin/bookings/new'
 
   if (!firstName || !email || !eventName || !eventDate || !eventTime || !eventTimeZone) {
     redirectWithError(
@@ -964,19 +1005,55 @@ export async function createAdminBookingAction(formData: FormData) {
     redirectWithError(returnPath, bookingError?.message || 'Unable to create the booking.')
   }
 
-  await appendBookingTimelineNote(
-    admin,
-    booking.id,
-    'Booking created manually in Admin.'
-  )
+  let managerLinked = false
+
+  if (managerOpportunity) {
+    const { data: linkedOpportunity, error: managerLinkError } = await admin
+      .from('manager_opportunities')
+      .update({
+        linked_booking_id: booking.id,
+        status: 'booked',
+        booked_at: new Date().toISOString(),
+      })
+      .eq('id', managerOpportunity.id)
+      .is('linked_booking_id', null)
+      .select('id')
+      .maybeSingle()
+
+    managerLinked = Boolean(linkedOpportunity?.id) && !managerLinkError
+
+    await appendBookingTimelineNote(
+      admin,
+      booking.id,
+      managerLinked
+        ? `Booking created from Manager opportunity: ${managerOpportunity.title}.`
+        : `Booking created from Manager opportunity: ${managerOpportunity.title}. Manager link needs review.`
+    )
+  } else {
+    await appendBookingTimelineNote(
+      admin,
+      booking.id,
+      'Booking created manually in Admin.'
+    )
+  }
 
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/dashboard')
   revalidatePath('/admin/clients')
+  revalidatePath('/admin/manager')
+  if (managerOpportunity) {
+    revalidatePath(`/admin/manager/opportunities/${managerOpportunity.id}`)
+  }
   revalidatePath(`/admin/bookings/${booking.id}`)
 
+  const createdMessage = managerOpportunity
+    ? managerLinked
+      ? 'Booking created and linked to the Manager opportunity. Review the details, then confirm it when you are ready.'
+      : 'Booking created, but the Manager link needs review. Do not create another booking for this opportunity.'
+    : 'Booking created. Review the details, then confirm it when you are ready.'
+
   redirect(
-    `/admin/bookings/${booking.id}?success=${encodeURIComponent('Booking created. Review the details, then confirm it when you are ready.')}`
+    `/admin/bookings/${booking.id}?success=${encodeURIComponent(createdMessage)}`
   )
 }
 

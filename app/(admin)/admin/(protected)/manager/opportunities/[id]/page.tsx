@@ -22,6 +22,7 @@ type OpportunityDetail = ManagerOpportunityFormValue & {
   applied_at: string | null
   last_contacted_at: string | null
   booked_at: string | null
+  linked_booking_id?: string | null
   fit_score_breakdown?: {
     pay?: ScoreComponent
     travel?: ScoreComponent
@@ -249,6 +250,24 @@ export default async function ManagerOpportunityDetailPage({
           </div>
         </section>
       )}
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
+        {opportunity.linked_booking_id ? (
+          <Link
+            href={`/admin/bookings/${opportunity.linked_booking_id}`}
+            className="admin-btn-primary"
+          >
+            Open Linked Booking →
+          </Link>
+        ) : (
+          <Link
+            href={`/admin/bookings/new?opportunity=${opportunity.id}`}
+            className="admin-btn-primary"
+          >
+            Create Booking From Opportunity
+          </Link>
+        )}
+      </div>
 
       {opportunity.source_url && (
         <div style={{ marginBottom: 16 }}>
