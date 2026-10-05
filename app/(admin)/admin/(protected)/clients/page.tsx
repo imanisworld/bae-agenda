@@ -5,7 +5,9 @@
 import Link from 'next/link'
 import PageHeader      from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
+import AdminPagination from '@/components/admin/AdminPagination'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
+import { normalizeAdminPage, paginateRows } from '@/lib/admin-pagination'
 
 interface ClientRow {
   id:             string
@@ -57,8 +59,14 @@ async function getClients(): Promise<ClientRow[]> {
   }
 }
 
-export default async function ClientsPage() {
+export default async function ClientsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ page?: string | string[] }>
+}) {
   const clients = await getClients()
+  const params = searchParams ? await searchParams : undefined
+  const clientPage = paginateRows(clients, normalizeAdminPage(params?.page))
 
   return (
     <div className="admin-page">
@@ -78,7 +86,8 @@ export default async function ClientsPage() {
             desc="Clients are created automatically when a booking request comes in."
           />
         ) : (
-          <div className="admin-table-wrap">
+          <>
+            <div className="admin-table-wrap">
             <table className="admin-table admin-table-stack">
               <thead>
                 <tr>
@@ -91,7 +100,7 @@ export default async function ClientsPage() {
                 </tr>
               </thead>
               <tbody>
-                {clients.map((c) => (
+                {clientPage.items.map((c) => (
                   <tr key={c.id}>
                     <td data-label="Name" style={{ fontWeight: 400 }}>
                       {c.first_name}{c.last_name ? ` ${c.last_name}` : ''}
@@ -109,7 +118,15 @@ export default async function ClientsPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+            <AdminPagination
+              pathname="/admin/clients"
+              page={clientPage.page}
+              totalPages={clientPage.totalPages}
+              totalItems={clientPage.totalItems}
+              pageSize={clientPage.pageSize}
+            />
+          </>
         )}
       </div>
     </div>
