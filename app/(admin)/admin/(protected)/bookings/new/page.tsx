@@ -59,7 +59,7 @@ export default async function NewBookingPage({
             <div>
               <span className="admin-section-title">Client</span>
               <p className="muted" style={{ margin: '6px 0 0', fontSize: '12px', lineHeight: 1.6 }}>
-                Existing clients are matched by email so you do not create duplicates.
+                Existing clients are matched by email so you do not create duplicates. No email? Leave it blank; you can still invoice and track payment, just not email them.
               </p>
             </div>
           </div>
@@ -78,8 +78,8 @@ export default async function NewBookingPage({
 
             <div className="admin-form-grid-two">
               <label style={{ display: 'grid', gap: '7px' }}>
-                <span className="admin-field-label">Email *</span>
-                <input name="email" type="email" required autoComplete="email" style={inputStyle()} />
+                <span className="admin-field-label">Email (optional)</span>
+                <input name="email" type="email" autoComplete="email" style={inputStyle()} />
               </label>
               <label style={{ display: 'grid', gap: '7px' }}>
                 <span className="admin-field-label">Phone</span>

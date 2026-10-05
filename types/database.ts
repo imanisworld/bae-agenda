@@ -75,7 +75,7 @@ export type Database = {
           id:         string
           first_name: string
           last_name:  string | null
-          email:      string
+          email:      string | null  // optional: some clients only give a name
           phone:      string | null
           notes:      string | null
           created_at: string

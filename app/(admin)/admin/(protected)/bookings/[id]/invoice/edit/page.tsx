@@ -103,11 +103,10 @@ export default async function EditInvoicePage({
             </label>
 
             <label>
-              <span className="admin-field-label">Client Email</span>
+              <span className="admin-field-label">Client Email (optional)</span>
               <input
                 name="client_email"
                 type="email"
-                required
                 defaultValue={invoice.client_email ?? ''}
                 disabled={locked}
               />

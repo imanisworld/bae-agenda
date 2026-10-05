@@ -836,14 +836,15 @@ export async function createAdminBookingAction(formData: FormData) {
 
   const returnPath = '/admin/bookings/new'
 
-  if (!firstName || !email || !eventName || !eventDate || !eventTime || !eventTimeZone) {
+  if (!firstName || !eventName || !eventDate || !eventTime || !eventTimeZone) {
     redirectWithError(
       returnPath,
-      'Client first name, email, event name, date, start time, and timezone are required.'
+      'Client first name, event name, date, start time, and timezone are required.'
     )
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  // Email is optional: some clients only give a name. Without one, nothing can be emailed.
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     redirectWithError(returnPath, 'Enter a valid client email address.')
   }
 
@@ -893,11 +894,13 @@ export async function createAdminBookingAction(formData: FormData) {
     redirectWithError(returnPath, 'Deposit cannot be greater than the quote.')
   }
 
-  const { data: existingClient, error: existingClientError } = await admin
-    .from('clients')
-    .select('id, first_name, last_name, phone')
-    .eq('email', email)
-    .maybeSingle()
+  const { data: existingClient, error: existingClientError } = email
+    ? await admin
+      .from('clients')
+      .select('id, first_name, last_name, phone')
+      .eq('email', email)
+      .maybeSingle()
+    : { data: null, error: null }
 
   if (existingClientError) {
     redirectWithError(returnPath, existingClientError.message || 'Unable to check the client record.')

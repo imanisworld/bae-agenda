@@ -179,11 +179,11 @@ export async function createInvoiceForEventAction(formData: FormData) {
   const email = optionalString(formData.get('email'))?.toLowerCase() ?? null
   const amount = parseOptionalNumber(formData.get('amount'))
 
-  if (!firstName || !email || amount === null) {
-    redirectWithError(returnPath, 'Who is paying (name and email) and the amount are required to invoice this event.')
+  if (!firstName || amount === null) {
+    redirectWithError(returnPath, 'Who is paying (name) and the amount are required to invoice this event.')
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email as string)) {
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     redirectWithError(returnPath, 'Enter a valid email address for who is paying.')
   }
 
@@ -207,11 +207,13 @@ export async function createInvoiceForEventAction(formData: FormData) {
     redirect(`/admin/bookings/${event.booking_id}/invoice`)
   }
 
-  const { data: existingClient, error: existingClientError } = await admin
-    .from('clients')
-    .select('id')
-    .eq('email', email as string)
-    .maybeSingle()
+  const { data: existingClient, error: existingClientError } = email
+    ? await admin
+      .from('clients')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle()
+    : { data: null, error: null }
 
   if (existingClientError) {
     redirectWithError(returnPath, existingClientError.message || 'Unable to check the client record.')
@@ -414,7 +416,6 @@ export async function updateInvoiceDetailsAction(formData: FormData) {
     !bookingId ||
     !eventName ||
     !clientName ||
-    !clientEmail ||
     depositAmount === null ||
     !paymentTerms ||
     !lineItems ||
@@ -422,7 +423,7 @@ export async function updateInvoiceDetailsAction(formData: FormData) {
   ) {
     redirectWithError(
       bookingId ? `/admin/bookings/${bookingId}/invoice/edit` : '/admin/invoices',
-      'Client, event, email, payment terms, deposit, and at least one valid line item are required.'
+      'Client, event, payment terms, deposit, and at least one valid line item are required.'
     )
   }
 

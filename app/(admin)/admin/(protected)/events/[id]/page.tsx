@@ -205,8 +205,8 @@ export default async function EditEventPage({
               </div>
               <div className="admin-form-grid-two">
                 <label style={{ display: 'grid', gap: '7px' }}>
-                  <span className="admin-field-label">Email *</span>
-                  <input name="email" type="email" required autoComplete="off" style={inputStyle()} />
+                  <span className="admin-field-label">Email (optional)</span>
+                  <input name="email" type="email" autoComplete="off" style={inputStyle()} />
                 </label>
                 <label style={{ display: 'grid', gap: '7px' }}>
                   <span className="admin-field-label">Amount (USD) *</span>
