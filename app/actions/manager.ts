@@ -83,7 +83,10 @@ const OpportunitySchema = z.object({
   compensation_min: OptionalMoney,
   compensation_max: OptionalMoney,
   compensation_notes: z.string().trim().max(2000).optional().default(''),
-  expected_work_hours: OptionalNumber,
+  expected_work_hours: OptionalNumber.refine(
+    (value) => value === null || value > 0,
+    'Expected work hours must be greater than zero.'
+  ),
   travel_minutes: OptionalInteger,
   travel_miles: OptionalNumber,
   travel_cost_estimate: OptionalMoney,
