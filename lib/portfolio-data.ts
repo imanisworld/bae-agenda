@@ -15,8 +15,8 @@ export const SELECTED_WORK: SelectedWorkItem[] = [
     category: 'Recurring Night',
     year: '2025',
     location: 'Indianapolis, IN',
-    summary: "A recurring nightlife series centering Black queer women — parties open to everyone. Built on community, good music, and a room that knows how to move. Started May 8, 2025.",
-    highlights: ['Monthly run', 'Community-centered', 'Blind Tiger Indy'],
+    summary: "A nightlife series centering Black women — parties open to everyone. Co-created by DJ B.A.E., Brooke Billions, and Slim. Built on community, good music, and a room that knows how to move. Started May 8, 2025 at Blind Tiger Indy.",
+    highlights: ['Co-created', 'Community-centered', 'Indianapolis'],
   },
   {
     id: 'work-bae-billions',
@@ -30,11 +30,11 @@ export const SELECTED_WORK: SelectedWorkItem[] = [
   {
     id: 'work-1',
     title: 'Club Plex',
-    category: 'Nightlife',
+    category: 'Residency',
     year: '2024–2025',
     location: 'Indianapolis, IN',
-    summary: 'DJ appearances at Club Plex in Indianapolis, with open-format sets built around the room and the crowd.',
-    highlights: ['Nightlife', 'Open format', 'Indianapolis'],
+    summary: "Former resident DJ at Club Plex in Indianapolis — open-format sets built around the room and the crowd, including the live New Year's Eve 2024 set.",
+    highlights: ['Former resident', 'Open format', 'Indianapolis'],
   },
 ]
 
@@ -55,7 +55,7 @@ export const GIG_HISTORY: GigItem[] = [
   {
     id:       'gig-chi-chis',
     title:    "Chi Chi's",
-    venue:    'Blind Tiger Indy',
+    venue:    'Various (first night at Blind Tiger Indy)',
     city:     'Indianapolis, IN',
     date:     'May 2025 — Ongoing',
     year:     '2025',
@@ -79,7 +79,7 @@ export const GIG_HISTORY: GigItem[] = [
     city:     'Indianapolis, IN',
     date:     '2024 — 2025',
     year:     '2024',
-    tags:     ['Open Format', 'Nightlife'],
+    tags:     ['Residency', 'Open Format', 'Nightlife'],
     featured: false,
   },
 ]
