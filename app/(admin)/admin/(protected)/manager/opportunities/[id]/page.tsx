@@ -9,6 +9,7 @@ import { addManagerOpportunityActivityAction } from '@/app/actions/manager-activ
 import { prepareManagerOutreachAction, saveManagerOutreachDraftAction } from '@/app/actions/manager-outreach'
 import { dispatchManagerOutreachAction } from '@/app/actions/manager-dispatch'
 import { dispatchManagerFollowUpAction } from '@/app/actions/manager-follow-up'
+import { recordManagerNegotiationDecisionAction } from '@/app/actions/manager-negotiation'
 import {
   MANAGER_ACTIVITY_TYPES,
   MANAGER_ACTIVITY_TYPE_LABELS,
@@ -32,8 +33,15 @@ import {
   managerFollowUpActionLabel,
   managerFollowUpUrgency,
 } from '@/lib/manager-follow-up'
+import { buildManagerNegotiation } from '@/lib/manager-negotiation'
 
 type ScoreComponent = { score?: number; max?: number; note?: string }
+
+type NegotiationProfile = {
+  minimum_fee: number | null
+  target_hourly_rate: number | null
+  max_drive_minutes: number | null
+}
 
 type ActivityRow = {
   id: string
@@ -124,6 +132,25 @@ function fmtTimestamp(value: string | null) {
   })
 }
 
+async function getNegotiationProfile(): Promise<NegotiationProfile> {
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('manager_profiles')
+    .select('minimum_fee, target_hourly_rate, max_drive_minutes')
+    .eq('profile_key', 'dj_bae')
+    .maybeSingle()
+
+  if (error || !data) {
+    return {
+      minimum_fee: null,
+      target_hourly_rate: null,
+      max_drive_minutes: null,
+    }
+  }
+
+  return data as NegotiationProfile
+}
+
 async function getActivities(id: string): Promise<ActivityRow[]> {
   const admin = createAdminClient()
   const { data, error } = await admin
@@ -174,9 +201,10 @@ export default async function ManagerOpportunityDetailPage({
 }) {
   const { id } = await params
   const query = searchParams ? await searchParams : undefined
-  const [opportunity, activities] = await Promise.all([
+  const [opportunity, activities, negotiationProfile] = await Promise.all([
     getOpportunity(id),
     getActivities(id),
+    getNegotiationProfile(),
   ])
   if (!opportunity) notFound()
 
@@ -190,6 +218,10 @@ export default async function ManagerOpportunityDetailPage({
   const followUpDraft = followUpEligible
     ? buildManagerFollowUpDraft(opportunity)
     : null
+  const negotiation =
+    status === 'negotiating'
+      ? buildManagerNegotiation(negotiationProfile, opportunity)
+      : null
 
   return (
     <div className="admin-page admin-page--narrow">
@@ -280,6 +312,107 @@ export default async function ManagerOpportunityDetailPage({
           </p>
         )}
       </section>
+
+      {negotiation && (
+        <section className="admin-section" style={{ marginBottom: 16 }}>
+          <div className="admin-section-header">
+            <span className="admin-section-title">Negotiation Assistant</span>
+            <span className="muted">Recommendation: {negotiation.label}</span>
+          </div>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+              gap: 1,
+              background: 'var(--border)',
+              marginBottom: 14,
+            }}
+          >
+            {[
+              ['Current Offer', fmtMoney(opportunity.compensation_min)],
+              ['Minimum Fee', fmtMoney(negotiationProfile.minimum_fee)],
+              ['Effective Rate', opportunity.effective_hourly_rate == null ? '—' : `${fmtMoney(opportunity.effective_hourly_rate)}/hr`],
+              ['Target Rate', negotiationProfile.target_hourly_rate == null ? '—' : `${fmtMoney(negotiationProfile.target_hourly_rate)}/hr`],
+              ['Suggested Counter', fmtMoney(negotiation.suggested_counter_fee)],
+            ].map(([label, value]) => (
+              <div key={String(label)} style={{ background: 'var(--surface)', padding: '14px 16px' }}>
+                <div style={{ color: 'var(--muted)', fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
+                  {label}
+                </div>
+                <div style={{ color: 'var(--white)', fontSize: 12 }}>{value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ display: 'grid', gap: 6, marginBottom: 14 }}>
+            {negotiation.reasons.map((reason) => (
+              <div key={reason} className="muted" style={{ fontSize: 11, lineHeight: 1.55 }}>
+                {reason}
+              </div>
+            ))}
+            {negotiation.missing.length > 0 && (
+              <div className="muted" style={{ fontSize: 11 }}>
+                Missing: {negotiation.missing.join(', ')}
+              </div>
+            )}
+          </div>
+
+          <form action={recordManagerNegotiationDecisionAction}>
+            <input type="hidden" name="opportunity_id" value={opportunity.id} />
+
+            <div className="admin-form-grid-two" style={{ marginBottom: 12 }}>
+              <label style={{ display: 'grid', gap: 7 }}>
+                <span className="admin-field-label">Decision</span>
+                <select
+                  name="decision"
+                  defaultValue={negotiation.decision}
+                  className="admin-input"
+                >
+                  <option value="accept">Accept</option>
+                  <option value="counter">Counter</option>
+                  <option value="pass">Pass</option>
+                  <option value="needs_info">Needs Info</option>
+                </select>
+              </label>
+
+              <label style={{ display: 'grid', gap: 7 }}>
+                <span className="admin-field-label">Proposed Fee</span>
+                <input
+                  name="proposed_fee"
+                  type="number"
+                  min={0}
+                  step="25"
+                  defaultValue={negotiation.suggested_counter_fee ?? ''}
+                  className="admin-input"
+                  placeholder="Optional"
+                />
+              </label>
+            </div>
+
+            <label style={{ display: 'grid', gap: 7, marginBottom: 12 }}>
+              <span className="admin-field-label">Negotiation Note / Counter Draft</span>
+              <textarea
+                name="note"
+                rows={9}
+                defaultValue={negotiation.counter_draft ?? ''}
+                className="admin-input"
+                style={{ minHeight: 190, resize: 'vertical', lineHeight: 1.6 }}
+                placeholder="Add the terms, response, or editable counter message you want preserved in the timeline."
+              />
+            </label>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <span className="muted" style={{ fontSize: 10 }}>
+                Records the decision and terms only. It does not send a message or create a booking.
+              </span>
+              <button type="submit" className="admin-btn-primary">
+                Record Negotiation Decision
+              </button>
+            </div>
+          </form>
+        </section>
+      )}
 
       {opportunity.fit_score_breakdown && (
         <section className="admin-section" style={{ marginBottom: 16 }}>
