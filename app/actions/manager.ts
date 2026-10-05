@@ -13,6 +13,7 @@ import {
 import { createAdminClient } from '@/lib/supabase/admin'
 import { scoreManagerOpportunity } from '@/lib/manager-scoring'
 import { calculateManagerEconomics } from '@/lib/manager-economics'
+import { logManagerOpportunityActivity } from '@/lib/manager-activity'
 
 const OptionalDate = z
   .string()
@@ -291,6 +292,17 @@ export async function createManagerOpportunityAction(formData: FormData) {
     redirectWithError('/admin/manager/opportunities/new', managerDbError(error))
   }
 
+  await logManagerOpportunityActivity(admin, {
+    opportunityId: data.id,
+    activityType: 'created',
+    title: 'Opportunity added to Manager',
+    body: parsed.data.source_reference || 'Opportunity created manually in Manager.',
+    metadata: {
+      source_type: parsed.data.source_type,
+      initial_status: parsed.data.status,
+    },
+  })
+
   revalidatePath('/admin/manager')
   redirect(`/admin/manager/opportunities/${data.id}?success=${encodeURIComponent('Opportunity added.')}`)
 }
@@ -351,6 +363,18 @@ export async function updateManagerOpportunityAction(formData: FormData) {
 
   if (error) {
     redirectWithError(`/admin/manager/opportunities/${id}`, managerDbError(error))
+  }
+
+  if (statusChanged) {
+    await logManagerOpportunityActivity(admin, {
+      opportunityId: id,
+      activityType: 'status_change',
+      title: 'Pipeline status changed',
+      body: `${current.status} → ${parsed.data.status}`,
+      occurredAt: now,
+      fromStatus: current.status,
+      toStatus: parsed.data.status,
+    })
   }
 
   revalidatePath('/admin/manager')
