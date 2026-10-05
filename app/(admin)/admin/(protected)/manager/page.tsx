@@ -220,6 +220,57 @@ export default async function ManagerPage() {
         </Link>
       </div>
 
+      <section id="today" className="admin-section" style={{ marginBottom: 24 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Today</span>
+          <span className="muted">
+            {todayQueue.total > todayQueue.entries.length
+              ? `Top ${todayQueue.entries.length} of ${todayQueue.total} actions`
+              : `${todayQueue.total} action${todayQueue.total === 1 ? '' : 's'}`}
+          </span>
+        </div>
+
+        {todayQueue.entries.length === 0 ? (
+          <AdminEmptyState
+            title="Nothing needs action right now"
+            desc="New leads, ready outreach, negotiations, and due follow-ups will surface here automatically."
+          />
+        ) : (
+          <div style={{ display: 'grid', gap: 1, background: 'var(--border)' }}>
+            {todayQueue.entries.map(({ item, label, dueOn }) => (
+              <Link
+                key={item.id}
+                href={`/admin/manager/opportunities/${item.id}`}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'minmax(0, 1fr) auto',
+                  gap: 12,
+                  alignItems: 'center',
+                  padding: '14px 16px',
+                  background: 'var(--surface)',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <strong style={{ display: 'block', fontSize: 12, fontWeight: 500 }}>{label}</strong>
+                  <span className="muted" style={{ display: 'block', fontSize: 10, lineHeight: 1.45, marginTop: 2 }}>
+                    {item.title}{item.organization ? ` · ${item.organization}` : ''}
+                    {dueOn ? ` · ${fmtDate(dueOn)}` : ''}
+                  </span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <ManagerStatusBadge status={item.status as ManagerOpportunityStatus} />
+                  <div className="muted" style={{ marginTop: 4, fontSize: 10 }}>
+                    {item.fit_score === null ? 'Fit —' : `Fit ${item.fit_score}`}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
+
       <div
         style={{
           display: 'grid',
@@ -245,57 +296,6 @@ export default async function ManagerPage() {
         ))}
       </div>
 
-      <section id="today" className="admin-section" style={{ marginBottom: 24 }}>
-        <div className="admin-section-header">
-          <span className="admin-section-title">Today</span>
-          <span className="muted">
-            {todayQueue.total > todayQueue.entries.length
-              ? `Top ${todayQueue.entries.length} of ${todayQueue.total} actions`
-              : `${todayQueue.total} action${todayQueue.total === 1 ? '' : 's'}`}
-          </span>
-        </div>
-
-        {todayQueue.entries.length === 0 ? (
-          <AdminEmptyState
-            title="Nothing needs action right now"
-            desc="New leads, ready outreach, negotiations, and due follow-ups will surface here automatically."
-          />
-        ) : (
-          <div style={{ display: 'grid', gap: 1, background: 'var(--border)' }}>
-            {todayQueue.entries.map(({ item, label, priority, dueOn }) => (
-              <Link
-                key={item.id}
-                href={`/admin/manager/opportunities/${item.id}`}
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: '20px minmax(0, 1fr) auto',
-                  gap: 12,
-                  alignItems: 'center',
-                  padding: '14px 16px',
-                  background: 'var(--surface)',
-                  color: 'inherit',
-                  textDecoration: 'none',
-                }}
-              >
-                <div style={{ fontSize: 10, color: 'var(--gold)' }}>{priority}</div>
-                <div style={{ minWidth: 0 }}>
-                  <strong style={{ display: 'block', fontSize: 12, fontWeight: 500 }}>{label}</strong>
-                  <span className="muted" style={{ fontSize: 10 }}>
-                    {item.title}{item.organization ? ` · ${item.organization}` : ''}
-                    {dueOn ? ` · ${fmtDate(dueOn)}` : ''}
-                  </span>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <ManagerStatusBadge status={item.status as ManagerOpportunityStatus} />
-                  <div className="muted" style={{ marginTop: 4, fontSize: 10 }}>
-                    {item.fit_score === null ? 'Fit —' : `Fit ${item.fit_score}`}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
-      </section>
 
       {!data.profileReady && data.configured && (
         <div className="admin-preview-banner" style={{ marginBottom: 18 }}>
