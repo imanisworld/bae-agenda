@@ -106,9 +106,9 @@ export const PAYMENT_TYPES   = ['deposit', 'balance', 'full', 'refund'] as const
 // on SoundCloud and it appears in the Lab — no admin entry needed.
 export const LAB_CRATES = [
   { key: 'mixes',   label: 'Mixes',     url: 'https://soundcloud.com/deejaybae/sets/mixes'    },
+  { key: 'kiss',    label: 'Kiss P.2',  url: 'https://soundcloud.com/deejaybae/sets/songs-that-should-kiss-p2' },
   { key: 'mashups', label: 'Mashups',   url: 'https://soundcloud.com/deejaybae/sets/mashups'  },
   { key: 'edits',   label: 'Edits P.1', url: 'https://soundcloud.com/deejaybae/sets/edit-p-1' },
-  { key: 'kiss',    label: 'Kiss P.2',  url: 'https://soundcloud.com/deejaybae/sets/songs-that-should-kiss-p2' },
 ] as const
 
 export const SOCIALS = [
