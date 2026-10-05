@@ -40,7 +40,7 @@ This is observability only and does not alter booking state or resend messages a
 - Punch Bowl Social Galentine's 2027: warm rebook scheduled
 - Level Up Walkathon 2027: high-confidence warm rebook; prior organizer interest in having DJ B.A.E. back next year is recorded
 
-Grok has authenticated X access for secondary scouting. Grok findings remain candidate signals and must be verified before becoming actionable Manager leads.
+Grok has authenticated X access for secondary scouting and Resend access. X findings remain candidate signals and must be verified before becoming actionable Manager leads. Resend access does not change the safety rule: no autonomous outreach or sending.
 
 ## Deployment State
 
