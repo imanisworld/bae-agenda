@@ -1,6 +1,7 @@
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
+import { PDFDocument, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
 import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
 import { getPaymentInstructionTextLines } from '@/lib/payment-instructions'
+import { brand, drawBrandFooter, drawBrandHeader, loadBrand } from '@/lib/pdf-brand'
 
 export interface InvoiceBookingData {
   id: string
@@ -230,7 +231,7 @@ function drawRule(page: PDFPage, y: number) {
     start: { x: PAGE.marginX, y },
     end: { x: PAGE.width - PAGE.marginX, y },
     thickness: 1,
-    color: rgb(0.87, 0.87, 0.9),
+    color: brand.rule,
   })
 }
 
@@ -268,12 +269,12 @@ export async function generateInvoicePdf(
 ) {
   const pdf = await PDFDocument.create()
   const page = pdf.addPage([PAGE.width, PAGE.height])
-  const fontRegular = await pdf.embedFont(StandardFonts.Helvetica)
-  const fontBold = await pdf.embedFont(StandardFonts.HelveticaBold)
+  const brandAssets = await loadBrand(pdf)
+  const { regular: fontRegular, bold: fontBold, heading: fontHeading } = brandAssets.fonts
 
-  const violet = rgb(0.52, 0.33, 0.87)
-  const muted = rgb(0.42, 0.42, 0.48)
-  const black = rgb(0.08, 0.08, 0.08)
+  const violet = brand.oxblood
+  const muted = brand.muted
+  const black = brand.ink
 
   const clientName = clientNameOf(booking)
   const eventDate = formatEventDate(booking.event_date, booking.event_timezone, {
@@ -294,57 +295,26 @@ export async function generateInvoicePdf(
     total
   )
 
-  page.drawText('DJ ', {
-    x: PAGE.marginX,
-    y: PAGE.top,
-    size: 20,
-    font: fontBold,
-    color: black,
-  })
-  page.drawText('B.A.E.', {
-    x: PAGE.marginX + 28,
-    y: PAGE.top,
-    size: 20,
-    font: fontBold,
-    color: violet,
-  })
+  drawBrandHeader(page, brandAssets)
 
-  drawTextBlock(page, 'Imani Crumble\nThe Bae Agenda\n8320 Berrybush Lane\nIndianapolis, IN 46345\nbaebookings@proton.me', {
-    x: PAGE.marginX,
-    y: PAGE.top - 24,
-    width: 220,
-    font: fontRegular,
-    size: 11,
-    color: muted,
-    lineGap: 3,
+  const invoiceMeta = [`INVOICE #${invoiceNumber}`, formatDate(new Date().toISOString())]
+  invoiceMeta.forEach((text, index) => {
+    const font = index === 0 ? fontBold : fontRegular
+    page.drawText(text, {
+      x: PAGE.width - PAGE.marginX - font.widthOfTextAtSize(text, 10),
+      y: PAGE.top - 94 - index * 15,
+      size: 10,
+      font,
+      color: index === 0 ? violet : muted,
+    })
   })
-
-  page.drawText('EVENT INVOICE', {
-    x: PAGE.width - 176,
-    y: PAGE.top,
-    size: 18,
-    font: fontBold,
-    color: violet,
-  })
-
-  drawTextBlock(page, `#${invoiceNumber}\n${formatDate(new Date().toISOString())}`, {
-    x: PAGE.width - 176,
-    y: PAGE.top - 24,
-    width: 120,
-    font: fontRegular,
-    size: 11,
-    color: muted,
-    lineGap: 3,
-  })
-
-  drawRule(page, PAGE.top - 66)
 
   page.drawText('BILL TO', {
     x: PAGE.marginX,
     y: PAGE.top - 94,
     size: 9,
-    font: fontBold,
-    color: muted,
+    font: fontHeading,
+    color: violet,
   })
 
   let billToY = PAGE.top - 114
@@ -357,21 +327,16 @@ export async function generateInvoicePdf(
     color: black,
   })
 
-  const billToDetails = [booking.clients?.email, booking.clients?.phone]
-    .filter(Boolean)
-    .join('\n')
-
-  if (billToDetails) {
-    drawTextBlock(page, billToDetails, {
+  const billToDetails = [booking.clients?.email, booking.clients?.phone].filter(Boolean) as string[]
+  billToDetails.forEach((detail, index) => {
+    page.drawText(detail, {
       x: PAGE.marginX,
-      y: billToY - 2,
-      width: 240,
-      font: fontRegular,
+      y: billToY - 2 - index * 14,
       size: 11,
+      font: fontRegular,
       color: muted,
-      lineGap: 3,
     })
-  }
+  })
 
   let y = PAGE.top - 188
   y = drawLabelValueRow(page, 'Event', booking.event_name ?? '-', y, fontBold, fontRegular)
@@ -390,8 +355,8 @@ export async function generateInvoicePdf(
     x: PAGE.marginX,
     y,
     size: 9,
-    font: fontBold,
-    color: muted,
+    font: fontHeading,
+    color: violet,
   })
   y -= 20
 
@@ -467,11 +432,18 @@ export async function generateInvoicePdf(
 
   y -= 28
   drawRule(page, y + 12)
-  page.drawText('Balance Due', {
-    x: PAGE.width - PAGE.marginX - 160,
+  page.drawRectangle({
+    x: PAGE.width - PAGE.marginX - 214,
+    y: y - 8,
+    width: 214,
+    height: 26,
+    color: brand.cream,
+  })
+  page.drawText('BALANCE DUE', {
+    x: PAGE.width - PAGE.marginX - 206,
     y,
-    size: 13,
-    font: fontBold,
+    size: 10,
+    font: fontHeading,
     color: muted,
   })
   page.drawText(formatCurrency(balance), {
@@ -488,8 +460,8 @@ export async function generateInvoicePdf(
       x: PAGE.marginX,
       y: notesY,
       size: 9,
-      font: fontBold,
-      color: muted,
+      font: fontHeading,
+      color: violet,
     })
     notesY -= 18
     drawTextBlock(page, booking.notes, {
@@ -513,15 +485,19 @@ export async function generateInvoicePdf(
     paymentTerms,
   ].join('\n')
 
-  drawTextBlock(page, invoiceFooter, {
-    x: PAGE.marginX,
-    y: PAGE.bottom + 44,
-    width: PAGE.width - PAGE.marginX * 2,
-    font: fontRegular,
-    size: 10,
-    color: muted,
-    lineGap: 3,
-  })
+  const footerWidth = PAGE.width - PAGE.marginX * 2
+  const footerLines = invoiceFooter
+    .split('\n')
+    .flatMap((paragraph) => (paragraph ? wrapText(paragraph, footerWidth, fontRegular, 9) : ['']))
+  let footerY = 54 + (footerLines.length - 1) * 12
+  for (const footerLine of footerLines) {
+    if (footerLine) {
+      page.drawText(footerLine, { x: PAGE.marginX, y: footerY, size: 9, font: fontRegular, color: muted })
+    }
+    footerY -= 12
+  }
+
+  drawBrandFooter(page, brandAssets.fonts)
 
   return pdf.save()
 }
