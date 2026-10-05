@@ -33,6 +33,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Invoice PDFs read the logo and heading font from disk at request time.
+  outputFileTracingIncludes: {
+    '/api/invoice/**': ['./lib/pdf-assets/**'],
+  },
   async redirects() {
     return [
       { source: '/experience', destination: '/portfolio', permanent: true },

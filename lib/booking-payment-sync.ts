@@ -52,5 +52,15 @@ export async function syncComputedBookingPaymentState(admin: any, bookingId: str
     return null
   }
 
+  // Keep the invoice in step with the money: paid bookings show a paid invoice,
+  // and a refund that reopens the balance puts it back to sent.
+  const invoiceUpdate = paymentStatus === 'paid'
+    ? admin.from('invoices').update({ status: 'paid' }).eq('booking_id', bookingId).in('status', ['draft', 'sent'])
+    : admin.from('invoices').update({ status: 'sent' }).eq('booking_id', bookingId).eq('status', 'paid')
+  const { error: invoiceError } = await invoiceUpdate
+  if (invoiceError) {
+    console.error('[booking-payment-sync] unable to update invoice status:', invoiceError.message ?? invoiceError)
+  }
+
   return { lifecycleStatus, paymentStatus: paymentStatus as BookingWorkflowPaymentStatus }
 }

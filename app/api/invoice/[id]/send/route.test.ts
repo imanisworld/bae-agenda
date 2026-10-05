@@ -36,6 +36,7 @@ vi.mock('@/lib/invoices', () => ({
   balanceDueOf: () => 800,
   formatInvoiceDueDate: () => null,
   generateInvoicePdf: mocks.generateInvoicePdf,
+  getInvoicePaidStamp: () => null,
   invoiceFilename: () => 'invoice.pdf',
   invoiceNumberOf: () => 'BAE-1001',
   normalizeInvoiceLineItems: () => [],

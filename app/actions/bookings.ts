@@ -880,14 +880,15 @@ export async function createAdminBookingAction(formData: FormData) {
     ? `/admin/bookings/new?opportunity=${encodeURIComponent(managerOpportunityId)}`
     : '/admin/bookings/new'
 
-  if (!firstName || !email || !eventName || !eventDate || !eventTime || !eventTimeZone) {
+  if (!firstName || !eventName || !eventDate || !eventTime || !eventTimeZone) {
     redirectWithError(
       returnPath,
-      'Client first name, email, event name, date, start time, and timezone are required.'
+      'Client first name, event name, date, start time, and timezone are required.'
     )
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  // Email is optional: some clients only give a name. Without one, nothing can be emailed.
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     redirectWithError(returnPath, 'Enter a valid client email address.')
   }
 
@@ -937,11 +938,13 @@ export async function createAdminBookingAction(formData: FormData) {
     redirectWithError(returnPath, 'Deposit cannot be greater than the quote.')
   }
 
-  const { data: existingClient, error: existingClientError } = await admin
-    .from('clients')
-    .select('id, first_name, last_name, phone')
-    .eq('email', email)
-    .maybeSingle()
+  const { data: existingClient, error: existingClientError } = email
+    ? await admin
+      .from('clients')
+      .select('id, first_name, last_name, phone')
+      .eq('email', email)
+      .maybeSingle()
+    : { data: null, error: null }
 
   if (existingClientError) {
     redirectWithError(returnPath, existingClientError.message || 'Unable to check the client record.')
@@ -1781,10 +1784,25 @@ export async function markFullyPaidAction(formData: FormData) {
   const admin = createAdminClient()
   const bookingId = optionalString(formData.get('booking_id'))
   if (!bookingId) redirectWithError('/admin/bookings', 'Missing booking ID.')
+  // Lets the event page reuse this action and land back where it started.
+  const returnToRaw = optionalString(formData.get('return_to'))
+  const returnTo = returnToRaw && /^\/admin\/[\w\-/]+$/.test(returnToRaw) ? returnToRaw : `/admin/bookings/${bookingId}`
   const paymentReference = actionAttemptReference('quick-balance', bookingId as string, formData.get('payment_attempt_id'))
   if (!paymentReference) {
-    redirectWithError(`/admin/bookings/${bookingId}`, 'Refresh the page and try recording the final payment again.')
+    redirectWithError(returnTo, 'Refresh the page and try recording the final payment again.')
   }
+
+  const methodRaw = optionalString(formData.get('method'))
+  if (methodRaw && !isPaymentMethod(methodRaw)) {
+    redirectWithError(returnTo, 'Invalid payment method.')
+  }
+
+  // A bare date from <input type="date"> is pinned to midday UTC so it never
+  // shows up as the day before in US time zones.
+  const paidOnRaw = optionalString(formData.get('paid_on'))
+  const paidAt = paidOnRaw && /^\d{4}-\d{2}-\d{2}$/.test(paidOnRaw)
+    ? new Date(`${paidOnRaw}T12:00:00Z`).toISOString()
+    : new Date().toISOString()
 
   const { data: booking, error } = await admin
     .from('bookings')
@@ -1793,7 +1811,7 @@ export async function markFullyPaidAction(formData: FormData) {
     .maybeSingle()
 
   if (error || !booking) {
-    redirectWithError(`/admin/bookings/${bookingId}`, error?.message || 'Unable to load booking payment state.')
+    redirectWithError(returnTo, error?.message || 'Unable to load booking payment state.')
   }
 
   const bookingRecord = booking as NonNullable<typeof booking>
@@ -1803,7 +1821,7 @@ export async function markFullyPaidAction(formData: FormData) {
   )
 
   if (remainingBalance <= 0) {
-    redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Booking is already fully paid.')}`)
+    redirect(`${returnTo}?success=${encodeURIComponent('Already paid in full.')}`)
   }
 
   const { error: paymentError } = await admin
@@ -1812,10 +1830,11 @@ export async function markFullyPaidAction(formData: FormData) {
       booking_id: bookingId as string,
       amount: remainingBalance,
       type: 'balance',
+      method: (methodRaw as PaymentMethod | null) ?? null,
       status: 'received',
-      paid_at: new Date().toISOString(),
+      paid_at: paidAt,
       external_reference: paymentReference,
-      notes: 'Balance marked received from booking workflow quick action.',
+      notes: 'Marked paid in full from admin. No email sent.',
     })
 
   if (paymentError) {
@@ -1826,10 +1845,10 @@ export async function markFullyPaidAction(formData: FormData) {
       revalidatePath('/admin/bookings')
       revalidatePath('/admin/payments')
       revalidatePath('/admin/dashboard')
-      redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Final payment was already recorded.')}`)
+      redirect(`${returnTo}?success=${encodeURIComponent('Final payment was already recorded.')}`)
     }
 
-    redirectWithError(`/admin/bookings/${bookingId}`, paymentError.message || 'Unable to record the final payment.')
+    redirectWithError(returnTo, paymentError.message || 'Unable to record the final payment.')
   }
 
   await syncComputedBookingPaymentState(admin, bookingId as string)
@@ -1838,7 +1857,8 @@ export async function markFullyPaidAction(formData: FormData) {
   revalidatePath('/admin/bookings')
   revalidatePath('/admin/payments')
   revalidatePath('/admin/dashboard')
-  redirect(`/admin/bookings/${bookingId}?success=${encodeURIComponent('Booking marked as fully paid.')}`)
+  revalidatePath('/admin/events', 'layout')
+  redirect(`${returnTo}?success=${encodeURIComponent('Marked paid in full. No email was sent.')}`)
 }
 
 export async function markBookingCompleteAction(formData: FormData) {

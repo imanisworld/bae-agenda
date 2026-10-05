@@ -7,11 +7,12 @@ import AdminNotice from '@/components/admin/AdminNotice'
 import BookingPricingFields from '@/components/admin/BookingPricingFields'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
+import MarkPaidForm from '@/components/admin/MarkPaidForm'
 import { getBookingFinancialSnapshot } from '@/lib/booking-finance'
 import { formatPaymentMethodLabel, getDepositConfirmedVia, getDepositPaidAt } from '@/lib/booking-deposit'
 import { getBookingWorkflowPaymentStatus, getBookingLifecycleStatus } from '@/lib/booking-workflow'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
-import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, createEventFromBookingAction, updateBookingPaymentAction, deleteBookingAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, markFullyPaidAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
+import { confirmBookingAction, createBookingNoteAction, createBookingPaymentAction, createEventFromBookingAction, updateBookingPaymentAction, deleteBookingAction, markBookingCompleteAction, markBookingContactedAction, markBookingLostAction, markDepositReceivedAction, requestFinalPaymentAction, resendBookingConfirmationAction, resendBookingInquiryReceiptAction, resendBookingPostEventFollowUpAction, sendBookingBalanceReminderAction, sendBookingReviewRequestAction, updateBookingDetailsAction, updatePortalRequestStatusAction } from '@/app/actions/bookings'
 import { confirmManualDepositAction } from '@/app/actions/deposits'
 import { createInvoiceFromBookingAction } from '@/app/actions/invoices'
 import { getEventInputDateTime } from '@/lib/date-time'
@@ -234,7 +235,6 @@ export default async function EditBookingPage({
   const manualDepositConfirmationId = randomUUID()
   const paymentLogAttemptId = randomUUID()
   const markDepositAttemptId = randomUUID()
-  const markFullyPaidAttemptId = randomUUID()
   const inquiryReceiptEmailAttemptId = randomUUID()
   const confirmationEmailAttemptId = randomUUID()
   const balanceReminderEmailAttemptId = randomUUID()
@@ -345,6 +345,17 @@ export default async function EditBookingPage({
         </div>
       </div>
 
+      {lifecycleStatus !== 'lost' && outstandingBalance > 0 && (
+        <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
+          <div className="admin-section-title" style={{ marginBottom: '6px' }}>Got Paid?</div>
+          <p className="muted" style={{ fontSize: '12px', lineHeight: 1.6, margin: '0 0 14px' }}>
+            {formatCurrency(outstandingBalance)} still open. Use this if you were paid at the gig, in cash, or without a deposit.
+            It records the payment and marks the invoice paid. Nothing is emailed. For a partial amount, use Log Payment below.
+          </p>
+          <MarkPaidForm bookingId={booking.id} balance={outstandingBalance} />
+        </div>
+      )}
+
       {lifecycleStatus !== 'completed' && lifecycleStatus !== 'lost' && (
         <div className="admin-section" style={{ padding: '24px', marginBottom: '16px' }}>
           <div className="admin-section-title" style={{ marginBottom: '14px' }}>Next Step</div>
@@ -391,19 +402,6 @@ export default async function EditBookingPage({
                   className="admin-btn-primary"
                 >
                   Request Final Payment
-                </ConfirmSubmitButton>
-              </form>
-            )}
-
-            {lifecycleStatus === 'confirmed' && paymentStatus === 'balance_requested' && (
-              <form action={markFullyPaidAction}>
-                <input type="hidden" name="booking_id" value={booking.id} />
-                <input type="hidden" name="payment_attempt_id" value={markFullyPaidAttemptId} />
-                <ConfirmSubmitButton
-                  message="Record the remaining balance as received and mark this booking fully paid?"
-                  className="admin-btn-primary"
-                >
-                  Mark Fully Paid
                 </ConfirmSubmitButton>
               </form>
             )}
