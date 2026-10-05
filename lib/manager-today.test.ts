@@ -69,6 +69,19 @@ describe('buildManagerTodayQueue', () => {
     expect(entries[0].label).toBe('Resolve 2 blockers')
   })
 
+  it('defers future pre-outreach actions until their scheduled date', () => {
+    const { entries } = queue([
+      lead({
+        id: 'annual-rebook',
+        status: 'review',
+        next_action: 'Reach back out for next year',
+        next_action_at: '2026-11-15',
+      }),
+    ])
+
+    expect(entries).toEqual([])
+  })
+
   it('ignores stale outreach blockers once a lead is contacted', () => {
     const { entries } = queue([
       lead({ id: 'sent', status: 'applied', next_action_at: '2026-10-12', outreach_missing_items: ['mix'] }),

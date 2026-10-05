@@ -23,6 +23,8 @@ Create one Manager Today section ordered by:
 
 ## 2. Work eligible live leads
 
+Prioritize warm rebook leads from DJ B.A.E.'s own completed event history before equivalent cold leads when an annual, seasonal, or clearly recurring program is verified.
+
 For each direct-buyer lead:
 - verify the action route
 - refresh outreach prep
@@ -30,6 +32,7 @@ For each direct-buyer lead:
 - use follow-up workflow
 - log responses and negotiations
 - pass weak leads promptly
+- for past clients/events, preserve the prior relationship and schedule a re-engagement window instead of inventing a new event date
 
 ## 3. Discovery quality
 
