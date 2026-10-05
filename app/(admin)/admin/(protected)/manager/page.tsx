@@ -29,6 +29,9 @@ interface OpportunityRow {
   estimated_net_pay: number | null
   effective_hourly_rate: number | null
   economics_basis: string | null
+  outreach_prepared_at: string | null
+  outreach_missing_items: string[] | null
+  outreach_channel: string | null
   fit_score: number | null
   next_action: string | null
   next_action_at: string | null
@@ -84,6 +87,17 @@ function fmtEconomics(row: OpportunityRow) {
   return 'Incomplete'
 }
 
+function outreachLabel(row: OpportunityRow) {
+  if (!row.outreach_prepared_at) return 'Not prepped'
+  const missing = row.outreach_missing_items?.length ?? 0
+  if (missing > 0) return `Needs ${missing}`
+  if (row.outreach_channel === 'instagram_dm') return 'Ready · IG'
+  if (row.outreach_channel === 'web_form') return 'Ready · Web'
+  if (row.outreach_channel === 'application') return 'Ready · Apply'
+  if (row.outreach_channel === 'email') return 'Ready · Email'
+  return 'Ready'
+}
+
 function locationLabel(row: OpportunityRow) {
   const parts = [row.location_city, row.location_state].filter(Boolean)
   return parts.length ? parts.join(', ') : 'Unknown'
@@ -98,7 +112,7 @@ async function getManagerData(): Promise<ManagerData> {
     ] = await Promise.all([
       admin
         .from('manager_opportunities')
-        .select('id, title, organization, opportunity_type, status, location_city, location_state, event_date, application_deadline, compensation_min, compensation_max, recommended_demo, expected_work_hours, estimated_total_hours, estimated_net_pay, effective_hourly_rate, economics_basis, fit_score, next_action, next_action_at, created_at')
+        .select('id, title, organization, opportunity_type, status, location_city, location_state, event_date, application_deadline, compensation_min, compensation_max, recommended_demo, expected_work_hours, estimated_total_hours, estimated_net_pay, effective_hourly_rate, economics_basis, outreach_prepared_at, outreach_missing_items, outreach_channel, fit_score, next_action, next_action_at, created_at')
         .order('created_at', { ascending: false })
         .limit(100),
       admin
@@ -244,6 +258,7 @@ export default async function ManagerPage() {
                   <th>Location</th>
                   <th>Economics</th>
                   <th>Demo</th>
+                  <th>Outreach</th>
                   <th>Fit</th>
                   <th>Action</th>
                 </tr>
@@ -268,6 +283,7 @@ export default async function ManagerPage() {
                     <td data-label="Location" className="muted">{locationLabel(item)}</td>
                     <td data-label="Economics" className="muted">{fmtEconomics(item)}</td>
                     <td data-label="Demo" className="muted">{item.recommended_demo ?? '—'}</td>
+                    <td data-label="Outreach" className="muted">{outreachLabel(item)}</td>
                     <td data-label="Fit">
                       {item.fit_score === null ? '—' : `${item.fit_score}/100`}
                     </td>
