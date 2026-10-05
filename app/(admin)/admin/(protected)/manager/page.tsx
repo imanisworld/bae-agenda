@@ -193,6 +193,9 @@ export default async function ManagerPage() {
       )}
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
+        <a href="#today" className="admin-btn-primary">
+          Today
+        </a>
         <Link href="/admin/manager/profile" className="admin-btn-ghost">
           Manager Profile
         </Link>
