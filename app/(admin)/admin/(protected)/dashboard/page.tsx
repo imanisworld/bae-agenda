@@ -40,6 +40,7 @@ interface UpcomingEvent {
 
 interface PaymentReminder {
   id:           string
+  bookingId:    string
   booking_name: string
   amount:       number
   status:       PaymentStatus
@@ -62,6 +63,7 @@ interface BookingQueryRow {
 
 interface PaymentQueryRow {
   id: string
+  booking_id: string
   amount: number
   status: PaymentStatus
   type: string
@@ -114,7 +116,7 @@ async function getDashboardData() {
         .eq('public', true).gte('event_date', now)
         .order('event_date', { ascending: true }).limit(4),
       supabase.from('payments')
-        .select('id, amount, status, type, bookings(event_name)')
+        .select('id, booking_id, amount, status, type, bookings(event_name)')
         .eq('status', 'pending')
         .order('created_at', { ascending: false }).limit(5),
     ])
@@ -166,6 +168,7 @@ async function getDashboardData() {
         const booking = p.bookings?.[0] ?? null
         return {
           id:           p.id,
+          bookingId:    p.booking_id,
           booking_name: booking?.event_name ?? 'Unknown',
           amount:       p.amount,
           status:       p.status as PaymentStatus,
@@ -266,23 +269,27 @@ export default async function DashboardPage() {
           value={stats.upcomingEvents}
           sub="Scheduled"
           accent="violet"
+          href="/admin/events"
         />
         <StatCard
           label="Active Bookings"
           value={stats.activeBookings}
           sub="Confirmed"
           accent="violet"
+          href="/admin/bookings?filter=confirmed"
         />
         <StatCard
           label="New Inquiries"
           value={stats.pendingInquiries}
           sub="Needs response"
           accent="gold"
+          href="/admin/bookings"
         />
         <StatCard
           label="Total Clients"
           value={stats.totalClients}
           sub="All time"
+          href="/admin/clients"
         />
       </div>
 
@@ -315,7 +322,9 @@ export default async function DashboardPage() {
             <tbody>
               {recentBookings.map((b) => (
                 <tr key={b.id}>
-                  <td data-label="Event" style={{ fontWeight: 400 }}>{b.event_name}</td>
+                  <td data-label="Event" style={{ fontWeight: 400 }}>
+                    <Link href={`/admin/bookings/${b.id}`} className="admin-record-link">{b.event_name}</Link>
+                  </td>
                   <td data-label="Client" className="muted">{b.client_name ?? '—'}</td>
                   <td data-label="Date" className="muted">{fmtDate(b.event_date, b.event_timezone)}</td>
                   <td data-label="Status"><Badge variant={b.status} label={BOOKING_LIFECYCLE_STATUS_LABELS[b.status]} /></td>
@@ -363,7 +372,7 @@ export default async function DashboardPage() {
               }}>
                 <div>
                   <div style={{ fontSize: '13px', color: 'var(--white)', marginBottom: '4px' }}>
-                    {ev.title}
+                    <Link href={`/admin/events/${ev.id}`} className="admin-record-link">{ev.title}</Link>
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
                     {fmtDate(ev.event_date, ev.event_timezone ?? 'America/Indiana/Indianapolis')}{ev.venue ? ` · ${ev.venue}` : ''}
@@ -409,7 +418,7 @@ export default async function DashboardPage() {
               }}>
                 <div>
                   <div style={{ fontSize: '13px', color: 'var(--white)', marginBottom: '4px' }}>
-                    {p.booking_name}
+                    <Link href={`/admin/bookings/${p.bookingId}`} className="admin-record-link">{p.booking_name}</Link>
                   </div>
                   <div style={{
                     fontSize: '11px', color: 'var(--muted)', textTransform: 'capitalize',

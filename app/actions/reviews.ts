@@ -98,6 +98,7 @@ export async function approveReview(id: string) {
   await supabase.from('reviews').update({ approved: true }).eq('id', id)
   revalidatePath('/admin/reviews')
   revalidatePath('/')
+  revalidatePath('/book')
 }
 
 export async function rejectReview(id: string) {
@@ -106,4 +107,5 @@ export async function rejectReview(id: string) {
   await supabase.from('reviews').delete().eq('id', id)
   revalidatePath('/admin/reviews')
   revalidatePath('/')
+  revalidatePath('/book')
 }

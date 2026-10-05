@@ -3,23 +3,18 @@
  * Brand · navigation + bottom copyright bar.
  */
 import Link from 'next/link'
+import { PUBLIC_LEGAL_NAV, PUBLIC_NAV, PUBLIC_SECONDARY_NAV } from '@/lib/constants'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
 const NAV_LINKS = [
-  { label: 'Events',    href: '/events'        },
-  { label: 'Lab',       href: '/lab'           },
-  { label: 'Portfolio', href: '/portfolio'     },
-  { label: 'Meet',      href: '/meet'          },
-  { label: 'Book',      href: '/book'          },
-  { label: 'Contact',   href: '/book#contact'  },
-  { label: 'Built',     href: '/built'         },
-  { label: 'Press Kit', href: '/press-kit'     },
+  ...PUBLIC_NAV.filter((item) => item.href !== '/'),
+  ...PUBLIC_SECONDARY_NAV,
 ]
 
 export default function Footer() {
   return (
-    <footer aria-label="Site footer" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
+    <footer className="site-footer" aria-label="Site footer" style={{ background: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
       <style>{`
         @media (max-width: 680px) {
           .footer-body {
@@ -86,11 +81,7 @@ export default function Footer() {
           © {CURRENT_YEAR} DJ B.A.E. · The Bae Agenda. All rights reserved.
         </p>
         <nav aria-label="Legal and accessibility" style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          {[
-            { label: 'Privacy', href: '/privacy' },
-            { label: 'Terms', href: '/terms' },
-            { label: 'Accessibility', href: '/accessibility' },
-          ].map((item) => (
+          {PUBLIC_LEGAL_NAV.map((item) => (
             <Link
               key={item.href}
               href={item.href}

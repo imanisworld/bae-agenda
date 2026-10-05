@@ -20,8 +20,67 @@
 }
 
 .route,
-.status {
+.status,
+.more {
   pointer-events: auto;
+}
+
+.more {
+  position: relative;
+  justify-self: start;
+}
+
+.moreButton {
+  min-height: 32px;
+  padding: 0 2px;
+  border: 0;
+  background: transparent;
+  color: rgba(246,241,232,.62);
+  font: inherit;
+  font-size: 9px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.moreButtonActive,
+.moreButton[aria-expanded='true'] {
+  color: #f6f1e8;
+}
+
+.moreMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 2;
+  display: grid;
+  min-width: 168px;
+  padding: 6px;
+  border: 1px solid rgba(246,241,232,.13);
+  border-radius: 14px;
+  background: rgba(22,18,16,.94);
+  backdrop-filter: blur(22px) saturate(1.15);
+  box-shadow: 0 18px 46px rgba(0,0,0,.34);
+}
+
+.moreLink {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 9px;
+  color: rgba(246,241,232,.82);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.moreLink:hover,
+.moreLink:focus-visible,
+.moreLinkActive {
+  background: rgba(246,241,232,.08);
+  color: #f6f1e8;
 }
 
 .route {

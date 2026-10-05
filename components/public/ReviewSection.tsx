@@ -2,9 +2,9 @@
  * REVIEW SECTION — Server Component
  * Shows approved reviews from Supabase as social proof.
  * Renders nothing until at least one approved review exists.
- * Review submission lives on /connect through ReviewDrawer.
+ * Shown on /book. Review submission lives in the book contact rail (ReviewDrawer).
  */
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import { logError } from '@/lib/monitoring'
 
 interface Review {
@@ -17,7 +17,8 @@ interface Review {
 
 async function getApprovedReviews(): Promise<Review[]> {
   try {
-    const supabase = await createClient()
+    // Cookie-free client so /book stays cached; RLS only exposes approved reviews.
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('reviews')
       .select('id, name, event_type, rating, message')

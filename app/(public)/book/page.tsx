@@ -2,6 +2,7 @@ import BookingForm from '@/components/public/booking/BookingForm'
 import { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
 import BookExperienceRail from '@/components/public/BookExperienceRail'
 import BookExperienceStage from '@/components/public/BookExperienceStage'
+import ReviewSection from '@/components/public/ReviewSection'
 
 /** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
 export const revalidate = 300
@@ -47,6 +48,7 @@ export default function BookPage() {
         form={<BookingForm embedded />}
         rail={<BookExperienceRail />}
       />
+      <ReviewSection />
     </>
   )
 }
