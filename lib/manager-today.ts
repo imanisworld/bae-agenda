@@ -67,6 +67,13 @@ function classify(item: ManagerTodayItem, today: string, now: Date): Omit<Manage
   }
 
   if (PRE_OUTREACH_STATUSES.includes(item.status)) {
+    // A deliberately scheduled pre-outreach action should stay out of Today
+    // until its date arrives. This supports annual/seasonal warm rebook leads
+    // without cluttering the daily queue months in advance.
+    if (item.next_action_at && item.next_action_at > today) {
+      return null
+    }
+
     // A pre-outreach lead whose date or deadline already passed is stale.
     const passed = [item.application_deadline, item.event_date].find(
       (date): date is string => Boolean(date && date < today)
