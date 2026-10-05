@@ -114,7 +114,7 @@ export default async function ManagerSourcesPage({
       source.location_state?.toUpperCase() === 'IN'
   )
   const networkSources = activeSources.filter(
-    (source) => ['dj', 'agency', 'promoter'].includes(source.source_kind)
+    (source) => ['dj', 'promoter'].includes(source.source_kind)
   )
 
   return (
@@ -154,7 +154,7 @@ export default async function ManagerSourcesPage({
         {[
           ['Active Sources', activeSources.length, 'Currently watched'],
           ['Indianapolis', localSources.length, 'Local discovery coverage'],
-          ['DJ / Agency Network', networkSources.length, 'Relationship mining'],
+          ['DJ Network', networkSources.length, 'Venue / promoter relationship mining'],
           ['Never Checked', unchecked.length, 'Waiting for first scan'],
           ['New Signals', actionableSignals.length, 'Need review'],
           ['Converted', signals.filter((signal) => signal.status === 'converted').length, 'Became opportunities'],
@@ -173,8 +173,8 @@ export default async function ManagerSourcesPage({
           <div className="admin-preview-title">Expanded discovery</div>
           <p>
             The scheduled discovery pass now combines this recurring watchlist with broad searches for DJ hiring,
-            festival submissions, campus entertainment, venue programming, event companies, corporate/community
-            activations, and DJ-to-venue relationships. New recurring sources are capped and must be verified before
+            festival submissions, campus entertainment, venue programming, direct event buyers, corporate/community
+            activations, and DJ-to-venue relationships. DJ staffing/roster companies are excluded. New recurring sources are capped and must be verified before
             they are added.
           </p>
         </div>
@@ -189,7 +189,7 @@ export default async function ManagerSourcesPage({
         {sources.length === 0 ? (
           <AdminEmptyState
             title="No watchlist sources yet"
-            desc="Add DJs, venues, promoters, event brands, agencies, or other public sources."
+            desc="Add DJs, venues, promoters, event brands, direct buyers, or other public sources. DJ staffing/roster companies are excluded."
           />
         ) : (
           <div className="admin-table-wrap">
