@@ -13,6 +13,16 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { managerFollowUpUrgency } from '@/lib/manager-follow-up'
 import { buildManagerTodayQueue } from '@/lib/manager-today'
 
+type ManagerPipelineView =
+  | 'active'
+  | 'needs_action'
+  | 'outreach_ready'
+  | 'follow_up'
+  | 'negotiating'
+  | 'warm_rebook'
+  | 'history'
+  | 'all'
+
 interface OpportunityRow {
   id: string
   title: string
@@ -37,6 +47,7 @@ interface OpportunityRow {
   fit_score: number | null
   next_action: string | null
   next_action_at: string | null
+  source_payload: Record<string, unknown> | null
   created_at: string
 }
 
@@ -49,7 +60,17 @@ interface ManagerData {
 }
 
 const CLOSED_STATUSES = ['booked', 'passed', 'lost']
-const OPPORTUNITY_COLUMNS = 'id, title, organization, opportunity_type, status, location_city, location_state, event_date, application_deadline, compensation_min, compensation_max, recommended_demo, expected_work_hours, estimated_total_hours, estimated_net_pay, effective_hourly_rate, economics_basis, outreach_prepared_at, outreach_missing_items, outreach_channel, fit_score, next_action, next_action_at, created_at'
+const PIPELINE_VIEWS: Array<{ value: ManagerPipelineView; label: string }> = [
+  { value: 'active', label: 'Active' },
+  { value: 'needs_action', label: 'Needs Action' },
+  { value: 'outreach_ready', label: 'Outreach Ready' },
+  { value: 'follow_up', label: 'Follow-up' },
+  { value: 'negotiating', label: 'Negotiating' },
+  { value: 'warm_rebook', label: 'Warm Rebooks' },
+  { value: 'history', label: 'History' },
+  { value: 'all', label: 'All' },
+]
+const OPPORTUNITY_COLUMNS = 'id, title, organization, opportunity_type, status, location_city, location_state, event_date, application_deadline, compensation_min, compensation_max, recommended_demo, expected_work_hours, estimated_total_hours, estimated_net_pay, effective_hourly_rate, economics_basis, outreach_prepared_at, outreach_missing_items, outreach_channel, fit_score, next_action, next_action_at, source_payload, created_at'
 
 function fmtDate(value: string | null) {
   if (!value) return '—'
@@ -110,6 +131,17 @@ function locationLabel(row: OpportunityRow) {
   return parts.length ? parts.join(', ') : 'Unknown'
 }
 
+function normalizePipelineView(value: string | string[] | undefined): ManagerPipelineView {
+  const raw = Array.isArray(value) ? value[0] : value
+  return PIPELINE_VIEWS.some((view) => view.value === raw)
+    ? raw as ManagerPipelineView
+    : 'active'
+}
+
+function isWarmRebook(row: OpportunityRow) {
+  return row.source_payload?.lead_origin === 'warm_rebook'
+}
+
 async function getManagerData(): Promise<ManagerData> {
   try {
     const admin = createAdminClient()
@@ -122,7 +154,7 @@ async function getManagerData(): Promise<ManagerData> {
         .from('manager_opportunities')
         .select(OPPORTUNITY_COLUMNS)
         .order('created_at', { ascending: false })
-        .limit(100),
+        .limit(1000),
       admin
         .from('manager_opportunities')
         .select(OPPORTUNITY_COLUMNS)
@@ -167,7 +199,13 @@ async function getManagerData(): Promise<ManagerData> {
   }
 }
 
-export default async function ManagerPage() {
+export default async function ManagerPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ view?: string | string[] }>
+}) {
+  const query = searchParams ? await searchParams : undefined
+  const selectedView = normalizePipelineView(query?.view)
   const data = await getManagerData()
   const opportunities = data.opportunities
   const active = data.activeOpportunities
@@ -175,6 +213,8 @@ export default async function ManagerPage() {
   const inMotion = active.filter((item) => ['outreach_ready', 'applied', 'contacted', 'follow_up', 'negotiating'].includes(item.status))
   const booked = opportunities.filter((item) => item.status === 'booked')
   const todayQueue = buildManagerTodayQueue(active)
+  const allActionQueue = buildManagerTodayQueue(active, { limit: 1000 })
+  const needsActionIds = new Set(allActionQueue.entries.map((entry) => entry.item.id))
   const followUpQueue = active
     .filter((item) => ['applied', 'contacted', 'follow_up'].includes(item.status))
     .map((item) => ({
@@ -183,6 +223,19 @@ export default async function ManagerPage() {
     }))
     .filter((item) => item.followUpUrgency === 'due' || item.followUpUrgency === 'overdue')
     .sort((a, b) => (a.next_action_at ?? '').localeCompare(b.next_action_at ?? ''))
+
+
+  const filteredOpportunities = opportunities.filter((item) => {
+    if (selectedView === 'all') return true
+    if (selectedView === 'history') return CLOSED_STATUSES.includes(item.status)
+    if (selectedView === 'active') return !CLOSED_STATUSES.includes(item.status)
+    if (selectedView === 'needs_action') return needsActionIds.has(item.id)
+    if (selectedView === 'outreach_ready') return item.status === 'outreach_ready'
+    if (selectedView === 'follow_up') return ['applied', 'contacted', 'follow_up'].includes(item.status)
+    if (selectedView === 'negotiating') return item.status === 'negotiating'
+    if (selectedView === 'warm_rebook') return !CLOSED_STATUSES.includes(item.status) && isWarmRebook(item)
+    return true
+  })
 
   return (
     <div className="admin-page">
@@ -364,15 +417,27 @@ export default async function ManagerPage() {
         )}
       </section>
 
-      <section className="admin-section" style={{ marginBottom: 0 }}>
+      <section id="pipeline" className="admin-section" style={{ marginBottom: 0 }}>
         <div className="admin-section-header">
           <span className="admin-section-title">Opportunity Pipeline</span>
-          <span className="muted">{opportunities.length} total</span>
+          <span className="muted">{filteredOpportunities.length} shown · {opportunities.length} total</span>
         </div>
 
-        {opportunities.length === 0 ? (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '14px 0 18px' }}>
+          {PIPELINE_VIEWS.map((view) => (
+            <Link
+              key={view.value}
+              href={`/admin/manager?view=${view.value}#pipeline`}
+              className={selectedView === view.value ? 'admin-btn-primary' : 'admin-btn-ghost'}
+            >
+              {view.label}
+            </Link>
+          ))}
+        </div>
+
+        {filteredOpportunities.length === 0 ? (
           <AdminEmptyState
-            title={data.configured ? 'No opportunities yet' : 'Manager storage unavailable'}
+            title={data.configured ? `No ${PIPELINE_VIEWS.find((view) => view.value === selectedView)?.label.toLowerCase() ?? ''} opportunities` : 'Manager storage unavailable'}
             desc={
               data.configured
                 ? 'Add a lead manually first. Automated discovery will write into this same pipeline later.'
@@ -399,13 +464,14 @@ export default async function ManagerPage() {
                 </tr>
               </thead>
               <tbody>
-                {opportunities.map((item) => (
+                {filteredOpportunities.map((item) => (
                   <tr key={item.id}>
                     <td data-label="Opportunity">
                       <div style={{ display: 'grid', gap: 3 }}>
                         <strong style={{ fontWeight: 500 }}>{item.title}</strong>
                         <span className="muted" style={{ fontSize: 11 }}>
                           {item.organization ?? MANAGER_OPPORTUNITY_TYPE_LABELS[item.opportunity_type]}
+                          {isWarmRebook(item) ? ' · Warm rebook' : ''}
                         </span>
                       </div>
                     </td>
