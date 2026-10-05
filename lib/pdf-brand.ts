@@ -17,7 +17,7 @@ export const brand = {
 export const BRAND_SENDER_LINES = [
   'Imani Crumble · The Bae Agenda',
   '8320 Berrybush Lane',
-  'Indianapolis, IN 46345',
+  'Indianapolis, IN 46234',
   'baebookings@proton.me',
 ]
 
@@ -58,8 +58,9 @@ export const BAND_BOTTOM = 680
 export function drawBrandHeader(
   page: PDFPage,
   brandAssets: { fonts: BrandFonts; logo: PDFImage | null },
-  title = 'INVOICE'
+  options: { title?: string; showSender?: boolean } = {}
 ) {
+  const title = options.title ?? 'INVOICE'
   const { width, height } = page.getSize()
   const { fonts, logo } = brandAssets
   const right = width - 56
@@ -75,14 +76,17 @@ export function drawBrandHeader(
     page.drawText('DJ B.A.E.', { x: 56, y: 730, size: 22, font: fonts.heading, color: brand.cream })
   }
 
-  const titleSize = 22
+  const showSender = options.showSender ?? true
+  const titleSize = showSender ? 22 : 26
   page.drawText(title, {
     x: right - fonts.heading.widthOfTextAtSize(title, titleSize),
-    y: 748,
+    y: showSender ? 748 : 724,
     size: titleSize,
     font: fonts.heading,
     color: brand.cream,
   })
+
+  if (!showSender) return
 
   BRAND_SENDER_LINES.forEach((text, index) => {
     const size = 8.5

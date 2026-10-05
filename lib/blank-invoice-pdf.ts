@@ -1,7 +1,7 @@
 import { PDFDocument, type PDFForm, type PDFPage } from 'pdf-lib'
 import { DEFAULT_INVOICE_PAYMENT_TERMS } from '@/lib/invoices'
 import { getPaymentInstructionTextLines } from '@/lib/payment-instructions'
-import { brand, drawBrandFooter, drawBrandHeader, loadBrand, type BrandFonts } from '@/lib/pdf-brand'
+import { BRAND_SENDER_LINES, brand, drawBrandFooter, drawBrandHeader, loadBrand, type BrandFonts } from '@/lib/pdf-brand'
 
 // A blank invoice with fillable boxes. Fill it in Acrobat, Preview or a browser,
 // or print it and write on the lines. Same letterhead as the generated invoices.
@@ -9,7 +9,7 @@ import { brand, drawBrandFooter, drawBrandHeader, loadBrand, type BrandFonts } f
 const PAGE = { width: 612, height: 792, marginX: 56 }
 const LEFT = PAGE.marginX
 const RIGHT = PAGE.width - PAGE.marginX
-const LINE_ITEM_ROWS = 8
+const LINE_ITEM_ROWS = 7
 
 function label(page: PDFPage, text: string, x: number, y: number, fonts: BrandFonts) {
   page.drawText(text.toUpperCase(), { x, y, size: 7, font: fonts.bold, color: brand.muted })
@@ -78,23 +78,35 @@ export async function generateBlankInvoicePdf() {
   const brandAssets = await loadBrand(pdf)
   const { fonts } = brandAssets
 
-  drawBrandHeader(page, brandAssets)
+  drawBrandHeader(page, brandAssets, { showSender: false })
 
-  // Invoice number and dates, one row
-  const metaWidth = (RIGHT - LEFT - 32) / 3
-  ;[
-    ['invoice_number', 'Invoice #'],
-    ['invoice_date', 'Invoice Date'],
-    ['due_date', 'Due Date'],
-  ].forEach(([name, text], index) => {
-    labeledField(form, page, name, text, LEFT + index * (metaWidth + 16), 632, metaWidth, fonts)
-  })
-
-  // Bill to + event, two columns
   const colWidth = (RIGHT - LEFT - 24) / 2
   const rightX = LEFT + colWidth + 24
-  sectionTitle(page, 'Bill To', LEFT, 602, fonts)
-  sectionTitle(page, 'Event', rightX, 602, fonts)
+
+  // From: your details, already filled in but still editable
+  sectionTitle(page, 'From', LEFT, 652, fonts)
+  field(form, page, 'from', { x: LEFT - 2, y: 584, width: colWidth, height: 60 }, fonts, {
+    multiline: true,
+    size: 9.5,
+    value: BRAND_SENDER_LINES.join('\n'),
+  })
+
+  // Invoice number and dates, label left of the line
+  ;[
+    ['invoice_number', 'Invoice #'],
+    ['invoice_date', 'Date'],
+    ['due_date', 'Due'],
+  ].forEach(([name, text], index) => {
+    const y = 630 - index * 22
+    label(page, text, rightX + 60, y + 5, fonts)
+    field(form, page, name, { x: rightX + 110, y, width: RIGHT - rightX - 110 }, fonts)
+  })
+
+  page.drawLine({ start: { x: LEFT, y: 572 }, end: { x: RIGHT, y: 572 }, thickness: 0.6, color: brand.gold })
+
+  // Bill to + event, two columns
+  sectionTitle(page, 'Bill To', LEFT, 552, fonts)
+  sectionTitle(page, 'Event', rightX, 552, fonts)
 
   const rows: Array<[[string, string], [string, string]]> = [
     [['bill_to_name', 'Name / Company'], ['event_name', 'Event']],
@@ -103,7 +115,7 @@ export async function generateBlankInvoicePdf() {
     [['bill_to_address', 'Address'], ['event_venue', 'Venue & City']],
   ]
   rows.forEach(([left, right], index) => {
-    const y = 564 - index * 34
+    const y = 516 - index * 32
     labeledField(form, page, left[0], left[1], LEFT, y, colWidth, fonts)
     labeledField(form, page, right[0], right[1], rightX, y, colWidth, fonts)
   })
@@ -112,9 +124,9 @@ export async function generateBlankInvoicePdf() {
   const qtyX = RIGHT - 210
   const rateX = RIGHT - 160
   const amountX = RIGHT - 82
-  sectionTitle(page, 'Charges', LEFT, 432, fonts)
-  page.drawRectangle({ x: LEFT, y: 408, width: RIGHT - LEFT, height: 16, color: brand.black })
-  const headerY = 413
+  sectionTitle(page, 'Charges', LEFT, 396, fonts)
+  page.drawRectangle({ x: LEFT, y: 372, width: RIGHT - LEFT, height: 16, color: brand.black })
+  const headerY = 377
   ;[
     ['Description', LEFT + 6],
     ['Qty', qtyX],
@@ -124,7 +136,7 @@ export async function generateBlankInvoicePdf() {
     page.drawText(String(text).toUpperCase(), { x: Number(x), y: headerY, size: 7, font: fonts.bold, color: brand.gold })
   })
 
-  let y = 386
+  let y = 350
   for (let row = 1; row <= LINE_ITEM_ROWS; row++) {
     field(form, page, `item_${row}_description`, { x: LEFT, y, width: qtyX - LEFT - 12 }, fonts)
     field(form, page, `item_${row}_qty`, { x: qtyX, y, width: 38 }, fonts, { alignRight: true })
@@ -160,7 +172,7 @@ export async function generateBlankInvoicePdf() {
   }
 
   // Notes, payment methods, terms
-  const boxTop = 152
+  const boxTop = 128
   const boxBottom = 52
   const halfWidth = (RIGHT - LEFT - 24) / 2
   label(page, 'Notes', LEFT, boxTop + 6, fonts)

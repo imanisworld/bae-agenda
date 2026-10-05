@@ -200,7 +200,7 @@ export default async function InvoicePage({
               Imani Crumble<br />
               The Bae Agenda<br />
               8320 Berrybush Lane<br />
-              Indianapolis, IN 46345<br />
+              Indianapolis, IN 46234<br />
               baebookings@proton.me
             </div>
           </div>
