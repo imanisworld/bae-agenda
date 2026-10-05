@@ -11,6 +11,7 @@ import {
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { managerFollowUpUrgency } from '@/lib/manager-follow-up'
+import { buildManagerTodayQueue } from '@/lib/manager-today'
 
 interface OpportunityRow {
   id: string
@@ -160,6 +161,7 @@ export default async function ManagerPage() {
   const needsReview = opportunities.filter((item) => ['found', 'qualified', 'review'].includes(item.status))
   const inMotion = opportunities.filter((item) => ['outreach_ready', 'applied', 'contacted', 'follow_up', 'negotiating'].includes(item.status))
   const booked = opportunities.filter((item) => item.status === 'booked')
+  const todayQueue = buildManagerTodayQueue(active)
   const followUpQueue = opportunities
     .filter((item) => ['applied', 'contacted', 'follow_up'].includes(item.status))
     .map((item) => ({
@@ -191,6 +193,9 @@ export default async function ManagerPage() {
       )}
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 24 }}>
+        <a href="#today" className="admin-btn-primary">
+          Today
+        </a>
         <Link href="/admin/manager/profile" className="admin-btn-ghost">
           Manager Profile
         </Link>
@@ -226,6 +231,53 @@ export default async function ManagerPage() {
           </div>
         ))}
       </div>
+
+      <section id="today" className="admin-section" style={{ marginBottom: 24 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Today</span>
+          <span className="muted">{todayQueue.length} actions</span>
+        </div>
+
+        {todayQueue.length === 0 ? (
+          <AdminEmptyState
+            title="Nothing needs action right now"
+            desc="New leads, ready outreach, negotiations, and due follow-ups will surface here automatically."
+          />
+        ) : (
+          <div style={{ display: 'grid', gap: 1, background: 'var(--border)' }}>
+            {todayQueue.map(({ item, label, priority }) => (
+              <Link
+                key={item.id}
+                href={`/admin/manager/opportunities/${item.id}`}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '36px minmax(0, 1fr) auto',
+                  gap: 14,
+                  alignItems: 'center',
+                  padding: '14px 16px',
+                  background: 'var(--surface)',
+                  color: 'inherit',
+                  textDecoration: 'none',
+                }}
+              >
+                <div style={{ fontSize: 10, color: 'var(--gold)' }}>{priority}</div>
+                <div style={{ minWidth: 0 }}>
+                  <strong style={{ display: 'block', fontSize: 12, fontWeight: 500 }}>{label}</strong>
+                  <span className="muted" style={{ fontSize: 10 }}>
+                    {item.title}{item.organization ? ` · ${item.organization}` : ''}
+                  </span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <ManagerStatusBadge status={item.status as ManagerOpportunityStatus} />
+                  <div className="muted" style={{ marginTop: 4, fontSize: 10 }}>
+                    {item.fit_score === null ? 'Fit —' : `Fit ${item.fit_score}`}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
       {!data.profileReady && data.configured && (
         <div className="admin-preview-banner" style={{ marginBottom: 18 }}>
