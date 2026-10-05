@@ -44,7 +44,12 @@ interface ManagerData {
   configured: boolean
   profileReady: boolean
   opportunities: OpportunityRow[]
+  /** Every open lead, uncapped by the pipeline table's row limit. */
+  activeOpportunities: OpportunityRow[]
 }
+
+const CLOSED_STATUSES = ['booked', 'passed', 'lost']
+const OPPORTUNITY_COLUMNS = 'id, title, organization, opportunity_type, status, location_city, location_state, event_date, application_deadline, compensation_min, compensation_max, recommended_demo, expected_work_hours, estimated_total_hours, estimated_net_pay, effective_hourly_rate, economics_basis, outreach_prepared_at, outreach_missing_items, outreach_channel, fit_score, next_action, next_action_at, created_at'
 
 function fmtDate(value: string | null) {
   if (!value) return '—'
@@ -110,13 +115,20 @@ async function getManagerData(): Promise<ManagerData> {
     const admin = createAdminClient()
     const [
       { data: opportunities, error: opportunitiesError },
+      { data: activeOpportunities, error: activeError },
       { data: profile, error: profileError },
     ] = await Promise.all([
       admin
         .from('manager_opportunities')
-        .select('id, title, organization, opportunity_type, status, location_city, location_state, event_date, application_deadline, compensation_min, compensation_max, recommended_demo, expected_work_hours, estimated_total_hours, estimated_net_pay, effective_hourly_rate, economics_basis, outreach_prepared_at, outreach_missing_items, outreach_channel, fit_score, next_action, next_action_at, created_at')
+        .select(OPPORTUNITY_COLUMNS)
         .order('created_at', { ascending: false })
         .limit(100),
+      admin
+        .from('manager_opportunities')
+        .select(OPPORTUNITY_COLUMNS)
+        .not('status', 'in', `(${CLOSED_STATUSES.join(',')})`)
+        .order('created_at', { ascending: false })
+        .limit(1000),
       admin
         .from('manager_profiles')
         .select('id')
@@ -124,15 +136,15 @@ async function getManagerData(): Promise<ManagerData> {
         .maybeSingle(),
     ])
 
-    if (opportunitiesError || profileError) {
-      const code = opportunitiesError?.code ?? profileError?.code
-      if (code === '42P01' || code === 'PGRST205') {
-        return { configured: false, profileReady: false, opportunities: [] }
+    const firstError = opportunitiesError ?? activeError ?? profileError
+    if (firstError) {
+      if (firstError.code === '42P01' || firstError.code === 'PGRST205') {
+        return { configured: false, profileReady: false, opportunities: [], activeOpportunities: [] }
       }
-      throw new Error(opportunitiesError?.message ?? profileError?.message ?? 'Unable to load manager.')
+      throw new Error(firstError.message ?? 'Unable to load manager.')
     }
 
-    const rows = (opportunities ?? [])
+    const normalize = (list: Record<string, unknown>[] | null) => (list ?? [])
       .map((row: Record<string, unknown>) => {
         const status = isManagerOpportunityStatus(row.status) ? row.status : 'found'
         const type = isManagerOpportunityType(row.opportunity_type) ? row.opportunity_type : 'other'
@@ -147,22 +159,23 @@ async function getManagerData(): Promise<ManagerData> {
     return {
       configured: true,
       profileReady: Boolean(profile),
-      opportunities: rows,
+      opportunities: normalize(opportunities),
+      activeOpportunities: normalize(activeOpportunities),
     }
   } catch {
-    return { configured: false, profileReady: false, opportunities: [] }
+    return { configured: false, profileReady: false, opportunities: [], activeOpportunities: [] }
   }
 }
 
 export default async function ManagerPage() {
   const data = await getManagerData()
   const opportunities = data.opportunities
-  const active = opportunities.filter((item) => !['booked', 'passed', 'lost'].includes(item.status))
-  const needsReview = opportunities.filter((item) => ['found', 'qualified', 'review'].includes(item.status))
-  const inMotion = opportunities.filter((item) => ['outreach_ready', 'applied', 'contacted', 'follow_up', 'negotiating'].includes(item.status))
+  const active = data.activeOpportunities
+  const needsReview = active.filter((item) => ['found', 'qualified', 'review'].includes(item.status))
+  const inMotion = active.filter((item) => ['outreach_ready', 'applied', 'contacted', 'follow_up', 'negotiating'].includes(item.status))
   const booked = opportunities.filter((item) => item.status === 'booked')
   const todayQueue = buildManagerTodayQueue(active)
-  const followUpQueue = opportunities
+  const followUpQueue = active
     .filter((item) => ['applied', 'contacted', 'follow_up'].includes(item.status))
     .map((item) => ({
       ...item,
@@ -235,24 +248,28 @@ export default async function ManagerPage() {
       <section id="today" className="admin-section" style={{ marginBottom: 24 }}>
         <div className="admin-section-header">
           <span className="admin-section-title">Today</span>
-          <span className="muted">{todayQueue.length} actions</span>
+          <span className="muted">
+            {todayQueue.total > todayQueue.entries.length
+              ? `Top ${todayQueue.entries.length} of ${todayQueue.total} actions`
+              : `${todayQueue.total} action${todayQueue.total === 1 ? '' : 's'}`}
+          </span>
         </div>
 
-        {todayQueue.length === 0 ? (
+        {todayQueue.entries.length === 0 ? (
           <AdminEmptyState
             title="Nothing needs action right now"
             desc="New leads, ready outreach, negotiations, and due follow-ups will surface here automatically."
           />
         ) : (
           <div style={{ display: 'grid', gap: 1, background: 'var(--border)' }}>
-            {todayQueue.map(({ item, label, priority }) => (
+            {todayQueue.entries.map(({ item, label, priority, dueOn }) => (
               <Link
                 key={item.id}
                 href={`/admin/manager/opportunities/${item.id}`}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '36px minmax(0, 1fr) auto',
-                  gap: 14,
+                  gridTemplateColumns: '20px minmax(0, 1fr) auto',
+                  gap: 12,
                   alignItems: 'center',
                   padding: '14px 16px',
                   background: 'var(--surface)',
@@ -265,6 +282,7 @@ export default async function ManagerPage() {
                   <strong style={{ display: 'block', fontSize: 12, fontWeight: 500 }}>{label}</strong>
                   <span className="muted" style={{ fontSize: 10 }}>
                     {item.title}{item.organization ? ` · ${item.organization}` : ''}
+                    {dueOn ? ` · ${fmtDate(dueOn)}` : ''}
                   </span>
                 </div>
                 <div style={{ textAlign: 'right' }}>
