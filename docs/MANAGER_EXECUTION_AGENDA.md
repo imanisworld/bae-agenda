@@ -11,6 +11,8 @@
 
 ## 1. Daily action surface
 
+Implementation status: in progress on the Manager dashboard via the Today queue.
+
 Create one Manager Today section ordered by:
 1. overdue follow-ups
 2. follow-ups due today
