@@ -59,9 +59,12 @@ export default function Nav() {
     sessionStorage.setItem(NAV_CUE_SESSION_KEY, '1')
   }
 
-  useEffect(() => {
+  // Close the More menu when the page changes (adjusting state during render, not in an effect).
+  const [menuPathname, setMenuPathname] = useState(pathname)
+  if (menuPathname !== pathname) {
+    setMenuPathname(pathname)
     setMoreOpen(false)
-  }, [pathname])
+  }
 
   useEffect(() => {
     if (!moreOpen) return
