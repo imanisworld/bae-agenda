@@ -1,90 +1,99 @@
 # Bae Agenda Roadmap
 
-Last reconciled against `main` at `09e1e7ef6039da52b92af7448bcfc9d667dae9e7` on 2026-09-06.
+Last reconciled on 2026-10-05 against the repository through PR #128.
 
 ## Rule
 
-Do not rebuild a feature just because it still appears in an old plan. Check the current code first.
-The previous phase-by-phase roadmap is preserved in Git history; this file now tracks only the
-current implementation state and genuinely pending work.
+Do not rebuild a feature because it appears in an old plan. Check current code, production state, and Manager data first.
 
 ## Implemented
 
-These capabilities already exist in the current codebase:
+### Public site and business operations
 
-- Public site: booking, events, mixes, portfolio, press kit, reviews, and contact flows
-- Protected admin area: dashboard, bookings, clients, payments, events, mixes, portfolio, reviews, content, and W-9
+- Public booking, events, mixes, portfolio, press kit, reviews, and contact flows
+- Protected admin for bookings, clients, payments, invoices, events, mixes, portfolio, reviews, content, W-9, and Manager
 - Booking intake with availability/conflict checks
 - Supabase-backed booking/client/payment data
 - Stripe Checkout deposit flow with signed webhook handling and payment deduplication
 - Manual Zelle / Cash App payment handling
-- Invoice draft generation, PDF generation, download, and email sending
+- Invoice draft generation, PDF generation, download, email sending, void/restore
 - Client portal
 - Resend email delivery
 - Twilio SMS support
 - Upstash rate limiting
 - Daily Vercel cron for final-payment reminders, post-event follow-ups, and review requests
 - Vercel Analytics and Speed Insights
-- Client-render error reporting and structured server logging
 - W-9 automation
-
-## Current Work
 
 ### Resend delivery-status tracking
 
-Add provider-confirmed delivery lifecycle evidence without changing the existing email-send flow.
+Verified operational:
 
-Required pieces:
+- signed Resend webhook endpoint exists at `/api/resend/webhook`
+- `email_delivery_events` exists in Supabase
+- `RESEND_WEBHOOK_SECRET` is configured in Vercel production
+- Resend webhook is enabled for sent/delivered/delayed/bounced/complained/failed/suppressed
+- successful sent and delivered webhook events have been observed
+- open/click tracking is intentionally excluded
 
-- verified Resend webhook endpoint
-- raw-body signature verification
-- idempotent event storage
-- track only sent/delivered/delayed/bounced/complained/failed/suppressed events
-- intentionally ignore open/click tracking
-- apply the Supabase migration
-- configure `RESEND_WEBHOOK_SECRET`
-- register `https://thebaeagenda.com/api/resend/webhook` in Resend
+### DJ B.A.E. Manager
 
-This is infrastructure/observability only. It must not change booking state or resend messages automatically.
+Implemented:
 
-## Still Genuinely Pending
+- Today action queue
+- direct-buyer sourcing rules and source-quality metrics
+- scoring/economics and outreach prep
+- warm-rebook scheduling
+- negotiation assistant
+- Active / Needs Action / Outreach Ready / Follow-up / Negotiating / Warm Rebooks / History / All views
+- History handling for booked/passed/lost Manager leads
+- 25-row admin pagination for Manager, Bookings, Events, Clients, and Invoices
+- Booking History for completed/lost
+- Events Upcoming / Past / All
+- source-specific draft review and status correction during real-use QA
 
-These are not already implemented based on the current repository audit:
+## Current Work
 
-- Expenses / tax-support workflow and exportable reporting
-- Completed-booking auto-archive
-- Content-publish email notifications
-- Pipeline health-check cron
-- FullCalendar-style admin calendar, if the existing event/admin views prove insufficient
-- Contracts / e-signature integration
-- Advanced media-library features
-- Role-based permissions, if the app grows beyond the current admin allowlist model
-- Deeper funnel/session analytics only if Vercel Analytics is insufficient
+### Deployment and QA
 
-## Cleanup / Reuse Opportunities
+Latest repository work through PR #128 is merged but not yet deployed because the Vercel Hobby deployment quota is temporarily blocking new production and preview builds.
 
-Do these only when the relevant area is being worked on:
+After the quota resets:
 
-- Migrate hand-built email HTML to React Email when email templates next need meaningful changes.
-  Do not rewrite working templates solely for this migration.
-- Use an established e-signature provider for contracts rather than building signature infrastructure.
-- Use FullCalendar or another mature calendar component if a richer admin calendar becomes necessary.
+1. deploy current `main`
+2. verify the deployment SHA
+3. run desktop/mobile visual and functional QA
+4. fix only verified regressions
+
+### Manager real-use pass
+
+- work high-value live leads rather than adding more infrastructure
+- prioritize verified warm rebooks over equivalent cold leads
+- measure which sources, pitches, and economics produce responses/bookings
+- keep weak or speculative relationship leads out of Outreach Ready
+
+## Remaining Work — Only When Useful
+
+- Manager junk/stale-record archive controls if real usage proves History/Pass is insufficient
+- expenses / tax-support workflow and exportable reporting
+- content-publish email notifications if there is a real audience/workflow for them
+- contracts / e-signature integration
+- advanced media-library features
+- richer calendar only if current event/admin views prove insufficient
+- role-based permissions only if the app grows beyond the current admin allowlist model
+- deeper funnel/session analytics only if Vercel Analytics is insufficient
 
 ## Do Not Add Now
 
-Do not add these unless a concrete failure or requirement appears:
+Do not add these without a concrete failure or requirement:
 
+- a second generic Manager scheduler or pipeline-health cron
 - Trigger.dev
-- a second cron/scheduler just to reproduce the existing Vercel reminder cron
-- a second payment system to replace working Stripe flows
-- a second generic analytics platform solely to duplicate Vercel Analytics
-- a new job queue for the current reminder volume
+- a second payment system
+- a second generic analytics platform
+- a new job queue for current reminder volume
+- autonomous outreach, applications, booking acceptance, or negotiation decisions
 
-## Deployment / Setup Debt
+## Manager Safety Rule
 
-`PROJECT_STATUS.md` currently records one important environment task:
-
-- link the Supabase project locally and apply the latest migrations
-
-Any new migration, including Resend delivery-event storage, remains inactive until it is actually
-applied to the intended Supabase environment.
+Manager may discover, score, research, draft, schedule follow-ups, and record decisions. It must not autonomously send outreach, submit applications, accept gigs, or book work.

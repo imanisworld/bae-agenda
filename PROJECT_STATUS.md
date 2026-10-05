@@ -1,82 +1,70 @@
 # Project Status
 
+Last reconciled: 2026-10-05.
+
 ## Current State
 
-- Booking form UX/conflict flow has been improved.
-- Booking email eligibility helpers were added and tested.
-- W-9 auto-send on qualifying received payments was added.
-- Invoice draft auto-create/refresh on booking confirmation was added.
-- Computed payment state (`unpaid` / `partial` / `paid`) was added to the admin UI.
-- Booking client email flow was trimmed to four sends.
-- Daily Vercel cron handles final-payment reminders, post-event follow-ups, and review requests.
-- Client portal, Stripe deposit flow, invoice sending, rate limiting, and Vercel analytics are already implemented.
-- Resend delivery-status webhook tracking is being added without changing the existing send flow.
+Core public-site, booking, admin, payment, invoice, client-portal, email, analytics, and Manager workflows are implemented.
 
-## Completed
+Latest merged Manager work through PR #128 adds:
 
-- Booking form updates:
-  - blocked-date calendar
-  - structured time selection
-  - clearer field-level validation
-  - better availability/conflict feedback
-- Booking email payload logic extracted into shared helpers with tests.
-- W-9 automation:
-  - threshold-based auto-send for qualifying received payments
-  - shared W-9 PDF generator
-- Invoice automation:
-  - `invoices` table introduced
-  - invoice draft created/refreshed when booking is confirmed
-  - invoice PDF generation/download/email sending
-- Payment state automation:
-  - computed `unpaid` / `partial` / `paid`
-  - shown in admin views
-  - invoice payment state synced on payment logging
-- Booking email cleanup:
-  - extra deposit/event/fully-paid emails removed from active flow
-  - admin email actions trimmed to the lean set
-- Review request automation:
-  - scheduled review request email sends 3-10 days after completed bookings
-  - review request send history stamps on the booking record
-- Booking cron:
-  - daily cron is configured in `vercel.json` for reminder/follow-up/review sends
-- Client portal and public payment page
-- Stripe signed webhook with payment deduplication
-- Upstash rate limiting
-- Vercel Analytics and Speed Insights
+- warm-rebook scheduling
+- negotiation guidance
+- pipeline filters/history
+- 25-row pagination for Manager, Bookings, Events, Clients, and Invoices
+- Booking History for Completed + Lost
+- Events Upcoming / Past / All
 
-## Still Needs Setup
+Current GitHub `main` before this status-only reconciliation is `6bb749a1ecca8c3f7dfe60895c031b28195b38bd`.
 
-- Link the Supabase project locally and apply the latest migrations.
-- For Resend delivery tracking after merge/deploy:
-  - apply the `email_delivery_events` migration
-  - set `RESEND_WEBHOOK_SECRET`
-  - register `https://thebaeagenda.com/api/resend/webhook` in Resend for the approved delivery lifecycle events
+## Verified Operational
+
+### Resend delivery tracking
+
+Resend delivery-status tracking is complete and operational:
+
+- `email_delivery_events` exists in Supabase
+- `RESEND_WEBHOOK_SECRET` exists in Vercel production
+- Resend webhook endpoint: `https://thebaeagenda.com/api/resend/webhook`
+- webhook is enabled for sent, delivered, delivery-delayed, bounced, complained, failed, and suppressed
+- successful `email.sent` and `email.delivered` webhook events have been observed
+
+This is observability only and does not alter booking state or resend messages automatically.
+
+### Manager live state
+
+- Silent Disco: Outreach Ready; strongest immediate direct-buyer lead
+- Elevate Social: Outreach Ready; verified creative-partnership route
+- Jazz Is Dead: Review / relationship-only because no current DJ opening is verified
+- Art & Soul 2027: warm rebook scheduled
+- Punch Bowl Social Galentine's 2027: warm rebook scheduled
+- Level Up Walkathon 2027: high-confidence warm rebook; prior organizer interest in having DJ B.A.E. back next year is recorded
+
+Grok has authenticated X access for secondary scouting. Grok findings remain candidate signals and must be verified before becoming actionable Manager leads.
+
+## Deployment State
+
+Vercel Hobby deployment quota is currently blocking new production and preview builds.
+
+Production therefore still trails current `main`. Do not create a replacement Vercel project or churn deployments to work around the quota.
 
 ## Next
 
-1. Finish and verify Resend delivery-status tracking.
-2. Add completed-booking auto-archive.
-3. Add content-publish email notifications.
-4. Add a pipeline health-check cron.
-5. Revisit expenses/tax support when that workflow becomes a priority.
+1. After the Vercel quota resets, deploy current `main`.
+2. Verify exact deployed SHA.
+3. Run mobile/desktop visual and functional QA.
+4. Fix verified deployment/UI regressions only.
+5. Work Silent Disco and Elevate Social through user-controlled send/pass decisions.
+6. Use Manager in real conditions and measure source quality, response rate, booked rate, and economics.
+7. Add further automation only when real usage identifies a concrete gap.
 
-## New Thread Handoff
+## Deferred / Optional
 
-Use this in a fresh thread when context gets messy:
-
-```md
-Project: Bae Agenda
-
-Current state:
-- Core booking/admin/payment/client-portal/invoice flows already exist.
-- Stripe signed webhook, Vercel cron reminders, Upstash rate limiting, and Vercel analytics already exist.
-- Booking email flow is inquiry, confirmation, final payment reminder, and thank-you, with scheduled review requests.
-- Resend delivery-status tracking is the current observability addition; it must not alter booking state or resend messages automatically.
-
-Important pending setup:
-- Link Supabase locally and apply newest migrations.
-- After Resend webhook deployment, set RESEND_WEBHOOK_SECRET and register the endpoint in Resend.
-
-Next task after delivery tracking:
-- Completed-booking auto-archive.
-```
+- Manager junk/stale archive controls if History/Pass proves insufficient
+- expenses/tax reporting
+- content-publish notifications
+- contracts/e-signature
+- advanced media library
+- richer calendar
+- multi-user roles
+- deeper analytics
