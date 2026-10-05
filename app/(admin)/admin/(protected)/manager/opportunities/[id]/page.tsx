@@ -9,6 +9,7 @@ import { addManagerOpportunityActivityAction } from '@/app/actions/manager-activ
 import { prepareManagerOutreachAction, saveManagerOutreachDraftAction } from '@/app/actions/manager-outreach'
 import { dispatchManagerOutreachAction } from '@/app/actions/manager-dispatch'
 import { dispatchManagerFollowUpAction } from '@/app/actions/manager-follow-up'
+import { recordManagerNegotiationDecisionAction } from '@/app/actions/manager-negotiation'
 import {
   MANAGER_ACTIVITY_TYPES,
   MANAGER_ACTIVITY_TYPE_LABELS,
@@ -32,8 +33,15 @@ import {
   managerFollowUpActionLabel,
   managerFollowUpUrgency,
 } from '@/lib/manager-follow-up'
+import { buildManagerNegotiation } from '@/lib/manager-negotiation'
 
 type ScoreComponent = { score?: number; max?: number; note?: string }
+
+type NegotiationProfile = {
+  minimum_fee: number | null
+  target_hourly_rate: number | null
+  max_drive_minutes: number | null
+}
 
 type ActivityRow = {
   id: string
@@ -124,6 +132,25 @@ function fmtTimestamp(value: string | null) {
   })
 }
 
+async function getNegotiationProfile(): Promise<NegotiationProfile> {
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('manager_profiles')
+    .select('minimum_fee, target_hourly_rate, max_drive_minutes')
+    .eq('profile_key', 'dj_bae')
+    .maybeSingle()
+
+  if (error || !data) {
+    return {
+      minimum_fee: null,
+      target_hourly_rate: null,
+      max_drive_minutes: null,
+    }
+  }
+
+  return data as NegotiationProfile
+}
+
 async function getActivities(id: string): Promise<ActivityRow[]> {
   const admin = createAdminClient()
   const { data, error } = await admin
@@ -174,9 +201,10 @@ export default async function ManagerOpportunityDetailPage({
 }) {
   const { id } = await params
   const query = searchParams ? await searchParams : undefined
-  const [opportunity, activities] = await Promise.all([
+  const [opportunity, activities, negotiationProfile] = await Promise.all([
     getOpportunity(id),
     getActivities(id),
+    getNegotiationProfile(),
   ])
   if (!opportunity) notFound()
 
@@ -190,6 +218,10 @@ export default async function ManagerOpportunityDetailPage({
   const followUpDraft = followUpEligible
     ? buildManagerFollowUpDraft(opportunity)
     : null
+  const negotiation =
+    status === 'negotiating'
+      ? buildManagerNegotiation(negotiationProfile, opportunity)
+      : null
 
   return (
     <div className="admin-page admin-page--narrow">
