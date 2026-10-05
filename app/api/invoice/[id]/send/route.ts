@@ -7,6 +7,7 @@ import {
   balanceDueOf,
   formatInvoiceDueDate,
   generateInvoicePdf,
+  getInvoicePaidStamp,
   invoiceFilename,
   invoiceNumberOf,
   normalizeInvoiceLineItems,
@@ -106,7 +107,8 @@ export async function POST(
         quote,
         deposit_amount,
         notes,
-        clients(first_name, last_name, email, phone)
+        clients(first_name, last_name, email, phone),
+        payments(amount, status, method, paid_at)
       `)
       .eq('id', id)
       .maybeSingle(),
@@ -152,7 +154,9 @@ export async function POST(
     .join(' ')
     .trim() || 'Client'
 
-  const pdfBase64 = Buffer.from(await generateInvoicePdf(effectiveBooking, invoice)).toString('base64')
+  const payments = (data as { payments?: Parameters<typeof getInvoicePaidStamp>[0] } | null)?.payments
+  const paidStamp = getInvoicePaidStamp(payments, Number(effectiveBooking.quote ?? 0))
+  const pdfBase64 = Buffer.from(await generateInvoicePdf(effectiveBooking, invoice, paidStamp)).toString('base64')
   const balance = invoice ? Number(invoice.balance_due ?? 0) : balanceDueOf(effectiveBooking)
   const invoiceNumber = invoice?.invoice_number || invoiceNumberOf(effectiveBooking)
   const pdfFilename = invoice?.pdf_filename || invoiceFilename(effectiveBooking)

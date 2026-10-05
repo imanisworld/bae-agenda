@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { applyInvoiceSnapshot, generateInvoicePdf, invoiceFilename, type InvoiceBookingData, type InvoiceSnapshotData } from '@/lib/invoices'
+import { applyInvoiceSnapshot, generateInvoicePdf, getInvoicePaidStamp, invoiceFilename, type InvoiceBookingData, type InvoiceSnapshotData } from '@/lib/invoices'
 import { isAllowedAdminUser } from '@/lib/admin-auth'
 
 export async function GET(
@@ -30,7 +30,8 @@ export async function GET(
     .select(`
       id, event_name, event_type, event_date, event_end_time, event_timezone, venue, city,
       package, hours, quote, deposit_amount, notes,
-      clients(first_name, last_name, email, phone)
+      clients(first_name, last_name, email, phone),
+      payments(amount, status, method, paid_at)
     `)
     .eq('id', id)
     .maybeSingle(),
@@ -49,7 +50,9 @@ export async function GET(
 
   const invoice = (invoiceData as InvoiceSnapshotData | null) ?? null
   const effectiveBooking = applyInvoiceSnapshot(booking, invoice)
-  const pdfBytes = await generateInvoicePdf(effectiveBooking, invoice)
+  const payments = (data as { payments?: Parameters<typeof getInvoicePaidStamp>[0] } | null)?.payments
+  const paidStamp = getInvoicePaidStamp(payments, Number(effectiveBooking.quote ?? 0))
+  const pdfBytes = await generateInvoicePdf(effectiveBooking, invoice, paidStamp)
   const filename = invoice?.pdf_filename || invoiceFilename(effectiveBooking)
 
   return new NextResponse(Buffer.from(pdfBytes), {

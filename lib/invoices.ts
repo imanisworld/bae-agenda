@@ -1,7 +1,8 @@
-import { PDFDocument, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
+import { PDFDocument, degrees, rgb, type PDFFont, type PDFPage } from 'pdf-lib'
 import { formatEventDate, formatEventTimeRange } from '@/lib/date-time'
 import { getPaymentInstructionTextLines } from '@/lib/payment-instructions'
 import { brand, drawBrandFooter, drawBrandHeader, loadBrand } from '@/lib/pdf-brand'
+import { formatPaymentMethodLabel } from '@/lib/booking-deposit'
 
 export interface InvoiceBookingData {
   id: string
@@ -134,6 +135,38 @@ export function applyInvoiceSnapshot(
   }
 }
 
+export interface InvoicePaidStamp {
+  paidAt: string | null
+  methods: string[]
+}
+
+type StampPayment = {
+  amount: number | string | null
+  status: string | null
+  method?: string | null
+  paid_at?: string | null
+}
+
+// Paid in full when received payments cover the invoice total. The stamp shows
+// the last payment date and how it came in, so the PDF works as a receipt.
+export function getInvoicePaidStamp(
+  payments: StampPayment[] | null | undefined,
+  total: number
+): InvoicePaidStamp | null {
+  const received = (payments ?? []).filter((payment) => payment.status === 'received')
+  const paidTotal = received.reduce((sum, payment) => sum + Number(payment.amount ?? 0), 0)
+  if (total <= 0 || paidTotal + 0.005 < total) return null
+
+  const paidAt = received
+    .map((payment) => payment.paid_at)
+    .filter((value): value is string => Boolean(value))
+    .sort()
+    .at(-1) ?? null
+  const methods = [...new Set(received.map((payment) => payment.method).filter((value): value is string => Boolean(value)))]
+
+  return { paidAt, methods }
+}
+
 const PAGE = {
   width: 612,
   height: 792,
@@ -263,9 +296,58 @@ function drawLabelValueRow(
   return y - 26
 }
 
+function drawPaidStamp(
+  page: PDFPage,
+  stamp: InvoicePaidStamp,
+  heading: PDFFont,
+  bold: PDFFont,
+  origin: { x: number; y: number }
+) {
+  const angle = 8
+  const rad = (angle * Math.PI) / 180
+  const width = 164
+  const height = 74
+  // Positions inside the stamp, turned with it.
+  const at = (dx: number, dy: number) => ({
+    x: origin.x + dx * Math.cos(rad) - dy * Math.sin(rad),
+    y: origin.y + dx * Math.sin(rad) + dy * Math.cos(rad),
+  })
+  const ink = brand.oxblood
+
+  page.drawRectangle({ ...origin, width, height, rotate: degrees(angle), borderColor: ink, borderWidth: 3, opacity: 0, borderOpacity: 0.85 })
+  page.drawRectangle({ ...at(5, 5), width: width - 10, height: height - 10, rotate: degrees(angle), borderColor: ink, borderWidth: 1, opacity: 0, borderOpacity: 0.85 })
+
+  const word = 'PAID'
+  const wordSize = 34
+  page.drawText(word, {
+    ...at((width - heading.widthOfTextAtSize(word, wordSize)) / 2, 30),
+    size: wordSize,
+    font: heading,
+    color: ink,
+    opacity: 0.85,
+    rotate: degrees(angle),
+  })
+
+  const date = stamp.paidAt ? formatDate(stamp.paidAt) : null
+  const method = stamp.methods.map((value) => formatPaymentMethodLabel(value)).join(' + ')
+  const detail = [date, method].filter(Boolean).join(' · ').toUpperCase()
+  if (detail) {
+    const detailSize = detail.length > 30 ? 7 : 8
+    page.drawText(detail, {
+      ...at((width - bold.widthOfTextAtSize(detail, detailSize)) / 2, 14),
+      size: detailSize,
+      font: bold,
+      color: ink,
+      opacity: 0.85,
+      rotate: degrees(angle),
+    })
+  }
+}
+
 export async function generateInvoicePdf(
   booking: InvoiceBookingData,
-  invoice?: InvoiceSnapshotData | null
+  invoice?: InvoiceSnapshotData | null,
+  paidStamp?: InvoicePaidStamp | null
 ) {
   const pdf = await PDFDocument.create()
   const page = pdf.addPage([PAGE.width, PAGE.height])
@@ -285,7 +367,9 @@ export async function generateInvoicePdf(
   const eventTime = formatEventTimeRange(booking.event_date, booking.event_end_time, booking.event_timezone)
   const total = invoice ? Number(invoice.total_amount ?? 0) : booking.quote ?? 0
   const deposit = invoice ? Number(invoice.deposit_amount ?? 0) : booking.deposit_amount ?? 0
-  const balance = invoice ? Number(invoice.balance_due ?? Math.max(total - deposit, 0)) : balanceDueOf(booking)
+  const balance = paidStamp
+    ? 0
+    : invoice ? Number(invoice.balance_due ?? Math.max(total - deposit, 0)) : balanceDueOf(booking)
   const invoiceNumber = invoice?.invoice_number || invoiceNumberOf(booking)
   const dueDate = formatInvoiceDueDate(invoice?.due_date)
   const paymentTerms = invoice?.payment_terms?.trim() || DEFAULT_INVOICE_PAYMENT_TERMS
@@ -412,16 +496,21 @@ export async function generateInvoicePdf(
     color: black,
   })
 
-  if (deposit > 0) {
+  const paidRow = paidStamp
+    ? { label: 'Paid', amount: total }
+    : deposit > 0
+      ? { label: 'Deposit Paid', amount: deposit }
+      : null
+  if (paidRow) {
     y -= 20
-    page.drawText('Deposit Paid', {
+    page.drawText(paidRow.label, {
       x: PAGE.width - PAGE.marginX - 160,
       y,
       size: 11,
       font: fontRegular,
       color: muted,
     })
-    page.drawText(`-${formatCurrency(deposit)}`, {
+    page.drawText(`-${formatCurrency(paidRow.amount)}`, {
       x: PAGE.width - PAGE.marginX - 82,
       y,
       size: 11,
@@ -431,6 +520,7 @@ export async function generateInvoicePdf(
   }
 
   y -= 28
+  const balanceY = y
   drawRule(page, y + 12)
   page.drawRectangle({
     x: PAGE.width - PAGE.marginX - 214,
@@ -495,6 +585,11 @@ export async function generateInvoicePdf(
       page.drawText(footerLine, { x: PAGE.marginX, y: footerY, size: 9, font: fontRegular, color: muted })
     }
     footerY -= 12
+  }
+
+  if (paidStamp) {
+    // Sits in the open space left of the totals, wherever they land.
+    drawPaidStamp(page, paidStamp, fontHeading, fontBold, { x: PAGE.marginX + 40, y: balanceY - 12 })
   }
 
   drawBrandFooter(page, brandAssets.fonts)
