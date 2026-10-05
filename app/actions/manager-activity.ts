@@ -10,6 +10,7 @@ import {
 } from '@/lib/manager'
 import { logManagerOpportunityActivity } from '@/lib/manager-activity'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { toEventISO } from '@/lib/date-time'
 
 const ActivitySchema = z.object({
   opportunity_id: z.string().uuid(),
@@ -27,9 +28,14 @@ function redirectWithError(opportunityId: string, message: string): never {
 function normalizeOccurredAt(value: string) {
   if (!value) return new Date().toISOString()
 
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) return null
-  return parsed.toISOString()
+  const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})$/.exec(value)
+  if (!match) return null
+
+  return toEventISO(
+    match[1],
+    'America/Indiana/Indianapolis',
+    match[2]
+  )
 }
 
 export async function addManagerOpportunityActivityAction(formData: FormData) {
@@ -88,7 +94,7 @@ export async function addManagerOpportunityActivityAction(formData: FormData) {
     lifecycleUpdate.applied_at = occurredAt
   }
 
-  if (data.activity_type === 'contact') {
+  if (data.activity_type === 'contact' || data.activity_type === 'follow_up') {
     const prior = opportunity.last_contacted_at
       ? new Date(opportunity.last_contacted_at).getTime()
       : 0
