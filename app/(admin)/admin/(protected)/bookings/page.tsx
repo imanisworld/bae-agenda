@@ -5,6 +5,7 @@
 import PageHeader      from '@/components/admin/PageHeader'
 import Badge           from '@/components/admin/Badge'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
+import AdminPagination from '@/components/admin/AdminPagination'
 import AdminNotice     from '@/components/admin/AdminNotice'
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { createEventFromBookingAction, updateBookingStatusAction } from '@/app/actions/bookings'
@@ -14,6 +15,7 @@ import { getBookingLifecycleStatus, getBookingWorkflowPaymentStatus, type Bookin
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import { BOOKING_LIFECYCLE_STATUS_LABELS, BOOKING_WORKFLOW_PAYMENT_STATUS_LABELS } from '@/lib/constants'
 import type { BookingStatus } from '@/types/index'
+import { normalizeAdminPage, paginateRows } from '@/lib/admin-pagination'
 import Link from 'next/link'
 
 interface BookingRow {
@@ -167,6 +169,7 @@ const BOOKING_FILTERS = [
   { key: 'new',         label: 'New',         matches: (s: BookingLifecycleStatus) => s === 'new' },
   { key: 'in_progress', label: 'In Progress', matches: (s: BookingLifecycleStatus) => s === 'contacted' || s === 'negotiating' },
   { key: 'confirmed',   label: 'Confirmed',   matches: (s: BookingLifecycleStatus) => s === 'confirmed' },
+  { key: 'history',     label: 'History',     matches: (s: BookingLifecycleStatus) => s === 'completed' || s === 'lost' },
   { key: 'completed',   label: 'Completed',   matches: (s: BookingLifecycleStatus) => s === 'completed' },
   { key: 'lost',        label: 'Lost',        matches: (s: BookingLifecycleStatus) => s === 'lost' },
 ] as const
@@ -240,6 +243,7 @@ export default async function BookingsPage({
     error?: string | string[]
     filter?: string | string[]
     q?: string | string[]
+    page?: string | string[]
   }>
 }) {
   const bookings = await getBookings()
@@ -247,9 +251,11 @@ export default async function BookingsPage({
   const errorMessage = getErrorMessage(resolvedSearchParams?.error)
   const activeFilter = resolveFilter(resolvedSearchParams?.filter)
   const query = singleParam(resolvedSearchParams?.q).trim()
+  const requestedPage = normalizeAdminPage(resolvedSearchParams?.page)
   const activeMatcher = BOOKING_FILTERS.find((f) => f.key === activeFilter) ?? BOOKING_FILTERS[0]
   const searchedBookings = bookings.filter((booking) => bookingMatchesSearch(booking, query))
   const visibleBookings = searchedBookings.filter((booking) => activeMatcher.matches(booking.status))
+  const bookingPage = paginateRows(visibleBookings, requestedPage)
 
   const newInquiryCount = bookings.filter((booking) => booking.status === 'new').length
   const activeFollowUpCount = bookings.filter((booking) => booking.status === 'contacted' || booking.status === 'negotiating').length
@@ -349,7 +355,8 @@ export default async function BookingsPage({
             desc={query ? `Nothing matches “${query}” in this view.` : 'Nothing matches this filter right now.'}
           />
         ) : (
-          <div className="admin-table-wrap">
+          <>
+            <div className="admin-table-wrap">
             <table className="admin-table bookings-admin-table">
               <thead>
                 <tr>
@@ -363,7 +370,7 @@ export default async function BookingsPage({
                 </tr>
               </thead>
               <tbody>
-                {visibleBookings.map((b) => (
+                {bookingPage.items.map((b) => (
                   <tr key={b.id}>
                     <td data-label="Event" className="booking-event-cell">
                       <div className="booking-event-title">{b.event_name}</div>
@@ -471,7 +478,19 @@ export default async function BookingsPage({
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+            <AdminPagination
+              pathname="/admin/bookings"
+              page={bookingPage.page}
+              totalPages={bookingPage.totalPages}
+              totalItems={bookingPage.totalItems}
+              pageSize={bookingPage.pageSize}
+              params={{
+                filter: activeFilter === 'all' ? undefined : activeFilter,
+                q: query || undefined,
+              }}
+            />
+          </>
         )}
       </div>
     </div>
