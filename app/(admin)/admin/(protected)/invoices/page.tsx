@@ -130,6 +130,12 @@ export default async function InvoicesPage({
         action={{ label: 'Create Invoice', href: '/admin/invoices/new' }}
       />
 
+      <div className="admin-form-actions" style={{ marginBottom: '16px' }}>
+        <a href="/api/invoice/blank" target="_blank" rel="noopener" className="admin-btn-ghost">
+          Blank Fillable Invoice (PDF)
+        </a>
+      </div>
+
       {invoices.length > 0 && (
         <div className="admin-summary-grid">
           <div className="admin-money-card" style={{ '--admin-money-color': '#d9bc89' } as CSSProperties}>

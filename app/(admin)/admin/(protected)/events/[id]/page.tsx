@@ -5,6 +5,7 @@ import AdminNotice from '@/components/admin/AdminNotice'
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import EventMediaUploader from '@/components/admin/EventMediaUploader'
 import EventLocationFields from '@/components/admin/EventLocationFields'
+import MarkPaidForm from '@/components/admin/MarkPaidForm'
 import { createAdminClient as createClient } from '@/lib/supabase/admin'
 import {
   addEventMediaAction,
@@ -15,6 +16,7 @@ import {
 } from '@/app/actions/events'
 import { createInvoiceForEventAction } from '@/app/actions/invoices'
 import { getEventInputDateTime } from '@/lib/date-time'
+import { getBookingFinancialSnapshot } from '@/lib/booking-finance'
 import { suggestEventTimeZone } from '@/lib/event-form-options'
 
 interface EventRow {
@@ -91,6 +93,27 @@ async function getEventMedia(eventId: string): Promise<EventMediaRow[]> {
   return (data ?? []) as EventMediaRow[]
 }
 
+async function getLinkedBookingMoney(bookingId: string | null) {
+  if (!bookingId) return null
+  const supabase = createClient()
+  const { data } = await supabase
+    .from('bookings')
+    .select('quote, lifecycle_status, payments(amount, status)')
+    .eq('id', bookingId)
+    .maybeSingle()
+  if (!data) return null
+
+  const snapshot = getBookingFinancialSnapshot({
+    totalDue: data.quote as number | null,
+    payments: (data.payments as Array<{ amount: number; status: 'pending' | 'received' | 'refunded' }> | null) ?? null,
+  })
+  return { ...snapshot, lost: data.lifecycle_status === 'lost' }
+}
+
+function money(value: number) {
+  return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })
+}
+
 export default async function EditEventPage({
   params,
   searchParams,
@@ -102,6 +125,7 @@ export default async function EditEventPage({
   const resolvedSearchParams = searchParams ? await searchParams : undefined
   const [event, media] = await Promise.all([getEvent(id), getEventMedia(id)])
   if (!event) notFound()
+  const bookingMoney = await getLinkedBookingMoney(event.booking_id)
 
   const errorMessage = getMessage(resolvedSearchParams?.error)
   const successMessage = getMessage(resolvedSearchParams?.success)
@@ -130,7 +154,13 @@ export default async function EditEventPage({
           <div>
             <div className="admin-section-title" style={{ marginBottom: '5px' }}>Booking Link</div>
             <div className="muted" style={{ fontSize: '12px' }}>
-              {event.booking_id ? 'This event is linked to a booking record.' : 'This is a standalone event.'}
+              {!event.booking_id
+                ? 'This is a standalone event.'
+                : bookingMoney && bookingMoney.totalDue > 0
+                  ? bookingMoney.remainingBalance > 0
+                    ? `${money(bookingMoney.totalPaid)} of ${money(bookingMoney.totalDue)} received · ${money(bookingMoney.remainingBalance)} open`
+                    : `Paid in full · ${money(bookingMoney.totalPaid)} received`
+                  : 'This event is linked to a booking record.'}
             </div>
           </div>
           {event.booking_id && (
@@ -144,6 +174,12 @@ export default async function EditEventPage({
             </div>
           )}
         </div>
+
+        {event.booking_id && bookingMoney && !bookingMoney.lost && bookingMoney.remainingBalance > 0 && (
+          <div style={{ marginTop: '14px', borderTop: '1px solid var(--border)', paddingTop: '14px' }}>
+            <MarkPaidForm bookingId={event.booking_id} balance={bookingMoney.remainingBalance} returnTo={`/admin/events/${event.id}`} />
+          </div>
+        )}
 
         {!event.booking_id && (
           <details id="invoice" open={Boolean(getMessage(resolvedSearchParams?.invoice))} style={{ marginTop: '14px', borderTop: '1px solid var(--border)', paddingTop: '14px' }}>

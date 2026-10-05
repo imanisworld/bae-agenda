@@ -13,16 +13,22 @@ function buildAdmin(args: {
   const selectEq = vi.fn(() => ({ maybeSingle }))
   const select = vi.fn(() => ({ eq: selectEq }))
 
-  const updateEq = vi.fn().mockResolvedValue({
-    error: args.updateError ?? null,
-  })
-  const update = vi.fn(() => ({ eq: updateEq }))
+  // Awaitable filter chain: update(...).eq(...).in(...) / .eq(...).eq(...)
+  const filters: Array<[string, string, unknown]> = []
+  const chain: Record<string, unknown> = {
+    eq: vi.fn((column: string, value: unknown) => { filters.push(['eq', column, value]); return chain }),
+    in: vi.fn((column: string, value: unknown) => { filters.push(['in', column, value]); return chain }),
+    then: (resolve: (value: unknown) => void) => resolve({ error: args.updateError ?? null }),
+  }
+  const update = vi.fn(() => chain)
 
   const from = vi.fn(() => ({ select, update }))
 
   return {
     admin: { from },
+    from,
     update,
+    filters,
   }
 }
 
@@ -60,6 +66,9 @@ describe('booking payment state sync', () => {
       payment_status: 'paid',
       balance_paid_at: '2026-09-28T18:30:00.000Z',
     })
+    expect(setup.from).toHaveBeenCalledWith('invoices')
+    expect(setup.update).toHaveBeenCalledWith({ status: 'paid' })
+    expect(setup.filters).toContainEqual(['in', 'status', ['draft', 'sent']])
   })
 
   it('clears balance paid timestamp when the booking is not fully paid', async () => {
@@ -86,6 +95,8 @@ describe('booking payment state sync', () => {
       payment_status: 'deposit_paid',
       balance_paid_at: null,
     })
+    expect(setup.update).toHaveBeenCalledWith({ status: 'sent' })
+    expect(setup.filters).toContainEqual(['eq', 'status', 'paid'])
   })
 
   it('returns null without writing when the booking cannot be loaded', async () => {
