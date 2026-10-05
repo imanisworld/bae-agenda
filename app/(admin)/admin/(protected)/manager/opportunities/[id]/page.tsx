@@ -8,6 +8,7 @@ import { updateManagerOpportunityAction } from '@/app/actions/manager'
 import { addManagerOpportunityActivityAction } from '@/app/actions/manager-activity'
 import { prepareManagerOutreachAction, saveManagerOutreachDraftAction } from '@/app/actions/manager-outreach'
 import { dispatchManagerOutreachAction } from '@/app/actions/manager-dispatch'
+import { dispatchManagerFollowUpAction } from '@/app/actions/manager-follow-up'
 import {
   MANAGER_ACTIVITY_TYPES,
   MANAGER_ACTIVITY_TYPE_LABELS,
@@ -25,6 +26,12 @@ import {
 } from '@/lib/manager-outreach'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { defaultManagerFollowUpDate, managerDispatchActionLabel } from '@/lib/manager-dispatch'
+import {
+  buildManagerFollowUpDraft,
+  defaultManagerSecondFollowUpDate,
+  managerFollowUpActionLabel,
+  managerFollowUpUrgency,
+} from '@/lib/manager-follow-up'
 
 type ScoreComponent = { score?: number; max?: number; note?: string }
 
@@ -178,6 +185,11 @@ export default async function ManagerOpportunityDetailPage({
   const status = opportunity.status ?? 'found'
   const opportunityType = opportunity.opportunity_type ?? 'other'
   const sourceType = opportunity.source_type ?? 'other'
+  const followUpEligible = ['applied', 'contacted', 'follow_up'].includes(status)
+  const followUpUrgency = managerFollowUpUrgency(opportunity.next_action_at)
+  const followUpDraft = followUpEligible
+    ? buildManagerFollowUpDraft(opportunity)
+    : null
 
   return (
     <div className="admin-page admin-page--narrow">
@@ -511,6 +523,89 @@ export default async function ManagerOpportunityDetailPage({
         )}
       </section>
 
+      {followUpEligible && followUpDraft && opportunity.outreach_channel && (
+        <section className="admin-section" style={{ marginBottom: 16 }}>
+          <div className="admin-section-header">
+            <span className="admin-section-title">Follow-up</span>
+            <span
+              className="muted"
+              style={{
+                color:
+                  followUpUrgency === 'overdue'
+                    ? '#e85d75'
+                    : followUpUrgency === 'due'
+                      ? 'var(--gold)'
+                      : undefined,
+              }}
+            >
+              {opportunity.next_action_at
+                ? `${followUpUrgency === 'overdue' ? 'Overdue' : followUpUrgency === 'due' ? 'Due today' : 'Scheduled'} · ${opportunity.next_action_at}`
+                : 'Not scheduled'}
+            </span>
+          </div>
+
+          <p className="muted" style={{ margin: '14px 0', fontSize: 11, lineHeight: 1.6 }}>
+            This draft is based on the original opportunity and outreach route. Edit it before sending or recording the follow-up.
+            {opportunity.outreach_channel === 'email'
+              ? ' Email follow-ups use the existing Resend transport.'
+              : ' Complete this follow-up externally, then record it here.'}
+          </p>
+
+          <form action={dispatchManagerFollowUpAction}>
+            <input type="hidden" name="opportunity_id" value={opportunity.id} />
+
+            <label style={{ display: 'grid', gap: 7, marginBottom: 14 }}>
+              <span className="admin-field-label">Follow-up Draft</span>
+              <textarea
+                name="follow_up_draft"
+                rows={10}
+                defaultValue={followUpDraft}
+                className="admin-input"
+                style={{ minHeight: 220, resize: 'vertical', lineHeight: 1.6 }}
+              />
+            </label>
+
+            <div className="admin-form-grid-two" style={{ marginBottom: 14 }}>
+              <div style={{ display: 'grid', gap: 7 }}>
+                <span className="admin-field-label">Channel</span>
+                <div className="admin-input" style={{ display: 'flex', alignItems: 'center' }}>
+                  {MANAGER_OUTREACH_CHANNEL_LABELS[opportunity.outreach_channel]}
+                </div>
+              </div>
+
+              <label style={{ display: 'grid', gap: 7 }}>
+                <span className="admin-field-label">Next Check If No Response</span>
+                <input
+                  name="next_follow_up_on"
+                  type="date"
+                  defaultValue={defaultManagerSecondFollowUpDate()}
+                  className="admin-input"
+                />
+              </label>
+            </div>
+
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 14, color: 'var(--muted)', fontSize: 11, lineHeight: 1.5 }}>
+              <input
+                type="checkbox"
+                name="confirm_follow_up"
+                value="yes"
+                required
+                style={{ marginTop: 2 }}
+              />
+              <span>
+                {opportunity.outreach_channel === 'email'
+                  ? 'I reviewed this follow-up. Send it now and record it in Manager.'
+                  : 'I completed this follow-up externally. Record the saved copy and schedule the next check.'}
+              </span>
+            </label>
+
+            <button type="submit" className="admin-btn-primary">
+              {managerFollowUpActionLabel(opportunity.outreach_channel)}
+            </button>
+          </form>
+        </section>
+      )}
+
       <section className="admin-section" style={{ marginBottom: 16 }}>
         <div className="admin-section-header">
           <span className="admin-section-title">Activity Timeline</span>
@@ -555,7 +650,7 @@ export default async function ManagerOpportunityDetailPage({
 
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
             <span className="muted" style={{ fontSize: 10 }}>
-              Logging activity does not change pipeline status. Status changes are recorded automatically when you save the opportunity.
+              Response clears the scheduled follow-up. Negotiation moves the opportunity to Negotiating. Other manual activity does not change pipeline status unless noted.
             </span>
             <button type="submit" className="admin-btn-primary">Add Activity</button>
           </div>
