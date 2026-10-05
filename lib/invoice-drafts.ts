@@ -33,7 +33,7 @@ function invoiceDueDate(booking: InvoiceDraftSource) {
   }
 }
 
-export function buildInvoiceDraftRecord(booking: InvoiceDraftSource) {
+export function buildInvoiceDraftRecord(booking: InvoiceDraftSource, invoiceNumber?: string) {
   const clientName = [booking.clients?.first_name, booking.clients?.last_name]
     .filter(Boolean)
     .join(' ')
@@ -46,7 +46,7 @@ export function buildInvoiceDraftRecord(booking: InvoiceDraftSource) {
   return {
     booking_id: booking.id,
     status: 'draft' as const,
-    invoice_number: invoiceNumberOf(booking),
+    invoice_number: invoiceNumber ?? invoiceNumberOf(booking),
     pdf_filename: invoiceFilename(booking),
     event_name: booking.event_name,
     client_name: clientName,

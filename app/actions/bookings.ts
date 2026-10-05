@@ -35,6 +35,7 @@ import {
 import { isValidTimeZone, toEventISO } from '@/lib/date-time'
 import { suggestEventTimeZone } from '@/lib/event-form-options'
 import { buildInvoiceDraftRecord, type InvoiceDraftSource } from '@/lib/invoice-drafts'
+import { getNextInvoiceNumber } from '@/lib/invoice-numbers'
 import { sendBookingBalanceReminder, sendBookingConfirmedNotification, sendBookingInquiryReceipt, sendW9Notification } from '@/lib/notifications'
 import { BOOKING_LIFECYCLE_STATUSES, PAYMENT_METHODS, PAYMENT_TYPES } from '@/lib/constants'
 import { generateW9Pdf } from '@/lib/w9-pdf'
@@ -330,7 +331,6 @@ async function ensureInvoiceDraft(admin: ReturnType<typeof createAdminClient>, b
   const booking = await getBookingInvoiceDraftSource(admin, bookingId)
   if (!booking || booking.status !== 'confirmed') return { created: false, updated: false }
 
-  const draft = buildInvoiceDraftRecord(booking)
   const { data: existing, error: existingError } = await admin
     .from('invoices')
     .select('id')
@@ -339,8 +339,15 @@ async function ensureInvoiceDraft(admin: ReturnType<typeof createAdminClient>, b
 
   if (existingError) {
     console.error('[invoice-draft] unable to check existing invoice:', existingError)
+    return { created: false, updated: false }
   }
 
+  // A new invoice takes the next number; an existing one keeps the number it already has.
+  const { invoice_number: nextNumber, ...draftFields } = buildInvoiceDraftRecord(
+    booking,
+    existing?.id ? undefined : await getNextInvoiceNumber(admin)
+  )
+  const draft = existing?.id ? draftFields : { ...draftFields, invoice_number: nextNumber }
   const { error } = await admin
     .from('invoices')
     .upsert(draft, { onConflict: 'booking_id' })

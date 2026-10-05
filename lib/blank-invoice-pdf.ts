@@ -69,7 +69,7 @@ function labeledField(
   field(form, page, name, { x, y, width }, fonts)
 }
 
-export async function generateBlankInvoicePdf() {
+export async function generateBlankInvoicePdf(prefill: { invoiceNumber?: string; invoiceDate?: string } = {}) {
   const pdf = await PDFDocument.create()
   pdf.setTitle('DJ B.A.E. Invoice')
   pdf.setAuthor('DJ B.A.E. — The Bae Agenda')
@@ -92,14 +92,15 @@ export async function generateBlankInvoicePdf() {
   })
 
   // Invoice number and dates, label left of the line
+  // Number and date come prefilled with the next invoice number and today; both stay editable.
   ;[
-    ['invoice_number', 'Invoice #'],
-    ['invoice_date', 'Date'],
-    ['due_date', 'Due'],
-  ].forEach(([name, text], index) => {
+    ['invoice_number', 'Invoice #', prefill.invoiceNumber],
+    ['invoice_date', 'Date', prefill.invoiceDate],
+    ['due_date', 'Due', undefined],
+  ].forEach(([name, text, value], index) => {
     const y = 630 - index * 22
-    label(page, text, rightX + 60, y + 5, fonts)
-    field(form, page, name, { x: rightX + 110, y, width: RIGHT - rightX - 110 }, fonts)
+    label(page, text as string, rightX + 60, y + 5, fonts)
+    field(form, page, name as string, { x: rightX + 110, y, width: RIGHT - rightX - 110 }, fonts, { value })
   })
 
   page.drawLine({ start: { x: LEFT, y: 572 }, end: { x: RIGHT, y: 572 }, thickness: 0.6, color: brand.gold })
