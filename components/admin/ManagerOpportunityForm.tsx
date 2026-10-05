@@ -351,7 +351,7 @@ export default function ManagerOpportunityForm({
             />
           </label>
           <label style={{ display: 'grid', gap: 7 }}>
-            <FieldLabel>Travel Cost</FieldLabel>
+            <FieldLabel>Out-of-pocket Travel Cost</FieldLabel>
             <input
               name="travel_cost_estimate"
               type="number"
