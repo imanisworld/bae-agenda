@@ -10,6 +10,7 @@ import {
   type ManagerOpportunityType,
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { managerFollowUpUrgency } from '@/lib/manager-follow-up'
 
 interface OpportunityRow {
   id: string
@@ -159,6 +160,14 @@ export default async function ManagerPage() {
   const needsReview = opportunities.filter((item) => ['found', 'qualified', 'review'].includes(item.status))
   const inMotion = opportunities.filter((item) => ['outreach_ready', 'applied', 'contacted', 'follow_up', 'negotiating'].includes(item.status))
   const booked = opportunities.filter((item) => item.status === 'booked')
+  const followUpQueue = opportunities
+    .filter((item) => ['applied', 'contacted', 'follow_up'].includes(item.status))
+    .map((item) => ({
+      ...item,
+      followUpUrgency: managerFollowUpUrgency(item.next_action_at),
+    }))
+    .filter((item) => item.followUpUrgency === 'due' || item.followUpUrgency === 'overdue')
+    .sort((a, b) => (a.next_action_at ?? '').localeCompare(b.next_action_at ?? ''))
 
   return (
     <div className="admin-page">
@@ -205,6 +214,7 @@ export default async function ManagerPage() {
           ['Active', active.length, 'Open pipeline'],
           ['Needs Review', needsReview.length, 'Found / qualified'],
           ['In Motion', inMotion.length, 'Outreach through negotiation'],
+          ['Follow-ups', followUpQueue.length, 'Due or overdue'],
           ['Booked', booked.length, 'Converted opportunities'],
         ].map(([label, value, sub]) => (
           <div key={String(label)} className="admin-stat-card">
@@ -228,6 +238,61 @@ export default async function ManagerPage() {
           </div>
         </div>
       )}
+
+      <section className="admin-section" style={{ marginBottom: 24 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Follow-up Queue</span>
+          <span className="muted">{followUpQueue.length} due / overdue</span>
+        </div>
+
+        {followUpQueue.length === 0 ? (
+          <AdminEmptyState
+            title="No follow-ups due"
+            desc="Contacted and applied opportunities will appear here when their scheduled follow-up date arrives."
+          />
+        ) : (
+          <div style={{ display: 'grid', gap: 1, background: 'var(--border)' }}>
+            {followUpQueue.map((item) => (
+              <Link
+                key={item.id}
+                href={`/admin/manager/opportunities/${item.id}`}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'minmax(0, 1fr) auto auto',
+                  gap: 14,
+                  alignItems: 'center',
+                  padding: '14px 16px',
+                  background: 'var(--surface)',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
+              >
+                <div style={{ minWidth: 0 }}>
+                  <strong style={{ display: 'block', fontSize: 12, fontWeight: 500 }}>
+                    {item.title}
+                  </strong>
+                  <span className="muted" style={{ fontSize: 10 }}>
+                    {item.organization ?? 'No organization'} · {item.next_action ?? 'Follow up'}
+                  </span>
+                </div>
+                <span
+                  style={{
+                    fontSize: 10,
+                    textTransform: 'uppercase',
+                    letterSpacing: '.08em',
+                    color: item.followUpUrgency === 'overdue' ? '#e85d75' : 'var(--gold)',
+                  }}
+                >
+                  {item.followUpUrgency}
+                </span>
+                <span className="muted" style={{ fontSize: 11 }}>
+                  {fmtDate(item.next_action_at)}
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="admin-section" style={{ marginBottom: 0 }}>
         <div className="admin-section-header">
