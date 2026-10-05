@@ -1,0 +1,560 @@
+import Link from 'next/link'
+import { notFound } from 'next/navigation'
+import AdminNotice from '@/components/admin/AdminNotice'
+import ManagerOpportunityForm, { type ManagerOpportunityFormValue } from '@/components/admin/ManagerOpportunityForm'
+import ManagerStatusBadge from '@/components/admin/ManagerStatusBadge'
+import PageHeader from '@/components/admin/PageHeader'
+import { updateManagerOpportunityAction } from '@/app/actions/manager'
+import { addManagerOpportunityActivityAction } from '@/app/actions/manager-activity'
+import { prepareManagerOutreachAction, saveManagerOutreachDraftAction } from '@/app/actions/manager-outreach'
+import {
+  MANAGER_ACTIVITY_TYPES,
+  MANAGER_ACTIVITY_TYPE_LABELS,
+  MANAGER_OPPORTUNITY_TYPE_LABELS,
+  MANAGER_SOURCE_TYPE_LABELS,
+  isManagerOpportunityStatus,
+  isManagerOpportunityType,
+  isManagerSourceType,
+} from '@/lib/manager'
+import {
+  MANAGER_OUTREACH_CHANNELS,
+  MANAGER_OUTREACH_CHANNEL_LABELS,
+  type ManagerOutreachChannel,
+  type ManagerOutreachAsset,
+} from '@/lib/manager-outreach'
+import { createAdminClient } from '@/lib/supabase/admin'
+
+type ScoreComponent = { score?: number; max?: number; note?: string }
+
+type ActivityRow = {
+  id: string
+  activity_type: keyof typeof MANAGER_ACTIVITY_TYPE_LABELS
+  title: string
+  body: string | null
+  occurred_at: string
+  from_status: string | null
+  to_status: string | null
+  metadata: Record<string, unknown> | null
+}
+
+type OpportunityDetail = ManagerOpportunityFormValue & {
+  id: string
+  created_at: string
+  applied_at: string | null
+  last_contacted_at: string | null
+  booked_at: string | null
+  linked_booking_id?: string | null
+  fit_score_breakdown?: {
+    pay?: ScoreComponent
+    travel?: ScoreComponent
+    eventFit?: ScoreComponent
+    musicFit?: ScoreComponent
+    readiness?: ScoreComponent
+    flags?: string[]
+  } | null
+  fit_score_version?: string | null
+  fit_scored_at?: string | null
+  outreach_channel?: ManagerOutreachChannel | null
+  outreach_subject?: string | null
+  outreach_draft?: string | null
+  outreach_assets?: ManagerOutreachAsset[] | null
+  outreach_missing_items?: string[] | null
+  outreach_prepared_at?: string | null
+  outreach_version?: string | null
+  economics_breakdown?: {
+    note?: string
+    guaranteed_gross?: number | null
+    expected_work_hours?: number | null
+    one_way_travel_minutes?: number | null
+    round_trip_travel_hours?: number | null
+    expected_total_hours?: number | null
+    travel_cost_estimate?: number | null
+    estimated_net_pay?: number | null
+    on_site_gross_hourly_rate?: number | null
+    effective_hourly_rate?: number | null
+    effective_hourly_basis?: string | null
+    complete?: boolean
+  } | null
+}
+
+function getMessage(value: string | string[] | undefined) {
+  if (!value) return null
+  return Array.isArray(value) ? value[0] ?? null : value
+}
+
+function fmtMoney(value: number | null | undefined) {
+  if (value === null || value === undefined) return '—'
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 2,
+  }).format(value)
+}
+
+function fmtHours(value: number | null | undefined) {
+  if (value === null || value === undefined) return '—'
+  return `${Number(value).toFixed(Number(value) % 1 === 0 ? 0 : 2)} hr`
+}
+
+function economicsBasisLabel(value: string | null | undefined) {
+  if (value === 'all_in_net') return 'All-in net'
+  if (value === 'all_in_gross') return 'All-in gross'
+  if (value === 'on_site_gross') return 'On-site gross'
+  return 'Incomplete'
+}
+
+function fmtTimestamp(value: string | null) {
+  if (!value) return '—'
+  return new Date(value).toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZone: 'America/Indiana/Indianapolis',
+  })
+}
+
+async function getActivities(id: string): Promise<ActivityRow[]> {
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('manager_opportunity_activities')
+    .select('id, activity_type, title, body, occurred_at, from_status, to_status, metadata')
+    .eq('opportunity_id', id)
+    .order('occurred_at', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(100)
+
+  if (error) {
+    if (error.code === '42P01' || error.code === 'PGRST205') return []
+    throw new Error(error.message || 'Unable to load opportunity activity.')
+  }
+
+  return (data ?? []) as ActivityRow[]
+}
+
+async function getOpportunity(id: string): Promise<OpportunityDetail | null> {
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('manager_opportunities')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (error) {
+    if (error.code === '42P01' || error.code === 'PGRST205') return null
+    throw new Error(error.message || 'Unable to load opportunity.')
+  }
+
+  if (!data) return null
+
+  return {
+    ...data,
+    opportunity_type: isManagerOpportunityType(data.opportunity_type) ? data.opportunity_type : 'other',
+    source_type: isManagerSourceType(data.source_type) ? data.source_type : 'other',
+    status: isManagerOpportunityStatus(data.status) ? data.status : 'found',
+  } as OpportunityDetail
+}
+
+export default async function ManagerOpportunityDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>
+  searchParams?: Promise<{ error?: string | string[]; success?: string | string[] }>
+}) {
+  const { id } = await params
+  const query = searchParams ? await searchParams : undefined
+  const [opportunity, activities] = await Promise.all([
+    getOpportunity(id),
+    getActivities(id),
+  ])
+  if (!opportunity) notFound()
+
+  const errorMessage = getMessage(query?.error)
+  const successMessage = getMessage(query?.success)
+  const status = opportunity.status ?? 'found'
+  const opportunityType = opportunity.opportunity_type ?? 'other'
+  const sourceType = opportunity.source_type ?? 'other'
+
+  return (
+    <div className="admin-page admin-page--narrow">
+      <PageHeader
+        title={opportunity.title ?? 'Opportunity'}
+        subtitle={[
+          opportunity.organization,
+          MANAGER_OPPORTUNITY_TYPE_LABELS[opportunityType],
+        ].filter(Boolean).join(' · ')}
+        action={{ label: 'Back To Manager', href: '/admin/manager' }}
+      />
+
+      {errorMessage && <AdminNotice message={errorMessage} />}
+      {successMessage && (
+        <div className="admin-preview-banner" style={{ marginBottom: 16 }}>
+          <span className="admin-preview-mark" aria-hidden="true">✓</span>
+          <div><div className="admin-preview-title">{successMessage}</div></div>
+        </div>
+      )}
+
+      <section className="admin-section" style={{ marginBottom: 16 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Manager Snapshot</span>
+          <ManagerStatusBadge status={status} />
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: 1,
+            background: 'var(--border)',
+          }}
+        >
+          {[
+            ['Type', MANAGER_OPPORTUNITY_TYPE_LABELS[opportunityType]],
+            ['Source', MANAGER_SOURCE_TYPE_LABELS[sourceType]],
+            ['Demo', opportunity.recommended_demo ?? 'Not selected'],
+            ['Fit', opportunity.fit_score === null || opportunity.fit_score === undefined ? 'Not scored' : `${opportunity.fit_score}/100`],
+            ['Scored', fmtTimestamp(opportunity.fit_scored_at ?? null)],
+            ['Added', fmtTimestamp(opportunity.created_at)],
+            ['Applied', fmtTimestamp(opportunity.applied_at)],
+            ['Last Contact', fmtTimestamp(opportunity.last_contacted_at)],
+            ['Booked', fmtTimestamp(opportunity.booked_at)],
+          ].map(([label, value]) => (
+            <div key={label} style={{ background: 'var(--surface)', padding: '14px 16px' }}>
+              <div style={{ color: 'var(--muted)', fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
+                {label}
+              </div>
+              <div style={{ color: 'var(--white)', fontSize: 12 }}>{value}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="admin-section" style={{ marginBottom: 16 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Gig Economics</span>
+          <span className="muted">{economicsBasisLabel(opportunity.economics_basis)}</span>
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+            gap: 1,
+            background: 'var(--border)',
+          }}
+        >
+          {[
+            ['Guaranteed Pay', fmtMoney(opportunity.compensation_min)],
+            ['Work Hours', fmtHours(opportunity.expected_work_hours)],
+            ['Travel One-way', opportunity.travel_minutes === null || opportunity.travel_minutes === undefined ? '—' : `${opportunity.travel_minutes} min`],
+            ['Total Time', fmtHours(opportunity.estimated_total_hours)],
+            ['Travel Cost', fmtMoney(opportunity.travel_cost_estimate)],
+            ['Est. Net Pay', fmtMoney(opportunity.estimated_net_pay)],
+            ['Effective Rate', opportunity.effective_hourly_rate === null || opportunity.effective_hourly_rate === undefined ? '—' : `${fmtMoney(opportunity.effective_hourly_rate)}/hr`],
+          ].map(([label, value]) => (
+            <div key={String(label)} style={{ background: 'var(--surface)', padding: '14px 16px' }}>
+              <div style={{ color: 'var(--muted)', fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
+                {label}
+              </div>
+              <div style={{ color: 'var(--white)', fontSize: 12 }}>{value}</div>
+            </div>
+          ))}
+        </div>
+        {opportunity.economics_breakdown?.note && (
+          <p className="muted" style={{ fontSize: 11, margin: '12px 0 0' }}>
+            {opportunity.economics_breakdown.note}
+          </p>
+        )}
+      </section>
+
+      {opportunity.fit_score_breakdown && (
+        <section className="admin-section" style={{ marginBottom: 16 }}>
+          <div className="admin-section-header">
+            <span className="admin-section-title">Why This Score</span>
+            <span className="muted">{opportunity.fit_score_version ?? 'v1'}</span>
+          </div>
+          <div style={{ display: 'grid', gap: 10, padding: '4px 0' }}>
+            {[
+              ['Pay', opportunity.fit_score_breakdown.pay],
+              ['Travel', opportunity.fit_score_breakdown.travel],
+              ['Event Fit', opportunity.fit_score_breakdown.eventFit],
+              ['Music Fit', opportunity.fit_score_breakdown.musicFit],
+              ['Readiness', opportunity.fit_score_breakdown.readiness],
+            ].map(([label, component]) => {
+              const item = component as ScoreComponent | undefined
+              if (!item) return null
+              return (
+                <div key={String(label)} style={{ display: 'grid', gridTemplateColumns: '110px 70px 1fr', gap: 12, alignItems: 'baseline' }}>
+                  <strong style={{ fontSize: 12, fontWeight: 500 }}>{String(label)}</strong>
+                  <span style={{ fontSize: 12 }}>{item.score ?? 0}/{item.max ?? '—'}</span>
+                  <span className="muted" style={{ fontSize: 12 }}>{item.note ?? '—'}</span>
+                </div>
+              )
+            })}
+            {(opportunity.fit_score_breakdown.flags?.length ?? 0) > 0 && (
+              <div className="muted" style={{ fontSize: 11 }}>
+                Flags: {opportunity.fit_score_breakdown.flags?.join(', ')}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginBottom: 16 }}>
+        {opportunity.linked_booking_id ? (
+          <Link
+            href={`/admin/bookings/${opportunity.linked_booking_id}`}
+            className="admin-btn-primary"
+          >
+            Open Linked Booking →
+          </Link>
+        ) : (
+          <Link
+            href={`/admin/bookings/new?opportunity=${opportunity.id}`}
+            className="admin-btn-primary"
+          >
+            Create Booking From Opportunity
+          </Link>
+        )}
+      </div>
+
+      {opportunity.source_url && (
+        <div style={{ marginBottom: 16 }}>
+          <Link
+            href={opportunity.source_url}
+            target="_blank"
+            rel="noreferrer"
+            className="admin-btn-ghost"
+          >
+            Open Original Source ↗
+          </Link>
+        </div>
+      )}
+
+      <section className="admin-section" style={{ marginBottom: 16 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Outreach / Application Prep</span>
+          <span className="muted">
+            {opportunity.outreach_prepared_at
+              ? `Prepared ${fmtTimestamp(opportunity.outreach_prepared_at)}`
+              : 'Not prepared'}
+          </span>
+        </div>
+
+        {!opportunity.outreach_draft ? (
+          <div style={{ padding: '18px 0' }}>
+            <p className="muted" style={{ margin: '0 0 14px', fontSize: 12, lineHeight: 1.6 }}>
+              Build a review-only pitch using the opportunity, Manager Profile, website, Instagram, and closest published mix. Nothing is sent automatically.
+            </p>
+            <form action={prepareManagerOutreachAction}>
+              <input type="hidden" name="opportunity_id" value={opportunity.id} />
+              <button type="submit" className="admin-btn-primary">Prepare Outreach</button>
+            </form>
+          </div>
+        ) : (
+          <>
+            {(opportunity.outreach_missing_items?.length ?? 0) > 0 ? (
+              <div className="admin-preview-banner" style={{ margin: '14px 0' }}>
+                <span className="admin-preview-mark" aria-hidden="true">!</span>
+                <div>
+                  <div className="admin-preview-title">Missing Before Outreach</div>
+                  <div style={{ display: 'grid', gap: 4, marginTop: 6 }}>
+                    {opportunity.outreach_missing_items?.map((item) => (
+                      <span key={item} className="muted" style={{ fontSize: 11 }}>{item}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="admin-preview-banner" style={{ margin: '14px 0' }}>
+                <span className="admin-preview-mark" aria-hidden="true">✓</span>
+                <div>
+                  <div className="admin-preview-title">Prep complete</div>
+                  <p>Manager found a usable route and supporting assets. Review the copy before you send or apply.</p>
+                </div>
+              </div>
+            )}
+
+            <form action={saveManagerOutreachDraftAction} style={{ padding: '14px 0 18px' }}>
+              <input type="hidden" name="opportunity_id" value={opportunity.id} />
+
+              <div className="admin-form-grid-two" style={{ marginBottom: 12 }}>
+                <label style={{ display: 'grid', gap: 7 }}>
+                  <span className="admin-field-label">Recommended Channel</span>
+                  <select
+                    name="outreach_channel"
+                    defaultValue={opportunity.outreach_channel ?? 'other'}
+                    className="admin-input"
+                  >
+                    {MANAGER_OUTREACH_CHANNELS.map((channel) => (
+                      <option key={channel} value={channel}>
+                        {MANAGER_OUTREACH_CHANNEL_LABELS[channel]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label style={{ display: 'grid', gap: 7 }}>
+                  <span className="admin-field-label">Subject</span>
+                  <input
+                    name="outreach_subject"
+                    defaultValue={opportunity.outreach_subject ?? ''}
+                    className="admin-input"
+                    placeholder="Email/application subject"
+                  />
+                </label>
+              </div>
+
+              <label style={{ display: 'grid', gap: 7, marginBottom: 14 }}>
+                <span className="admin-field-label">Prepared Draft</span>
+                <textarea
+                  name="outreach_draft"
+                  rows={14}
+                  defaultValue={opportunity.outreach_draft ?? ''}
+                  className="admin-input"
+                  style={{ minHeight: 300, resize: 'vertical', lineHeight: 1.6 }}
+                />
+              </label>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                <span className="muted" style={{ fontSize: 10 }}>
+                  Saving edits does not contact anyone.
+                </span>
+                <button type="submit" className="admin-btn-primary">Save Draft</button>
+              </div>
+            </form>
+
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+              <div className="admin-section-title" style={{ marginBottom: 10 }}>Assets To Send</div>
+              {(opportunity.outreach_assets?.length ?? 0) === 0 ? (
+                <p className="muted" style={{ fontSize: 11, margin: 0 }}>No supporting assets selected.</p>
+              ) : (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {opportunity.outreach_assets?.map((asset) => (
+                    <Link
+                      key={`${asset.kind}:${asset.url}`}
+                      href={asset.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="admin-btn-ghost"
+                      title={asset.note}
+                    >
+                      {asset.label} ↗
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              <form action={prepareManagerOutreachAction} style={{ marginTop: 14 }}>
+                <input type="hidden" name="opportunity_id" value={opportunity.id} />
+                <button type="submit" className="admin-btn-ghost">Refresh Prep</button>
+              </form>
+            </div>
+          </>
+        )}
+      </section>
+
+      <section className="admin-section" style={{ marginBottom: 16 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Activity Timeline</span>
+          <span className="muted">{activities.length} entries</span>
+        </div>
+
+        <form action={addManagerOpportunityActivityAction} style={{ padding: '16px 0 20px', borderBottom: '1px solid var(--border)', marginBottom: 18 }}>
+          <input type="hidden" name="opportunity_id" value={opportunity.id} />
+          <div className="admin-form-grid-two" style={{ marginBottom: 12 }}>
+            <label style={{ display: 'grid', gap: 7 }}>
+              <span className="admin-field-label">Activity Type</span>
+              <select name="activity_type" defaultValue="note" className="admin-input">
+                {MANAGER_ACTIVITY_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {MANAGER_ACTIVITY_TYPE_LABELS[type]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: 7 }}>
+              <span className="admin-field-label">When</span>
+              <input
+                name="occurred_at"
+                type="datetime-local"
+                className="admin-input"
+              />
+              <span className="muted" style={{ fontSize: 10 }}>
+                Leave blank to use now.
+              </span>
+            </label>
+          </div>
+
+          <label style={{ display: 'grid', gap: 7, marginBottom: 12 }}>
+            <span className="admin-field-label">Details</span>
+            <textarea
+              name="body"
+              rows={3}
+              className="admin-input"
+              placeholder="What happened? Who replied? What needs to happen next?"
+            />
+          </label>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span className="muted" style={{ fontSize: 10 }}>
+              Logging activity does not change pipeline status. Status changes are recorded automatically when you save the opportunity.
+            </span>
+            <button type="submit" className="admin-btn-primary">Add Activity</button>
+          </div>
+        </form>
+
+        {activities.length === 0 ? (
+          <p className="muted" style={{ margin: 0, fontSize: 12 }}>
+            No activity has been recorded yet.
+          </p>
+        ) : (
+          <div style={{ display: 'grid', gap: 0 }}>
+            {activities.map((activity) => (
+              <div
+                key={activity.id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '120px minmax(0, 1fr)',
+                  gap: 18,
+                  padding: '14px 0',
+                  borderBottom: '1px solid var(--border)',
+                }}
+              >
+                <div>
+                  <div style={{ color: 'var(--gold)', fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 5 }}>
+                    {MANAGER_ACTIVITY_TYPE_LABELS[activity.activity_type] ?? activity.activity_type}
+                  </div>
+                  <div className="muted" style={{ fontSize: 10 }}>
+                    {fmtTimestamp(activity.occurred_at)}
+                  </div>
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <strong style={{ display: 'block', fontSize: 12, fontWeight: 500, marginBottom: activity.body ? 5 : 0 }}>
+                    {activity.title}
+                  </strong>
+                  {activity.body && (
+                    <p className="muted" style={{ margin: 0, fontSize: 11, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                      {activity.body}
+                    </p>
+                  )}
+                  {activity.from_status && activity.to_status && (
+                    <div className="muted" style={{ marginTop: 5, fontSize: 10 }}>
+                      {activity.from_status} → {activity.to_status}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <ManagerOpportunityForm
+        action={updateManagerOpportunityAction}
+        mode="edit"
+        value={opportunity}
+      />
+    </div>
+  )
+}
