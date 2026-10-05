@@ -2,11 +2,13 @@ import type { CSSProperties } from 'react'
 import Link from 'next/link'
 import PageHeader from '@/components/admin/PageHeader'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
+import AdminPagination from '@/components/admin/AdminPagination'
 import SendInvoiceButton from '@/components/admin/SendInvoiceButton'
 import ConfirmSubmitButton from '@/components/admin/ConfirmSubmitButton'
 import { restoreInvoiceDraftAction, voidInvoiceAction } from '@/app/actions/invoices'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { formatInvoiceDueDate } from '@/lib/invoices'
+import { normalizeAdminPage, paginateRows } from '@/lib/admin-pagination'
 
 export const dynamic = 'force-dynamic'
 
@@ -99,12 +101,13 @@ async function getInvoices(): Promise<InvoiceRow[]> {
 export default async function InvoicesPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ status?: string | string[]; q?: string | string[] }>
+  searchParams?: Promise<{ status?: string | string[]; q?: string | string[]; page?: string | string[] }>
 }) {
   const invoices = await getInvoices()
   const params = searchParams ? await searchParams : undefined
   const requestedStatus = singleParam(params?.status)
   const query = singleParam(params?.q).trim()
+  const requestedPage = normalizeAdminPage(params?.page)
   const activeStatus: InvoiceFilterKey = FILTERS.some((filter) => filter.key === requestedStatus)
     ? requestedStatus as InvoiceFilterKey
     : 'all'
@@ -113,6 +116,7 @@ export default async function InvoicesPage({
   const visibleInvoices = activeStatus === 'all'
     ? searchedInvoices
     : searchedInvoices.filter((invoice) => invoice.status === activeStatus)
+  const invoicePage = paginateRows(visibleInvoices, requestedPage)
 
   const outstanding = invoices
     .filter((invoice) => invoice.status !== 'paid' && invoice.status !== 'void')
@@ -216,7 +220,8 @@ export default async function InvoicesPage({
             desc={query ? `Nothing matches “${query}” in this view.` : 'Nothing matches this filter right now.'}
           />
         ) : (
-          <div className="admin-table-wrap">
+          <>
+            <div className="admin-table-wrap">
             <table className="admin-table admin-table-stack invoices-admin-table">
               <thead>
                 <tr>
@@ -231,7 +236,7 @@ export default async function InvoicesPage({
                 </tr>
               </thead>
               <tbody>
-                {visibleInvoices.map((invoice) => (
+                {invoicePage.items.map((invoice) => (
                   <tr key={invoice.id}>
                     <td data-label="Invoice">
                       <div className="invoice-number">#{invoice.invoice_number}</div>
@@ -311,7 +316,19 @@ export default async function InvoicesPage({
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+            <AdminPagination
+              pathname="/admin/invoices"
+              page={invoicePage.page}
+              totalPages={invoicePage.totalPages}
+              totalItems={invoicePage.totalItems}
+              pageSize={invoicePage.pageSize}
+              params={{
+                status: activeStatus === 'all' ? undefined : activeStatus,
+                q: query || undefined,
+              }}
+            />
+          </>
         )}
       </div>
     </div>
