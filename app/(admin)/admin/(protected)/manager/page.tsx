@@ -2,6 +2,7 @@ import Link from 'next/link'
 import AdminEmptyState from '@/components/admin/AdminEmptyState'
 import ManagerStatusBadge from '@/components/admin/ManagerStatusBadge'
 import PageHeader from '@/components/admin/PageHeader'
+import AdminPagination from '@/components/admin/AdminPagination'
 import {
   MANAGER_OPPORTUNITY_TYPE_LABELS,
   isManagerOpportunityStatus,
@@ -12,6 +13,7 @@ import {
 import { createAdminClient } from '@/lib/supabase/admin'
 import { managerFollowUpUrgency } from '@/lib/manager-follow-up'
 import { buildManagerTodayQueue } from '@/lib/manager-today'
+import { normalizeAdminPage, paginateRows } from '@/lib/admin-pagination'
 
 type ManagerPipelineView =
   | 'active'
@@ -202,10 +204,11 @@ async function getManagerData(): Promise<ManagerData> {
 export default async function ManagerPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ view?: string | string[] }>
+  searchParams?: Promise<{ view?: string | string[]; page?: string | string[] }>
 }) {
   const query = searchParams ? await searchParams : undefined
   const selectedView = normalizePipelineView(query?.view)
+  const requestedPage = normalizeAdminPage(query?.page)
   const data = await getManagerData()
   const opportunities = data.opportunities
   const active = data.activeOpportunities
@@ -236,6 +239,7 @@ export default async function ManagerPage({
     if (selectedView === 'warm_rebook') return !CLOSED_STATUSES.includes(item.status) && isWarmRebook(item)
     return true
   })
+  const pipelinePage = paginateRows(filteredOpportunities, requestedPage)
 
   return (
     <div className="admin-page">
@@ -420,7 +424,7 @@ export default async function ManagerPage({
       <section id="pipeline" className="admin-section" style={{ marginBottom: 0 }}>
         <div className="admin-section-header">
           <span className="admin-section-title">Opportunity Pipeline</span>
-          <span className="muted">{filteredOpportunities.length} shown · {opportunities.length} total</span>
+          <span className="muted">{filteredOpportunities.length} matching · {opportunities.length} total</span>
         </div>
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '14px 0 18px' }}>
@@ -446,7 +450,8 @@ export default async function ManagerPage({
             action={data.configured ? { label: 'Add Opportunity', href: '/admin/manager/opportunities/new' } : undefined}
           />
         ) : (
-          <div className="admin-table-wrap">
+          <>
+            <div className="admin-table-wrap">
             <table className="admin-table admin-table-stack">
               <thead>
                 <tr>
@@ -464,7 +469,7 @@ export default async function ManagerPage({
                 </tr>
               </thead>
               <tbody>
-                {filteredOpportunities.map((item) => (
+                {pipelinePage.items.map((item) => (
                   <tr key={item.id}>
                     <td data-label="Opportunity">
                       <div style={{ display: 'grid', gap: 3 }}>
@@ -497,7 +502,17 @@ export default async function ManagerPage({
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+            <AdminPagination
+              pathname="/admin/manager"
+              page={pipelinePage.page}
+              totalPages={pipelinePage.totalPages}
+              totalItems={pipelinePage.totalItems}
+              pageSize={pipelinePage.pageSize}
+              params={{ view: selectedView }}
+              hash="pipeline"
+            />
+          </>
         )}
       </section>
     </div>
