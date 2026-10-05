@@ -1,11 +1,6 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
-
-const UTILITY_LINKS = [
-  { label: 'Privacy', href: '/privacy' },
-  { label: 'Terms', href: '/terms' },
-  { label: 'Accessibility', href: '/accessibility' },
-]
+import { PUBLIC_LEGAL_NAV } from '@/lib/constants'
 
 interface Props {
   eyebrow: string
@@ -32,7 +27,7 @@ export default function UtilityPageShell({
           <div className="utility-page-intro">{intro}</div>
 
           <nav className="utility-page-nav" aria-label="Site policies">
-            {UTILITY_LINKS.map((item) => (
+            {PUBLIC_LEGAL_NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}

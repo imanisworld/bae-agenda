@@ -14,6 +14,20 @@ export const PUBLIC_NAV = [
   { label: 'Book',      href: '/book'      },
 ] as const
 
+/** Pages that exist outside the dock. Shown in the More menu and the footer. */
+export const PUBLIC_SECONDARY_NAV = [
+  { label: 'Contact',       href: '/book#contact' },
+  { label: 'Built',         href: '/built'        },
+  { label: 'Press Kit',     href: '/press-kit'    },
+  { label: 'Client Portal', href: '/portal/login' },
+] as const
+
+export const PUBLIC_LEGAL_NAV = [
+  { label: 'Privacy',       href: '/privacy'       },
+  { label: 'Terms',         href: '/terms'         },
+  { label: 'Accessibility', href: '/accessibility' },
+] as const
+
 export const ADMIN_NAV = [
   { label: 'Dashboard', href: '/admin/dashboard', icon: '⊞'  },
   { label: 'Manager',   href: '/admin/manager',   icon: 'MG' },

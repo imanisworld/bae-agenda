@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { PUBLIC_LEGAL_NAV } from '@/lib/constants'
 
 export const metadata: Metadata = {
   robots: {
@@ -15,9 +16,9 @@ export default function PortalLayout({ children }: { children: React.ReactNode }
       <div className="portal-shell-atmosphere" aria-hidden="true" />
       <div className="portal-shell-content">{children}</div>
       <nav className="portal-shell-utility" aria-label="Client portal policies">
-        <Link href="/privacy">Privacy</Link>
-        <Link href="/terms">Terms</Link>
-        <Link href="/accessibility">Accessibility</Link>
+        {PUBLIC_LEGAL_NAV.map((item) => (
+          <Link key={item.href} href={item.href}>{item.label}</Link>
+        ))}
         <Link href="/book#contact">Contact</Link>
       </nav>
     </div>
