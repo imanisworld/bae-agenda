@@ -18,6 +18,7 @@ import {
   type ManagerOutreachAsset,
   type ManagerOutreachChannel,
 } from '@/lib/manager-outreach'
+import { managerAsksConfirmed, splitManagerAsks } from '@/lib/manager-asks'
 import { sendEmailNotification } from '@/lib/notifications'
 import { createAdminClient } from '@/lib/supabase/admin'
 
@@ -61,7 +62,7 @@ export async function dispatchManagerOutreachAction(formData: FormData) {
     .from('manager_opportunities')
     .select(`
       id, title, organization, status,
-      contact_email,
+      contact_email, requirements,
       outreach_channel, outreach_subject, outreach_draft,
       outreach_assets, outreach_missing_items, outreach_prepared_at, outreach_version,
       applied_at, last_contacted_at
@@ -98,6 +99,16 @@ export async function dispatchManagerOutreachAction(formData: FormData) {
 
   if (missing.length > 0) {
     redirectWithError(id, 'Resolve the outreach-prep missing items before dispatch.')
+  }
+
+  const asks = splitManagerAsks(opportunity.requirements)
+
+  if (asks.length === 0) {
+    redirectWithError(id, 'Add what they asked for (Requirements) before sending or recording outreach.')
+  }
+
+  if (!managerAsksConfirmed(asks, formData.getAll('ask_covered').map(String))) {
+    redirectWithError(id, 'Check off every item they asked for before sending or recording outreach.')
   }
 
   const now = new Date().toISOString()
@@ -181,6 +192,7 @@ export async function dispatchManagerOutreachAction(formData: FormData) {
       subject: opportunity.outreach_subject,
       assets,
       follow_up_on: followUpOn,
+      asks_covered: asks,
       outreach_version: opportunity.outreach_version,
       delivery: channel === 'email' ? 'sent_by_manager_via_resend' : 'recorded_external_action',
     },

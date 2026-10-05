@@ -34,6 +34,7 @@ import {
   managerFollowUpUrgency,
 } from '@/lib/manager-follow-up'
 import { buildManagerNegotiation } from '@/lib/manager-negotiation'
+import { splitManagerAsks } from '@/lib/manager-asks'
 
 type ScoreComponent = { score?: number; max?: number; note?: string }
 
@@ -215,6 +216,7 @@ export default async function ManagerOpportunityDetailPage({
   const sourceType = opportunity.source_type ?? 'other'
   const followUpEligible = ['applied', 'contacted', 'follow_up'].includes(status)
   const followUpUrgency = managerFollowUpUrgency(opportunity.next_action_at)
+  const asks = splitManagerAsks(opportunity.requirements)
   const followUpDraft = followUpEligible
     ? buildManagerFollowUpDraft(opportunity)
     : null
@@ -522,6 +524,29 @@ export default async function ManagerOpportunityDetailPage({
               </div>
             )}
 
+            <div style={{ border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px', margin: '0 0 4px' }}>
+              <div className="admin-section-title" style={{ marginBottom: 8 }}>What They Asked For</div>
+              {asks.length === 0 ? (
+                <p className="muted" style={{ margin: 0, fontSize: 11, lineHeight: 1.6 }}>
+                  Manager didn&apos;t record what this lead is asking for. Open the original source, then add their asks to{' '}
+                  <a href="#edit-opportunity" style={{ textDecoration: 'underline' }}>Requirements</a>{' '}
+                  (one per line). Sending stays locked until you do.
+                </p>
+              ) : (
+                <>
+                  <ul style={{ margin: 0, paddingLeft: 18, display: 'grid', gap: 4, fontSize: 12, lineHeight: 1.5 }}>
+                    {asks.map((ask, index) => (
+                      <li key={`${index}:${ask}`}>{ask}</li>
+                    ))}
+                  </ul>
+                  <p className="muted" style={{ margin: '8px 0 0', fontSize: 10 }}>
+                    Make sure the draft below answers each of these. Wrong or incomplete? Fix it in{' '}
+                    <a href="#edit-opportunity" style={{ textDecoration: 'underline' }}>Requirements</a>.
+                  </p>
+                </>
+              )}
+            </div>
+
             <form action={saveManagerOutreachDraftAction} style={{ padding: '14px 0 18px' }}>
               <input type="hidden" name="opportunity_id" value={opportunity.id} />
 
@@ -609,8 +634,31 @@ export default async function ManagerOpportunityDetailPage({
                     : 'Complete the DM/application/form/call outside Manager first, then use this button to record exactly what was submitted and advance the pipeline.'}
                 </p>
 
+                {asks.length === 0 ? (
+                  <p className="muted" style={{ margin: 0, fontSize: 11, lineHeight: 1.6 }}>
+                    Locked: add what they asked for to{' '}
+                    <a href="#edit-opportunity" style={{ textDecoration: 'underline' }}>Requirements</a>{' '}
+                    first.
+                  </p>
+                ) : (
                 <form action={dispatchManagerOutreachAction}>
                   <input type="hidden" name="opportunity_id" value={opportunity.id} />
+
+                  <fieldset style={{ border: 0, padding: 0, margin: '0 0 14px', display: 'grid', gap: 8 }}>
+                    <legend className="admin-field-label" style={{ marginBottom: 8 }}>My message covers everything they asked for</legend>
+                    {asks.map((ask, index) => (
+                      <label key={`${index}:${ask}`} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, fontSize: 12, lineHeight: 1.5 }}>
+                        <input
+                          type="checkbox"
+                          name="ask_covered"
+                          value={String(index)}
+                          required
+                          style={{ marginTop: 3 }}
+                        />
+                        <span>{ask}</span>
+                      </label>
+                    ))}
+                  </fieldset>
 
                   <div className="admin-form-grid-two" style={{ marginBottom: 12 }}>
                     <div style={{ display: 'grid', gap: 7 }}>
@@ -650,6 +698,7 @@ export default async function ManagerOpportunityDetailPage({
                     {managerDispatchActionLabel(opportunity.outreach_channel)}
                   </button>
                 </form>
+                )}
               </div>
             )}
           </>
@@ -835,11 +884,13 @@ export default async function ManagerOpportunityDetailPage({
         )}
       </section>
 
-      <ManagerOpportunityForm
-        action={updateManagerOpportunityAction}
-        mode="edit"
-        value={opportunity}
-      />
+      <div id="edit-opportunity">
+        <ManagerOpportunityForm
+          action={updateManagerOpportunityAction}
+          mode="edit"
+          value={opportunity}
+        />
+      </div>
     </div>
   )
 }
