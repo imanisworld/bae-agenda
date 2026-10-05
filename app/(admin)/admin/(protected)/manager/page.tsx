@@ -11,6 +11,7 @@ import {
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { managerFollowUpUrgency } from '@/lib/manager-follow-up'
+import { buildManagerTodayQueue } from '@/lib/manager-today'
 
 interface OpportunityRow {
   id: string
@@ -160,6 +161,7 @@ export default async function ManagerPage() {
   const needsReview = opportunities.filter((item) => ['found', 'qualified', 'review'].includes(item.status))
   const inMotion = opportunities.filter((item) => ['outreach_ready', 'applied', 'contacted', 'follow_up', 'negotiating'].includes(item.status))
   const booked = opportunities.filter((item) => item.status === 'booked')
+  const todayQueue = buildManagerTodayQueue(active)
   const followUpQueue = opportunities
     .filter((item) => ['applied', 'contacted', 'follow_up'].includes(item.status))
     .map((item) => ({
