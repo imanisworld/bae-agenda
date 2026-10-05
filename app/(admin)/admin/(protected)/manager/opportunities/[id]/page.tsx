@@ -6,6 +6,7 @@ import ManagerStatusBadge from '@/components/admin/ManagerStatusBadge'
 import PageHeader from '@/components/admin/PageHeader'
 import { updateManagerOpportunityAction } from '@/app/actions/manager'
 import { addManagerOpportunityActivityAction } from '@/app/actions/manager-activity'
+import { prepareManagerOutreachAction, saveManagerOutreachDraftAction } from '@/app/actions/manager-outreach'
 import {
   MANAGER_ACTIVITY_TYPES,
   MANAGER_ACTIVITY_TYPE_LABELS,
@@ -15,6 +16,12 @@ import {
   isManagerOpportunityType,
   isManagerSourceType,
 } from '@/lib/manager'
+import {
+  MANAGER_OUTREACH_CHANNELS,
+  MANAGER_OUTREACH_CHANNEL_LABELS,
+  type ManagerOutreachChannel,
+  type ManagerOutreachAsset,
+} from '@/lib/manager-outreach'
 import { createAdminClient } from '@/lib/supabase/admin'
 
 type ScoreComponent = { score?: number; max?: number; note?: string }
@@ -47,6 +54,13 @@ type OpportunityDetail = ManagerOpportunityFormValue & {
   } | null
   fit_score_version?: string | null
   fit_scored_at?: string | null
+  outreach_channel?: ManagerOutreachChannel | null
+  outreach_subject?: string | null
+  outreach_draft?: string | null
+  outreach_assets?: ManagerOutreachAsset[] | null
+  outreach_missing_items?: string[] | null
+  outreach_prepared_at?: string | null
+  outreach_version?: string | null
   economics_breakdown?: {
     note?: string
     guaranteed_gross?: number | null
@@ -316,6 +330,129 @@ export default async function ManagerOpportunityDetailPage({
           </Link>
         </div>
       )}
+
+      <section className="admin-section" style={{ marginBottom: 16 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Outreach / Application Prep</span>
+          <span className="muted">
+            {opportunity.outreach_prepared_at
+              ? `Prepared ${fmtTimestamp(opportunity.outreach_prepared_at)}`
+              : 'Not prepared'}
+          </span>
+        </div>
+
+        {!opportunity.outreach_draft ? (
+          <div style={{ padding: '18px 0' }}>
+            <p className="muted" style={{ margin: '0 0 14px', fontSize: 12, lineHeight: 1.6 }}>
+              Build a review-only pitch using the opportunity, Manager Profile, website, Instagram, and closest published mix. Nothing is sent automatically.
+            </p>
+            <form action={prepareManagerOutreachAction}>
+              <input type="hidden" name="opportunity_id" value={opportunity.id} />
+              <button type="submit" className="admin-btn-primary">Prepare Outreach</button>
+            </form>
+          </div>
+        ) : (
+          <>
+            {(opportunity.outreach_missing_items?.length ?? 0) > 0 ? (
+              <div className="admin-preview-banner" style={{ margin: '14px 0' }}>
+                <span className="admin-preview-mark" aria-hidden="true">!</span>
+                <div>
+                  <div className="admin-preview-title">Missing Before Outreach</div>
+                  <div style={{ display: 'grid', gap: 4, marginTop: 6 }}>
+                    {opportunity.outreach_missing_items?.map((item) => (
+                      <span key={item} className="muted" style={{ fontSize: 11 }}>{item}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="admin-preview-banner" style={{ margin: '14px 0' }}>
+                <span className="admin-preview-mark" aria-hidden="true">✓</span>
+                <div>
+                  <div className="admin-preview-title">Prep complete</div>
+                  <p>Manager found a usable route and supporting assets. Review the copy before you send or apply.</p>
+                </div>
+              </div>
+            )}
+
+            <form action={saveManagerOutreachDraftAction} style={{ padding: '14px 0 18px' }}>
+              <input type="hidden" name="opportunity_id" value={opportunity.id} />
+
+              <div className="admin-form-grid-two" style={{ marginBottom: 12 }}>
+                <label style={{ display: 'grid', gap: 7 }}>
+                  <span className="admin-field-label">Recommended Channel</span>
+                  <select
+                    name="outreach_channel"
+                    defaultValue={opportunity.outreach_channel ?? 'other'}
+                    className="admin-input"
+                  >
+                    {MANAGER_OUTREACH_CHANNELS.map((channel) => (
+                      <option key={channel} value={channel}>
+                        {MANAGER_OUTREACH_CHANNEL_LABELS[channel]}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label style={{ display: 'grid', gap: 7 }}>
+                  <span className="admin-field-label">Subject</span>
+                  <input
+                    name="outreach_subject"
+                    defaultValue={opportunity.outreach_subject ?? ''}
+                    className="admin-input"
+                    placeholder="Email/application subject"
+                  />
+                </label>
+              </div>
+
+              <label style={{ display: 'grid', gap: 7, marginBottom: 14 }}>
+                <span className="admin-field-label">Prepared Draft</span>
+                <textarea
+                  name="outreach_draft"
+                  rows={14}
+                  defaultValue={opportunity.outreach_draft ?? ''}
+                  className="admin-input"
+                  style={{ minHeight: 300, resize: 'vertical', lineHeight: 1.6 }}
+                />
+              </label>
+
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+                <span className="muted" style={{ fontSize: 10 }}>
+                  Saving edits does not contact anyone.
+                </span>
+                <button type="submit" className="admin-btn-primary">Save Draft</button>
+              </div>
+            </form>
+
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: 16 }}>
+              <div className="admin-section-title" style={{ marginBottom: 10 }}>Assets To Send</div>
+              {(opportunity.outreach_assets?.length ?? 0) === 0 ? (
+                <p className="muted" style={{ fontSize: 11, margin: 0 }}>No supporting assets selected.</p>
+              ) : (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {opportunity.outreach_assets?.map((asset) => (
+                    <Link
+                      key={`${asset.kind}:${asset.url}`}
+                      href={asset.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="admin-btn-ghost"
+                      title={asset.note}
+                    >
+                      {asset.label} ↗
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              <form action={prepareManagerOutreachAction} style={{ marginTop: 14 }}>
+                <input type="hidden" name="opportunity_id" value={opportunity.id} />
+                <button type="submit" className="admin-btn-ghost">Refresh Prep</button>
+              </form>
+            </div>
+          </>
+        )}
+      </section>
 
       <section className="admin-section" style={{ marginBottom: 16 }}>
         <div className="admin-section-header">
