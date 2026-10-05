@@ -32,21 +32,7 @@ values
     'Use the closest event-specific demo; this source publishes performing calls, DJ curation requests, artist opportunities, and local paid activations.',
     'High-value local opportunity board. Prefer current performing/music/DJ calls and ignore unrelated visual-art, grant, or volunteer listings.'
   ),
-  (
-    'Deckademics',
-    'agency',
-    'website',
-    'https://deckademics.com/book-a-dj/',
-    null,
-    'Indianapolis',
-    'IN',
-    true,
-    24,
-    'partial',
-    'Open Format / Corporate / Wedding',
-    'Deckademics places experienced Indianapolis DJs across corporate, wedding, sports, festival, and private-event work.',
-    'Watch for roster, booking, collaboration, workshop, festival, and partner signals. Also mine recurring venues and client relationships.'
-  ),
+
   (
     'CHREECE',
     'event_brand',
@@ -62,51 +48,9 @@ values
     'CHREECE explicitly programs DJs and producers in its Indianapolis hip-hop festival ecosystem.',
     'Watch for future artist/DJ submissions, showcase calls, after-parties, partner events, and venue relationships.'
   ),
-  (
-    'Complete Weddings + Events Indianapolis',
-    'agency',
-    'website',
-    'https://completewedo.com/indianapolis/about/',
-    null,
-    'Indianapolis',
-    'IN',
-    true,
-    24,
-    'partial',
-    'Clean Wedding / Corporate',
-    'Wedding/event DJ work requires clean multi-generational programming, MC skills, crowd reading, and event flow.',
-    'Watch Join Our Team, DJ hiring, event staffing, and local vendor/network signals.'
-  ),
-  (
-    'DJ Connection Indianapolis',
-    'agency',
-    'website',
-    'https://www.djconnection.com/jobs',
-    null,
-    'Indianapolis',
-    'IN',
-    true,
-    24,
-    'partial',
-    'Clean Wedding / Corporate',
-    'DJ Connection hires DJ/MC roles and serves weddings, schools, corporate, nonprofit, and promotional events.',
-    'Watch current DJ/MC openings and Indianapolis-specific staffing opportunities; ignore non-DJ corporate roles.'
-  ),
-  (
-    'Indy DJ Connect',
-    'agency',
-    'website',
-    'https://www.indianapolisdj.com/',
-    null,
-    'Indianapolis',
-    'IN',
-    true,
-    48,
-    'partial',
-    'Open Format / Corporate / School',
-    'The roster covers corporate events, weddings, schools, kids parties, private parties, and special events.',
-    'Use as a local network/reference source. Mine roster, client, venue, sports, and event relationships rather than treating booking copy as a job lead.'
-  ),
+
+
+
   (
     'IU Indianapolis Weeks of Welcome',
     'event_brand',
