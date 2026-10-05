@@ -16,6 +16,7 @@ import {
   MANAGER_OUTREACH_CHANNELS,
   MANAGER_OUTREACH_CHANNEL_LABELS,
   type ManagerOutreachAsset,
+  type ManagerOutreachChannel,
 } from '@/lib/manager-outreach'
 import { sendEmailNotification } from '@/lib/notifications'
 import { createAdminClient } from '@/lib/supabase/admin'
@@ -76,11 +77,16 @@ export async function dispatchManagerOutreachAction(formData: FormData) {
     redirectWithError(id, 'This opportunity is not currently marked outreach-ready.')
   }
 
-  if (!opportunity.outreach_channel || !MANAGER_OUTREACH_CHANNELS.includes(opportunity.outreach_channel)) {
+  const rawChannel = opportunity.outreach_channel as string | null
+
+  if (
+    !rawChannel ||
+    !MANAGER_OUTREACH_CHANNELS.includes(rawChannel as ManagerOutreachChannel)
+  ) {
     redirectWithError(id, 'Prepare outreach before sending or recording it.')
   }
 
-  const channel = opportunity.outreach_channel
+  const channel = rawChannel as ManagerOutreachChannel
   const draft = opportunity.outreach_draft?.trim()
   const missing = Array.isArray(opportunity.outreach_missing_items)
     ? opportunity.outreach_missing_items
