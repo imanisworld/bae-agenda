@@ -21,9 +21,9 @@ export function summarizeManagerSourceSignals(
   let health: ManagerSourceSignalSummary['health'] = 'mixed'
   if (total === 0) {
     health = 'no_data'
-  } else if (converted > 0 || (total >= 2 && useful / total >= 0.67)) {
+  } else if (converted > 0 || (total >= 2 && useful * 3 >= total * 2)) {
     health = 'productive'
-  } else if (total >= 3 && ignored / total >= 0.67) {
+  } else if (total >= 3 && ignored * 3 >= total * 2) {
     health = 'noisy'
   }
 
