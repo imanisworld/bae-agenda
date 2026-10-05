@@ -7,6 +7,7 @@ import { getOutstandingBalance, getOutstandingDeposit } from '@/lib/booking-fina
 import { stampBookingEmailSentAt } from '@/lib/booking-email-tracking'
 import { syncComputedBookingPaymentState } from '@/lib/booking-payment-sync'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { logManagerOpportunityActivity } from '@/lib/manager-activity'
 import { requireAdminUser } from '@/lib/admin-auth'
 import { sendBookingPostEventFollowUpEmail, sendBookingReviewRequestEmail } from '@/lib/booking-email-workflows'
 import { getBookingPaymentStatus } from '@/lib/booking-payment-status'
@@ -827,13 +828,14 @@ export async function createAdminBookingAction(formData: FormData) {
   let managerOpportunity: {
     id: string
     title: string
+    status: string
     linked_booking_id: string | null
   } | null = null
 
   if (managerOpportunityId) {
     const { data, error } = await admin
       .from('manager_opportunities')
-      .select('id, title, linked_booking_id')
+      .select('id, title, status, linked_booking_id')
       .eq('id', managerOpportunityId)
       .maybeSingle()
 
@@ -844,6 +846,7 @@ export async function createAdminBookingAction(formData: FormData) {
     managerOpportunity = data as {
       id: string
       title: string
+      status: string
       linked_booking_id: string | null
     }
 
@@ -1021,6 +1024,18 @@ export async function createAdminBookingAction(formData: FormData) {
       .maybeSingle()
 
     managerLinked = Boolean(linkedOpportunity?.id) && !managerLinkError
+
+    if (managerLinked) {
+      await logManagerOpportunityActivity(admin, {
+        opportunityId: managerOpportunity.id,
+        activityType: 'booking',
+        title: 'Booking created and linked',
+        body: `Created booking ${booking.id} from this Manager opportunity.`,
+        fromStatus: managerOpportunity.status,
+        toStatus: 'booked',
+        metadata: { booking_id: booking.id },
+      })
+    }
 
     await appendBookingTimelineNote(
       admin,

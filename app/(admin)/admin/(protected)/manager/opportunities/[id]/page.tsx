@@ -5,7 +5,10 @@ import ManagerOpportunityForm, { type ManagerOpportunityFormValue } from '@/comp
 import ManagerStatusBadge from '@/components/admin/ManagerStatusBadge'
 import PageHeader from '@/components/admin/PageHeader'
 import { updateManagerOpportunityAction } from '@/app/actions/manager'
+import { addManagerOpportunityActivityAction } from '@/app/actions/manager-activity'
 import {
+  MANAGER_ACTIVITY_TYPES,
+  MANAGER_ACTIVITY_TYPE_LABELS,
   MANAGER_OPPORTUNITY_TYPE_LABELS,
   MANAGER_SOURCE_TYPE_LABELS,
   isManagerOpportunityStatus,
@@ -15,6 +18,17 @@ import {
 import { createAdminClient } from '@/lib/supabase/admin'
 
 type ScoreComponent = { score?: number; max?: number; note?: string }
+
+type ActivityRow = {
+  id: string
+  activity_type: keyof typeof MANAGER_ACTIVITY_TYPE_LABELS
+  title: string
+  body: string | null
+  occurred_at: string
+  from_status: string | null
+  to_status: string | null
+  metadata: Record<string, unknown> | null
+}
 
 type OpportunityDetail = ManagerOpportunityFormValue & {
   id: string
@@ -87,6 +101,24 @@ function fmtTimestamp(value: string | null) {
   })
 }
 
+async function getActivities(id: string): Promise<ActivityRow[]> {
+  const admin = createAdminClient()
+  const { data, error } = await admin
+    .from('manager_opportunity_activities')
+    .select('id, activity_type, title, body, occurred_at, from_status, to_status, metadata')
+    .eq('opportunity_id', id)
+    .order('occurred_at', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(100)
+
+  if (error) {
+    if (error.code === '42P01' || error.code === 'PGRST205') return []
+    throw new Error(error.message || 'Unable to load opportunity activity.')
+  }
+
+  return (data ?? []) as ActivityRow[]
+}
+
 async function getOpportunity(id: string): Promise<OpportunityDetail | null> {
   const admin = createAdminClient()
   const { data, error } = await admin
@@ -119,7 +151,10 @@ export default async function ManagerOpportunityDetailPage({
 }) {
   const { id } = await params
   const query = searchParams ? await searchParams : undefined
-  const opportunity = await getOpportunity(id)
+  const [opportunity, activities] = await Promise.all([
+    getOpportunity(id),
+    getActivities(id),
+  ])
   if (!opportunity) notFound()
 
   const errorMessage = getMessage(query?.error)
@@ -281,6 +316,102 @@ export default async function ManagerOpportunityDetailPage({
           </Link>
         </div>
       )}
+
+      <section className="admin-section" style={{ marginBottom: 16 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Activity Timeline</span>
+          <span className="muted">{activities.length} entries</span>
+        </div>
+
+        <form action={addManagerOpportunityActivityAction} style={{ padding: '16px 0 20px', borderBottom: '1px solid var(--border)', marginBottom: 18 }}>
+          <input type="hidden" name="opportunity_id" value={opportunity.id} />
+          <div className="admin-form-grid-two" style={{ marginBottom: 12 }}>
+            <label style={{ display: 'grid', gap: 7 }}>
+              <span className="admin-field-label">Activity Type</span>
+              <select name="activity_type" defaultValue="note" className="admin-input">
+                {MANAGER_ACTIVITY_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {MANAGER_ACTIVITY_TYPE_LABELS[type]}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label style={{ display: 'grid', gap: 7 }}>
+              <span className="admin-field-label">When</span>
+              <input
+                name="occurred_at"
+                type="datetime-local"
+                className="admin-input"
+              />
+              <span className="muted" style={{ fontSize: 10 }}>
+                Leave blank to use now.
+              </span>
+            </label>
+          </div>
+
+          <label style={{ display: 'grid', gap: 7, marginBottom: 12 }}>
+            <span className="admin-field-label">Details</span>
+            <textarea
+              name="body"
+              rows={3}
+              className="admin-input"
+              placeholder="What happened? Who replied? What needs to happen next?"
+            />
+          </label>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+            <span className="muted" style={{ fontSize: 10 }}>
+              Logging activity does not change pipeline status. Status changes are recorded automatically when you save the opportunity.
+            </span>
+            <button type="submit" className="admin-btn-primary">Add Activity</button>
+          </div>
+        </form>
+
+        {activities.length === 0 ? (
+          <p className="muted" style={{ margin: 0, fontSize: 12 }}>
+            No activity has been recorded yet.
+          </p>
+        ) : (
+          <div style={{ display: 'grid', gap: 0 }}>
+            {activities.map((activity) => (
+              <div
+                key={activity.id}
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: '120px minmax(0, 1fr)',
+                  gap: 18,
+                  padding: '14px 0',
+                  borderBottom: '1px solid var(--border)',
+                }}
+              >
+                <div>
+                  <div style={{ color: 'var(--gold)', fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', marginBottom: 5 }}>
+                    {MANAGER_ACTIVITY_TYPE_LABELS[activity.activity_type] ?? activity.activity_type}
+                  </div>
+                  <div className="muted" style={{ fontSize: 10 }}>
+                    {fmtTimestamp(activity.occurred_at)}
+                  </div>
+                </div>
+                <div style={{ minWidth: 0 }}>
+                  <strong style={{ display: 'block', fontSize: 12, fontWeight: 500, marginBottom: activity.body ? 5 : 0 }}>
+                    {activity.title}
+                  </strong>
+                  {activity.body && (
+                    <p className="muted" style={{ margin: 0, fontSize: 11, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                      {activity.body}
+                    </p>
+                  )}
+                  {activity.from_status && activity.to_status && (
+                    <div className="muted" style={{ marginTop: 5, fontSize: 10 }}>
+                      {activity.from_status} → {activity.to_status}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       <ManagerOpportunityForm
         action={updateManagerOpportunityAction}

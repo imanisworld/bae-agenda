@@ -78,6 +78,34 @@ export const MANAGER_WATCH_PLATFORM_LABELS: Record<ManagerWatchPlatform, string>
   other: 'Other',
 }
 
+export const MANAGER_ACTIVITY_TYPES = [
+  'research',
+  'note',
+  'application',
+  'contact',
+  'follow_up',
+  'response',
+  'negotiation',
+  'booking',
+  'other',
+] as const
+
+export type ManagerActivityType = typeof MANAGER_ACTIVITY_TYPES[number]
+
+export const MANAGER_ACTIVITY_TYPE_LABELS: Record<ManagerActivityType | 'created' | 'status_change', string> = {
+  created: 'Created',
+  research: 'Research',
+  note: 'Note',
+  application: 'Application',
+  contact: 'Contact',
+  follow_up: 'Follow-up',
+  response: 'Response',
+  negotiation: 'Negotiation',
+  status_change: 'Status Change',
+  booking: 'Booking',
+  other: 'Other',
+}
+
 export const MANAGER_OPPORTUNITY_STATUSES = [
   'found',
   'qualified',
