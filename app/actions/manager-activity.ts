@@ -11,6 +11,7 @@ import {
 import { logManagerOpportunityActivity } from '@/lib/manager-activity'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { toEventISO } from '@/lib/date-time'
+import { defaultManagerSecondFollowUpDate } from '@/lib/manager-follow-up'
 
 const ActivitySchema = z.object({
   opportunity_id: z.string().uuid(),
@@ -116,6 +117,8 @@ export async function addManagerOpportunityActivityAction(formData: FormData) {
 
   if (data.activity_type === 'follow_up') {
     lifecycleUpdate.status = 'follow_up'
+    lifecycleUpdate.next_action = 'Follow up again if there is still no response.'
+    lifecycleUpdate.next_action_at = defaultManagerSecondFollowUpDate(new Date(occurredAt))
   }
 
   if (Object.keys(lifecycleUpdate).length > 0) {
