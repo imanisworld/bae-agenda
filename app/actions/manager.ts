@@ -12,6 +12,7 @@ import {
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { scoreManagerOpportunity } from '@/lib/manager-scoring'
+import { calculateManagerEconomics } from '@/lib/manager-economics'
 
 const OptionalDate = z
   .string()
@@ -82,6 +83,7 @@ const OpportunitySchema = z.object({
   compensation_min: OptionalMoney,
   compensation_max: OptionalMoney,
   compensation_notes: z.string().trim().max(2000).optional().default(''),
+  expected_work_hours: OptionalNumber,
   travel_minutes: OptionalInteger,
   travel_miles: OptionalNumber,
   travel_cost_estimate: OptionalMoney,
@@ -177,6 +179,7 @@ function opportunityInput(formData: FormData) {
     compensation_min: formData.get('compensation_min'),
     compensation_max: formData.get('compensation_max'),
     compensation_notes: formData.get('compensation_notes'),
+    expected_work_hours: formData.get('expected_work_hours'),
     travel_minutes: formData.get('travel_minutes'),
     travel_miles: formData.get('travel_miles'),
     travel_cost_estimate: formData.get('travel_cost_estimate'),
@@ -198,7 +201,7 @@ function opportunityInput(formData: FormData) {
 async function scoringProfile(admin: ReturnType<typeof createAdminClient>) {
   const { data } = await admin
     .from('manager_profiles')
-    .select('home_market, minimum_fee, max_drive_minutes, preferred_event_types, excluded_event_types, genres')
+    .select('home_market, minimum_fee, target_hourly_rate, max_drive_minutes, preferred_event_types, excluded_event_types, genres')
     .eq('profile_key', 'dj_bae')
     .maybeSingle()
   return data
@@ -240,6 +243,7 @@ function opportunityPayload(data: z.infer<typeof OpportunitySchema>) {
     compensation_min: data.compensation_min,
     compensation_max: data.compensation_max,
     compensation_notes: optionalString(data.compensation_notes),
+    expected_work_hours: data.expected_work_hours,
     travel_minutes: data.travel_minutes,
     travel_miles: data.travel_miles,
     travel_cost_estimate: data.travel_cost_estimate,
@@ -271,10 +275,12 @@ export async function createManagerOpportunityAction(formData: FormData) {
 
   const admin = createAdminClient()
   const payload = opportunityPayload(parsed.data)
+  const economics = calculateManagerEconomics(payload)
+  const scoringInput = { ...payload, ...economics }
   const profile = await scoringProfile(admin)
   const { data, error } = await admin
     .from('manager_opportunities')
-    .insert({ ...payload, ...scoredFields(profile, payload) })
+    .insert({ ...payload, ...economics, ...scoredFields(profile, scoringInput) })
     .select('id')
     .single()
 
@@ -300,11 +306,13 @@ export async function updateManagerOpportunityAction(formData: FormData) {
 
   const id = parsed.data.id
   const basePayload = opportunityPayload(parsed.data)
+  const economics = calculateManagerEconomics(basePayload)
   const admin = createAdminClient()
   const profile = await scoringProfile(admin)
   const payload: Record<string, unknown> = {
     ...basePayload,
-    ...scoredFields(profile, basePayload),
+    ...economics,
+    ...scoredFields(profile, { ...basePayload, ...economics }),
   }
 
   const { data: current, error: currentError } = await admin
@@ -412,12 +420,13 @@ export async function updateManagerProfileAction(formData: FormData) {
 
   const { data: opportunities } = await admin
     .from('manager_opportunities')
-    .select('id, title, organization, venue_name, location_city, location_state, compensation_min, compensation_max, travel_minutes, travel_covered, requirements, why_fit, recommended_demo, source_url, contact_name, contact_email, contact_phone, event_date, application_deadline')
+    .select('id, title, organization, venue_name, location_city, location_state, compensation_min, compensation_max, travel_minutes, travel_covered, effective_hourly_rate, economics_basis, requirements, why_fit, recommended_demo, source_url, contact_name, contact_email, contact_phone, event_date, application_deadline')
 
   if (opportunities?.length) {
     const profileForScore = {
       home_market: optionalString(data.home_market),
       minimum_fee: data.minimum_fee,
+      target_hourly_rate: data.target_hourly_rate,
       max_drive_minutes: data.max_drive_minutes,
       preferred_event_types: splitManagerList(data.preferred_event_types),
       excluded_event_types: splitManagerList(data.excluded_event_types),
