@@ -689,7 +689,7 @@ export default async function ManagerOpportunityDetailPage({
                 <p className="muted" style={{ margin: '0 0 14px', fontSize: 11, lineHeight: 1.6 }}>
                   {opportunity.outreach_channel === 'email'
                     ? 'This will send the saved draft through the existing Resend mail transport. Review the recipient, subject, copy, and assets above first.'
-                    : 'Complete the DM/application/form/call outside Manager first, then use this button to record exactly what was submitted and advance the pipeline.'}
+                    : 'Complete the DM/application/form/call outside Manager first, paste what you actually sent below, then record it to advance the pipeline.'}
                 </p>
 
                 {asks.length === 0 ? (
@@ -717,6 +717,22 @@ export default async function ManagerOpportunityDetailPage({
                       </label>
                     ))}
                   </fieldset>
+
+                  {opportunity.outreach_channel !== 'email' && (
+                    <label style={{ display: 'grid', gap: 7, marginBottom: 14 }}>
+                      <span className="admin-field-label">Message You Sent</span>
+                      <textarea
+                        name="sent_message"
+                        rows={10}
+                        defaultValue={opportunity.outreach_draft ?? ''}
+                        className="admin-input"
+                        style={{ minHeight: 200, resize: 'vertical', lineHeight: 1.6 }}
+                      />
+                      <span className="muted" style={{ fontSize: 10 }}>
+                        Edit or paste over this so it matches exactly what you sent. This is what Manager keeps on record.
+                      </span>
+                    </label>
+                  )}
 
                   <div className="admin-form-grid-two" style={{ marginBottom: 12 }}>
                     <div style={{ display: 'grid', gap: 7 }}>
@@ -748,7 +764,7 @@ export default async function ManagerOpportunityDetailPage({
                     <span>
                       {opportunity.outreach_channel === 'email'
                         ? 'I reviewed the saved recipient, subject, draft, and assets. Send this email now.'
-                        : 'I completed this outreach externally using the saved draft (or edited and saved it first). Record it now and schedule follow-up.'}
+                        : 'I completed this outreach externally and the message above matches what I sent. Record it now and schedule follow-up.'}
                     </span>
                   </label>
 

@@ -80,3 +80,20 @@ export function renderManagerOutreachHtml(draft: string) {
   </body>
 </html>`
 }
+
+/**
+ * The message to keep on record for a dispatch. Email sends the saved draft,
+ * so that is what was sent. For DMs, forms, applications, and calls the user
+ * sends outside Manager and can paste/edit the actual text before recording.
+ */
+export function managerRecordedMessage(
+  channel: ManagerOutreachChannel,
+  savedDraft: string,
+  sentMessage: string | null | undefined
+) {
+  const sent = sentMessage?.replace(/\r\n/g, '\n').trim()
+  if (channel === 'email' || !sent) {
+    return { body: savedDraft, source: 'saved_draft' as const, edited: false }
+  }
+  return { body: sent, source: 'as_sent' as const, edited: sent !== savedDraft.trim() }
+}
