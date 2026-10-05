@@ -108,6 +108,14 @@ export default async function ManagerSourcesPage({
   const activeSources = sources.filter((source) => source.active)
   const unchecked = activeSources.filter((source) => !source.last_checked_at)
   const actionableSignals = signals.filter((signal) => ['new', 'relevant'].includes(signal.status))
+  const localSources = activeSources.filter(
+    (source) =>
+      source.location_city?.toLowerCase() === 'indianapolis' &&
+      source.location_state?.toUpperCase() === 'IN'
+  )
+  const networkSources = activeSources.filter(
+    (source) => ['dj', 'agency', 'promoter'].includes(source.source_kind)
+  )
 
   return (
     <div className="admin-page">
@@ -145,6 +153,8 @@ export default async function ManagerSourcesPage({
       >
         {[
           ['Active Sources', activeSources.length, 'Currently watched'],
+          ['Indianapolis', localSources.length, 'Local discovery coverage'],
+          ['DJ / Agency Network', networkSources.length, 'Relationship mining'],
           ['Never Checked', unchecked.length, 'Waiting for first scan'],
           ['New Signals', actionableSignals.length, 'Need review'],
           ['Converted', signals.filter((signal) => signal.status === 'converted').length, 'Became opportunities'],
@@ -155,6 +165,19 @@ export default async function ManagerSourcesPage({
             <div className="admin-stat-sub">{sub}</div>
           </div>
         ))}
+      </div>
+
+      <div className="admin-preview-banner" style={{ marginBottom: 20 }}>
+        <span className="admin-preview-mark" aria-hidden="true">⌕</span>
+        <div>
+          <div className="admin-preview-title">Expanded discovery</div>
+          <p>
+            The scheduled discovery pass now combines this recurring watchlist with broad searches for DJ hiring,
+            festival submissions, campus entertainment, venue programming, event companies, corporate/community
+            activations, and DJ-to-venue relationships. New recurring sources are capped and must be verified before
+            they are added.
+          </p>
+        </div>
       </div>
 
       <section className="admin-section" style={{ marginBottom: 20 }}>
@@ -177,6 +200,7 @@ export default async function ManagerSourcesPage({
                   <th>Type</th>
                   <th>Platform</th>
                   <th>Location</th>
+                  <th>Cadence</th>
                   <th>Last Check</th>
                   <th>Latest Signal</th>
                   <th>Demo</th>
@@ -199,6 +223,7 @@ export default async function ManagerSourcesPage({
                     <td data-label="Type">{MANAGER_WATCH_SOURCE_KIND_LABELS[source.source_kind] ?? source.source_kind}</td>
                     <td data-label="Platform">{MANAGER_WATCH_PLATFORM_LABELS[source.platform] ?? source.platform}</td>
                     <td data-label="Location" className="muted">{locationLabel(source)}</td>
+                    <td data-label="Cadence" className="muted">{source.check_frequency_hours}h</td>
                     <td data-label="Last Check" className="muted">{fmtTimestamp(source.last_checked_at)}</td>
                     <td data-label="Latest Signal" className="muted">{fmtTimestamp(source.latest_signal_at)}</td>
                     <td data-label="Demo" className="muted">{source.recommended_demo ?? '—'}</td>
