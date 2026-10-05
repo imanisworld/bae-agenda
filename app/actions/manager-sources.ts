@@ -10,6 +10,7 @@ import {
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { scoreManagerOpportunity } from '@/lib/manager-scoring'
+import { logManagerOpportunityActivity } from '@/lib/manager-activity'
 
 const SourceSchema = z.object({
   name: z.string().trim().min(1, 'Source name is required.').max(200),
@@ -192,6 +193,18 @@ export async function convertManagerSignalToOpportunityAction(formData: FormData
   if (opportunityError || !opportunity?.id) {
     redirectWithError(opportunityError?.message ?? 'Could not create opportunity.')
   }
+
+  await logManagerOpportunityActivity(admin, {
+    opportunityId: opportunity.id,
+    activityType: 'created',
+    title: 'Opportunity created from Watchlist',
+    body: signal.summary ?? `Converted from ${source.name} watchlist signal.`,
+    metadata: {
+      source_id: source.id,
+      signal_id: signal.id,
+      signal_type: signal.signal_type,
+    },
+  })
 
   const { error: signalError } = await admin
     .from('manager_source_signals')
