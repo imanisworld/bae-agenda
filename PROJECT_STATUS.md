@@ -6,11 +6,13 @@ Last reconciled: 2026-10-07.
 
 Core public-site, booking, admin, payment, invoice, client-portal, email, analytics, and Manager workflows are implemented.
 
-Current GitHub `main`: `4196777887476584e07e6b12ea7b6859fe121513` (PR #101).
+Current GitHub `main`: `250b530b30dd9e3e2f9bc9c87fe519f7344faf45` (PR #147).
 
 Latest live Manager work includes warm-rebook scheduling, negotiation guidance, pipeline filters/history, admin pagination, required lead/event details before outreach, Manager lead-save fixes, actual externally sent-message recording, relationship intelligence/warm-rebook views, and source-health/weak-lead guardrails.
 
 Discovery Runs backend + daily tracking logic are installed in production; the UI branch remains parked without a PR.
+
+Public-site prototype PR #142 (`feat/public-vibe-experience`) is intentionally draft/local-review only. It is not merged or deployed. The prototype was simplified before review: redundant Room Reader, duplicate portfolio story layer, extra Lab context rail, second booking selector, raw tag filter wall, nested detail drawer, and duplicate CTAs were removed.
 
 ## Verified Production
 
@@ -69,13 +71,15 @@ Remaining unrelated advisor items:
 
 ## Next
 
-1. Follow up Silent Disco and Elevate Social on Oct 10.
-2. Let daily discovery runs collect data and evaluate source quality / response / booked economics.
-3. Decide whether to resume the parked Discovery Runs UI.
-4. Decide whether to resume PR #59 Full Portfolio Archive media galleries.
+1. Review PR #142 locally before any merge or deployment; sync it with latest `main` first if it is going to move forward, then rerun test/lint/build.
+2. Follow up Silent Disco and Elevate Social on Oct 10.
+3. Let daily discovery runs collect data and evaluate source quality / response / booked economics.
+4. Decide whether to resume the parked Discovery Runs UI.
+5. Decide whether to resume PR #59 Full Portfolio Archive media galleries.
 
 ## Open / Held
 
+- PR #142: Public vibe/portfolio/Lab experience — draft, local-review only, not merged/deployed.
 - PR #59: Full Portfolio Archive media galleries — intentionally held/separate.
 - Bot access for Manager — not started; approval-gated design only.
 - Discovery Runs UI branch — parked; backend/daily tracking logic already exists.
