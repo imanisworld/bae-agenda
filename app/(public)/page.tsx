@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import HeroSection from '@/components/public/HeroSection'
+import VibeExperience from '@/components/public/VibeExperience'
 import { getContentMap } from '@/lib/db/content'
 import { SOCIALS } from '@/lib/constants'
 
@@ -64,6 +65,7 @@ export default async function HomePage() {
       />
       <div className="home-experience">
         <HeroSection content={{ hero_title: content.hero_title, hero_subtitle: content.hero_subtitle }} />
+        <VibeExperience />
       </div>
     </>
   )
