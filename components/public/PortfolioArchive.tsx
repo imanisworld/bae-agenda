@@ -237,6 +237,7 @@ export default function PortfolioArchive({
   )
 
   const hasFilters = city !== null || category !== null
+  const isThinCategory = category !== null && filtered.length > 0 && filtered.length < 3
   const visibleYears = expanded || hasFilters ? allYears : allYears.slice(0, COLLAPSED_YEARS)
 
   function clearFilters() {
@@ -321,11 +322,50 @@ export default function PortfolioArchive({
       </div>
 
       {filtered.length === 0 ? (
-        <div style={{ padding: '48px 0', textAlign: 'center', color: 'var(--muted)', fontSize: '14px' }}>
-          No events match these filters.
+        <div
+          role="status"
+          style={{
+            padding: '42px 20px',
+            textAlign: 'center',
+            border: '1px solid var(--border)',
+            background: 'rgba(255,255,255,0.02)',
+          }}
+        >
+          <strong style={{ display: 'block', color: 'var(--white)', fontSize: '14px', marginBottom: '8px' }}>
+            No exact archive matches yet.
+          </strong>
+          <p style={{ margin: '0 auto 16px', maxWidth: '520px', color: 'var(--muted)', fontSize: '12px', lineHeight: 1.6 }}>
+            This filter is narrower than the work currently tagged in the archive. Browse all past work instead.
+          </p>
+          <button type="button" style={filterBtnActive} onClick={clearFilters}>
+            Browse all work
+          </button>
         </div>
       ) : (
         <>
+          {isThinCategory ? (
+            <div
+              role="status"
+              style={{
+                margin: '18px 0 4px',
+                padding: '14px 16px',
+                border: '1px solid rgba(196,165,116,.18)',
+                background: 'rgba(196,165,116,.04)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '14px',
+                flexWrap: 'wrap',
+              }}
+            >
+              <span style={{ color: 'var(--muted)', fontSize: '11px', lineHeight: 1.55 }}>
+                Only {filtered.length} {filtered.length === 1 ? 'archive record matches' : 'archive records match'} this category right now.
+              </span>
+              <button type="button" style={filterBtnBase} onClick={clearFilters}>
+                Browse all work
+              </button>
+            </div>
+          ) : null}
           {visibleYears.map((year) => {
             const yearEntries = filtered.filter((entry) => entry.year === year)
             return (
