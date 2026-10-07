@@ -272,6 +272,12 @@ export default async function ManagerPage({
         <Link href="/admin/manager/sources" className="admin-btn-ghost">
           Sources / Watchlist
         </Link>
+        <Link href="/admin/manager/relationships" className="admin-btn-ghost">
+          Relationships
+        </Link>
+        <Link href="/admin/manager/warm-rebooks" className="admin-btn-ghost">
+          Warm Rebooks
+        </Link>
         <Link href="/admin/manager/opportunities/new" className="admin-btn-ghost">
           Manual Lead
         </Link>
