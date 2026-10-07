@@ -1,18 +1,19 @@
 # Bae Agenda
 
-Booking, admin, content, and client-communications app for DJ B.A.E. built with Next.js, Supabase, and Resend.
+Booking, admin, content, client-communications, and DJ business-development app for DJ B.A.E. built with Next.js, Supabase, Resend, and Vercel.
 
 ## What This App Does
 
-- Public marketing site with booking flow, events, portfolio, mixes, press kit, and contact pages
-- Admin area for bookings, payments, events, mixes, portfolio, reviews, content, W9, and dashboard views
+- Public marketing site with booking flow, events, portfolio, mixes, press kit, reviews, and contact pages
+- Protected admin for bookings, clients, payments, invoices, events, mixes, portfolio, reviews, content, W-9, and Manager
 - Booking inquiry intake with availability checks, rate limiting, and email/SMS notifications
 - Invoice PDF generation and invoice email sending
-- Manual client email actions from the booking detail page:
-  inquiry receipt, confirmation resend, final payment reminder, and post-event thank-you
-- Internal timeline notes on bookings for follow-up and email history
-- Daily cron automation for final payment reminders, post-event thank-yous, and review requests
-- Verified Resend webhook ingestion for sent/delivered/delayed/bounced/complained/failed/suppressed email events
+- Client portal
+- Manual client email actions from booking detail
+- Daily cron automation for final-payment reminders, post-event follow-ups, and review requests
+- Verified Resend webhook ingestion for sent/delivered/delayed/bounced/complained/failed/suppressed events
+- Manager workflow for sourcing, scoring, economics, outreach prep, follow-ups, warm rebooks, negotiation, relationship intelligence, and source-quality tracking
+- Discovery Runs backend + daily tracking for Manager source discovery
 
 ## Stack
 
@@ -46,40 +47,40 @@ cp .env.example .env.local
 npm run dev
 ```
 
-4. Open `http://localhost:3000`
+4. Open `http://localhost:3000`.
 
 ## Environment Variables
 
 See [`.env.example`](.env.example).
 
-Production envs break down like this:
+Production envs:
 
-- Core app required:
+- Core app:
   `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- Required for booking writes, admin mutations, portal requests, cron actions, and delivery-event storage:
+- Booking/admin/portal/cron/server writes:
   `SUPABASE_SERVICE_ROLE_KEY`
-- Required for admin access control:
+- Admin access control:
   `ADMIN_EMAILS`
-- Required only if you want booking and mix signup emails to send:
+- Email sending:
   `RESEND_API_KEY`, `BOOKING_FROM_EMAIL`
-- Required only when the Resend delivery-status webhook is configured:
+- Resend delivery webhook:
   `RESEND_WEBHOOK_SECRET`
-- Email delivery safety:
-  production defaults to live delivery; preview/staging/local default to disabled. Set
-  `EMAIL_DELIVERY_MODE=redirect` and `EMAIL_REDIRECT_TO` in staging to exercise the full
-  Resend path without contacting real clients.
-- Optional booking alert overrides:
-  `BOOKING_ALERT_EMAIL`, `BOOKING_ALERT_PHONE`, `BOOKING_ZELLE_HANDLE`, `BOOKING_CASH_APP_HANDLE`
-- Required only for Stripe payment routes and the `/pay/[id]` payment experience:
+- Stripe:
   `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
-- Optional URL override for links inside emails and Stripe flows:
+- Optional URL override:
   `NEXT_PUBLIC_APP_URL`
-- Optional Twilio SMS alerts:
+- Optional Twilio:
   `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_FROM_NUMBER`
-- Optional Upstash rate limiting:
+- Optional Upstash:
   `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`
-- Required for the Vercel payment-reminder cron:
+- Vercel payment-reminder cron:
   `CRON_SECRET`
+
+Email delivery safety:
+
+- production defaults to live delivery
+- preview/staging/local default to disabled
+- use `EMAIL_DELIVERY_MODE=redirect` and `EMAIL_REDIRECT_TO` for controlled non-production email testing
 
 Not used by this codebase:
 
@@ -93,17 +94,16 @@ Not used by this codebase:
 - Public form submits to `app/api/booking/route.ts`
 - Availability is checked before a booking is created
 - Client contact is upserted in Supabase
-- Booking is stored with status `inquiry`
+- Booking is stored as an inquiry
 - Owner alert email and optional SMS are sent
 - Client inquiry receipt email is sent
 
 ### Admin booking operations
 
-- Protected admin routes live under `app/(admin)/admin/(protected)`
+- Protected routes live under `app/(admin)/admin/(protected)`
 - Admin allowlist is enforced through `lib/admin-auth.ts`
-- Booking detail pages support:
-  payment logging, internal notes, invoice sending, and client email actions
-- Email actions append timeline notes to the booking
+- Booking detail supports payment logging, notes, invoice actions, and client communications
+- Successful email actions append timeline notes
 
 ### Invoices
 
@@ -111,30 +111,44 @@ Not used by this codebase:
 - Download route: `app/api/invoice/[id]/route.ts`
 - Email send route: `app/api/invoice/[id]/send/route.ts`
 
+### Manager
+
+Manager is already live. It includes:
+
+- Today queue
+- source/watchlist workflows
+- scoring and economics
+- lead enrichment
+- outreach prep + requirements checks
+- actual sent-message recording
+- follow-ups/history
+- relationship intelligence
+- warm rebooks
+- negotiation assistance
+- source-health/weak-lead guardrails
+- Discovery Runs backend + daily tracking
+
+The Discovery Runs UI is intentionally parked.
+
+Manager must not autonomously send outreach, submit applications, accept gigs, or book work.
+
 ### Resend delivery events
 
-- Apply the migration that creates `email_delivery_events` before enabling the webhook.
-- Configure a Resend webhook pointing to:
-  `https://thebaeagenda.com/api/resend/webhook`
-- Subscribe only to:
-  `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`,
-  `email.complained`, `email.failed`, and `email.suppressed`.
-- Add the webhook signing secret to production as `RESEND_WEBHOOK_SECRET`.
-- The endpoint verifies the raw request with Resend's signed Svix headers before writing anything.
-- Replayed/retried events are idempotent by the provider event id.
-- Open/click events are intentionally ignored.
+Webhook endpoint:
 
-## Admin Email Actions
+`https://thebaeagenda.com/api/resend/webhook`
 
-From the booking detail page you can manually send:
+Supported events:
 
-- Inquiry receipt
-- Booking confirmation
-- Final payment reminder
-- Post-event thank-you
-- Invoice email
+- `email.sent`
+- `email.delivered`
+- `email.delivery_delayed`
+- `email.bounced`
+- `email.complained`
+- `email.failed`
+- `email.suppressed`
 
-Recent email activity is shown in the booking page and logged to booking notes.
+Open/click tracking is intentionally excluded.
 
 ## Verification Commands
 
@@ -144,23 +158,45 @@ npm run test
 npm run build
 ```
 
-## Deployment Notes
+## Deployment
 
-- This app is set up for Vercel-style deployment
-- The reproducible homepage-debug workflow is documented in `docs/staging-preview.md`
-- Use the long-lived `staging` target and staging-only service credentials for browser reproduction; do not debug against production writes
-- Production env vars must be added before booking, auth, invoice, or notification flows will work
-- Stripe deposit flow also requires the Stripe env vars above plus a webhook endpoint pointed at
-  `https://thebaeagenda.com/api/stripe/webhook`
-- Resend delivery tracking requires the `email_delivery_events` migration, `RESEND_WEBHOOK_SECRET`, and a webhook pointed at
-  `https://thebaeagenda.com/api/resend/webhook`
-- Twilio is optional unless SMS alerts are required
-- Upstash is optional. If omitted, the site still builds and runs, but shared rate limits are disabled
+Automatic Vercel Git deployments are disabled.
 
-## Current Operational Guidance
+For application changes:
 
-- Daily cron sends are configured for:
-  seven-day final payment reminders, post-event thank-you follow-ups, and review requests
-- Keep manual email actions available as the fallback path from the booking detail page
-- Keep `ADMIN_EMAILS` populated so admin access stays restricted
-- Watch the booking detail timeline notes for send history and follow-up context
+1. merge reviewed work into `main`
+2. create a deliberate preview when runtime/visual QA is needed
+3. verify the intended commit
+4. create one deliberate production deployment
+5. verify the production SHA, key routes, `/api/health`, and runtime logs
+
+Do not use Vercel Redeploy to publish newer merged commits.
+
+The old long-lived `staging` workflow is parked. See `docs/staging-preview.md` for the current preview process.
+
+Docs-only changes and database-history/documentation-only merges normally do not require an application deployment.
+
+## Database Safety
+
+Production Supabase migration history is historically drifted.
+
+Do not run blanket `supabase db push`.
+
+For production DB changes:
+
+- inspect live schema first
+- use narrow reviewed migrations only
+- verify RLS/grants and advisors after changes
+- preserve existing Manager/business data
+
+PR #101 legacy invoice/review/client-portal hardening is already applied and verified.
+
+## Current Source of Truth
+
+Read these before starting substantial work:
+
+1. `PROJECT_STATUS.md`
+2. `docs/MANAGER_EXECUTION_AGENDA.md` for Manager/outreach
+3. `docs/ROADMAP.MD`
+4. `docs/operations.md`
+5. `docs/PRODUCTION_DATABASE_CHANGE_POLICY.md` for DB changes
