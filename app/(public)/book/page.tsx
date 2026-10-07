@@ -1,5 +1,4 @@
 import BookingForm from '@/components/public/booking/BookingForm'
-import BookingIntentBar from '@/components/public/booking/BookingIntentBar'
 import { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
 import BookExperienceRail from '@/components/public/BookExperienceRail'
 import BookExperienceStage from '@/components/public/BookExperienceStage'
@@ -58,12 +57,7 @@ export default async function BookPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify([faqJsonLd, serviceJsonLd]) }}
       />
       <BookExperienceStage
-        form={
-          <>
-            <BookingIntentBar activeType={initialEventType} />
-            <BookingForm embedded initialEventType={initialEventType} />
-          </>
-        }
+        form={<BookingForm embedded initialEventType={initialEventType} />}
         rail={<BookExperienceRail />}
       />
       <ReviewSection />
