@@ -67,7 +67,7 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 
 ### Held / review-on-purpose work
 
-- PR #142: Public Vibe experience prototype — draft/local-test only
+- PR #149: clean Public Vibe experience prototype — draft/preview-review only; replaces closed #142
 - PR #59: Full Portfolio Archive media galleries — held/separate
 - Discovery Runs UI — parked
 - Manager bot-access/suggestions design — parked until there is a demonstrated need

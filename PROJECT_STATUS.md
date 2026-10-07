@@ -76,7 +76,7 @@ Remaining unrelated advisor items:
 
 ## Open / Held
 
-- PR #142: Public Vibe experience prototype — draft/local-test only; keep separate until intentionally reviewed.
+- PR #149: clean Public Vibe experience prototype — draft/preview-review only; replaces closed #142 and stays separate until intentionally reviewed.
 - PR #59: Full Portfolio Archive media galleries — intentionally held/separate.
 - Bot access for Manager — not started; approval-gated design only.
 - Discovery Runs UI branch — parked; backend/daily tracking logic already exists.
