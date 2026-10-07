@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import styles from './VibeExperience.module.css'
+import RoomReader from '@/components/public/RoomReader'
 
 type Vibe = {
   id: string
@@ -188,6 +189,8 @@ export default function VibeExperience() {
           </div>
         </div>
       </section>
+
+      <RoomReader />
 
       <section className={styles.projects} aria-labelledby="projects-heading">
         <div className={styles.inner}>
