@@ -13,6 +13,7 @@ type Vibe = {
   sound: string[]
   energy: string
   fits: string[]
+  bookingType: string
 }
 
 const VIBES: Vibe[] = [
@@ -25,6 +26,7 @@ const VIBES: Vibe[] = [
     sound: ['R&B', 'Hip-Hop', 'Slow Jams', 'Edits'],
     energy: 'Warm-up → singalong → bounce',
     fits: ['Birthdays', 'Day parties', 'Lounges'],
+    bookingType: 'Birthday / Private Party',
   },
   {
     id: 'girls-night',
@@ -35,6 +37,7 @@ const VIBES: Vibe[] = [
     sound: ['R&B', 'Hip-Hop', 'Club', 'Throwbacks'],
     energy: 'Flirty → loud → hands up',
     fits: ['Nightlife', 'Birthdays', 'Branded events'],
+    bookingType: 'Club / Venue Night',
   },
   {
     id: 'cookout',
@@ -45,6 +48,7 @@ const VIBES: Vibe[] = [
     sound: ['Hip-Hop', 'R&B', 'Funk', 'House'],
     energy: 'Easy → social → dance floor',
     fits: ['Community events', 'Day parties', 'Outdoor events'],
+    bookingType: 'Brunch / Day Party',
   },
   {
     id: 'grown',
@@ -55,6 +59,7 @@ const VIBES: Vibe[] = [
     sound: ['R&B', 'Soul', 'Hip-Hop', 'House'],
     energy: 'Low glow → groove → late-night',
     fits: ['Lounges', 'Dinners', 'Milestone events'],
+    bookingType: 'Birthday / Private Party',
   },
   {
     id: 'open-format',
@@ -65,6 +70,7 @@ const VIBES: Vibe[] = [
     sound: ['Hip-Hop', 'R&B', 'House', 'Club'],
     energy: 'Adaptive → layered → peak',
     fits: ['Private events', 'Corporate', 'Nightlife'],
+    bookingType: 'Corporate Event',
   },
   {
     id: 'global-club',
@@ -75,6 +81,7 @@ const VIBES: Vibe[] = [
     sound: ['Baile', 'House', 'Juke', 'Club edits'],
     energy: 'Percussive → kinetic → release',
     fits: ['Creative events', 'Nightlife', 'Fashion / art'],
+    bookingType: 'Club / Venue Night',
   },
 ]
 
@@ -167,7 +174,7 @@ export default function VibeExperience() {
               <div className={styles.actions}>
                 <Link href="/lab" className="btn-primary">Hear the range →</Link>
                 <Link href="/portfolio" className="btn-ghost">See the proof</Link>
-                <Link href="/book" className={styles.textLink}>Book this kind of room</Link>
+                <Link href={`/book?type=${encodeURIComponent(selected.bookingType)}`} className={styles.textLink}>Book this kind of room</Link>
               </div>
             </div>
 
