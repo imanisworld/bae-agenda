@@ -178,7 +178,7 @@ export default function VibeExperience() {
                 >
                   See the proof
                 </Link>
-                <Link href={`/book?type=${encodeURIComponent(selected.bookingType)}`} className={styles.textLink}>Book this kind of room</Link>
+                <Link href={`/book?type=${encodeURIComponent(selected.bookingType)}&from=${encodeURIComponent(`vibe:${selected.id}`)}`} className={styles.textLink}>Book this kind of room</Link>
               </div>
             </div>
 
