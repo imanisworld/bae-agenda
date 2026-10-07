@@ -13,6 +13,7 @@ This list is reconciled against the current Manager state and DJ B.A.E. preferen
 - [x] Jazz Is Dead passed 2026-10-05 because no Indianapolis date/open DJ slot was verified.
 - [x] Punch Bowl Social relationship route identified: ask Rich the Kid before direct outreach.
 - [x] Level Up Walkathon 2027 is recorded as a high-confidence warm rebook.
+- [x] Manager relationship/warm-rebook views, actual-sent-message recording, and source-health guardrails are live in production.
 
 ## Current actions
 
@@ -41,10 +42,6 @@ This list is reconciled against the current Manager state and DJ B.A.E. preferen
 - [ ] Mar 2027: Atlanta Pride 2027 entertainment application opens.
 - [ ] Watch Chicago queer/house relationships such as Queen!/Smartbar and Party Noire for direct guest-DJ routes.
 - [ ] Watch strong Black/queer/femme party relationships in Atlanta, Detroit, DC, and other strategic markets.
-
-## Manager release note
-
-PRs #136-#138 are merged but not yet live. Do not assume the new relationship/warm-rebook views, actual-sent-message recording, or source-health guardrails are live until the next deliberate production deployment.
 
 ## Research archive / low priority
 
