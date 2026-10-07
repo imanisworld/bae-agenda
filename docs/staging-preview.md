@@ -1,60 +1,79 @@
-# Staging homepage preview
+# Preview / Staging Workflow
 
-The stable pre-production target is `staging`. Production remains the Vercel production branch (`main`) and must not be used to reproduce homepage failures.
+Last reconciled: 2026-10-07.
 
-## One-time Git branch setup
+## Current rule
 
-No `staging` branch existed when this workflow was added. Create it from a known-good production commit after the current work is committed:
+Automatic Vercel Git deployments are disabled. Pushing or merging a branch should not be assumed to create a preview or production deployment.
 
-```bash
-git fetch origin
-git switch -c staging origin/main
-git push -u origin staging
-git switch main
-```
+The old long-lived `staging` workflow is currently parked. The `staging` branch has no unique work and is far behind `main`; do not use it as a source of truth until it is intentionally revived and rebased.
 
-## One-time Vercel setup
+## Normal preview workflow
 
-Preferred (Vercel Pro/Enterprise):
+For a change that needs runtime or visual QA:
 
-1. Create a custom environment named `staging` and map the Git branch `staging` to it.
-2. Attach a stable domain such as `staging.thebaeagenda.com` to that environment.
-3. Configure staging-only Supabase, Stripe test-mode, Resend, and Upstash values in that environment. Do not copy production write credentials.
-4. Set `EMAIL_DELIVERY_MODE=redirect` and `EMAIL_REDIRECT_TO` to a controlled staging inbox. Staging and preview email otherwise fails closed without contacting the original recipient.
-5. Set `NEXT_PUBLIC_APP_URL` to the stable staging domain. `NEXT_PUBLIC_DEPLOYMENT_ENV` is derived from `VERCEL_TARGET_ENV`, but setting it to `staging` explicitly is harmless.
+1. merge or identify the exact candidate commit
+2. create one deliberate Vercel preview deployment from that commit/branch
+3. confirm the preview deployment metadata points to the intended SHA
+4. test the affected public/admin routes
+5. inspect preview runtime logs
+6. only then create a deliberate production deployment if approved
 
-Hobby fallback:
+Do not assume every PR needs a preview. Docs-only changes normally do not.
 
-1. Keep a long-lived `staging` branch and assign a stable branch domain to it.
-2. Add branch-specific Preview environment variables for the `staging` branch, including `NEXT_PUBLIC_DEPLOYMENT_ENV=staging` and the staging service credentials.
+## Preview environment caveat
 
-## Normal debugging workflow
+Preview deployments may not have production-only environment variables.
 
-```bash
-git fetch origin
-git switch staging
-git merge --ff-only origin/staging
-git merge --no-ff <homepage-debug-branch>
-npm test
-npm run build:staging
-git push origin staging
-```
+For example, a preview can build successfully while `/api/health` reports degraded if `SUPABASE_SERVICE_ROLE_KEY` or another production-only credential is intentionally absent.
 
-Open the stable staging domain in Safari and Chrome. A failed homepage section now leaves the other sections rendered and sends a structured `client_render_error` entry to the deployment logs. Filter logs by:
+When a preview health check fails:
 
-- `message=client_render_error`
-- `environment=staging`
-- `section=hero` (or `mixes`, `events`, `photo-strip`, `portfolio`, `booking`, `reviews`, `connect`)
-- `release=<git commit SHA>`
+- inspect the exact runtime error
+- distinguish missing preview configuration from an application regression
+- compare against current production health before blocking a release
 
-The endpoint records the browser user agent, bounded error/component stacks, path without query parameters, deployment label, and release SHA. It does not intentionally collect cookies, form values, URL query strings, or page content.
+Do not copy production write credentials into preview merely to make a health check green.
 
-Every response includes `X-Deployment-Environment`, and all non-production builds emit `X-Robots-Tag: noindex, nofollow, noarchive`. Their `/robots.txt` also disallows crawling the entire deployment.
+## Browser reproduction
 
-## Local staging-mode check
+When visual/browser reproduction is needed:
 
-Use `npm run dev:staging` for an interactive staging-labeled run, or `npm run build:staging` to verify the exact production build mode. Local staging mode should use a non-production `.env.local`.
+- use the deliberate preview URL
+- test Safari/Chrome as needed
+- use staging-safe or redirect-mode email settings
+- never test client-facing sends or production writes casually from preview
 
-## Promotion rule
+Non-production builds should remain noindex/nofollow.
 
-Reproduce and verify the fix on `staging`, then merge the tested commit into `main`. Never promote by running `vercel --prod` from an unreviewed homepage-debug branch.
+## If long-lived staging is revived later
+
+Only revive `staging` deliberately:
+
+1. reset/rebase it from current `main`
+2. configure staging-only Supabase/service credentials
+3. use Stripe test mode
+4. set `EMAIL_DELIVERY_MODE=redirect`
+5. set `EMAIL_REDIRECT_TO` to a controlled inbox
+6. assign a stable staging domain if useful
+7. document the reason long-lived staging is needed
+
+Do not revive it just because an old document references it.
+
+## Production promotion rule
+
+Production is a separate deliberate deployment from the reviewed `main` commit.
+
+Do not:
+
+- use Vercel Redeploy to publish newer merges
+- deploy an unreviewed feature branch directly to production
+- assume merge = publish
+
+After production deployment, verify:
+
+- exact Git SHA
+- `/api/health`
+- key public routes
+- protected admin behavior
+- relevant runtime logs

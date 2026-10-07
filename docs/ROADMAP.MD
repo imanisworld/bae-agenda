@@ -1,10 +1,10 @@
 # Bae Agenda Roadmap
 
-Last reconciled on 2026-10-05 against the repository through PR #128.
+Last reconciled: 2026-10-07.
 
 ## Rule
 
-Do not rebuild a feature because it appears in an old plan. Check current code, production state, and Manager data first.
+Do not rebuild a feature because it appears in an old plan. Check current code, production state, Manager data, and `PROJECT_STATUS.md` first.
 
 ## Implemented
 
@@ -16,78 +16,79 @@ Do not rebuild a feature because it appears in an old plan. Check current code, 
 - Supabase-backed booking/client/payment data
 - Stripe Checkout deposit flow with signed webhook handling and payment deduplication
 - Manual Zelle / Cash App payment handling
-- Invoice draft generation, PDF generation, download, email sending, void/restore
+- Invoice generation, PDF download, email sending, void/restore
 - Client portal
-- Resend email delivery
-- Twilio SMS support
-- Upstash rate limiting
+- Resend email delivery + signed delivery-status webhook tracking
+- Optional Twilio SMS support
+- Optional Upstash shared rate limiting
 - Daily Vercel cron for final-payment reminders, post-event follow-ups, and review requests
 - Vercel Analytics and Speed Insights
 - W-9 automation
 
-### Resend delivery-status tracking
-
-Verified operational:
-
-- signed Resend webhook endpoint exists at `/api/resend/webhook`
-- `email_delivery_events` exists in Supabase
-- `RESEND_WEBHOOK_SECRET` is configured in Vercel production
-- Resend webhook is enabled for sent/delivered/delayed/bounced/complained/failed/suppressed
-- successful sent and delivered webhook events have been observed
-- open/click tracking is intentionally excluded
-
 ### DJ B.A.E. Manager
 
-Implemented:
+Live in production:
 
 - Today action queue
-- direct-buyer sourcing rules and source-quality metrics
-- scoring/economics and outreach prep
-- warm-rebook scheduling
+- direct-buyer sourcing rules
+- source-quality metrics and weak-lead guardrails
+- scoring, economics, and outreach prep
+- required event details / What They Asked For checks
+- actual sent-message recording
+- relationship intelligence
+- warm-rebook scheduling and views
 - negotiation assistant
+- follow-up and history handling
+- Opportunity → Booking conversion
 - Active / Needs Action / Outreach Ready / Follow-up / Negotiating / Warm Rebooks / History / All views
-- History handling for booked/passed/lost Manager leads
-- 25-row admin pagination for Manager, Bookings, Events, Clients, and Invoices
-- Booking History for completed/lost
-- Events Upcoming / Past / All
-- source-specific draft review and status correction during real-use QA
+- 25-row pagination across major admin views
+- Discovery Runs backend + daily tracking logic
+
+The Discovery Runs UI is intentionally parked while the backend collects useful history.
+
+### Production security / deployment
+
+- Automatic Vercel Git deployments were disabled in PR #135.
+- Production is published deliberately after an intended batch is QA'd.
+- The latest verified application release includes Manager work through PR #139.
+- Production database hardening from PR #101 is applied and verified.
+- Older Supabase migration-history drift still exists, so blanket `supabase db push` remains prohibited.
 
 ## Current Work
 
-### Deployment and QA
-
-Latest repository work through PR #128 is merged but not yet deployed because the Vercel Hobby deployment quota is temporarily blocking new production and preview builds.
-
-After the quota resets:
-
-1. deploy current `main`
-2. verify the deployment SHA
-3. run desktop/mobile visual and functional QA
-4. fix only verified regressions
-
 ### Manager real-use pass
 
-- work high-value live leads rather than adding more infrastructure
+- follow up Silent Disco and Elevate Social on Oct 10 if there is no reply
 - prioritize verified warm rebooks over equivalent cold leads
+- let daily Discovery Runs collect data
 - measure which sources, pitches, and economics produce responses/bookings
-- keep weak or speculative relationship leads out of Outreach Ready
+- keep weak/speculative relationship leads out of Outreach Ready
+- improve discovery quality before adding volume
+
+### Held / review-on-purpose work
+
+- PR #142: Public Vibe experience prototype — draft/local-test only
+- PR #59: Full Portfolio Archive media galleries — held/separate
+- Discovery Runs UI — parked
+- Manager bot-access/suggestions design — parked until there is a demonstrated need
 
 ## Remaining Work — Only When Useful
 
-- Manager junk/stale-record archive controls if real usage proves History/Pass is insufficient
-- expenses / tax-support workflow and exportable reporting
-- content-publish email notifications if there is a real audience/workflow for them
-- contracts / e-signature integration
+- Manager junk/stale-record archive controls if History/Pass proves insufficient
+- leaked-password protection
+- duplicate-permissive-policy / unused-index cleanup
+- expenses / tax-support workflow
+- contracts / e-signature
 - advanced media-library features
-- richer calendar only if current event/admin views prove insufficient
-- role-based permissions only if the app grows beyond the current admin allowlist model
-- deeper funnel/session analytics only if Vercel Analytics is insufficient
+- richer calendar
+- multi-user roles
+- deeper analytics
 
 ## Do Not Add Now
 
 Do not add these without a concrete failure or requirement:
 
-- a second generic Manager scheduler or pipeline-health cron
+- a second generic Manager scheduler or discovery cron
 - Trigger.dev
 - a second payment system
 - a second generic analytics platform
@@ -96,4 +97,4 @@ Do not add these without a concrete failure or requirement:
 
 ## Manager Safety Rule
 
-Manager may discover, score, research, draft, schedule follow-ups, and record decisions. It must not autonomously send outreach, submit applications, accept gigs, or book work.
+Manager may discover, score, research, draft, schedule follow-ups, record actual messages, and record decisions. It must not autonomously send outreach, submit applications, accept gigs, or book work.

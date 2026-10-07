@@ -1,50 +1,69 @@
-# Manager Production Rollout
+# Manager Production Rollout — Completed
 
-Production migration history does not fully match the repository migration folder, so this rollout uses one exact reviewed migration rather than a blanket database push.
+Last reconciled: 2026-10-07.
 
-## Preflight
+This document is now a historical record of the Manager production rollout. Do not reuse its original preflight as if Manager were not installed.
 
-Confirm against the live Supabase project:
+## Current production state
 
-- `public.manager_profiles` does not exist.
-- `public.manager_opportunities` does not exist.
-- `public.bookings(id)` exists.
-- `public.touch_updated_at()` exists.
-- existing booking/client/payment/event/invoice/media orphan checks are zero.
-- the production Vercel deployment is READY.
-- current production logs do not show a new database failure relevant to this rollout.
+Manager is already live in production.
 
-## Apply
+Production migration history records the Manager foundation and follow-on work, including:
 
-Apply only `20261004220000_create_manager_foundation.sql`.
+- `20261004214429_create_manager_foundation`
+- `20261004221308_add_manager_demo_recommendation`
+- `20261004221926_create_manager_sources_watchlist`
+- `20261004223040_add_manager_fit_score_details`
+- `20261005021451_add_manager_gig_economics`
+- `20261005133058_create_manager_opportunity_activity`
+- `20261005134153_add_manager_outreach_prep`
+- `20261007165421_create_manager_discovery_runs`
 
-## Expected effects
+Manager tables already contain real operating state. Do not run the original foundation migration again and do not use the old “tables must not exist” preflight.
 
-- two new Manager tables
-- one Manager profile seeded with identity/contact facts only
-- no existing booking, client, invoice, payment, or event rows changed
-- no anon/authenticated access to Manager tables
-- service-role CRUD access only
-- two updated-at triggers and five indexes
+## What is live
 
-## Postflight
+- Manager profile/opportunities
+- sources/watchlist and source signals
+- scoring and fit details
+- gig economics
+- opportunity activity/history
+- outreach preparation and controlled dispatch support
+- relationship intelligence
+- warm rebooks
+- actual sent-message recording
+- source health / weak-lead guardrails
+- Discovery Runs backend + daily tracking
 
-- confirm both Manager tables exist with RLS enabled
-- confirm anon/authenticated have no privileges on them
-- confirm the seeded profile exists exactly once
-- confirm opportunities row count is zero
-- confirm existing core row counts are unchanged
-- rerun FK orphan checks
-- rerun Supabase security/performance advisors
-- verify admin Manager pages and current Vercel runtime logs
+## Database safety rule
 
-## Rollback
+Production migration history remains historically drifted from the repository.
 
-Before any real Manager data is entered, rollback is simply:
+Therefore:
 
-```sql
-drop table if exists public.manager_opportunities;
-drop table if exists public.manager_profiles;
-```
+- never run a blanket `supabase db push`
+- inspect live schema first
+- use one narrow reviewed migration for any future DB change
+- verify RLS/grants and advisors after a change
+- preserve existing Manager data
 
-After real Manager data exists, export/preserve it before considering rollback.
+PR #101 separately hardened legacy invoice/review/client-portal access and is already applied.
+
+## Application release rule
+
+Automatic Vercel Git deployments are disabled.
+
+For future Manager application changes:
+
+1. merge reviewed changes into `main`
+2. create one deliberate preview if runtime/visual QA is needed
+3. verify the intended commit
+4. create one deliberate production deployment
+5. verify production SHA, routes, health, and runtime logs
+
+Do not use Vercel Redeploy to publish newer merged commits.
+
+## Parked work
+
+- Discovery Runs UI: backend is live; UI branch is parked until enough data exists to justify it.
+- Manager bot access/suggestions: intentionally not started.

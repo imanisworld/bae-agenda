@@ -1,14 +1,14 @@
 # Production Database Change Policy
 
+Last reconciled: 2026-10-07.
+
 ## Current production state
 
-As re-audited on 2026-10-07:
-
-- Supabase project is healthy and is the project configured in the production Vercel app.
-- Production has migration-history drift: the live schema contains objects whose historical repo migration filenames are not all recorded in production.
-- Manager tables already exist in production, including the discovery-runs backend.
-- Vercel Git auto-deploys were disabled in PR #135. Merging to `main` no longer publishes the site automatically.
-- Current production is deliberately deployed from the reviewed `main` commit rather than implicitly from each merge.
+- Supabase production is healthy.
+- Production migration history is historically drifted from the repository migration folder.
+- Manager tables already exist in production, including Discovery Runs.
+- PR #101 legacy access hardening is applied and verified.
+- Automatic Vercel Git deployments are disabled; database changes and application deployments are separate actions.
 
 ## Non-negotiable rule
 
@@ -16,103 +16,104 @@ As re-audited on 2026-10-07:
 
 A blanket push can attempt to replay historical migrations that are already represented in the live schema.
 
-Until migration history is explicitly reconciled, production database changes must use this process:
+## Required production DB workflow
 
-1. Identify the exact production project before any write.
-2. Read the live schema and confirm every object the migration expects.
-3. Review the exact SQL as a single scoped migration.
-4. Reject destructive statements unless they are independently justified.
-5. Apply only that exact migration through the Supabase migration API/tool.
-6. Re-run security and performance advisors.
-7. Verify schema, grants, RLS policies, row counts, and foreign-key integrity.
-8. Smoke-test the affected public/admin workflows.
-9. Check current Vercel production runtime errors after the change.
-10. Record the migration name and result.
+For every future production database change:
 
-## Backup / rollback constraint
+1. identify the exact Supabase production project
+2. inspect the live schema and migration ledger
+3. confirm every object/precondition the change expects
+4. review one narrow migration
+5. reject unrelated or destructive changes
+6. apply only that exact reviewed migration
+7. rerun security/performance advisors
+8. verify schema, grants, RLS, row counts, and relevant integrity checks
+9. smoke-test affected application flows
+10. verify production `/api/health` and runtime logs
+11. record the applied migration version/result
 
-For metadata-only, reversible changes such as RLS policies and grants, prefer:
+## Completed legacy-access hardening
 
-- no data-changing SQL,
-- fail-closed preconditions,
-- a narrowly scoped migration,
-- an explicit reverse plan,
-- immediate post-change verification.
+PR #101 addressed broad client-role access on:
 
-Do not combine unrelated data edits with a schema/security migration.
+- `invoices`
+- `reviews`
+- `client_portal_codes`
+- `client_portal_sessions`
+- `booking_portal_requests`
 
-## Current issue addressed by PR #101
+Applied production migration:
 
-### Legacy broad authenticated policies
+`20261007171755_harden_legacy_authenticated_policies`
 
-The following legacy tables currently have broad policies equivalent to "any authenticated user" and broad client-role table grants:
+Verified after application:
 
-- invoices
-- reviews
-- client_portal_codes
-- client_portal_sessions
-- booking_portal_requests
+- all five target tables retain RLS
+- client portal state tables have no anon/authenticated SELECT or INSERT privileges
+- invoices grant authenticated SELECT only and the RLS policy gates reads through `private.is_admin_user()`
+- a non-admin identity fails the database admin helper
+- the active allowlisted admin passes it
+- reviews expose SELECT only through the approved-review policy
+- review/portal writes remain server-side through the service-role client
+- no application rows were inserted, updated, or deleted by the migration
+- public site, portal login, and `/api/health` remained healthy
+- production runtime verification showed no new warning/error/fatal logs
 
-All five already have RLS enabled.
+Do not reapply this migration.
 
-Current application code does not require broad authenticated write access:
+## Admin-helper constraint
 
-- portal code/session/request access uses `createAdminClient()`
-- public review submission and admin review moderation use `createAdminClient()`
-- invoice mutations use `createAdminClient()`
-- invoice PDF/send reads use the signed-in user client and separately enforce the application admin allowlist
+`private.is_admin_user()` is shared by multiple admin RLS policies.
 
-Production currently has an active database admin allowlist entry, and `private.is_admin_user()` is present and executable by the authenticated role.
+Its historical behavior allows signed-in users when the database admin allowlist is empty. PR #101 did not change that shared behavior; instead, its migration fails closed if the active admin allowlist is empty.
 
-The companion hardening migration:
+Keep `public.admin_users` populated in production.
 
-- refuses to run if the admin helper is missing or unusable
-- refuses to run if the active database admin allowlist is empty
-- refuses to run if any target table is missing
-- refuses to run if any target table lacks RLS
-- removes broad anon/authenticated table privileges
-- permits authenticated invoice reads only through the existing admin helper
-- preserves public read access only for approved reviews
-- makes portal state server-only
-- does not insert, update, or delete application rows
+Changing the helper itself to fail closed everywhere should be treated as a separate reviewed security change because it can affect multiple admin policies.
 
-## Important admin-helper constraint
+## Service-role-only tables
 
-`private.is_admin_user()` intentionally allows signed-in users when the database admin allowlist is empty. That fallback predates PR #101 and is used by other admin RLS policies.
+Some internal tables intentionally have:
 
-PR #101 therefore requires at least one active `public.admin_users` row before changing invoice access. Changing the helper itself to fail closed would affect multiple existing admin policies and should be reviewed as a separate hardening change rather than silently bundled here.
+- RLS enabled
+- no anon/authenticated table privileges
+- no client policies
+- server-side/service-role access only
 
-## Advisor findings outside PR #101
+Supabase may report these as informational “RLS enabled, no policy” findings. Do not add client policies merely to silence the advisor.
 
-Current security advisor findings include:
+Examples include Manager/internal operational tables and client-portal state after PR #101.
 
-- service-role-only tables with RLS and no client policies; these are intentional where the application accesses them only through the server-side service role
-- leaked-password protection is disabled
+## Remaining advisor items
 
-Those are separate from the five-table legacy-policy fix and should not be bundled into this migration.
+Current unrelated items include:
 
-## Deployment policy
+- leaked-password protection disabled
+- duplicate permissive policies on some older public/admin-read tables
+- unused-index notices
 
-Database hardening and application deployment are separate actions.
+These are separate cleanup/hardening work. Do not bundle them into unrelated migrations.
 
-- Merging PR #101 does not need to publish the website.
-- Automatic Vercel Git deployments are disabled.
-- Apply the exact reviewed database migration only after its production preflight passes.
-- After the database change is verified, publish application code only if application code changed and a deployment is actually required.
+## Backup / rollback rule
 
-## Postflight for PR #101
+For metadata-only changes:
 
-After applying the exact hardening migration:
+- do not combine data edits
+- use fail-closed preconditions
+- define the reverse operation before applying
+- verify immediately afterward
 
-- run Supabase security advisor
-- run Supabase performance advisor
-- confirm expected grants and policies on all five target tables
-- confirm `anon` cannot read/write portal state or invoices
-- confirm an allowlisted authenticated admin can read invoices
-- confirm a non-admin authenticated user cannot read invoices
-- verify public approved-review reads
-- verify public review submission
-- verify portal login/verification flow
-- verify admin invoice reads and invoice send flow
-- confirm production `/api/health` is OK
-- inspect current production runtime errors
+For any migration that changes or removes real business data, require an explicit backup/export and rollback plan first.
+
+## Application deployment after DB changes
+
+A database migration does not automatically require a new Vercel deployment.
+
+If application code also changed:
+
+1. merge reviewed code
+2. QA the intended commit
+3. create one deliberate production deployment
+4. verify exact SHA and runtime health
+
+Do not use Vercel Redeploy to publish newer merged commits.
