@@ -114,8 +114,7 @@ export default function VibeExperience() {
             <span className={styles.kicker}>Choose the room</span>
             <h2 id="vibe-heading">What are we doing tonight?</h2>
             <p>
-              Pick the kind of night you&apos;re planning. The point is not a fixed playlist — it&apos;s showing how DJ B.A.E.
-              thinks about pacing, context, and the crowd.
+              Pick a lane. This is not a fixed playlist — it&apos;s how DJ B.A.E. thinks about pacing, context, and the crowd.
             </p>
           </div>
 
@@ -166,7 +165,6 @@ export default function VibeExperience() {
 
               <div className={styles.actions}>
                 <Link href="/lab" className="btn-primary">Hear the range →</Link>
-                <Link href="/portfolio" className="btn-ghost">See the proof</Link>
                 <Link href={`/book?type=${encodeURIComponent(selected.bookingType)}`} className={styles.textLink}>Book this kind of room</Link>
               </div>
             </div>
