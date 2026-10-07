@@ -33,22 +33,22 @@ Automatic Vercel Git deployments were disabled in PR #135.
 
 Workflow: merge approved PRs into `main` without publishing, QA the intended batch, then create one deliberate production deployment from latest `main`. Do not use Redeploy to publish newly merged commits because it rebuilds an older deployment.
 
-Current production is `78fd1907b13a57489de7145043367e9430cf6c75` (PR #134). PRs #136, #137, and #138 are merged but not live yet. The payment-reminders cron remains configured against production.
+Current production is `e4b4ae761b3a027b5efb2372c844ab559a68a775` (PR #139). PRs #136-#139 are live. Production `/api/health` returned 200 OK after deployment, public routes returned 200, protected Manager routes failed closed to admin login, and the production deployment had no warning/error runtime logs in the verification window.
+
+The payment-reminders cron remains configured against production.
 
 ## Next
 
-1. QA #136-#138 together.
-2. If clean, publish latest `main` once.
-3. Verify deployed SHA and run mobile/desktop functional QA.
-4. Follow up Silent Disco and Elevate Social on Oct 10.
-5. Use Manager in real conditions and measure source quality, response rate, booked rate, and economics.
-6. Address production DB hardening separately in PR #101 after review; do not blanket-push drifted Supabase migration history.
+1. Follow up Silent Disco and Elevate Social on Oct 10.
+2. Use Manager in real conditions and measure source quality, response rate, booked rate, and economics.
+3. Review/apply production DB hardening separately in PR #101; do not blanket-push drifted Supabase migration history.
 
 ## Open / Held
 
-- PR #101: production DB/RLS hardening — unresolved security work; keep separate.
+- PR #101: production DB/RLS hardening — reviewed and tightened on 2026-10-07; remains draft and unapplied.
 - PR #59: Full Portfolio Archive media galleries — intentionally held/separate.
 - Bot access for Manager — not started; approval-gated design only.
+- Discovery Runs UI branch — parked; backend/daily tracking logic already exists.
 
 ## Deferred / Optional
 
