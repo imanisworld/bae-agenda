@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type KeyboardEvent } from 'react'
 import { trackEvent } from '@/lib/analytics'
 import styles from './VibeExperience.module.css'
 
@@ -137,6 +137,26 @@ export default function VibeExperience({ initialVibe }: { initialVibe?: string |
     })
   }
 
+  function focusVibe(id: string) {
+    chooseVibe(id)
+    window.requestAnimationFrame(() => {
+      document.getElementById(`vibe-tab-${id}`)?.focus()
+    })
+  }
+
+  function onVibeKeyDown(event: KeyboardEvent<HTMLButtonElement>, index: number) {
+    let nextIndex: number | null = null
+
+    if (event.key === 'ArrowRight') nextIndex = (index + 1) % VIBES.length
+    if (event.key === 'ArrowLeft') nextIndex = (index - 1 + VIBES.length) % VIBES.length
+    if (event.key === 'Home') nextIndex = 0
+    if (event.key === 'End') nextIndex = VIBES.length - 1
+
+    if (nextIndex === null) return
+    event.preventDefault()
+    focusVibe(VIBES[nextIndex].id)
+  }
+
   return (
     <>
       <section className={styles.section} aria-labelledby="vibe-heading">
@@ -150,16 +170,20 @@ export default function VibeExperience({ initialVibe }: { initialVibe?: string |
           </div>
 
           <div className={styles.selector} role="tablist" aria-label="Choose a vibe">
-            {VIBES.map((vibe) => {
+            {VIBES.map((vibe, index) => {
               const active = vibe.id === selected.id
               return (
                 <button
                   key={vibe.id}
+                  id={`vibe-tab-${vibe.id}`}
                   type="button"
                   role="tab"
                   aria-selected={active}
+                  aria-controls="vibe-panel"
+                  tabIndex={active ? 0 : -1}
                   className={active ? styles.tabActive : styles.tab}
                   onClick={() => chooseVibe(vibe.id)}
+                  onKeyDown={(event) => onVibeKeyDown(event, index)}
                 >
                   {vibe.label}
                 </button>
@@ -167,7 +191,12 @@ export default function VibeExperience({ initialVibe }: { initialVibe?: string |
             })}
           </div>
 
-          <div className={styles.stage}>
+          <div
+            id="vibe-panel"
+            className={styles.stage}
+            role="tabpanel"
+            aria-labelledby={`vibe-tab-${selected.id}`}
+          >
             <div className={styles.stageNumber} aria-hidden="true">
               {String(VIBES.findIndex((vibe) => vibe.id === selected.id) + 1).padStart(2, '0')}
             </div>
