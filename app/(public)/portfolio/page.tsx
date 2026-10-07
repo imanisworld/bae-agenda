@@ -6,6 +6,7 @@ import { getContentMap } from '@/lib/db/content'
 import { parseInstagramPosts } from '@/lib/instagram'
 import { CONTENT_DEFAULTS } from '@/lib/content-schema'
 import { getPublishedMixes } from '@/lib/db/mixes'
+import { isPortfolioCategory } from '@/lib/portfolio-experience'
 
 /** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
 export const revalidate = 300
@@ -28,7 +29,14 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function PortfolioPage() {
+export default async function PortfolioPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ category?: string | string[] }>
+}) {
+  const params = searchParams ? await searchParams : {}
+  const rawCategory = Array.isArray(params.category) ? params.category[0] : params.category
+  const initialCategory = isPortfolioCategory(rawCategory) ? rawCategory : null
   const [entries, featured, stats, content, mixes] = await Promise.all([
     getPortfolioEntries(),
     getFeaturedPortfolioEntries(),
@@ -79,6 +87,7 @@ export default async function PortfolioPage() {
       }))}
       instagramUrl={instagramUrl}
       instagramPosts={instagramPosts}
+      initialCategory={initialCategory}
     />
   )
 }
