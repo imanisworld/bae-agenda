@@ -4,6 +4,7 @@ import BookExperienceRail from '@/components/public/BookExperienceRail'
 import BookExperienceStage from '@/components/public/BookExperienceStage'
 import ReviewSection from '@/components/public/ReviewSection'
 import { EVENT_TYPES } from '@/lib/constants'
+import { bookingSourceContextValue, parseBookingSourceContext } from '@/lib/booking-source-context'
 
 /** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
 export const revalidate = 300
@@ -45,11 +46,13 @@ function validEventType(value: string | undefined) {
 export default async function BookPage({
   searchParams,
 }: {
-  searchParams?: Promise<{ type?: string | string[] }>
+  searchParams?: Promise<{ type?: string | string[]; from?: string | string[] }>
 }) {
   const params = searchParams ? await searchParams : {}
   const rawType = Array.isArray(params.type) ? params.type[0] : params.type
+  const rawSource = Array.isArray(params.from) ? params.from[0] : params.from
   const initialEventType = validEventType(rawType)
+  const initialSourceContext = bookingSourceContextValue(parseBookingSourceContext(rawSource))
   return (
     <>
       <script
@@ -57,7 +60,7 @@ export default async function BookPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify([faqJsonLd, serviceJsonLd]) }}
       />
       <BookExperienceStage
-        form={<BookingForm embedded initialEventType={initialEventType} />}
+        form={<BookingForm embedded initialEventType={initialEventType} initialSourceContext={initialSourceContext} />}
         rail={<BookExperienceRail />}
       />
       <ReviewSection />
