@@ -374,14 +374,51 @@
   }
 
   .selector {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    margin-right: -20px;
+    padding-right: 20px;
+    padding-bottom: 7px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .selector::-webkit-scrollbar {
+    display: none;
   }
 
   .tab,
   .tabActive {
+    flex: 0 0 min(72vw, 250px);
+    min-height: 52px;
     text-align: left;
     font-size: 11px;
+    scroll-snap-align: start;
+  }
+
+  .projectGrid {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    border: 0;
+    background: transparent;
+    margin-right: -20px;
+    padding-right: 20px;
+    padding-bottom: 8px;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .projectGrid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .projectCard {
+    flex: 0 0 min(82vw, 340px);
+    min-height: 260px;
+    border: 1px solid rgba(246,241,232,0.1);
+    scroll-snap-align: start;
   }
 
   .stage {
