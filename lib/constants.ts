@@ -107,7 +107,6 @@ export const PAYMENT_TYPES   = ['deposit', 'balance', 'full', 'refund'] as const
 export const LAB_CRATES = [
   { key: 'mixes',   label: 'Mixes',     url: 'https://soundcloud.com/deejaybae/sets/mixes'    },
   { key: 'mashups', label: 'Mashups',   url: 'https://soundcloud.com/deejaybae/sets/mashups'  },
-  { key: 'edits',   label: 'Edits P.1', url: 'https://soundcloud.com/deejaybae/sets/edit-p-1' },
 ] as const
 
 export const SOCIALS = [
