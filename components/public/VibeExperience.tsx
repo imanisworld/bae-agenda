@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { trackEvent } from '@/lib/analytics'
 import styles from './VibeExperience.module.css'
 
 type Vibe = {
@@ -109,9 +110,32 @@ const PROJECTS = [
   },
 ]
 
-export default function VibeExperience() {
-  const [selectedId, setSelectedId] = useState(VIBES[0].id)
+function validVibeId(value: string | null | undefined) {
+  return VIBES.some((vibe) => vibe.id === value) ? value as string : VIBES[0].id
+}
+
+export default function VibeExperience({ initialVibe }: { initialVibe?: string | null }) {
+  const [selectedId, setSelectedId] = useState(() => validVibeId(initialVibe))
   const selected = VIBES.find((vibe) => vibe.id === selectedId) ?? VIBES[0]
+
+  useEffect(() => {
+    if (!initialVibe || validVibeId(initialVibe) !== initialVibe) return
+    trackEvent('vibe_shared_view', { vibe: initialVibe })
+  }, [initialVibe])
+
+  function chooseVibe(id: string) {
+    setSelectedId(id)
+
+    const url = new URL(window.location.href)
+    url.searchParams.set('vibe', id)
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
+
+    const vibe = VIBES.find((item) => item.id === id)
+    trackEvent('vibe_selected', {
+      vibe: id,
+      label: vibe?.label ?? id,
+    })
+  }
 
   return (
     <>
@@ -135,7 +159,7 @@ export default function VibeExperience() {
                   role="tab"
                   aria-selected={active}
                   className={active ? styles.tabActive : styles.tab}
-                  onClick={() => setSelectedId(vibe.id)}
+                  onClick={() => chooseVibe(vibe.id)}
                 >
                   {vibe.label}
                 </button>
@@ -171,14 +195,33 @@ export default function VibeExperience() {
               </div>
 
               <div className={styles.actions}>
-                <Link href="/lab" className="btn-primary">Hear the range →</Link>
+                <Link
+                  href="/lab"
+                  className="btn-primary"
+                  onClick={() => trackEvent('vibe_lab_clicked', { vibe: selected.id })}
+                >
+                  Hear the range →
+                </Link>
                 <Link
                   href={`/portfolio?category=${encodeURIComponent(selected.portfolioCategory)}`}
                   className="btn-ghost"
+                  onClick={() => trackEvent('vibe_proof_clicked', {
+                    vibe: selected.id,
+                    category: selected.portfolioCategory,
+                  })}
                 >
                   See the proof
                 </Link>
-                <Link href={`/book?type=${encodeURIComponent(selected.bookingType)}&from=${encodeURIComponent(`vibe:${selected.id}`)}`} className={styles.textLink}>Book this kind of room</Link>
+                <Link
+                  href={`/book?type=${encodeURIComponent(selected.bookingType)}&from=${encodeURIComponent(`vibe:${selected.id}`)}`}
+                  className={styles.textLink}
+                  onClick={() => trackEvent('vibe_booking_clicked', {
+                    vibe: selected.id,
+                    eventType: selected.bookingType,
+                  })}
+                >
+                  Book this kind of room
+                </Link>
               </div>
             </div>
 
