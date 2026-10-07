@@ -2,7 +2,9 @@
 
 Work in `imanisworld/bae-agenda`.
 
-Start by reading:
+Read the repository root `AGENTS.md` first. Its shared rules override duplicated or older agent-specific guidance.
+
+Then read:
 
 1. `PROJECT_STATUS.md`
 2. `docs/MANAGER_EXECUTION_AGENDA.md`

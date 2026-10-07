@@ -193,7 +193,9 @@ PR #101 legacy invoice/review/client-portal hardening is already applied and ver
 
 ## Current Source of Truth
 
-Read these before starting substantial work:
+For AI/coding agents, read `AGENTS.md` first.
+
+Then read these before starting substantial work:
 
 1. `PROJECT_STATUS.md`
 2. `docs/MANAGER_EXECUTION_AGENDA.md` for Manager/outreach
