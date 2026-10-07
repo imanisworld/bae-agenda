@@ -14,6 +14,7 @@ type Vibe = {
   energy: string
   fits: string[]
   bookingType: string
+  portfolioCategory: string
 }
 
 const VIBES: Vibe[] = [
@@ -27,6 +28,7 @@ const VIBES: Vibe[] = [
     energy: 'Warm-up → singalong → bounce',
     fits: ['Birthdays', 'Day parties', 'Lounges'],
     bookingType: 'Birthday / Private Party',
+    portfolioCategory: 'Private + Social',
   },
   {
     id: 'girls-night',
@@ -38,6 +40,7 @@ const VIBES: Vibe[] = [
     energy: 'Flirty → loud → hands up',
     fits: ['Nightlife', 'Birthdays', 'Branded events'],
     bookingType: 'Club / Venue Night',
+    portfolioCategory: 'Nightlife',
   },
   {
     id: 'cookout',
@@ -49,6 +52,7 @@ const VIBES: Vibe[] = [
     energy: 'Easy → social → dance floor',
     fits: ['Community events', 'Day parties', 'Outdoor events'],
     bookingType: 'Brunch / Day Party',
+    portfolioCategory: 'Community + Culture',
   },
   {
     id: 'grown',
@@ -60,6 +64,7 @@ const VIBES: Vibe[] = [
     energy: 'Low glow → groove → late-night',
     fits: ['Lounges', 'Dinners', 'Milestone events'],
     bookingType: 'Birthday / Private Party',
+    portfolioCategory: 'Private + Social',
   },
   {
     id: 'open-format',
@@ -71,6 +76,7 @@ const VIBES: Vibe[] = [
     energy: 'Adaptive → layered → peak',
     fits: ['Private events', 'Corporate', 'Nightlife'],
     bookingType: 'Corporate Event',
+    portfolioCategory: 'Corporate + Brand',
   },
   {
     id: 'global-club',
@@ -82,6 +88,7 @@ const VIBES: Vibe[] = [
     energy: 'Percussive → kinetic → release',
     fits: ['Creative events', 'Nightlife', 'Fashion / art'],
     bookingType: 'Club / Venue Night',
+    portfolioCategory: 'Nightlife',
   },
 ]
 
@@ -165,6 +172,12 @@ export default function VibeExperience() {
 
               <div className={styles.actions}>
                 <Link href="/lab" className="btn-primary">Hear the range →</Link>
+                <Link
+                  href={`/portfolio?category=${encodeURIComponent(selected.portfolioCategory)}`}
+                  className="btn-ghost"
+                >
+                  See the proof
+                </Link>
                 <Link href={`/book?type=${encodeURIComponent(selected.bookingType)}`} className={styles.textLink}>Book this kind of room</Link>
               </div>
             </div>
