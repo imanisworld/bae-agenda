@@ -1,8 +1,10 @@
 import BookingForm from '@/components/public/booking/BookingForm'
+import BookingIntentBar from '@/components/public/booking/BookingIntentBar'
 import { BOOKING_FAQ } from '@/components/public/booking/BookingFaq'
 import BookExperienceRail from '@/components/public/BookExperienceRail'
 import BookExperienceStage from '@/components/public/BookExperienceStage'
 import ReviewSection from '@/components/public/ReviewSection'
+import { EVENT_TYPES } from '@/lib/constants'
 
 /** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
 export const revalidate = 300
@@ -37,7 +39,18 @@ const serviceJsonLd = {
   ],
 }
 
-export default function BookPage() {
+function validEventType(value: string | undefined) {
+  return EVENT_TYPES.includes(value as (typeof EVENT_TYPES)[number]) ? value : ''
+}
+
+export default async function BookPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ type?: string | string[] }>
+}) {
+  const params = searchParams ? await searchParams : {}
+  const rawType = Array.isArray(params.type) ? params.type[0] : params.type
+  const initialEventType = validEventType(rawType)
   return (
     <>
       <script
@@ -45,7 +58,12 @@ export default function BookPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify([faqJsonLd, serviceJsonLd]) }}
       />
       <BookExperienceStage
-        form={<BookingForm embedded />}
+        form={
+          <>
+            <BookingIntentBar activeType={initialEventType} />
+            <BookingForm embedded initialEventType={initialEventType} />
+          </>
+        }
         rail={<BookExperienceRail />}
       />
       <ReviewSection />
