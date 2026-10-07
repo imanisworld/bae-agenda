@@ -10,6 +10,7 @@ import {
   managerDispatchActivityType,
   managerDispatchStatus,
   managerDispatchSuccessLabel,
+  managerRecordedMessage,
   renderManagerOutreachHtml,
 } from '@/lib/manager-dispatch'
 import {
@@ -30,6 +31,7 @@ const DispatchSchema = z.object({
     .refine((value) => !value || /^\d{4}-\d{2}-\d{2}$/.test(value), 'Use a valid follow-up date.')
     .transform((value) => value || null),
   confirm_dispatch: z.literal('yes'),
+  sent_message: z.string().max(20000, 'The sent message is too long to record.').optional(),
 })
 
 function redirectWithError(id: string, message: string): never {
@@ -46,6 +48,7 @@ export async function dispatchManagerOutreachAction(formData: FormData) {
     opportunity_id: formData.get('opportunity_id'),
     follow_up_on: formData.get('follow_up_on'),
     confirm_dispatch: formData.get('confirm_dispatch'),
+    sent_message: formData.get('sent_message') ?? undefined,
   })
 
   if (!parsed.success) {
@@ -144,11 +147,16 @@ export async function dispatchManagerOutreachAction(formData: FormData) {
     }
   }
 
+  const recorded = managerRecordedMessage(channel, draft, parsed.data.sent_message)
   const nextStatus = managerDispatchStatus(channel)
   const lifecycleUpdate: Record<string, unknown> = {
     status: nextStatus,
     next_action: 'Follow up on outreach.',
     next_action_at: followUpOn,
+  }
+
+  if (recorded.edited) {
+    lifecycleUpdate.outreach_draft = recorded.body
   }
 
   if (nextStatus === 'applied') {
@@ -183,9 +191,10 @@ export async function dispatchManagerOutreachAction(formData: FormData) {
     opportunityId: id,
     activityType: managerDispatchActivityType(channel),
     title: managerDispatchSuccessLabel(channel),
-    body: draft,
+    body: recorded.body,
     occurredAt: now,
     metadata: {
+      message_source: recorded.source,
       channel,
       channel_label: channelLabel,
       recipient,

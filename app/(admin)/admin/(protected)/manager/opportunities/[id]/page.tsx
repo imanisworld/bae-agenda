@@ -737,6 +737,22 @@ export default async function ManagerOpportunityDetailPage({
                     </label>
                   </div>
 
+                  {opportunity.outreach_channel !== 'email' && (
+                    <label style={{ display: 'grid', gap: 7, marginBottom: 14 }}>
+                      <span className="admin-field-label">Message You Sent</span>
+                      <textarea
+                        name="sent_message"
+                        rows={10}
+                        defaultValue={opportunity.outreach_draft ?? ''}
+                        className="admin-input"
+                        style={{ minHeight: 220, resize: 'vertical', lineHeight: 1.6 }}
+                      />
+                      <span className="muted" style={{ fontSize: 10 }}>
+                        Paste or edit this to match what actually went out. Manager will preserve this copy in the activity timeline.
+                      </span>
+                    </label>
+                  )}
+
                   <label style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 14, color: 'var(--muted)', fontSize: 11, lineHeight: 1.5 }}>
                     <input
                       type="checkbox"
@@ -748,7 +764,7 @@ export default async function ManagerOpportunityDetailPage({
                     <span>
                       {opportunity.outreach_channel === 'email'
                         ? 'I reviewed the saved recipient, subject, draft, and assets. Send this email now.'
-                        : 'I completed this outreach externally using the saved draft (or edited and saved it first). Record it now and schedule follow-up.'}
+                        : 'I completed this outreach externally. Record the message above exactly as sent and schedule follow-up.'}
                     </span>
                   </label>
 
