@@ -1,11 +1,18 @@
-export type PortfolioCategory =
-  | 'Nightlife'
-  | 'Community + Culture'
-  | 'Festival + Large Event'
-  | 'Corporate + Brand'
-  | 'Campus'
-  | 'Private + Social'
-  | 'Other'
+export const PORTFOLIO_CATEGORIES = [
+  'Nightlife',
+  'Community + Culture',
+  'Festival + Large Event',
+  'Corporate + Brand',
+  'Campus',
+  'Private + Social',
+  'Other',
+] as const
+
+export type PortfolioCategory = (typeof PORTFOLIO_CATEGORIES)[number]
+
+export function isPortfolioCategory(value: string | null | undefined): value is PortfolioCategory {
+  return PORTFOLIO_CATEGORIES.includes(value as PortfolioCategory)
+}
 
 export type PortfolioEventForExperience = {
   id: string
