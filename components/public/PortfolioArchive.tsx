@@ -404,8 +404,6 @@ export default function PortfolioArchive({
           ) : null}
         </>
       )}
-
-      {selected ? <EventDetail entry={selected} mixes={mixes} onClose={() => setSelected(null)} /> : null}
     </section>
   )
 }
