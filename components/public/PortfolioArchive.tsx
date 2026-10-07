@@ -147,7 +147,7 @@ function EventDetail({
           <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'flex-start' }}>
             <div>
               <span style={{ color: 'var(--gold)', fontSize: '9px', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-                Archive record
+                Past work
               </span>
               <h3
                 style={{
@@ -182,8 +182,7 @@ function EventDetail({
           >
             {[
               ['When', displayDate(entry.date, entry.year)],
-              ['Where', entry.venue || entry.city],
-              ['Location', [entry.city, entry.state].filter(Boolean).join(', ')],
+              ['Place', [entry.venue, [entry.city, entry.state].filter(Boolean).join(', ')].filter(Boolean).join(' · ')],
               ['Type', categories.join(' · ')],
             ].map(([label, value]) => (
               <div key={label} style={{ padding: '13px', background: 'var(--surface)' }}>
@@ -195,16 +194,6 @@ function EventDetail({
             ))}
           </div>
 
-          {entry.tags.length > 0 ? (
-            <div style={{ marginTop: '20px' }}>
-              <div style={{ color: 'var(--muted)', fontSize: '8px', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '9px' }}>
-                Archive tags
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                {entry.tags.map((tag) => <TagChip key={tag} label={tag} />)}
-              </div>
-            </div>
-          ) : null}
 
           {entry.notes ? (
             <div style={{ marginTop: '22px', paddingTop: '18px', borderTop: '1px solid var(--border)' }}>
@@ -220,7 +209,7 @@ function EventDetail({
               Related listening
             </div>
             <p style={{ margin: '0 0 13px', color: 'var(--muted)', fontSize: '11px', lineHeight: 1.65 }}>
-              Suggested from the event&apos;s archive tags and mix metadata. These are not claimed to be recordings from this event.
+              Matched from archive tags and mix metadata — not claimed as a recording from this event.
             </p>
 
             {related.length > 0 ? (
@@ -253,7 +242,6 @@ function EventDetail({
             <Link href={`/book?type=${encodeURIComponent(bookingType)}`} className="btn-primary">
               Plan something similar →
             </Link>
-            <Link href="/lab" className="btn-ghost">Hear more</Link>
           </div>
         </div>
       </aside>
@@ -284,7 +272,6 @@ export default function PortfolioArchive({
 }) {
   const [city, setCity] = useState<string | null>(null)
   const [category, setCategory] = useState<PortfolioCategory | null>(null)
-  const [tag, setTag] = useState<string | null>(null)
   const [expanded, setExpanded] = useState(false)
   const [selected, setSelected] = useState<PortfolioEventForExperience | null>(null)
 
@@ -296,33 +283,26 @@ export default function PortfolioArchive({
 
   const categories = useMemo(() => allPortfolioCategories(entries), [entries])
 
-  const tags = useMemo(() => {
-    const seen = new Set<string>()
-    entries.forEach((entry) => entry.tags.forEach((value) => seen.add(value)))
-    return [...seen].sort()
-  }, [entries])
 
   const filtered = useMemo(() => {
     return entries.filter((entry) => {
       if (city && !entry.city.startsWith(city)) return false
       if (category && !portfolioCategories(entry).includes(category)) return false
-      if (tag && !entry.tags.includes(tag)) return false
       return true
     })
-  }, [entries, city, category, tag])
+  }, [entries, city, category])
 
   const allYears = useMemo(
     () => [...new Set(filtered.map((entry) => entry.year))].sort((a, b) => b - a),
     [filtered]
   )
 
-  const hasFilters = city !== null || category !== null || tag !== null
+  const hasFilters = city !== null || category !== null
   const visibleYears = expanded || hasFilters ? allYears : allYears.slice(0, COLLAPSED_YEARS)
 
   function clearFilters() {
     setCity(null)
     setCategory(null)
-    setTag(null)
   }
 
   return (
