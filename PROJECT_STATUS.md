@@ -1,62 +1,54 @@
 # Project Status
 
-Last reconciled: 2026-10-05.
+Last reconciled: 2026-10-07.
 
 ## Current State
 
 Core public-site, booking, admin, payment, invoice, client-portal, email, analytics, and Manager workflows are implemented.
 
-Latest merged Manager work through PR #128 adds:
+Current GitHub `main`: `712bcfaa6d32fb04c92ebdb5c498236ce59ef63e` (PR #138).
 
-- warm-rebook scheduling
-- negotiation guidance
-- pipeline filters/history
-- 25-row pagination for Manager, Bookings, Events, Clients, and Invoices
-- Booking History for Completed + Lost
-- Events Upcoming / Past / All
+Latest merged Manager work through PR #138 adds warm-rebook scheduling, negotiation guidance, pipeline filters/history, admin pagination, required lead/event details before outreach, the Manager lead-save fix, actual externally sent-message recording, relationship intelligence/warm-rebook views, and source-health/weak-lead guardrails.
 
-Current GitHub `main` before this status-only reconciliation is `6bb749a1ecca8c3f7dfe60895c031b28195b38bd`.
+## Verified Production
 
-## Verified Operational
+Audit on 2026-10-07:
 
-### Resend delivery tracking
+- Home, Book, Portfolio, Lab, and Press Kit return HTTP 200.
+- Admin routes to login as expected.
+- No recent production runtime warnings/errors were found in the available retention window.
+- Email delivery tracking remains operational.
 
-Resend delivery-status tracking is complete and operational:
+### Manager current state
 
-- `email_delivery_events` exists in Supabase
-- `RESEND_WEBHOOK_SECRET` exists in Vercel production
-- Resend webhook endpoint: `https://thebaeagenda.com/api/resend/webhook`
-- webhook is enabled for sent, delivered, delivery-delayed, bounced, complained, failed, and suppressed
-- successful `email.sent` and `email.delivered` webhook events have been observed
-
-This is observability only and does not alter booking state or resend messages automatically.
-
-### Manager live state
-
-- Silent Disco: Outreach Ready; strongest immediate direct-buyer lead
-- Elevate Social: Outreach Ready; verified creative-partnership route
-- Jazz Is Dead: Review / relationship-only because no current DJ opening is verified
-- Art & Soul 2027: warm rebook scheduled
-- Punch Bowl Social Galentine's 2027: warm rebook scheduled
-- Level Up Walkathon 2027: high-confidence warm rebook; prior organizer interest in having DJ B.A.E. back next year is recorded
-
-Grok has authenticated X access for secondary scouting and Resend access. X findings remain candidate signals and must be verified before becoming actionable Manager leads. Resend access does not change the safety rule: no autonomous outreach or sending.
+- Silent Disco: contacted 2026-10-05; follow-up Oct 10.
+- Elevate Social: contacted 2026-10-05; follow-up Oct 10.
+- Jazz Is Dead: passed 2026-10-05 because no Indianapolis date/open DJ slot was verified.
+- Punch Bowl Social: use the existing Rich the Kid relationship before direct outreach.
+- Art & Soul 2027, Punch Bowl Social Galentine's 2027, and Level Up Walkathon 2027 are scheduled warm-rebook work.
 
 ## Deployment State
 
-Vercel Hobby deployment quota is currently blocking new production and preview builds.
+Automatic Vercel Git deployments were disabled in PR #135.
 
-Production therefore still trails current `main`. Do not create a replacement Vercel project or churn deployments to work around the quota.
+Workflow: merge approved PRs into `main` without publishing, QA the intended batch, then create one deliberate production deployment from latest `main`. Do not use Redeploy to publish newly merged commits because it rebuilds an older deployment.
+
+Current production is `78fd1907b13a57489de7145043367e9430cf6c75` (PR #134). PRs #136, #137, and #138 are merged but not live yet. The payment-reminders cron remains configured against production.
 
 ## Next
 
-1. After the Vercel quota resets, deploy current `main`.
-2. Verify exact deployed SHA.
-3. Run mobile/desktop visual and functional QA.
-4. Fix verified deployment/UI regressions only.
-5. Work Silent Disco and Elevate Social through user-controlled send/pass decisions.
-6. Use Manager in real conditions and measure source quality, response rate, booked rate, and economics.
-7. Add further automation only when real usage identifies a concrete gap.
+1. QA #136-#138 together.
+2. If clean, publish latest `main` once.
+3. Verify deployed SHA and run mobile/desktop functional QA.
+4. Follow up Silent Disco and Elevate Social on Oct 10.
+5. Use Manager in real conditions and measure source quality, response rate, booked rate, and economics.
+6. Address production DB hardening separately in PR #101 after review; do not blanket-push drifted Supabase migration history.
+
+## Open / Held
+
+- PR #101: production DB/RLS hardening — unresolved security work; keep separate.
+- PR #59: Full Portfolio Archive media galleries — intentionally held/separate.
+- Bot access for Manager — not started; approval-gated design only.
 
 ## Deferred / Optional
 
