@@ -56,7 +56,13 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ vibe?: string | string[] }>
+}) {
+  const params = searchParams ? await searchParams : {}
+  const initialVibe = Array.isArray(params.vibe) ? params.vibe[0] : params.vibe
   const [content, portfolioEntries] = await Promise.all([
     getContentMap(['hero_title', 'hero_subtitle']),
     getPortfolioEntries(),
@@ -89,7 +95,7 @@ export default async function HomePage() {
           since={since}
           proof={explicitProof}
         />
-        <VibeExperience />
+        <VibeExperience initialVibe={initialVibe} />
       </div>
     </>
   )
