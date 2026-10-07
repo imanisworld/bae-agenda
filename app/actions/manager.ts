@@ -12,7 +12,7 @@ import {
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { scoreManagerOpportunity } from '@/lib/manager-scoring'
-import { calculateManagerEconomics } from '@/lib/manager-economics'
+import { calculateManagerEconomics, managerEconomicsColumns } from '@/lib/manager-economics'
 import { logManagerOpportunityActivity } from '@/lib/manager-activity'
 
 const OptionalDate = z
@@ -279,7 +279,7 @@ export async function createManagerOpportunityAction(formData: FormData) {
 
   const admin = createAdminClient()
   const payload = opportunityPayload(parsed.data)
-  const economics = calculateManagerEconomics(payload)
+  const economics = managerEconomicsColumns(calculateManagerEconomics(payload))
   const scoringInput = { ...payload, ...economics }
   const profile = await scoringProfile(admin)
   const { data, error } = await admin
@@ -321,7 +321,7 @@ export async function updateManagerOpportunityAction(formData: FormData) {
 
   const id = parsed.data.id
   const basePayload = opportunityPayload(parsed.data)
-  const economics = calculateManagerEconomics(basePayload)
+  const economics = managerEconomicsColumns(calculateManagerEconomics(basePayload))
   const admin = createAdminClient()
   const profile = await scoringProfile(admin)
   const payload: Record<string, unknown> = {

@@ -134,3 +134,13 @@ export function calculateManagerEconomics(
     },
   }
 }
+
+/**
+ * The economics result shaped as manager_opportunities columns. The table
+ * stores total hours as `estimated_total_hours`; writing the result's
+ * `expected_total_hours` key directly makes every save fail.
+ */
+export function managerEconomicsColumns(result: ManagerEconomicsResult) {
+  const { expected_total_hours, ...rest } = result
+  return { ...rest, estimated_total_hours: expected_total_hours }
+}
