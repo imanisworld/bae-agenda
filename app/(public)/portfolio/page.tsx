@@ -5,6 +5,7 @@ import { SOCIALS } from '@/lib/constants'
 import { getContentMap } from '@/lib/db/content'
 import { parseInstagramPosts } from '@/lib/instagram'
 import { CONTENT_DEFAULTS } from '@/lib/content-schema'
+import { getPublishedMixes } from '@/lib/db/mixes'
 
 /** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
 export const revalidate = 300
@@ -28,11 +29,12 @@ export const metadata: Metadata = {
 }
 
 export default async function PortfolioPage() {
-  const [entries, featured, stats, content] = await Promise.all([
+  const [entries, featured, stats, content, mixes] = await Promise.all([
     getPortfolioEntries(),
     getFeaturedPortfolioEntries(),
     getPortfolioStats(),
     getContentMap(['instagram_url', 'instagram_posts']),
+    getPublishedMixes(30),
   ])
   const instagramUrl =
     content.instagram_url || SOCIALS.find((social) => social.label === 'Instagram')!.url
@@ -59,11 +61,22 @@ export default async function PortfolioPage() {
         event_name: entry.event_name,
         venue: entry.venue ?? null,
         city: entry.city,
+        state: entry.state ?? null,
         year: entry.year,
+        date: entry.date ?? null,
         tags: entry.tags ?? [],
+        photo_url: entry.photo_url ?? null,
         featured: entry.featured,
+        notes: entry.notes ?? null,
       }))}
       stats={stats}
+      mixes={mixes.map((mix) => ({
+        id: mix.id,
+        title: mix.title,
+        genre: mix.genre,
+        description: mix.description,
+        embed_url: mix.embed_url,
+      }))}
       instagramUrl={instagramUrl}
       instagramPosts={instagramPosts}
     />
