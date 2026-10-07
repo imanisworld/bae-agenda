@@ -5,6 +5,7 @@ export type PortfolioCategory =
   | 'Corporate + Brand'
   | 'Campus'
   | 'Private + Social'
+  | 'Other'
 
 export type PortfolioEventForExperience = {
   id: string
@@ -44,6 +45,7 @@ const CATEGORY_SOUND_TERMS: Record<PortfolioCategory, string[]> = {
   'Corporate + Brand': ['open format', 'r&b', 'hip-hop', 'house'],
   Campus: ['open format', 'hip-hop', 'r&b', 'club', 'throwback'],
   'Private + Social': ['r&b', 'hip-hop', 'open format', 'throwback', 'soul'],
+  Other: [],
 }
 
 function normalize(value: string | null | undefined) {
@@ -56,12 +58,13 @@ export function portfolioCategories(entry: Pick<PortfolioEventForExperience, 'ta
     .filter(({ tags: candidates }) => candidates.some((candidate) => tags.includes(candidate)))
     .map(({ category }) => category)
 
-  return matches.length > 0 ? matches : ['Community + Culture']
+  return matches.length > 0 ? matches : ['Other']
 }
 
 export function allPortfolioCategories(entries: PortfolioEventForExperience[]): PortfolioCategory[] {
   const present = new Set(entries.flatMap(portfolioCategories))
-  return CATEGORY_TAGS.map(({ category }) => category).filter((category) => present.has(category))
+  const ordered = CATEGORY_TAGS.map(({ category }) => category).filter((category) => present.has(category))
+  return present.has('Other') ? [...ordered, 'Other'] : ordered
 }
 
 export function relatedListening(
