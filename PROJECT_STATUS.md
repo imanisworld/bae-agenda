@@ -6,7 +6,7 @@ Last reconciled: 2026-10-07.
 
 Core public-site, booking, admin, payment, invoice, client-portal, email, analytics, and Manager workflows are implemented.
 
-Current GitHub `main`: `4196777887476584e07e6b12ea7b6859fe121513` (PR #101).
+Last audited GitHub `main` before this docs-only reconciliation: `ef24ed79f8225d892c382967e5c6720f3746c6f5` (PR #143). This is an audit anchor, not a live pointer; later merges may advance `main`.
 
 Latest live Manager work includes warm-rebook scheduling, negotiation guidance, pipeline filters/history, admin pagination, required lead/event details before outreach, Manager lead-save fixes, actual externally sent-message recording, relationship intelligence/warm-rebook views, and source-health/weak-lead guardrails.
 
@@ -76,6 +76,7 @@ Remaining unrelated advisor items:
 
 ## Open / Held
 
+- PR #142: Public Vibe experience prototype — draft/local-test only; keep separate until intentionally reviewed.
 - PR #59: Full Portfolio Archive media galleries — intentionally held/separate.
 - Bot access for Manager — not started; approval-gated design only.
 - Discovery Runs UI branch — parked; backend/daily tracking logic already exists.
