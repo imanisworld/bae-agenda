@@ -1,30 +1,31 @@
-# DJ B.A.E. scouting to-do — reconciled Oct 5, 2026
+# DJ B.A.E. scouting to-do — reconciled Oct 7, 2026
 
-This list is reconciled against the live Manager system and current DJ B.A.E. preferences.
+This list is reconciled against the current Manager state and DJ B.A.E. preferences.
 
 ## Already handled
 
 - [x] Daily opportunity/source discovery already exists in Manager. Do not create a duplicate weekly scan.
 - [x] DJ staffing companies, DJ agencies, wedding-DJ rosters, and staff/house/touring-DJ employment are excluded.
-- [x] Strong recurring scout sources include Indy Pride, GANGGANG, Monsterz Inc., Forty5, Indy Arts Council, CHREECE, and direct venue/promoter relationships.
 - [x] Existing EPK is live at https://thebaeagenda.com/press-kit.
-- [x] Grok has authenticated X access for X-specific secondary scouting.
 - [x] Warm-rebook scheduling exists in Manager.
-- [x] Level Up Walkathon 2027 is recorded as a high-confidence warm rebook because the prior organizer said they want DJ B.A.E. back next year.
+- [x] Silent Disco contacted 2026-10-05; follow-up Oct 10.
+- [x] Elevate Social contacted 2026-10-05; follow-up Oct 10.
+- [x] Jazz Is Dead passed 2026-10-05 because no Indianapolis date/open DJ slot was verified.
+- [x] Punch Bowl Social relationship route identified: ask Rich the Kid before direct outreach.
+- [x] Level Up Walkathon 2027 is recorded as a high-confidence warm rebook.
 
-## Imani decisions / actions
+## Current actions
 
-- [ ] Silent Disco: send or pass.
-- [ ] Elevate Social: send or pass.
-- [ ] Jazz Is Dead: no immediate action required; keep as relationship-only Review unless a concrete DJ/support opening appears.
+- [ ] Oct 10, 2026: follow up Silent Disco if no reply.
+- [ ] Oct 10, 2026: follow up Elevate Social if no reply.
 - [ ] Consider the GANGGANG Artist Directory after reviewing its current terms.
 - [ ] Consider the free Indy Arts Council Artist Directory listing.
 
 ## Scheduled warm rebooks
 
 - [ ] Oct 20, 2026: Art & Soul 2027 re-engagement.
-- [ ] Nov 15, 2026: Punch Bowl Social Galentine's 2027 re-engagement.
-- [ ] May 15, 2027: Level Up Walkathon 2027 reconnect to confirm date, role, rate, and logistics. Prior interest is already established; do not cold-pitch.
+- [ ] Nov 15, 2026: Punch Bowl Social Galentine's 2027 re-engagement through the existing relationship route.
+- [ ] May 15, 2027: Level Up Walkathon 2027 reconnect to confirm date, role, rate, and logistics. Prior interest is established; do not cold-pitch.
 
 ## High-value local watches
 
@@ -40,6 +41,10 @@ This list is reconciled against the live Manager system and current DJ B.A.E. pr
 - [ ] Mar 2027: Atlanta Pride 2027 entertainment application opens.
 - [ ] Watch Chicago queer/house relationships such as Queen!/Smartbar and Party Noire for direct guest-DJ routes.
 - [ ] Watch strong Black/queer/femme party relationships in Atlanta, Detroit, DC, and other strategic markets.
+
+## Manager release note
+
+PRs #136-#138 are merged but not yet live. Do not assume the new relationship/warm-rebook views, actual-sent-message recording, or source-health guardrails are live until the next deliberate production deployment.
 
 ## Research archive / low priority
 
