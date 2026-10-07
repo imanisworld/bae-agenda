@@ -107,9 +107,11 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
       const index = candidate.mixes.findIndex((mix) => normalizedListenUrl(mix.embed_url) === target)
       if (index >= 0) {
         initialSelectionApplied.current = true
-        setCrateKey(candidate.key)
-        setFocus(index)
-        return
+        const timer = window.setTimeout(() => {
+          setCrateKey(candidate.key)
+          setFocus(index)
+        }, 0)
+        return () => window.clearTimeout(timer)
       }
     }
   }, [crates, initialTrackUrl])
