@@ -27,7 +27,13 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function LabPage() {
+export default async function LabPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ listen?: string | string[] }>
+}) {
+  const params = searchParams ? await searchParams : {}
+  const initialTrackUrl = Array.isArray(params.listen) ? params.listen[0] : params.listen
   const mixes = await getPublishedMixes()
   const listeningMixes: ListeningMix[] = mixes.map((mix) => ({
     id: mix.id,
@@ -42,7 +48,7 @@ export default async function LabPage() {
   return (
     <div className="lab-experience">
       <LabContextRail mixes={listeningMixes} />
-      <LabListeningStation mixes={listeningMixes} />
+      <LabListeningStation mixes={listeningMixes} initialTrackUrl={initialTrackUrl || null} />
     </div>
   )
 }
