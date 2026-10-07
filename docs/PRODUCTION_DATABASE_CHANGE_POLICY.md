@@ -2,14 +2,13 @@
 
 ## Current production state
 
-As audited on 2026-10-04:
+As re-audited on 2026-10-07:
 
 - Supabase project is healthy and is the project configured in the production Vercel app.
-- Production is on the Supabase Free plan.
-- The repository contains 39 migration files, while production records 18 migrations.
-- Several live tables/columns clearly exist even though their historical migration filenames are not recorded in production.
-- Production therefore has **migration-history drift**.
-- Main is currently not branch-protected and Vercel automatically deploys main.
+- Production has migration-history drift: the live schema contains objects whose historical repo migration filenames are not all recorded in production.
+- Manager tables already exist in production, including the discovery-runs backend.
+- Vercel Git auto-deploys were disabled in PR #135. Merging to `main` no longer publishes the site automatically.
+- Current production is deliberately deployed from the reviewed `main` commit rather than implicitly from each merge.
 
 ## Non-negotiable rule
 
@@ -32,9 +31,7 @@ Until migration history is explicitly reconciled, production database changes mu
 
 ## Backup / rollback constraint
 
-This project is on Supabase Free. Supabase recommends Free-plan projects maintain their own regular logical exports; accessible scheduled backup/restore is not guaranteed like it is on Pro/Team/Enterprise.
-
-For metadata-only, reversible changes (RLS policies, grants, new empty tables), prefer:
+For metadata-only, reversible changes such as RLS policies and grants, prefer:
 
 - no data-changing SQL,
 - fail-closed preconditions,
@@ -44,15 +41,11 @@ For metadata-only, reversible changes (RLS policies, grants, new empty tables), 
 
 Do not combine unrelated data edits with a schema/security migration.
 
-## Current production issues found by audit
-
-### Migration history drift
-
-This is the largest deployment-process risk. Treat the live schema as authoritative until history is repaired deliberately.
+## Current issue addressed by PR #101
 
 ### Legacy broad authenticated policies
 
-The following legacy tables used policies equivalent to "any authenticated user":
+The following legacy tables currently have broad policies equivalent to "any authenticated user" and broad client-role table grants:
 
 - invoices
 - reviews
@@ -60,68 +53,66 @@ The following legacy tables used policies equivalent to "any authenticated user"
 - client_portal_sessions
 - booking_portal_requests
 
-Production currently has two Auth users and one active admin allowlist entry. The non-admin Auth user is not a client email. Current application code does not require broad authenticated write access:
+All five already have RLS enabled.
+
+Current application code does not require broad authenticated write access:
 
 - portal code/session/request access uses `createAdminClient()`
 - public review submission and admin review moderation use `createAdminClient()`
 - invoice mutations use `createAdminClient()`
-- invoice PDF/send reads use the signed-in user client and separately enforce the admin allowlist
+- invoice PDF/send reads use the signed-in user client and separately enforce the application admin allowlist
 
-The companion hardening migration narrows those privileges without changing application data.
+Production currently has an active database admin allowlist entry, and `private.is_admin_user()` is present and executable by the authenticated role.
 
-### Advisor findings that are not blockers for Manager
+The companion hardening migration:
 
-- service-role-only tables with RLS and no client policies are intentional
-- several unused indexes are informational at current scale
-- several legacy RLS policies have performance warnings
-- duplicate permissive public-read policies exist on some public tables
+- refuses to run if the admin helper is missing or unusable
+- refuses to run if the active database admin allowlist is empty
+- refuses to run if any target table is missing
+- refuses to run if any target table lacks RLS
+- removes broad anon/authenticated table privileges
+- permits authenticated invoice reads only through the existing admin helper
+- preserves public read access only for approved reviews
+- makes portal state server-only
+- does not insert, update, or delete application rows
+
+## Important admin-helper constraint
+
+`private.is_admin_user()` intentionally allows signed-in users when the database admin allowlist is empty. That fallback predates PR #101 and is used by other admin RLS policies.
+
+PR #101 therefore requires at least one active `public.admin_users` row before changing invoice access. Changing the helper itself to fail closed would affect multiple existing admin policies and should be reviewed as a separate hardening change rather than silently bundled here.
+
+## Advisor findings outside PR #101
+
+Current security advisor findings include:
+
+- service-role-only tables with RLS and no client policies; these are intentional where the application accesses them only through the server-side service role
 - leaked-password protection is disabled
 
-These should be handled separately from the Manager migration rather than bundled into one production change.
+Those are separate from the five-table legacy-policy fix and should not be bundled into this migration.
 
-### Historical events permission error
+## Deployment policy
 
-A prior deployment logged one `permission denied for table events` error. The current production deployment showed no error/warning logs in its baseline window. Keep this on the watch list; do not change event grants as part of the Manager work.
+Database hardening and application deployment are separate actions.
 
-## Production preflight for Manager
+- Merging PR #101 does not need to publish the website.
+- Automatic Vercel Git deployments are disabled.
+- Apply the exact reviewed database migration only after its production preflight passes.
+- After the database change is verified, publish application code only if application code changed and a deployment is actually required.
 
-Before creating Manager tables, confirm:
+## Postflight for PR #101
 
-- `public.manager_profiles` does not exist
-- `public.manager_opportunities` does not exist
-- `public.bookings(id)` exists for the optional opportunity → booking foreign key
-- `public.touch_updated_at()` exists
-- existing FK orphan checks are all zero
-- current production deployment is READY
-- no new relevant production runtime errors are present
-
-If any preflight condition fails, stop.
-
-## Manager migration design
-
-The Manager migration must be additive only:
-
-- create two new private-business tables in `public`
-- enable RLS
-- revoke anon/authenticated access
-- grant only required CRUD to `service_role`
-- create indexes
-- attach the existing updated-at trigger
-- seed only identity fields that are known facts
-
-Do **not** seed assumed rates, travel limits, event preferences, brand preferences, or other business rules.
-
-## Postflight
-
-After each production DB change:
+After applying the exact hardening migration:
 
 - run Supabase security advisor
 - run Supabase performance advisor
-- confirm expected grants/policies
-- verify existing core row counts remain unchanged
-- re-run FK orphan checks
-- verify homepage/events
-- verify portal login flow reaches the login/verification UI
-- verify admin login and invoice reads
+- confirm expected grants and policies on all five target tables
+- confirm `anon` cannot read/write portal state or invoices
+- confirm an allowlisted authenticated admin can read invoices
+- confirm a non-admin authenticated user cannot read invoices
 - verify public approved-review reads
+- verify public review submission
+- verify portal login/verification flow
+- verify admin invoice reads and invoice send flow
+- confirm production `/api/health` is OK
 - inspect current production runtime errors
