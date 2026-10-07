@@ -51,7 +51,7 @@ export async function prepareManagerOutreachAction(formData: FormData) {
   ] = await Promise.all([
     admin
       .from('manager_opportunities')
-      .select('id, title, organization, source_type, source_url, source_reference, contact_name, contact_email, contact_phone, application_deadline, requirements, why_fit, recommended_demo, status')
+      .select('id, title, organization, source_type, source_url, source_reference, contact_name, contact_email, contact_phone, venue_name, location_city, location_state, event_date, application_deadline, requirements, why_fit, recommended_demo, status')
       .eq('id', id)
       .maybeSingle(),
     admin

@@ -38,6 +38,10 @@ type OutreachOpportunity = {
   contact_name?: string | null
   contact_email?: string | null
   contact_phone?: string | null
+  venue_name?: string | null
+  location_city?: string | null
+  location_state?: string | null
+  event_date?: string | null
   application_deadline?: string | null
   requirements?: string | null
   why_fit?: string | null
@@ -247,6 +251,19 @@ export function prepareManagerOutreach(
 
   if (channel === 'other') {
     missingItems.push('No verified contact or application route.')
+  }
+  if (!opportunity.organization?.trim()) {
+    missingItems.push("Who's running this is unknown. Look up the organizer from the source, or enter \"Anonymous poster\" if the post hides it.")
+  }
+  if (
+    opportunity.event_date &&
+    !opportunity.venue_name?.trim() &&
+    !opportunity.location_city?.trim()
+  ) {
+    missingItems.push('Where the event is held is unknown. Add the venue or city.')
+  }
+  if (!opportunity.requirements?.trim()) {
+    missingItems.push("What they asked for isn't recorded. Add it to Requirements from the source.")
   }
   if (channel === 'email' && !opportunity.contact_email) {
     missingItems.push('Contact email is missing.')

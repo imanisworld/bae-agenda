@@ -34,6 +34,7 @@ import {
   managerFollowUpUrgency,
 } from '@/lib/manager-follow-up'
 import { buildManagerNegotiation } from '@/lib/manager-negotiation'
+import { splitManagerAsks } from '@/lib/manager-asks'
 
 type ScoreComponent = { score?: number; max?: number; note?: string }
 
@@ -111,6 +112,16 @@ function fmtMoney(value: number | null | undefined) {
 function fmtHours(value: number | null | undefined) {
   if (value === null || value === undefined) return '—'
   return `${Number(value).toFixed(Number(value) % 1 === 0 ? 0 : 2)} hr`
+}
+
+function fmtDay(value: string | null | undefined) {
+  if (!value) return null
+  return new Date(`${value.slice(0, 10)}T12:00:00`).toLocaleDateString('en-US', {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  })
 }
 
 function economicsBasisLabel(value: string | null | undefined) {
@@ -215,6 +226,25 @@ export default async function ManagerOpportunityDetailPage({
   const sourceType = opportunity.source_type ?? 'other'
   const followUpEligible = ['applied', 'contacted', 'follow_up'].includes(status)
   const followUpUrgency = managerFollowUpUrgency(opportunity.next_action_at)
+  const asks = splitManagerAsks(opportunity.requirements)
+  const eventPlace = [
+    opportunity.venue_name,
+    [opportunity.location_city, opportunity.location_state].filter(Boolean).join(', '),
+  ].filter(Boolean).join(' — ')
+  const eventContact = [
+    opportunity.contact_name,
+    opportunity.contact_email,
+    opportunity.contact_phone,
+  ].filter(Boolean).join(' · ')
+  const eventDetails: [string, string | null][] = [
+    ['Who\'s Running It', opportunity.organization?.trim() || null],
+    ['Contact Person', eventContact || null],
+    ['Where', eventPlace || null],
+    ['Event Date', fmtDay(opportunity.event_date)],
+    ...(opportunity.application_deadline
+      ? [['Apply By', fmtDay(opportunity.application_deadline)] as [string, string | null]]
+      : []),
+  ]
   const followUpDraft = followUpEligible
     ? buildManagerFollowUpDraft(opportunity)
     : null
@@ -241,6 +271,36 @@ export default async function ManagerOpportunityDetailPage({
           <div><div className="admin-preview-title">{successMessage}</div></div>
         </div>
       )}
+
+      <section className="admin-section" style={{ marginBottom: 16 }}>
+        <div className="admin-section-header">
+          <span className="admin-section-title">Event Details</span>
+          {eventDetails.some(([, value]) => !value) && (
+            <a href="#edit-opportunity" className="muted" style={{ fontSize: 10, textDecoration: 'underline' }}>
+              Fill in missing details
+            </a>
+          )}
+        </div>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+            gap: 1,
+            background: 'var(--border)',
+          }}
+        >
+          {eventDetails.map(([label, value]) => (
+            <div key={label} style={{ background: 'var(--surface)', padding: '14px 16px' }}>
+              <div style={{ color: 'var(--muted)', fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
+                {label}
+              </div>
+              <div style={{ color: value ? 'var(--white)' : 'var(--muted)', fontSize: 12, overflowWrap: 'anywhere' }}>
+                {value ?? 'Not found yet'}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="admin-section" style={{ marginBottom: 16 }}>
         <div className="admin-section-header">
@@ -522,6 +582,29 @@ export default async function ManagerOpportunityDetailPage({
               </div>
             )}
 
+            <div style={{ border: '1px solid var(--border)', borderRadius: 10, padding: '14px 16px', margin: '0 0 4px' }}>
+              <div className="admin-section-title" style={{ marginBottom: 8 }}>What They Asked For</div>
+              {asks.length === 0 ? (
+                <p className="muted" style={{ margin: 0, fontSize: 11, lineHeight: 1.6 }}>
+                  Manager didn&apos;t record what this lead is asking for. Open the original source, then add their asks to{' '}
+                  <a href="#edit-opportunity" style={{ textDecoration: 'underline' }}>Requirements</a>{' '}
+                  (one per line). Sending stays locked until you do.
+                </p>
+              ) : (
+                <>
+                  <ul style={{ margin: 0, paddingLeft: 18, display: 'grid', gap: 4, fontSize: 12, lineHeight: 1.5 }}>
+                    {asks.map((ask, index) => (
+                      <li key={`${index}:${ask}`}>{ask}</li>
+                    ))}
+                  </ul>
+                  <p className="muted" style={{ margin: '8px 0 0', fontSize: 10 }}>
+                    Make sure the draft below answers each of these. Wrong or incomplete? Fix it in{' '}
+                    <a href="#edit-opportunity" style={{ textDecoration: 'underline' }}>Requirements</a>.
+                  </p>
+                </>
+              )}
+            </div>
+
             <form action={saveManagerOutreachDraftAction} style={{ padding: '14px 0 18px' }}>
               <input type="hidden" name="opportunity_id" value={opportunity.id} />
 
@@ -609,8 +692,31 @@ export default async function ManagerOpportunityDetailPage({
                     : 'Complete the DM/application/form/call outside Manager first, then use this button to record exactly what was submitted and advance the pipeline.'}
                 </p>
 
+                {asks.length === 0 ? (
+                  <p className="muted" style={{ margin: 0, fontSize: 11, lineHeight: 1.6 }}>
+                    Locked: add what they asked for to{' '}
+                    <a href="#edit-opportunity" style={{ textDecoration: 'underline' }}>Requirements</a>{' '}
+                    first.
+                  </p>
+                ) : (
                 <form action={dispatchManagerOutreachAction}>
                   <input type="hidden" name="opportunity_id" value={opportunity.id} />
+
+                  <fieldset style={{ border: 0, padding: 0, margin: '0 0 14px', display: 'grid', gap: 8 }}>
+                    <legend className="admin-field-label" style={{ marginBottom: 8 }}>My message covers everything they asked for</legend>
+                    {asks.map((ask, index) => (
+                      <label key={`${index}:${ask}`} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, fontSize: 12, lineHeight: 1.5 }}>
+                        <input
+                          type="checkbox"
+                          name="ask_covered"
+                          value={String(index)}
+                          required
+                          style={{ marginTop: 3 }}
+                        />
+                        <span>{ask}</span>
+                      </label>
+                    ))}
+                  </fieldset>
 
                   <div className="admin-form-grid-two" style={{ marginBottom: 12 }}>
                     <div style={{ display: 'grid', gap: 7 }}>
@@ -650,6 +756,7 @@ export default async function ManagerOpportunityDetailPage({
                     {managerDispatchActionLabel(opportunity.outreach_channel)}
                   </button>
                 </form>
+                )}
               </div>
             )}
           </>
@@ -835,11 +942,13 @@ export default async function ManagerOpportunityDetailPage({
         )}
       </section>
 
-      <ManagerOpportunityForm
-        action={updateManagerOpportunityAction}
-        mode="edit"
-        value={opportunity}
-      />
+      <div id="edit-opportunity">
+        <ManagerOpportunityForm
+          action={updateManagerOpportunityAction}
+          mode="edit"
+          value={opportunity}
+        />
+      </div>
     </div>
   )
 }
