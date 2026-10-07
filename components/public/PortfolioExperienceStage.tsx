@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react'
 import InstagramEmbeds from '@/components/public/InstagramEmbeds'
 import PortfolioArchive from '@/components/public/PortfolioArchive'
 import PortfolioArchiveHero, { type ArchivePrint } from '@/components/public/PortfolioArchiveHero'
-import SelectedWorkStories from '@/components/public/SelectedWorkStories'
 import type { PortfolioEventForExperience, RelatedListeningMix } from '@/lib/portfolio-experience'
 
 type PortfolioStats = {
@@ -74,7 +73,6 @@ export default function PortfolioExperienceStage({
             <button ref={closeButtonRef} type="button" onClick={closeArchive} aria-label="Close archive">Close ×</button>
           </div>
           <div className="experience-drawer-scroll">
-            <SelectedWorkStories />
             <InstagramEmbeds posts={instagramPosts} profileUrl={instagramUrl} />
             <PortfolioArchive entries={entries} mixes={mixes} />
           </div>
