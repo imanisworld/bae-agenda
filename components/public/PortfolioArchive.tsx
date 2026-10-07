@@ -90,7 +90,7 @@ function InlineEventDetail({
     <div
       style={{
         display: 'grid',
-        gridTemplateColumns: entry.photo_url ? 'minmax(150px, .45fr) minmax(0, 1fr)' : '1fr',
+        gridTemplateColumns: '1fr',
         gap: '22px',
         padding: '20px',
         margin: '0 0 10px',
@@ -170,13 +170,6 @@ function InlineEventDetail({
         </div>
       </div>
 
-      <style jsx>{`
-        @media (max-width: 720px) {
-          div {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </div>
   )
 }
@@ -288,21 +281,6 @@ export default function PortfolioArchive({
           </button>
         )) : null}
 
-        {cities.length > 1 && tags.length > 0 ? (
-          <span style={{ width: '1px', height: '18px', background: 'var(--border)', flexShrink: 0 }} />
-        ) : null}
-
-        {tags.slice(0, 10).map((value) => (
-          <button
-            key={value}
-            type="button"
-            style={tag === value ? filterBtnActive : filterBtnBase}
-            onClick={() => setTag(tag === value ? null : value)}
-          >
-            {value}
-          </button>
-        ))}
-
         {hasFilters ? (
           <button
             type="button"
@@ -356,7 +334,7 @@ export default function PortfolioArchive({
                     const entryCategories = portfolioCategories(entry)
                     return (
                       <div key={entry.id}>
-                      <button
+                        <button
                         type="button"
                         className="portfolio-year-row"
                         onClick={() => setSelectedId(selectedId === entry.id ? null : entry.id)}
@@ -403,8 +381,8 @@ export default function PortfolioArchive({
                           <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{entry.city}</div>
                           <div style={{ fontSize: '10px', color: 'var(--gold)', marginTop: '4px' }}>{selectedId === entry.id ? 'Close ↑' : 'Details ↓'}</div>
                         </div>
-                      </button>
-                      {selectedId === entry.id ? <InlineEventDetail entry={entry} mixes={mixes} /> : null}
+                        </button>
+                        {selectedId === entry.id ? <InlineEventDetail entry={entry} mixes={mixes} /> : null}
                       </div>
                     )
                   })}
