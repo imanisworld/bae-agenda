@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import LabListeningStation, { type ListeningMix } from '@/components/public/LabListeningStation'
-import LabContextRail from '@/components/public/LabContextRail'
 import { getPublishedMixes } from '@/lib/db/mixes'
 
 /** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
@@ -47,7 +46,6 @@ export default async function LabPage({
 
   return (
     <div className="lab-experience">
-      <LabContextRail mixes={listeningMixes} />
       <LabListeningStation mixes={listeningMixes} initialTrackUrl={initialTrackUrl || null} />
     </div>
   )
