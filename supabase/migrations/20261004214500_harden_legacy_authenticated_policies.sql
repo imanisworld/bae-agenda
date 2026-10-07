@@ -6,6 +6,8 @@
 -- migration by exact reviewed SQL only; do not run a blanket db push.
 
 do $$
+declare
+  unprotected_count integer;
 begin
   if to_regprocedure('private.is_admin_user()') is null then
     raise exception 'Required function private.is_admin_user() is missing';
@@ -15,12 +17,45 @@ begin
     raise exception 'authenticated role cannot execute private.is_admin_user()';
   end if;
 
+  if to_regclass('public.admin_users') is null then
+    raise exception 'Required table public.admin_users is missing';
+  end if;
+
+  -- private.is_admin_user() intentionally permits signed-in users when the
+  -- allowlist is empty. This hardening must never be applied in that fallback
+  -- state because invoices would then be readable by any authenticated user.
+  if not exists (
+    select 1
+    from public.admin_users
+    where active = true
+  ) then
+    raise exception 'Active admin allowlist is empty; stop rather than create authenticated invoice access';
+  end if;
+
   if to_regclass('public.invoices') is null
      or to_regclass('public.reviews') is null
      or to_regclass('public.client_portal_codes') is null
      or to_regclass('public.client_portal_sessions') is null
      or to_regclass('public.booking_portal_requests') is null then
     raise exception 'Expected production tables are missing; stop rather than partially harden';
+  end if;
+
+  select count(*)
+  into unprotected_count
+  from pg_class c
+  join pg_namespace n on n.oid = c.relnamespace
+  where n.nspname = 'public'
+    and c.relname in (
+      'invoices',
+      'reviews',
+      'client_portal_codes',
+      'client_portal_sessions',
+      'booking_portal_requests'
+    )
+    and not c.relrowsecurity;
+
+  if unprotected_count <> 0 then
+    raise exception 'One or more target tables do not have RLS enabled; stop rather than narrow grants incompletely';
   end if;
 end
 $$;
