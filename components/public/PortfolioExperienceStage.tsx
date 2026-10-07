@@ -5,16 +5,7 @@ import InstagramEmbeds from '@/components/public/InstagramEmbeds'
 import PortfolioArchive from '@/components/public/PortfolioArchive'
 import PortfolioArchiveHero, { type ArchivePrint } from '@/components/public/PortfolioArchiveHero'
 import SelectedWorkStories from '@/components/public/SelectedWorkStories'
-
-type ArchiveEntry = {
-  id: string
-  event_name: string
-  venue: string | null
-  city: string
-  year: number
-  tags: string[]
-  featured: boolean
-}
+import type { PortfolioEventForExperience, RelatedListeningMix } from '@/lib/portfolio-experience'
 
 type PortfolioStats = {
   total: number
@@ -26,12 +17,14 @@ export default function PortfolioExperienceStage({
   prints,
   entries,
   stats,
+  mixes,
   instagramUrl,
   instagramPosts = [],
 }: {
   prints: ArchivePrint[]
-  entries: ArchiveEntry[]
+  entries: PortfolioEventForExperience[]
   stats: PortfolioStats
+  mixes: RelatedListeningMix[]
   instagramUrl?: string
   instagramPosts?: string[]
 }) {
@@ -83,7 +76,7 @@ export default function PortfolioExperienceStage({
           <div className="experience-drawer-scroll">
             <SelectedWorkStories />
             <InstagramEmbeds posts={instagramPosts} profileUrl={instagramUrl} />
-            <PortfolioArchive entries={entries} />
+            <PortfolioArchive entries={entries} mixes={mixes} />
           </div>
         </div>
       ) : null}
