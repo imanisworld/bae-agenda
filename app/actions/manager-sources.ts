@@ -11,6 +11,7 @@ import {
 import { createAdminClient } from '@/lib/supabase/admin'
 import { scoreManagerOpportunity } from '@/lib/manager-scoring'
 import { logManagerOpportunityActivity } from '@/lib/manager-activity'
+import { managerSignalCanBecomeOpportunity } from '@/lib/manager-source-health'
 
 const SourceSchema = z.object({
   name: z.string().trim().min(1, 'Source name is required.').max(200),
@@ -128,9 +129,9 @@ export async function convertManagerSignalToOpportunityAction(formData: FormData
   const { data: signal, error } = await admin
     .from('manager_source_signals')
     .select(`
-      id, title, url, summary, signal_type, linked_opportunity_id,
+      id, title, url, summary, signal_type, source_payload, linked_opportunity_id,
       manager_sources!inner(
-        id, name, platform, url, recommended_demo, recommended_demo_reason
+        id, name, source_kind, platform, url, recommended_demo, recommended_demo_reason
       )
     `)
     .eq('id', id.data)
@@ -146,6 +147,14 @@ export async function convertManagerSignalToOpportunityAction(formData: FormData
     : signal.manager_sources
 
   if (!source) redirectWithError('Signal source is missing.')
+
+  if (!managerSignalCanBecomeOpportunity({
+    signal_type: signal.signal_type,
+    source_payload: signal.source_payload as Record<string, unknown> | null,
+    source_kind: source.source_kind,
+  })) {
+    redirectWithError('This is relationship/watch evidence, not an actionable opportunity. Keep it in Sources / Relationships.')
+  }
 
   const sourceType =
     source.platform === 'instagram' ? 'instagram' :

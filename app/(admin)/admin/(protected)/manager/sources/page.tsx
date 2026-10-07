@@ -18,6 +18,7 @@ import {
 } from '@/lib/manager'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { managerSourceHealthLabel, summarizeManagerSourceSignals } from '@/lib/manager-source-quality'
+import { managerSignalCanBecomeOpportunity, managerSourceCheckLabel, managerSourceCheckState, managerSourceNextCheckAt } from '@/lib/manager-source-health'
 
 interface SourceRow {
   id: string
@@ -49,6 +50,7 @@ interface SignalRow {
   discovered_at: string
   summary: string | null
   linked_opportunity_id: string | null
+  source_payload: Record<string, unknown> | null
 }
 
 function getMessage(value: string | string[] | undefined) {
@@ -93,7 +95,7 @@ export default async function ManagerSourcesPage({
       .order('name'),
     admin
       .from('manager_source_signals')
-      .select('id, source_id, signal_type, status, title, url, published_at, discovered_at, summary, linked_opportunity_id')
+      .select('id, source_id, signal_type, status, title, url, published_at, discovered_at, summary, linked_opportunity_id, source_payload')
       .order('discovered_at', { ascending: false })
       .limit(100),
     admin
@@ -127,7 +129,9 @@ export default async function ManagerSourcesPage({
     ])
   )
   const activeSources = sources.filter((source) => source.active)
+  const now = new Date()
   const unchecked = activeSources.filter((source) => !source.last_checked_at)
+  const dueSources = activeSources.filter((source) => managerSourceCheckState(source, now) === 'due')
   const actionableSignals = signals.filter((signal) => ['new', 'relevant'].includes(signal.status))
   const localSources = activeSources.filter(
     (source) =>
@@ -180,6 +184,7 @@ export default async function ManagerSourcesPage({
           ['Indianapolis', localSources.length, 'Local discovery coverage'],
           ['DJ Network', networkSources.length, 'Venue / promoter relationship mining'],
           ['Never Checked', unchecked.length, 'Waiting for first scan'],
+          ['Due Now', dueSources.length, 'Cadence elapsed'],
           ['Noisy Sources', noisySources.length, 'Mostly ignored signals'],
           ['New Signals', actionableSignals.length, 'Need review'],
           ['Converted', signals.filter((signal) => signal.status === 'converted').length, 'Became opportunities'],
@@ -236,6 +241,8 @@ export default async function ManagerSourcesPage({
               <tbody>
                 {sources.map((source) => {
                   const quality = sourceQuality.get(source.id) ?? summarizeManagerSourceSignals([])
+                  const checkState = managerSourceCheckState(source, now)
+                  const nextCheck = managerSourceNextCheckAt(source)
                   return (
                   <tr key={source.id}>
                     <td data-label="Source">
@@ -252,7 +259,18 @@ export default async function ManagerSourcesPage({
                     <td data-label="Platform">{MANAGER_WATCH_PLATFORM_LABELS[source.platform] ?? source.platform}</td>
                     <td data-label="Location" className="muted">{locationLabel(source)}</td>
                     <td data-label="Cadence" className="muted">{source.check_frequency_hours}h</td>
-                    <td data-label="Last Check" className="muted">{fmtTimestamp(source.last_checked_at)}</td>
+                    <td data-label="Last Check">
+                      <div style={{ display: 'grid', gap: 2 }}>
+                        <span>{managerSourceCheckLabel(checkState)}</span>
+                        <span className="muted" style={{ fontSize: 10 }}>
+                          {source.last_checked_at ? `Checked ${fmtTimestamp(source.last_checked_at)}` : 'No completed check'}
+                          {nextCheck && checkState === 'current' ? ` · due ${fmtTimestamp(nextCheck.toISOString())}` : ''}
+                        </span>
+                        <span className="muted" style={{ fontSize: 10 }}>
+                          Coverage: {source.check_reliability}
+                        </span>
+                      </div>
+                    </td>
                     <td data-label="Latest Signal" className="muted">{fmtTimestamp(source.latest_signal_at)}</td>
                     <td data-label="Yield">
                       <div style={{ display: 'grid', gap: 2 }}>
@@ -339,10 +357,18 @@ export default async function ManagerSourcesPage({
                           </Link>
                         ) : (
                           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-                            <form action={convertManagerSignalToOpportunityAction}>
-                              <input type="hidden" name="id" value={signal.id} />
-                              <button type="submit" className="admin-btn-primary">Opportunity</button>
-                            </form>
+                            {managerSignalCanBecomeOpportunity({
+                              signal_type: signal.signal_type,
+                              source_payload: signal.source_payload,
+                              source_kind: source?.source_kind,
+                            }) ? (
+                              <form action={convertManagerSignalToOpportunityAction}>
+                                <input type="hidden" name="id" value={signal.id} />
+                                <button type="submit" className="admin-btn-primary">Opportunity</button>
+                              </form>
+                            ) : (
+                              <span className="muted" style={{ fontSize: 10, alignSelf: 'center' }}>Watch / relationship only</span>
+                            )}
                             <form action={setManagerSignalStatusAction}>
                               <input type="hidden" name="id" value={signal.id} />
                               <input type="hidden" name="status" value="ignored" />
