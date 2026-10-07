@@ -230,11 +230,12 @@ function clearDraft() {
   }
 }
 
-export default function BookingForm({ embedded = false }: { embedded?: boolean }) {
+export default function BookingForm({ embedded = false, initialEventType = '' }: { embedded?: boolean; initialEventType?: string }) {
   const formRef = useRef<HTMLFormElement | null>(null)
   const [step, setStep] = useState<Step>(1)
   const [form, setForm] = useState<FormState>(() => ({
     ...INITIAL_STATE,
+    eventType: initialEventType,
     startedAt: String(Date.now()),
   }))
   const [loading, setLoading] = useState(false)
@@ -277,7 +278,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
 
   function startOver() {
     clearDraft()
-    setForm({ ...INITIAL_STATE, startedAt: String(Date.now()) })
+    setForm({ ...INITIAL_STATE, eventType: initialEventType, startedAt: String(Date.now()) })
     setStep(1)
     setFieldErrors({})
     setAvailabilityError('')
