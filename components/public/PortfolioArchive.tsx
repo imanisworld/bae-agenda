@@ -203,12 +203,14 @@ function InlineEventDetail({
 export default function PortfolioArchive({
   entries,
   mixes,
+  initialCategory = null,
 }: {
   entries: PortfolioEventForExperience[]
   mixes: RelatedListeningMix[]
+  initialCategory?: PortfolioCategory | null
 }) {
   const [city, setCity] = useState<string | null>(null)
-  const [category, setCategory] = useState<PortfolioCategory | null>(null)
+  const [category, setCategory] = useState<PortfolioCategory | null>(initialCategory)
   const [expanded, setExpanded] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
