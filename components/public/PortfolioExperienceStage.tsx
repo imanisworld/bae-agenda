@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import InstagramEmbeds from '@/components/public/InstagramEmbeds'
 import PortfolioArchive from '@/components/public/PortfolioArchive'
 import PortfolioArchiveHero, { type ArchivePrint } from '@/components/public/PortfolioArchiveHero'
-import type { PortfolioEventForExperience, RelatedListeningMix } from '@/lib/portfolio-experience'
+import type { PortfolioCategory, PortfolioEventForExperience, RelatedListeningMix } from '@/lib/portfolio-experience'
 
 type PortfolioStats = {
   total: number
@@ -19,6 +19,7 @@ export default function PortfolioExperienceStage({
   mixes,
   instagramUrl,
   instagramPosts = [],
+  initialCategory = null,
 }: {
   prints: ArchivePrint[]
   entries: PortfolioEventForExperience[]
@@ -26,8 +27,9 @@ export default function PortfolioExperienceStage({
   mixes: RelatedListeningMix[]
   instagramUrl?: string
   instagramPosts?: string[]
+  initialCategory?: PortfolioCategory | null
 }) {
-  const [archiveOpen, setArchiveOpen] = useState(false)
+  const [archiveOpen, setArchiveOpen] = useState(Boolean(initialCategory))
   const closeButtonRef = useRef<HTMLButtonElement | null>(null)
 
   function closeArchive() {
@@ -74,7 +76,7 @@ export default function PortfolioExperienceStage({
           </div>
           <div className="experience-drawer-scroll">
             <InstagramEmbeds posts={instagramPosts} profileUrl={instagramUrl} />
-            <PortfolioArchive entries={entries} mixes={mixes} />
+            <PortfolioArchive entries={entries} mixes={mixes} initialCategory={initialCategory} />
           </div>
         </div>
       ) : null}
