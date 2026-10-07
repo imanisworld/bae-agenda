@@ -230,7 +230,7 @@ function clearDraft() {
   }
 }
 
-export default function BookingForm({ embedded = false, initialEventType = '' }: { embedded?: boolean; initialEventType?: string }) {
+export default function BookingForm({ embedded = false, initialEventType = '', initialSourceContext = '' }: { embedded?: boolean; initialEventType?: string; initialSourceContext?: string }) {
   const formRef = useRef<HTMLFormElement | null>(null)
   const [step, setStep] = useState<Step>(1)
   const [form, setForm] = useState<FormState>(() => ({
@@ -520,6 +520,7 @@ export default function BookingForm({ embedded = false, initialEventType = '' }:
     setLoading(true)
     trackEvent('booking_submit_started', {
       eventType: form.eventType || 'unspecified',
+      sourceContext: initialSourceContext || 'direct',
       hasStartTime: Boolean(form.eventTime.trim()),
       hasEndTime: Boolean(form.eventEndTime.trim()),
       hasPackage: Boolean(form.package.trim()),
@@ -538,6 +539,7 @@ export default function BookingForm({ embedded = false, initialEventType = '' }:
           eventTime: normalizedStart,
           eventEndTime: normalizedEnd,
           acceptedTerms: termsAccepted,
+          sourceContext: initialSourceContext || undefined,
         }),
       })
 
@@ -591,6 +593,7 @@ export default function BookingForm({ embedded = false, initialEventType = '' }:
 
       trackEvent('booking_submit_succeeded', {
         eventType: form.eventType || 'unspecified',
+        sourceContext: initialSourceContext || 'direct',
         hasPackage: Boolean(form.package.trim()),
         hasCity: Boolean(form.city.trim()),
       })
