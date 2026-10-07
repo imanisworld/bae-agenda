@@ -67,6 +67,35 @@ export function allPortfolioCategories(entries: PortfolioEventForExperience[]): 
   return present.has('Other') ? [...ordered, 'Other'] : ordered
 }
 
+export function portfolioProof(
+  entry: PortfolioEventForExperience,
+  entries: PortfolioEventForExperience[]
+): string[] {
+  const proof: string[] = []
+  const tags = new Set(entry.tags.map(normalize))
+
+  if (tags.has('residency')) proof.push('Resident DJ')
+  else if (tags.has('recurring')) proof.push('Recurring series')
+
+  const eventName = normalize(entry.event_name)
+  const eventYears = new Set(
+    entries
+      .filter((candidate) => candidate.id !== entry.id && normalize(candidate.event_name) === eventName)
+      .map((candidate) => candidate.year)
+  )
+  eventYears.add(entry.year)
+
+  if (eventYears.size > 1) proof.push(`${eventYears.size} years in archive`)
+
+  const venue = normalize(entry.venue)
+  if (venue) {
+    const venueEntries = entries.filter((candidate) => normalize(candidate.venue) === venue)
+    if (venueEntries.length > 1) proof.push('Repeat venue')
+  }
+
+  return proof
+}
+
 export function relatedListening(
   entry: PortfolioEventForExperience,
   mixes: RelatedListeningMix[],
