@@ -323,11 +323,16 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
     window.setTimeout(() => setShareNote(''), 2200)
   }
 
+  const crateNote = crate?.key === 'mashups'
+    ? 'Mashups, pairings, and experiments.'
+    : 'Mixes and longer-form listening.'
+
   const header = (
     <header className={styles.header}>
       <div className={styles.headerIdentity}>
         <p>Bae&apos;s in the Lab · Listening Room</p>
         <h1>On wax<HangFrom finish="chrome" className={styles.titleTag}>.</HangFrom></h1>
+        <span className={styles.headerNote}>{crateNote}</span>
       </div>
       {crates.length > 1 ? (
         <div className={styles.crateSwitch} role="group" aria-label="Choose a crate">
