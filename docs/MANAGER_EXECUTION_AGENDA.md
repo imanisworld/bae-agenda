@@ -1,6 +1,6 @@
 # DJ B.A.E. Manager — Ordered Agenda
 
-Last reconciled: 2026-10-05.
+Last reconciled: 2026-10-07.
 
 ## Standing rules
 
@@ -15,7 +15,7 @@ Last reconciled: 2026-10-05.
 
 ## 1. Daily action surface — DONE
 
-Manager Today is implemented and prioritizes:
+Manager Today is live and prioritizes:
 
 1. overdue follow-ups
 2. follow-ups due today
@@ -26,20 +26,19 @@ Manager Today is implemented and prioritizes:
 
 ## 2. Work eligible live leads — ACTIVE
 
-Current priority:
+Current state as of 2026-10-07:
 
-Status as of 2026-10-05:
-
-- Silent Disco (Oct 23, Westfield): Contacted 2026-10-05 via Craigslist reply asking about gear, pickup/return, venue, and preferred music. Follow-up Oct 10. Real time is ~7 hours with ~62 miles of driving (~$110–115/hr before gas), so re-check economics against the reply.
-- Elevate Social: Contacted 2026-10-05 via partner form with a Chicago-leaning pitch. Follow-up Oct 10.
-- Jazz Is Dead: Passed 2026-10-05 (no Indianapolis dates, no open slot).
-- Punch Bowl Social: the Galentine's 2026 booking came through Rich the Kid. Ask Rich before contacting Punch Bowl directly about After Dark / Halloween / NYE DJ nights.
+- Silent Disco (Oct 23, Westfield): contacted 2026-10-05 via Craigslist reply asking about gear, pickup/return, venue, and preferred music. Follow-up Oct 10 if no reply. Re-check economics against any response.
+- Elevate Social: contacted 2026-10-05 via partner form with a Chicago-leaning pitch. Follow-up Oct 10 if no reply.
+- Jazz Is Dead: passed 2026-10-05 because no Indianapolis date/open DJ slot was verified.
+- Punch Bowl Social: the Galentine's 2026 booking came through Rich the Kid. Ask Rich before direct outreach about future Punch Bowl DJ nights.
 
 For each direct-buyer lead:
 
 - verify the action route
 - refresh/tighten outreach prep against the actual source
 - user decides send/pass
+- record the actual message sent
 - log responses and negotiations
 - pass weak leads promptly
 
@@ -47,11 +46,11 @@ For each direct-buyer lead:
 
 Prefer DJ B.A.E.'s own completed-event relationships over equivalent cold leads when recurrence or organizer interest is verified.
 
-Current examples:
+Current scheduled warm rebooks:
 
-- Art & Soul 2027
-- Punch Bowl Social Galentine's 2027
-- Level Up Walkathon 2027 — high confidence because the organizer previously said they want DJ B.A.E. back next year
+- Art & Soul 2027 — Oct 20, 2026 re-engagement
+- Punch Bowl Social Galentine's 2027 — Nov 15, 2026 through the existing relationship route
+- Level Up Walkathon 2027 — May 15, 2027 reconnect; high confidence because the organizer previously said they want DJ B.A.E. back next year
 
 For warm rebooks, reference the prior relationship. Do not cold-pitch or invent a new date.
 
@@ -63,6 +62,13 @@ For warm rebooks, reference the prior relationship. Do not cold-pitch or invent 
 - keep out-of-state leads only when travel can plausibly work
 - deduplicate and suppress noisy/stale sources
 - keep speculative relationship leads out of Outreach Ready
+- track discovery-run output so source quality can be measured over time
+
+### Discovery Runs
+
+Backend + daily tracking logic are installed in production.
+
+The Discovery Runs UI branch is parked and has no PR. Let the backend collect useful run history before deciding whether the UI is worth finishing.
 
 ## 5. Lead enrichment — ACTIVE
 
@@ -90,19 +96,23 @@ For negotiating leads, Manager can:
 
 User still makes the decision and sends any communication.
 
-## 7. Manager hygiene / UX
+## 7. Manager hygiene / UX — LIVE
 
-Done:
+Live:
 
 - source-quality indicators
+- weak-lead guardrails
+- relationship intelligence
+- warm-rebook views
+- What They Asked For checks before outreach
+- actual sent-message recording
 - Active/History separation
 - Needs Action / Outreach Ready / Follow-up / Negotiating / Warm Rebooks / History filters
 - 25-row Manager pagination
 
-Pending only if useful:
+Pending only if real usage shows a need:
 
 - junk/stale-record archive controls
-- live mobile/visual QA after the next Vercel deployment
 
 ## 8. Grok/X scout lane — CONNECTED
 
@@ -127,14 +137,13 @@ Only after enough real usage data:
 
 Keep this separate from Manager business-development logic.
 
-## Open to-do (not started)
+## Open to-do — intentionally not started
 
-- **Bot access for Manager.** Give Claude, Grok, and ChatGPT their own private keys, stored in Vercel env and switchable off. Bots can read Manager and submit *suggested changes* that Imani approves or rejects in a Manager "Suggestions" list. Bots can never send outreach, delete records, or touch bookings, invoices, or payments. Needs one new table (narrow reviewed SQL, no blanket migration push). Open decisions: approve everything vs. allow small edits automatically (recommend approve everything); which bots get keys. Imani said don't build yet.
-- **Mark Sent records the real message.** Built in PR #133 (stacked on #129). Rebase on main after #129 merges.
+- **Bot access for Manager.** Give Claude, Grok, and ChatGPT separate private keys, switchable off. Bots may read Manager and submit suggested changes for approval. Bots must never send outreach, delete records, or touch bookings, invoices, or payments. This remains parked until there is a clear need.
+- **Discovery Runs UI.** Backend and tracking are already live; UI remains parked until enough run data exists to justify finishing it.
 
-## Outreach facts confirmed by Imani (2026-10-05)
+## Outreach facts confirmed by Imani
 
 - Co-created Chi Chi's with Brooke Billions and Slim: a nightlife series centering Black women, open to everyone. The venue moves; the first night was at Blind Tiger Indy (May 8, 2025). Still running.
-- Former resident DJ at Club Plex, Indianapolis (including the live NYE 12.31.24 set).
+- Former resident DJ at Club Plex, Indianapolis, including the live NYE 12.31.24 set.
 - Club Plex sets (NYE 12.31.24, Plex Mix 19) are open format with house/club/bounce. Ask buyers what sound they want before picking a mix.
-
