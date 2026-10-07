@@ -1,154 +1,117 @@
-# PROJECT.md
+# Project Guidance
 
-## Documentation Files
+This is the shared project guidance for work in `imanisworld/bae-agenda`. Use it for Claude, Cursor, ChatGPT, or any other coding agent unless a task-specific handoff says otherwise.
 
-This project uses the following guidance files:
+## Source of truth
 
-- PROJECT.md → core rules and architecture direction
-- REFERENCE.md → evolving design and product thinking
-- V1_SCOPE.md → version 1 feature boundaries
-- ROUTES.md → application route structure
+Read these in this order when they are relevant:
 
-## Project
-Rebuild The Bae Agenda website from scratch so it can replace the current GoDaddy site and serve multiple purposes:
+1. `README.md` — setup, stack, core flows, verification commands
+2. `PROJECT_STATUS.md` — current operational/deployment state and held work
+3. existing code in the area being changed
+4. task-specific docs under `docs/`
 
-1. DJ bookings and brand presence
-2. Portfolio-quality frontend project
-3. Professional website that can also support job applications and showcase technical skills
+Manager-specific work should also read:
 
-## Core Goal
-This site should feel like a real, modern, intentional brand experience — not a template, not a placeholder, and not just a link hub.
+- `docs/MANAGER_EXECUTION_AGENDA.md`
+- `docs/MANAGER_EXPANDED_DISCOVERY.md`
+- `docs/CLAUDE_MANAGER_EXECUTION_HANDOFF.md`
 
-It should represent both sides of me:
-- DJ / creative brand
-- technical / systems / builder side
+Grok/X scouting uses `docs/GROK_MANAGER_SCOUT_PROMPT.md` and remains research-only.
 
-The site should help with:
-- DJ bookings
-- showcasing mixes and events
-- presenting a stronger personal brand
-- demonstrating frontend and technical ability to hiring managers
+## Current stack
 
-## Tech Stack
-Keep this project in:
-- HTML
-- CSS
-- JavaScript
+The application is already implemented in:
 
-Do NOT convert this into:
-- React
-- Next.js
-- Tailwind
-- a no-code site
-unless I explicitly ask for it.
+- Next.js 16 App Router
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- Supabase
+- Resend
+- Vercel
+- optional Twilio and Upstash integrations
 
-## Current Structure
-- index.html
-- css/style.css
-- js/script.js
-- images/
-- components/
-- .gitignore
-- PROJECT.md
+Do not replace the stack or rebuild the application from scratch unless explicitly requested.
 
-## Design Direction
-Desired vibe:
-- clean
-- minimal
-- sleek
-- futuristic
-- slightly interactive
+## Product shape
 
-Visual direction:
-- dark background
-- modern contrast
-- polished and intentional
-- subtle motion is good
-- not cluttered
-- not cheesy
-- not over-designed
+The Bae Agenda is one connected DJ business system:
 
-I really liked the first direction with the vinyl graphic and interactive feel.
+- public brand / booking site
+- events, portfolio, Lab/mixes, press kit, reviews, and client-facing flows
+- booking → invoice → payment → event workflow
+- protected admin tools
+- DJ Manager for discovery, relationships, outreach preparation, follow-up, and warm rebooks
 
-## Brand Positioning
-The website needs to support both:
-- DJ bookings
-- portfolio / showcase
+Preserve existing working flows instead of creating parallel replacements.
 
-These are equally important.
+## Design direction
 
-The current site should not feel split or confused. It should feel like one cohesive identity.
+Keep the current visual system cohesive:
 
-## Brand Voice / Messaging
-Use this as a key brand statement:
+- intentional, editorial, modern
+- dark/moody base with burgundy, warm neutrals, gold/chrome accents
+- strong photography and restrained copy
+- interaction should demonstrate taste or make a task easier
+- mobile behavior is first-class
 
-"I play songs you didn’t know you needed to hear again or for the first time in ways you haven’t heard before."
+Prefer fewer strong interactions over many small widgets. Remove duplication before adding another layer.
 
-That line is important and should be treated as core brand language.
+## Engineering rules
 
-## Content Notes
-- YouTube and SoundCloud are the primary music platforms
-- Some links and titles are still placeholders for now
-- Add comments in code wherever I need to insert my real links later
-- Placeholder pricing is okay for now
-- I like the vinyl graphic and want to keep that aesthetic direction for now
+- Inspect the existing implementation before editing.
+- Prefer targeted edits over rewrites.
+- Reuse existing components, data, and helpers when they already solve the problem.
+- Simplify before adding dependencies, schema, routes, or UI states.
+- Do not invent event facts, client history, pay, contacts, dates, testimonials, or music provenance.
+- Keep public claims tied to stored/verified data.
+- Treat related/recommended mixes as recommendations unless there is evidence they are recordings from a specific event.
+- Preserve accessibility, responsive behavior, and reduced-motion support.
+- Keep secrets and service-role credentials server-side.
+- Use a feature branch + PR for meaningful changes.
+- No direct pushes to `main`.
+- Run `npm run test`, `npm run lint`, and `npm run build` before calling a code change ready.
+- Do not publish production unless the user explicitly approves a production deployment.
 
-## Technical Showcase Requirement
-The site should subtly demonstrate skills that are useful for job applications.
+## Deployment model
 
-Add or preserve a section that naturally showcases:
-- HTML / CSS / JavaScript
-- GitHub / Git workflow
-- VS Code
-- Python / scripting
-- SQLite / data handling
-- APIs / Airtable / Stripe / automation
-- IT / systems thinking background
+Automatic production deployment from Git merges is disabled.
 
-This should feel integrated into the site, not like a random resume pasted into it.
+Normal flow:
 
-## Safety / Practical Constraints
-- Keep the site easy to maintain
-- Keep file structure clean
-- Preserve working functionality
-- Avoid unnecessary dependencies
-- Use comments for placeholders rather than fake final content
-- Keep JavaScript paths and asset paths accurate
-- Make responsive/mobile-friendly choices
-- Do not rewrite everything unless necessary
-- Prefer targeted edits over full regeneration when possible
+1. branch
+2. PR
+3. tests/lint/build
+4. local or preview review when needed
+5. merge only after approval
+6. deliberate production deployment from the intended latest `main`
 
-## Current Priority
-Keep improving the website that has already been started.
+Do not use an old Vercel Redeploy action to publish newer commits.
 
-Focus on:
-1. refining the homepage
-2. preserving the strong first design direction
-3. making the site feel polished and intentional
-4. keeping it useful as both a DJ brand site and a portfolio project
+## Active public-site experiment
 
-## Workflow Notes
-Git workflow:
-- main = stable
-- feature branches for larger experiments
-- commit before major rewrites
+PR #142 (`feat/public-vibe-experience`) is a local-review prototype and must remain unmerged/unpublished until the user reviews it.
 
-## What Claude Should Do
-- read the existing codebase first
-- respect the current structure and direction
-- continue improving what already exists
-- make focused edits
-- explain which files are being changed
-- use comments for anything I still need to fill in manually
+Current simplified direction:
 
-## Current Session Notes
-- Keep the vinyl graphic
-- Keep placeholders where needed
-- Add comments for missing links
-- Preserve the “Built from Scratch” / tech showcase concept
-- Do not overcomplicate the stack
-- Focus on homepage polish before deployment
+- homepage vibe selector
+- two focused “From the Booth” project cards
+- Portfolio event-type/city browsing
+- inline factual event detail expansion
+- metadata-based related listening
+- Lab lanes clarified as full sets vs mashups/experiments
+- booking links prefill the existing event-type field
+- swipe/snap behavior where useful on mobile
 
+Deliberately removed from this prototype as redundant:
 
+- Room Reader
+- separate Selected Work Stories layer
+- separate Lab context rail
+- second booking intent selector
+- raw Portfolio tag filter wall
+- nested event-detail drawer
+- duplicate CTAs
 
-
+The rule for further public-site work is: make it more distinctive without making it more complicated.
