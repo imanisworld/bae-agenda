@@ -6,6 +6,7 @@ import { useMemo, useState, type CSSProperties } from 'react'
 import {
   allPortfolioCategories,
   portfolioCategories,
+  portfolioProof,
   relatedListening,
   relatedListeningHref,
   type PortfolioCategory,
@@ -74,12 +75,15 @@ function bookingTypeFor(categories: PortfolioCategory[]) {
 
 function InlineEventDetail({
   entry,
+  entries,
   mixes,
 }: {
   entry: PortfolioEventForExperience
+  entries: PortfolioEventForExperience[]
   mixes: RelatedListeningMix[]
 }) {
   const categories = portfolioCategories(entry)
+  const proof = portfolioProof(entry, entries)
   const related = relatedListening(entry, mixes, 2)
   const bookingType = bookingTypeFor(categories)
   const place = [entry.venue, [entry.city, entry.state].filter(Boolean).join(', ')]
@@ -133,6 +137,28 @@ function InlineEventDetail({
             </div>
           ))}
         </div>
+
+        {proof.length > 0 ? (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', marginTop: '14px' }}>
+            {proof.map((label) => (
+              <span
+                key={label}
+                style={{
+                  padding: '6px 9px',
+                  border: '1px solid rgba(196,165,116,.34)',
+                  background: 'rgba(196,165,116,.09)',
+                  color: 'var(--gold)',
+                  fontSize: '9px',
+                  fontWeight: 600,
+                  letterSpacing: '.08em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        ) : null}
 
         {entry.notes ? (
           <p style={{ margin: '16px 0 0', color: 'var(--muted)', fontSize: '12px', lineHeight: 1.7 }}>
@@ -332,6 +358,7 @@ export default function PortfolioArchive({
                 <div className="portfolio-year-events" style={{ display: 'grid', gap: '0', minWidth: 0 }}>
                   {yearEntries.map((entry, index) => {
                     const entryCategories = portfolioCategories(entry)
+                    const proof = portfolioProof(entry, entries)
                     return (
                       <div key={entry.id}>
                         <button
@@ -374,6 +401,23 @@ export default function PortfolioArchive({
                           </div>
                           <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
                             {entryCategories.slice(0, 2).map((value) => <TagChip key={value} label={value} />)}
+                            {proof.slice(0, 1).map((value) => (
+                              <span
+                                key={value}
+                                style={{
+                                  fontSize: '9px',
+                                  letterSpacing: '.08em',
+                                  textTransform: 'uppercase',
+                                  color: 'var(--white)',
+                                  padding: '4px 7px',
+                                  border: '1px solid rgba(246,241,232,.18)',
+                                  background: 'rgba(246,241,232,.04)',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {value}
+                              </span>
+                            ))}
                           </div>
                         </div>
 
@@ -382,7 +426,7 @@ export default function PortfolioArchive({
                           <div style={{ fontSize: '10px', color: 'var(--gold)', marginTop: '4px' }}>{selectedId === entry.id ? 'Close ↑' : 'Details ↓'}</div>
                         </div>
                         </button>
-                        {selectedId === entry.id ? <InlineEventDetail entry={entry} mixes={mixes} /> : null}
+                        {selectedId === entry.id ? <InlineEventDetail entry={entry} entries={entries} mixes={mixes} /> : null}
                       </div>
                     )
                   })}
