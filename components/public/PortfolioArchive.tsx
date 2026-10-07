@@ -190,7 +190,7 @@ function InlineEventDetail({
         ) : null}
 
         <div style={{ marginTop: '18px' }}>
-          <Link href={`/book?type=${encodeURIComponent(bookingType)}`} className="btn-primary">
+          <Link href={`/book?type=${encodeURIComponent(bookingType)}&from=${encodeURIComponent(`portfolio:${entry.id}`)}`} className="btn-primary">
             Plan something similar →
           </Link>
         </div>
