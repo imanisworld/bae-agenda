@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useMemo, useState, type CSSProperties } from 'react'
+import { useMemo, useState, type CSSProperties } from 'react'
 import {
   allPortfolioCategories,
   portfolioCategories,
@@ -72,190 +72,108 @@ function bookingTypeFor(categories: PortfolioCategory[]) {
   return 'Other'
 }
 
-function EventDetail({
+function InlineEventDetail({
   entry,
   mixes,
-  onClose,
 }: {
   entry: PortfolioEventForExperience
   mixes: RelatedListeningMix[]
-  onClose: () => void
 }) {
   const categories = portfolioCategories(entry)
-  const related = relatedListening(entry, mixes)
+  const related = relatedListening(entry, mixes, 2)
   const bookingType = bookingTypeFor(categories)
-
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [onClose])
+  const place = [entry.venue, [entry.city, entry.state].filter(Boolean).join(', ')]
+    .filter(Boolean)
+    .join(' · ')
 
   return (
     <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={`${entry.event_name} details`}
       style={{
-        position: 'fixed',
-        inset: 0,
-        zIndex: 2400,
         display: 'grid',
-        gridTemplateColumns: 'minmax(0, 1fr) minmax(320px, 560px)',
-        background: 'rgba(7,5,5,0.72)',
-        backdropFilter: 'blur(8px)',
+        gridTemplateColumns: entry.photo_url ? 'minmax(150px, .45fr) minmax(0, 1fr)' : '1fr',
+        gap: '22px',
+        padding: '20px',
+        margin: '0 0 10px',
+        border: '1px solid rgba(196,165,116,.18)',
+        background: 'rgba(196,165,116,.035)',
       }}
     >
-      <button
-        type="button"
-        aria-label="Close event details"
-        onClick={onClose}
-        style={{ border: 0, background: 'transparent', cursor: 'default' }}
-      />
-      <aside
-        style={{
-          height: '100%',
-          overflowY: 'auto',
-          background: 'var(--off-black)',
-          borderLeft: '1px solid rgba(246,241,232,0.12)',
-          boxShadow: '-28px 0 80px rgba(0,0,0,0.32)',
-        }}
-      >
-        {entry.photo_url ? (
-          <div style={{ position: 'relative', minHeight: 'min(42vh, 420px)' }}>
-            <Image
-              src={entry.photo_url}
-              alt={entry.event_name}
-              fill
-              sizes="(max-width: 700px) 100vw, 560px"
-              style={{ objectFit: 'cover' }}
-            />
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background: 'linear-gradient(to top, var(--off-black), transparent 55%)',
-              }}
-            />
+      {entry.photo_url ? (
+        <div style={{ position: 'relative', minHeight: '220px', overflow: 'hidden' }}>
+          <Image
+            src={entry.photo_url}
+            alt={entry.event_name}
+            fill
+            sizes="(max-width: 720px) 100vw, 320px"
+            style={{ objectFit: 'cover' }}
+          />
+        </div>
+      ) : null}
+
+      <div style={{ minWidth: 0 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+            gap: '1px',
+            background: 'var(--border)',
+            border: '1px solid var(--border)',
+          }}
+        >
+          {[
+            ['When', displayDate(entry.date, entry.year)],
+            ['Place', place || entry.city],
+            ['Type', categories.join(' · ')],
+          ].map(([label, value]) => (
+            <div key={label} style={{ padding: '11px 12px', background: 'var(--surface)' }}>
+              <div style={{ color: 'var(--muted)', fontSize: '8px', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                {label}
+              </div>
+              <div style={{ color: 'var(--white)', fontSize: '11px', lineHeight: 1.5 }}>{value || '—'}</div>
+            </div>
+          ))}
+        </div>
+
+        {entry.notes ? (
+          <p style={{ margin: '16px 0 0', color: 'var(--muted)', fontSize: '12px', lineHeight: 1.7 }}>
+            {entry.notes}
+          </p>
+        ) : null}
+
+        {related.length > 0 ? (
+          <div style={{ marginTop: '18px' }}>
+            <div style={{ color: 'var(--gold)', fontSize: '8px', letterSpacing: '.17em', textTransform: 'uppercase', marginBottom: '7px' }}>
+              Related listening
+            </div>
+            <p style={{ margin: '0 0 9px', color: 'var(--muted)', fontSize: '10px', lineHeight: 1.55 }}>
+              Matched from archive tags + mix metadata, not claimed as an event recording.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
+              {related.map((mix) => (
+                <Link
+                  key={mix.id}
+                  href={relatedListeningHref(mix)}
+                  className="btn-ghost"
+                  style={{ minWidth: 0 }}
+                >
+                  {mix.title} →
+                </Link>
+              ))}
+            </div>
           </div>
         ) : null}
 
-        <div style={{ padding: '24px clamp(20px, 4vw, 34px) 40px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', alignItems: 'flex-start' }}>
-            <div>
-              <span style={{ color: 'var(--gold)', fontSize: '9px', letterSpacing: '0.2em', textTransform: 'uppercase' }}>
-                Past work
-              </span>
-              <h3
-                style={{
-                  margin: '8px 0 0',
-                  fontFamily: 'Conthrax, sans-serif',
-                  fontSize: 'clamp(25px, 4vw, 40px)',
-                  lineHeight: 1,
-                }}
-              >
-                {entry.event_name}
-              </h3>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn-ghost"
-              style={{ minWidth: 'unset', padding: '8px 11px', flexShrink: 0 }}
-            >
-              Close ×
-            </button>
-          </div>
-
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(2, minmax(0, 1fr))',
-              gap: '1px',
-              marginTop: '24px',
-              background: 'var(--border)',
-              border: '1px solid var(--border)',
-            }}
-          >
-            {[
-              ['When', displayDate(entry.date, entry.year)],
-              ['Place', [entry.venue, [entry.city, entry.state].filter(Boolean).join(', ')].filter(Boolean).join(' · ')],
-              ['Type', categories.join(' · ')],
-            ].map(([label, value]) => (
-              <div key={label} style={{ padding: '13px', background: 'var(--surface)' }}>
-                <div style={{ color: 'var(--muted)', fontSize: '8px', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '5px' }}>
-                  {label}
-                </div>
-                <div style={{ color: 'var(--white)', fontSize: '12px', lineHeight: 1.55 }}>{value || '—'}</div>
-              </div>
-            ))}
-          </div>
-
-
-          {entry.notes ? (
-            <div style={{ marginTop: '22px', paddingTop: '18px', borderTop: '1px solid var(--border)' }}>
-              <div style={{ color: 'var(--muted)', fontSize: '8px', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '8px' }}>
-                Notes
-              </div>
-              <p style={{ margin: 0, color: 'var(--muted)', fontSize: '13px', lineHeight: 1.75 }}>{entry.notes}</p>
-            </div>
-          ) : null}
-
-          <div style={{ marginTop: '26px', paddingTop: '20px', borderTop: '1px solid var(--border)' }}>
-            <div style={{ color: 'var(--gold)', fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '8px' }}>
-              Related listening
-            </div>
-            <p style={{ margin: '0 0 13px', color: 'var(--muted)', fontSize: '11px', lineHeight: 1.65 }}>
-              Matched from archive tags and mix metadata — not claimed as a recording from this event.
-            </p>
-
-            {related.length > 0 ? (
-              <div style={{ display: 'grid', gap: '7px' }}>
-                {related.map((mix) => (
-                  <Link
-                    key={mix.id}
-                    href={relatedListeningHref(mix)}
-                    style={{
-                      display: 'grid',
-                      gap: '3px',
-                      padding: '11px 12px',
-                      border: '1px solid var(--border)',
-                      color: 'inherit',
-                      textDecoration: 'none',
-                      background: 'rgba(246,241,232,0.02)',
-                    }}
-                  >
-                    <strong style={{ fontSize: '12px', fontWeight: 500 }}>{mix.title}</strong>
-                    <span style={{ color: 'var(--muted)', fontSize: '10px' }}>{mix.genre || 'Open format'} · Open in the Lab →</span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <Link href="/lab" className="btn-ghost">Explore the Lab →</Link>
-            )}
-          </div>
-
-          <div style={{ marginTop: '26px', display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <Link href={`/book?type=${encodeURIComponent(bookingType)}`} className="btn-primary">
-              Plan something similar →
-            </Link>
-          </div>
+        <div style={{ marginTop: '18px' }}>
+          <Link href={`/book?type=${encodeURIComponent(bookingType)}`} className="btn-primary">
+            Plan something similar →
+          </Link>
         </div>
-      </aside>
+      </div>
 
       <style jsx>{`
         @media (max-width: 720px) {
-          div[role='dialog'] {
+          div {
             grid-template-columns: 1fr !important;
-          }
-          div[role='dialog'] > button {
-            display: none;
-          }
-          div[role='dialog'] > aside {
-            border-left: 0 !important;
           }
         }
       `}</style>
@@ -273,7 +191,7 @@ export default function PortfolioArchive({
   const [city, setCity] = useState<string | null>(null)
   const [category, setCategory] = useState<PortfolioCategory | null>(null)
   const [expanded, setExpanded] = useState(false)
-  const [selected, setSelected] = useState<PortfolioEventForExperience | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const cities = useMemo(() => {
     const seen = new Set<string>()
@@ -437,11 +355,11 @@ export default function PortfolioArchive({
                   {yearEntries.map((entry, index) => {
                     const entryCategories = portfolioCategories(entry)
                     return (
+                      <div key={entry.id}>
                       <button
-                        key={entry.id}
                         type="button"
                         className="portfolio-year-row"
-                        onClick={() => setSelected(entry)}
+                        onClick={() => setSelectedId(selectedId === entry.id ? null : entry.id)}
                         style={{
                           width: '100%',
                           display: 'grid',
@@ -483,9 +401,11 @@ export default function PortfolioArchive({
 
                         <div className="portfolio-year-meta" style={{ textAlign: 'right', flexShrink: 0, minWidth: 0 }}>
                           <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{entry.city}</div>
-                          <div style={{ fontSize: '10px', color: 'var(--gold)', marginTop: '4px' }}>Open record →</div>
+                          <div style={{ fontSize: '10px', color: 'var(--gold)', marginTop: '4px' }}>{selectedId === entry.id ? 'Close ↑' : 'Details ↓'}</div>
                         </div>
                       </button>
+                      {selectedId === entry.id ? <InlineEventDetail entry={entry} mixes={mixes} /> : null}
+                      </div>
                     )
                   })}
                 </div>
