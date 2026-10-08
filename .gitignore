@@ -87,3 +87,13 @@ next-env.d.ts
 
 # local Claude credential file
 .claude/claude api
+
+# Local media curator — originals, reports, and Python environments stay local
+.media-curator/
+DJ Media Inbox/
+/tools/media-curator/.venv/
+/tools/media-curator/*.egg-info/
+/tools/media-curator/**/__pycache__/
+/tools/media-curator/.ruff_cache/
+/tools/media-curator/input/
+/tools/media-curator/output/
