@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import type { Event, EventMedia } from '@/lib/db/events'
 import { isValidTimeZone } from '@/lib/date-time'
 import styles from './EventMediaLightbox.module.css'
@@ -82,7 +83,9 @@ export default function EventMediaLightbox({
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [canStep, media.length, onClose])
 
-  return (
+  // Portal to <body>: the page stage is a transformed stacking context, which
+  // would otherwise trap this overlay beneath the fixed nav dock.
+  return createPortal(
     <div className={styles.backdrop} role="presentation" onMouseDown={onClose}>
       <section
         ref={dialogRef}
@@ -200,13 +203,15 @@ export default function EventMediaLightbox({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={item.poster_url} alt="" />
                 ) : (
-                  <span>VIDEO</span>
+                  // No poster yet — let the browser show the clip's opening frame.
+                  <video src={`${item.media_url}#t=0.1`} muted playsInline preload="metadata" tabIndex={-1} />
                 )}
               </button>
             ))}
           </div>
         ) : null}
       </section>
-    </div>
+    </div>,
+    document.body
   )
 }
