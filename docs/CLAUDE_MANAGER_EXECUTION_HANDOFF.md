@@ -72,8 +72,9 @@ Do not rebuild these.
 
 - Discovery Runs UI branch is parked.
 - Manager bot-access/suggestions design is intentionally not started.
-- PR #149 clean Public Vibe prototype is separate from Manager; closed #142 is obsolete.
-- PR #59 Portfolio Archive media galleries is separate from Manager.
+- Public Vibe work from PR #149 is live and remains separate from Manager logic; closed #142 is obsolete.
+- Event-media lightbox fixes from PR #152 are live; superseded PR #151 is closed.
+- PR #59 Portfolio Archive media galleries remains separate/held while real photo/video media is prepared.
 
 ## For every change
 
