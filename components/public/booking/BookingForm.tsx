@@ -230,11 +230,12 @@ function clearDraft() {
   }
 }
 
-export default function BookingForm({ embedded = false }: { embedded?: boolean }) {
+export default function BookingForm({ embedded = false, initialEventType = '', initialSourceContext = '' }: { embedded?: boolean; initialEventType?: string; initialSourceContext?: string }) {
   const formRef = useRef<HTMLFormElement | null>(null)
   const [step, setStep] = useState<Step>(1)
   const [form, setForm] = useState<FormState>(() => ({
     ...INITIAL_STATE,
+    eventType: initialEventType,
     startedAt: String(Date.now()),
   }))
   const [loading, setLoading] = useState(false)
@@ -277,7 +278,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
 
   function startOver() {
     clearDraft()
-    setForm({ ...INITIAL_STATE, startedAt: String(Date.now()) })
+    setForm({ ...INITIAL_STATE, eventType: initialEventType, startedAt: String(Date.now()) })
     setStep(1)
     setFieldErrors({})
     setAvailabilityError('')
@@ -519,6 +520,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
     setLoading(true)
     trackEvent('booking_submit_started', {
       eventType: form.eventType || 'unspecified',
+      sourceContext: initialSourceContext || 'direct',
       hasStartTime: Boolean(form.eventTime.trim()),
       hasEndTime: Boolean(form.eventEndTime.trim()),
       hasPackage: Boolean(form.package.trim()),
@@ -537,6 +539,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
           eventTime: normalizedStart,
           eventEndTime: normalizedEnd,
           acceptedTerms: termsAccepted,
+          sourceContext: initialSourceContext || undefined,
         }),
       })
 
@@ -590,6 +593,7 @@ export default function BookingForm({ embedded = false }: { embedded?: boolean }
 
       trackEvent('booking_submit_succeeded', {
         eventType: form.eventType || 'unspecified',
+        sourceContext: initialSourceContext || 'direct',
         hasPackage: Boolean(form.package.trim()),
         hasCity: Boolean(form.city.trim()),
       })

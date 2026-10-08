@@ -1400,3 +1400,78 @@
 .headerIdentity {
   padding-bottom: clamp(32px, 3.8vw, 56px);
 }
+
+
+/* Responsive Lab header: keep the display title/charm from competing with
+   the crate switch on phones, tablets, and narrower laptop windows. */
+@media (max-width: 940px) {
+  .header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+    gap: 12px;
+  }
+
+  .headerIdentity {
+    width: 100%;
+  }
+
+  .header h1 {
+    width: max-content;
+    max-width: 100%;
+    white-space: nowrap;
+  }
+
+  .crateSwitch {
+    width: 100%;
+    justify-self: stretch;
+  }
+
+  .crateSwitch button {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+@media (min-width: 621px) and (max-width: 940px) {
+  .station {
+    width: min(880px, calc(100% - 32px));
+  }
+
+  .headerIdentity {
+    padding-bottom: clamp(28px, 4vw, 42px);
+  }
+
+  .headerIdentity .titleTag {
+    --size: clamp(48px, 7vw, 66px);
+  }
+}
+
+@media (max-width: 620px) {
+  .header {
+    gap: 9px;
+  }
+
+  .header h1 {
+    font-size: clamp(25px, 8.2vw, 31px);
+  }
+
+  .headerIdentity {
+    padding-bottom: 30px;
+  }
+
+  .headerIdentity .titleTag {
+    --size: clamp(44px, 14vw, 58px);
+  }
+
+  .crateSwitch {
+    box-sizing: border-box;
+  }
+
+  .crateSwitch button {
+    min-height: 34px;
+    padding-inline: 8px;
+    font-size: 8.5px;
+    letter-spacing: .07em;
+  }
+}

@@ -1,28 +1,29 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-
-interface Entry {
-  id:         string
-  event_name: string
-  venue:      string | null
-  city:       string
-  year:       number
-  tags:       string[]
-  featured:   boolean
-}
+import Image from 'next/image'
+import Link from 'next/link'
+import { useMemo, useState, type CSSProperties } from 'react'
+import {
+  allPortfolioCategories,
+  portfolioCategories,
+  portfolioProof,
+  relatedListening,
+  relatedListeningHref,
+  type PortfolioCategory,
+  type PortfolioEventForExperience,
+  type RelatedListeningMix,
+} from '@/lib/portfolio-experience'
 
 function TagChip({ label }: { label: string }) {
   return (
     <span style={{
-      fontSize: '10px',
-      letterSpacing: '0.16em',
+      fontSize: '9px',
+      letterSpacing: '0.12em',
       textTransform: 'uppercase',
-      color: 'var(--violet)',
-      background: 'rgba(143,45,60,0.1)',
-      border: '1px solid rgba(143,45,60,0.2)',
-      borderRadius: '100px',
-      padding: '3px 8px',
+      color: 'var(--gold)',
+      background: 'rgba(196,165,116,0.06)',
+      border: '1px solid rgba(196,165,116,0.18)',
+      padding: '4px 7px',
       whiteSpace: 'nowrap',
     }}>
       {label}
@@ -30,148 +31,343 @@ function TagChip({ label }: { label: string }) {
   )
 }
 
-const filterBtnBase: React.CSSProperties = {
-  fontSize: '11px',
-  letterSpacing: '0.12em',
+const filterBtnBase: CSSProperties = {
+  fontSize: '10px',
+  letterSpacing: '0.09em',
   textTransform: 'uppercase',
-  padding: '10px 18px',
-  minHeight: '44px',
-  borderRadius: '100px',
-  borderWidth: '1px',
-  borderStyle: 'solid',
-  borderColor: 'var(--border)',
+  padding: '9px 13px',
+  minHeight: '40px',
+  border: '1px solid var(--border)',
   background: 'transparent',
   color: 'var(--muted)',
   cursor: 'pointer',
   fontFamily: 'DM Sans, sans-serif',
-  transition: 'border-color 200ms ease, color 200ms ease, background 200ms ease',
+  transition: 'border-color 180ms ease, color 180ms ease, background 180ms ease',
   whiteSpace: 'nowrap',
 }
 
-const filterBtnActive: React.CSSProperties = {
+const filterBtnActive: CSSProperties = {
   ...filterBtnBase,
-  borderColor: 'var(--violet)',
+  borderColor: 'var(--gold)',
   color: 'var(--white)',
-  background: 'rgba(143,45,60,0.1)',
+  background: 'rgba(196,165,116,0.08)',
 }
 
 const COLLAPSED_YEARS = 3
 
-export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
-  const [city,     setCity]     = useState<string | null>(null)
-  const [tag,      setTag]      = useState<string | null>(null)
+function displayDate(value: string | null | undefined, year: number) {
+  if (!value) return String(year)
+  const date = new Date(`${value}T12:00:00`)
+  if (Number.isNaN(date.getTime())) return String(year)
+  return new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  }).format(date)
+}
+
+function bookingTypeFor(categories: PortfolioCategory[]) {
+  if (categories.includes('Nightlife')) return 'Club / Venue Night'
+  if (categories.includes('Corporate + Brand')) return 'Corporate Event'
+  if (categories.includes('Private + Social')) return 'Birthday / Private Party'
+  return 'Other'
+}
+
+function InlineEventDetail({
+  entry,
+  entries,
+  mixes,
+}: {
+  entry: PortfolioEventForExperience
+  entries: PortfolioEventForExperience[]
+  mixes: RelatedListeningMix[]
+}) {
+  const categories = portfolioCategories(entry)
+  const proof = portfolioProof(entry, entries)
+  const related = relatedListening(entry, mixes, 2)
+  const bookingType = bookingTypeFor(categories)
+  const place = [entry.venue, [entry.city, entry.state].filter(Boolean).join(', ')]
+    .filter(Boolean)
+    .join(' · ')
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr',
+        gap: '22px',
+        padding: '20px',
+        margin: '0 0 10px',
+        border: '1px solid rgba(196,165,116,.18)',
+        background: 'rgba(196,165,116,.035)',
+      }}
+    >
+      {entry.photo_url ? (
+        <div style={{ position: 'relative', minHeight: '220px', overflow: 'hidden' }}>
+          <Image
+            src={entry.photo_url}
+            alt={entry.event_name}
+            fill
+            sizes="(max-width: 720px) 100vw, 320px"
+            style={{ objectFit: 'cover' }}
+          />
+        </div>
+      ) : null}
+
+      <div style={{ minWidth: 0 }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+            gap: '1px',
+            background: 'var(--border)',
+            border: '1px solid var(--border)',
+          }}
+        >
+          {[
+            ['When', displayDate(entry.date, entry.year)],
+            ['Place', place || entry.city],
+            ['Type', categories.join(' · ')],
+          ].map(([label, value]) => (
+            <div key={label} style={{ padding: '11px 12px', background: 'var(--surface)' }}>
+              <div style={{ color: 'var(--muted)', fontSize: '8px', letterSpacing: '.16em', textTransform: 'uppercase', marginBottom: '4px' }}>
+                {label}
+              </div>
+              <div style={{ color: 'var(--white)', fontSize: '11px', lineHeight: 1.5 }}>{value || '—'}</div>
+            </div>
+          ))}
+        </div>
+
+        {proof.length > 0 ? (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px', marginTop: '14px' }}>
+            {proof.map((label) => (
+              <span
+                key={label}
+                style={{
+                  padding: '6px 9px',
+                  border: '1px solid rgba(196,165,116,.34)',
+                  background: 'rgba(196,165,116,.09)',
+                  color: 'var(--gold)',
+                  fontSize: '9px',
+                  fontWeight: 600,
+                  letterSpacing: '.08em',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
+        {entry.notes ? (
+          <p style={{ margin: '16px 0 0', color: 'var(--muted)', fontSize: '12px', lineHeight: 1.7 }}>
+            {entry.notes}
+          </p>
+        ) : null}
+
+        {related.length > 0 ? (
+          <div style={{ marginTop: '18px' }}>
+            <div style={{ color: 'var(--gold)', fontSize: '8px', letterSpacing: '.17em', textTransform: 'uppercase', marginBottom: '7px' }}>
+              Related listening
+            </div>
+            <p style={{ margin: '0 0 9px', color: 'var(--muted)', fontSize: '10px', lineHeight: 1.55 }}>
+              Matched from archive tags + mix metadata, not claimed as an event recording.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
+              {related.map((mix) => (
+                <Link
+                  key={mix.id}
+                  href={relatedListeningHref(mix)}
+                  className="btn-ghost"
+                  style={{ minWidth: 0 }}
+                >
+                  {mix.title} →
+                </Link>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        <div style={{ marginTop: '18px' }}>
+          <Link href={`/book?type=${encodeURIComponent(bookingType)}&from=${encodeURIComponent(`portfolio:${entry.id}`)}`} className="btn-primary">
+            Plan something similar →
+          </Link>
+        </div>
+      </div>
+
+    </div>
+  )
+}
+
+export default function PortfolioArchive({
+  entries,
+  mixes,
+  initialCategory = null,
+}: {
+  entries: PortfolioEventForExperience[]
+  mixes: RelatedListeningMix[]
+  initialCategory?: PortfolioCategory | null
+}) {
+  const [city, setCity] = useState<string | null>(null)
+  const [category, setCategory] = useState<PortfolioCategory | null>(initialCategory)
   const [expanded, setExpanded] = useState(false)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
 
   const cities = useMemo(() => {
     const seen = new Set<string>()
-    entries.forEach((e) => {
-      const c = e.city.split(',')[0].trim()
-      seen.add(c)
-    })
+    entries.forEach((entry) => seen.add(entry.city.split(',')[0].trim()))
     return [...seen].sort()
   }, [entries])
 
-  const tags = useMemo(() => {
-    const seen = new Set<string>()
-    entries.forEach((e) => e.tags.forEach((t) => seen.add(t)))
-    return [...seen].sort()
-  }, [entries])
+  const categories = useMemo(() => allPortfolioCategories(entries), [entries])
+
 
   const filtered = useMemo(() => {
-    return entries.filter((e) => {
-      if (city && !e.city.startsWith(city)) return false
-      if (tag  && !e.tags.includes(tag))   return false
+    return entries.filter((entry) => {
+      if (city && !entry.city.startsWith(city)) return false
+      if (category && !portfolioCategories(entry).includes(category)) return false
       return true
     })
-  }, [entries, city, tag])
+  }, [entries, city, category])
 
-  const allYears = useMemo(() => {
-    const ys = [...new Set(filtered.map((e) => e.year))].sort((a, b) => b - a)
-    return ys
-  }, [filtered])
+  const allYears = useMemo(
+    () => [...new Set(filtered.map((entry) => entry.year))].sort((a, b) => b - a),
+    [filtered]
+  )
 
-  const hasFilters = city !== null || tag !== null
+  const hasFilters = city !== null || category !== null
+  const isThinCategory = category !== null && filtered.length > 0 && filtered.length < 3
+  const visibleYears = expanded || hasFilters ? allYears : allYears.slice(0, COLLAPSED_YEARS)
 
-  const visibleYears = useMemo(() => {
-    if (expanded || hasFilters) return allYears
-    return allYears.slice(0, COLLAPSED_YEARS)
-  }, [allYears, expanded, hasFilters])
+  function clearFilters() {
+    setCity(null)
+    setCategory(null)
+  }
 
   return (
     <section style={{ marginBottom: '80px' }}>
       <div style={{
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'end',
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '16px',
         marginBottom: '24px',
       }}>
-        <div className="hardware-heading" style={{ marginBottom: 0 }}>
-          <span className="section-label">Full Archive</span>
+        <div>
+          <div className="hardware-heading" style={{ marginBottom: '6px' }}>
+            <span className="section-label">Full Archive</span>
+          </div>
+          <p style={{ margin: 0, color: 'var(--muted)', fontSize: '12px' }}>
+            Browse by the kind of room or event you&apos;re planning, then open any record for context.
+          </p>
         </div>
         <span style={{ fontSize: '11px', color: 'var(--muted)' }}>
           {filtered.length} {filtered.length === 1 ? 'event' : 'events'}
         </span>
       </div>
 
-      {/* Filter bar */}
-      {(cities.length > 1 || tags.length > 0) && (
-        <div className="portfolio-filter-bar" style={{
+      {categories.length > 0 ? (
+        <div style={{ marginBottom: '14px' }}>
+          <div style={{ color: 'var(--muted)', fontSize: '8px', letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '8px' }}>
+            Event type
+          </div>
+          <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap' }}>
+            {categories.map((value) => (
+              <button
+                key={value}
+                type="button"
+                style={category === value ? filterBtnActive : filterBtnBase}
+                onClick={() => setCategory(category === value ? null : value)}
+              >
+                {value}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
+      <div
+        className="portfolio-filter-bar"
+        style={{
           display: 'flex',
-          gap: '8px',
+          gap: '7px',
           flexWrap: 'wrap',
           alignItems: 'center',
-          paddingBottom: '24px',
+          paddingBottom: '22px',
           borderBottom: '1px solid var(--border)',
-          marginBottom: '0',
-        }}>
-          {cities.length > 1 && cities.map((c) => (
-            <button
-              key={c}
-              type="button"
-              style={city === c ? filterBtnActive : filterBtnBase}
-              onClick={() => setCity(city === c ? null : c)}
-            >
-              {c}
-            </button>
-          ))}
+        }}
+      >
+        {cities.length > 1 ? cities.map((value) => (
+          <button
+            key={value}
+            type="button"
+            style={city === value ? filterBtnActive : filterBtnBase}
+            onClick={() => setCity(city === value ? null : value)}
+          >
+            {value}
+          </button>
+        )) : null}
 
-          {cities.length > 1 && tags.length > 0 && (
-            <span style={{ width: '1px', height: '18px', background: 'var(--border)', flexShrink: 0 }} />
-          )}
-
-          {tags.slice(0, 12).map((t) => (
-            <button
-              key={t}
-              type="button"
-              style={tag === t ? filterBtnActive : filterBtnBase}
-              onClick={() => setTag(tag === t ? null : t)}
-            >
-              {t}
-            </button>
-          ))}
-
-          {hasFilters && (
-            <button
-              type="button"
-              style={{ ...filterBtnBase, color: 'var(--muted)', borderColor: 'transparent' }}
-              onClick={() => { setCity(null); setTag(null) }}
-            >
-              Clear ×
-            </button>
-          )}
-        </div>
-      )}
+        {hasFilters ? (
+          <button
+            type="button"
+            style={{ ...filterBtnBase, color: 'var(--gold)', borderColor: 'transparent' }}
+            onClick={clearFilters}
+          >
+            Clear ×
+          </button>
+        ) : null}
+      </div>
 
       {filtered.length === 0 ? (
-        <div style={{ padding: '48px 0', textAlign: 'center', color: 'var(--muted)', fontSize: '14px' }}>
-          No events match the selected filters.
+        <div
+          role="status"
+          style={{
+            padding: '42px 20px',
+            textAlign: 'center',
+            border: '1px solid var(--border)',
+            background: 'rgba(255,255,255,0.02)',
+          }}
+        >
+          <strong style={{ display: 'block', color: 'var(--white)', fontSize: '14px', marginBottom: '8px' }}>
+            No exact archive matches yet.
+          </strong>
+          <p style={{ margin: '0 auto 16px', maxWidth: '520px', color: 'var(--muted)', fontSize: '12px', lineHeight: 1.6 }}>
+            This filter is narrower than the work currently tagged in the archive. Browse all past work instead.
+          </p>
+          <button type="button" style={filterBtnActive} onClick={clearFilters}>
+            Browse all work
+          </button>
         </div>
       ) : (
         <>
+          {isThinCategory ? (
+            <div
+              role="status"
+              style={{
+                margin: '18px 0 4px',
+                padding: '14px 16px',
+                border: '1px solid rgba(196,165,116,.18)',
+                background: 'rgba(196,165,116,.04)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '14px',
+                flexWrap: 'wrap',
+              }}
+            >
+              <span style={{ color: 'var(--muted)', fontSize: '11px', lineHeight: 1.55 }}>
+                Only {filtered.length} {filtered.length === 1 ? 'archive record matches' : 'archive records match'} this category right now.
+              </span>
+              <button type="button" style={filterBtnBase} onClick={clearFilters}>
+                Browse all work
+              </button>
+            </div>
+          ) : null}
           {visibleYears.map((year) => {
-            const yearEntries = filtered.filter((e) => e.year === year)
+            const yearEntries = filtered.filter((entry) => entry.year === year)
             return (
               <div
                 key={year}
@@ -185,121 +381,113 @@ export default function PortfolioArchive({ entries }: { entries: Entry[] }) {
                   paddingBottom: '32px',
                   alignItems: 'start',
                 }}
+              >
+                <div
+                  className="portfolio-year-label"
+                  style={{
+                    fontFamily: 'Conthrax, sans-serif',
+                    fontSize: 'clamp(24px, 3.5vw, 40px)',
+                    color: 'rgba(250,248,243,0.12)',
+                    lineHeight: 1,
+                    paddingTop: '4px',
+                    position: 'sticky',
+                    top: '88px',
+                  }}
                 >
-                  {/* Year label */}
-                <div className="portfolio-year-label" style={{
-                  fontFamily: 'Conthrax, sans-serif',
-                  fontSize: 'clamp(24px, 3.5vw, 40px)',
-                  color: 'rgba(250,248,243,0.12)',
-                  lineHeight: 1,
-                  paddingTop: '4px',
-                  position: 'sticky',
-                  top: '88px',
-                }}>
                   {year}
                 </div>
 
-                {/* Events list */}
                 <div className="portfolio-year-events" style={{ display: 'grid', gap: '0', minWidth: 0 }}>
-                  {yearEntries.map((entry, i) => (
-                    <div
-                      key={entry.id}
-                      className="portfolio-year-row"
-                      style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr auto',
-                        alignItems: 'center',
-                        gap: '16px',
-                        padding: '13px 0',
-                        borderBottom: i < yearEntries.length - 1
-                          ? '1px solid rgba(255,255,255,0.06)'
-                          : 'none',
-                      }}
-                    >
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{
-                          fontSize: 'clamp(13px, 1.8vw, 15px)',
-                          color: entry.featured ? 'var(--white)' : 'rgba(250,248,243,0.82)',
-                          fontWeight: entry.featured ? 500 : 300,
-                          marginBottom: entry.tags.length ? '6px' : 0,
-                          lineHeight: 1.4,
-                          overflowWrap: 'anywhere',
-                        }}>
-                          {entry.event_name}
-                          {entry.featured && (
-                            <span style={{
-                              marginLeft: '8px',
-                              fontSize: '8px',
-                              letterSpacing: '0.2em',
-                              textTransform: 'uppercase',
-                              color: 'var(--violet)',
-                              verticalAlign: 'middle',
-                            }}>
-                              ★
-                            </span>
-                          )}
-                        </div>
-                        {entry.tags.length > 0 && (
+                  {yearEntries.map((entry, index) => {
+                    const entryCategories = portfolioCategories(entry)
+                    const proof = portfolioProof(entry, entries)
+                    return (
+                      <div key={entry.id}>
+                        <button
+                        type="button"
+                        className="portfolio-year-row"
+                        onClick={() => setSelectedId(selectedId === entry.id ? null : entry.id)}
+                        style={{
+                          width: '100%',
+                          display: 'grid',
+                          gridTemplateColumns: '1fr auto',
+                          alignItems: 'center',
+                          gap: '16px',
+                          padding: '14px 0',
+                          border: 0,
+                          borderBottom: index < yearEntries.length - 1
+                            ? '1px solid rgba(255,255,255,0.06)'
+                            : 'none',
+                          background: 'transparent',
+                          color: 'inherit',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          fontFamily: 'inherit',
+                        }}
+                      >
+                        <div style={{ minWidth: 0 }}>
+                          <div
+                            style={{
+                              fontSize: 'clamp(13px, 1.8vw, 15px)',
+                              color: entry.featured ? 'var(--white)' : 'rgba(250,248,243,0.82)',
+                              fontWeight: entry.featured ? 500 : 300,
+                              marginBottom: '6px',
+                              lineHeight: 1.4,
+                              overflowWrap: 'anywhere',
+                            }}
+                          >
+                            {entry.event_name}
+                            {entry.featured ? (
+                              <span style={{ marginLeft: '8px', color: 'var(--gold)', fontSize: '9px' }}>★</span>
+                            ) : null}
+                          </div>
                           <div style={{ display: 'flex', gap: '5px', flexWrap: 'wrap' }}>
-                            {entry.tags.slice(0, 2).map((t) => (
-                              <TagChip key={t} label={t} />
+                            {entryCategories.slice(0, 2).map((value) => <TagChip key={value} label={value} />)}
+                            {proof.slice(0, 1).map((value) => (
+                              <span
+                                key={value}
+                                style={{
+                                  fontSize: '9px',
+                                  letterSpacing: '.08em',
+                                  textTransform: 'uppercase',
+                                  color: 'var(--white)',
+                                  padding: '4px 7px',
+                                  border: '1px solid rgba(246,241,232,.18)',
+                                  background: 'rgba(246,241,232,.04)',
+                                  whiteSpace: 'nowrap',
+                                }}
+                              >
+                                {value}
+                              </span>
                             ))}
                           </div>
-                        )}
+                        </div>
+
+                        <div className="portfolio-year-meta" style={{ textAlign: 'right', flexShrink: 0, minWidth: 0 }}>
+                          <div style={{ fontSize: '11px', color: 'var(--muted)' }}>{entry.city}</div>
+                          <div style={{ fontSize: '10px', color: 'var(--gold)', marginTop: '4px' }}>{selectedId === entry.id ? 'Close ↑' : 'Details ↓'}</div>
+                        </div>
+                        </button>
+                        {selectedId === entry.id ? <InlineEventDetail entry={entry} entries={entries} mixes={mixes} /> : null}
                       </div>
-                      <div className="portfolio-year-meta" style={{ textAlign: 'right', flexShrink: 0, minWidth: 0 }}>
-                        <div style={{ fontSize: '11px', color: 'var(--muted)', overflowWrap: 'anywhere' }}>{entry.city}</div>
-                        {entry.venue && (
-                          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '2px', overflowWrap: 'anywhere' }}>
-                            {entry.venue}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               </div>
             )
           })}
 
-          {/* Expand / collapse */}
-          {!hasFilters && allYears.length > COLLAPSED_YEARS && (
-            <div style={{
-              borderTop: '1px solid var(--border)',
-              paddingTop: '24px',
-              textAlign: 'center',
-            }}>
+          {!hasFilters && allYears.length > COLLAPSED_YEARS ? (
+            <div style={{ borderTop: '1px solid var(--border)', paddingTop: '24px', textAlign: 'center' }}>
               <button
                 type="button"
-                onClick={() => setExpanded((v) => !v)}
-                style={{
-                  fontSize: '11px',
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  color: 'var(--muted)',
-                  background: 'transparent',
-                  border: '1px solid var(--border)',
-                  borderRadius: '100px',
-                  padding: '9px 20px',
-                  cursor: 'pointer',
-                  fontFamily: 'DM Sans, sans-serif',
-                  transition: 'color 200ms ease, border-color 200ms ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--white)'
-                  e.currentTarget.style.borderColor = 'rgba(143,45,60,0.5)'
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--muted)'
-                  e.currentTarget.style.borderColor = 'var(--border)'
-                }}
+                onClick={() => setExpanded((value) => !value)}
+                style={filterBtnBase}
               >
-                {expanded
-                  ? `Show less ↑`
-                  : `Show all ${filtered.length} events ↓`}
+                {expanded ? 'Show less ↑' : `Show all ${filtered.length} events ↓`}
               </button>
             </div>
-          )}
+          ) : null}
         </>
       )}
     </section>

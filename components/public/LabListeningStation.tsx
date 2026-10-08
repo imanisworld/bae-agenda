@@ -74,7 +74,12 @@ function PauseIcon() {
   return <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="4" y="3" width="3" height="10" rx="1" /><rect x="9" y="3" width="3" height="10" rx="1" /></svg>
 }
 
-export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }) {
+function normalizedListenUrl(value: string | null | undefined) {
+  const permalink = permalinkFor(value ?? null)
+  return (permalink || value || '').toLowerCase().split('?')[0].replace(/\/+$/, '')
+}
+
+export default function LabListeningStation({ mixes, initialTrackUrl = null }: { mixes: ListeningMix[]; initialTrackUrl?: string | null }) {
   const player = usePlayer()
   const { cue } = player
   const { status: cratesStatus, crates } = useLabCrates(mixes)
@@ -91,6 +96,25 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
   const turntableRef = useRef<HTMLButtonElement | null>(null)
   const coversHint = useMotionHint(COVERS_CUE)
   const recordHint = useMotionHint(RECORD_CUE)
+  const initialSelectionApplied = useRef(false)
+
+  useEffect(() => {
+    if (initialSelectionApplied.current || !initialTrackUrl || crates.length === 0) return
+    const target = normalizedListenUrl(initialTrackUrl)
+    if (!target) return
+
+    for (const candidate of crates) {
+      const index = candidate.mixes.findIndex((mix) => normalizedListenUrl(mix.embed_url) === target)
+      if (index >= 0) {
+        initialSelectionApplied.current = true
+        const timer = window.setTimeout(() => {
+          setCrateKey(candidate.key)
+          setFocus(index)
+        }, 0)
+        return () => window.clearTimeout(timer)
+      }
+    }
+  }, [crates, initialTrackUrl])
 
   const crate = crates.find((item) => item.key === crateKey) ?? crates[0] ?? null
   const list = crate?.mixes ?? []
@@ -299,11 +323,16 @@ export default function LabListeningStation({ mixes }: { mixes: ListeningMix[] }
     window.setTimeout(() => setShareNote(''), 2200)
   }
 
+  const crateNote = crate?.key === 'mashups'
+    ? 'Mashups, pairings, and experiments.'
+    : 'Mixes and longer-form listening.'
+
   const header = (
     <header className={styles.header}>
       <div className={styles.headerIdentity}>
         <p>Bae&apos;s in the Lab · Listening Room</p>
         <h1>On wax<HangFrom finish="chrome" className={styles.titleTag}>.</HangFrom></h1>
+        <span className={styles.headerNote}>{crateNote}</span>
       </div>
       {crates.length > 1 ? (
         <div className={styles.crateSwitch} role="group" aria-label="Choose a crate">

@@ -8,6 +8,7 @@ import { sendBookingNotifications } from "@/lib/notifications";
 import { stampBookingEmailSentAt } from "@/lib/booking-email-tracking";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { logError, logEvent } from "@/lib/monitoring";
+import { bookingVibeSourceLabel, parseBookingSourceContext } from "@/lib/booking-source-context";
 
 const ALLOWED_ORIGINS = new Set([
   "https://thebaeagenda.com",
@@ -58,6 +59,10 @@ const BookingSchema = z.object({
   }),
   website:      z.string().optional(),
   startedAt:    z.string().optional(),
+  sourceContext: z.string().max(80).optional().refine(
+    (value) => !value || Boolean(parseBookingSourceContext(value)),
+    "Invalid booking source context"
+  ),
 }).superRefine((data, ctx) => {
   if (!isValidTimeZone(data.timeZone)) {
     ctx.addIssue({
@@ -146,6 +151,58 @@ function flattenFieldErrors(fieldErrors: Record<string, string[] | undefined>) {
       return message ? [[field, message]] : [];
     })
   );
+}
+
+async function recordBookingSourceContext(
+  admin: ReturnType<typeof createAdminClient>,
+  bookingId: string,
+  sourceContext?: string
+) {
+  const context = parseBookingSourceContext(sourceContext);
+  if (!context) return;
+
+  let body: string | null = null;
+
+  if (context.kind === "vibe") {
+    body = `Inquiry source: ${bookingVibeSourceLabel(context.id)} vibe`;
+  } else {
+    const { data: portfolioEntry, error: portfolioError } = await admin
+      .from("portfolio_entries")
+      .select("event_name")
+      .eq("id", context.id)
+      .maybeSingle();
+
+    if (portfolioError) {
+      logEvent("warn", "Booking source portfolio lookup failed", {
+        operation: "booking_source_context_lookup",
+        bookingId,
+        portfolioEntryId: context.id,
+        errorCode: portfolioError.code,
+        errorMessage: portfolioError.message,
+      });
+      return;
+    }
+
+    if (portfolioEntry?.event_name) {
+      body = `Inquiry source: Portfolio — ${portfolioEntry.event_name}`;
+    }
+  }
+
+  if (!body) return;
+
+  const { error } = await admin.from("notes").insert({
+    booking_id: bookingId,
+    body,
+  });
+
+  if (error) {
+    logEvent("warn", "Booking source context note failed", {
+      operation: "booking_source_context_note",
+      bookingId,
+      errorCode: error.code,
+      errorMessage: error.message,
+    });
+  }
 }
 
 export async function POST(req: NextRequest) {
@@ -317,6 +374,8 @@ export async function POST(req: NextRequest) {
       });
       return NextResponse.json({ error: "Unable to save your booking request. Please try again." }, { status: 500 });
     }
+
+    await recordBookingSourceContext(admin, booking.id, data.sourceContext);
 
     const notificationSummary = await sendBookingNotifications({
       firstName: clientPayload.first_name,

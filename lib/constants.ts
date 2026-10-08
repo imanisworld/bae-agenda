@@ -105,8 +105,8 @@ export const PAYMENT_TYPES   = ['deposit', 'balance', 'full', 'refund'] as const
 // Public SoundCloud playlists the Lab reads live. Add a track to one of these
 // on SoundCloud and it appears in the Lab — no admin entry needed.
 export const LAB_CRATES = [
-  { key: 'mixes',   label: 'Mixes',     url: 'https://soundcloud.com/deejaybae/sets/mixes'    },
-  { key: 'mashups', label: 'Mashups',   url: 'https://soundcloud.com/deejaybae/sets/mashups'  },
+  { key: 'mixes',   label: 'Mixes / Full Sets',        url: 'https://soundcloud.com/deejaybae/sets/mixes'   },
+  { key: 'mashups', label: 'Mashups / Experiments',     url: 'https://soundcloud.com/deejaybae/sets/mashups' },
 ] as const
 
 export const SOCIALS = [
