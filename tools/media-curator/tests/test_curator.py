@@ -154,7 +154,7 @@ class ScanTests(unittest.TestCase):
         self.assertEqual(sum(i["status"] == "DUPLICATE" for i in result["files"]), 1)
         self.assertTrue(all(i["source_verified_unchanged"] for i in result["files"]))
         self.assertTrue((self.output / "index.html").exists())
-        self.assertEqual(json.loads((self.output / "manifest.json").read_text())["schema_version"], 1)
+        self.assertEqual(json.loads((self.output / "manifest.json").read_text())["schema_version"], 2)
         self.assertTrue(list((self.output / "assets").glob("*.jpg")))
 
     def test_missing_metadata_and_unsupported(self):

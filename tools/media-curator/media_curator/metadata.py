@@ -73,7 +73,7 @@ def gps_exif(exif):
         return None
 
 
-def extract(path):
+def filesystem_metadata(path):
     stat = path.stat()
     item = {
         "source_path": str(path),
@@ -95,6 +95,11 @@ def extract(path):
         "gps": None,
         "warnings": [],
     }
+    return item
+
+
+def extract(path):
+    item = filesystem_metadata(path)
     candidates = []
     try:
         if item["media_type"] == "image":

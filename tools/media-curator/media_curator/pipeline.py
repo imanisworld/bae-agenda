@@ -1,7 +1,7 @@
-"""Source reads only. Fresh, disjoint output directory for every run."""
+"""Immutable source reads, durable human review, and per-file analysis checkpoints."""
 
+import copy
 import hashlib
-import json
 import os
 import shutil
 import stat
@@ -9,9 +9,12 @@ import subprocess
 from pathlib import Path
 
 from .analysis import recommend, review
+from .cache import AnalysisCache
 from .matching import match
-from .metadata import IMAGES, VIDEOS, extract
+from .metadata import IMAGES, VIDEOS, extract, filesystem_metadata
 from .report import render
+from .reviews import ReviewStore, apply_reviews
+from .storage import atomic_json, checked_path, initialize, workspace_path
 
 
 def digest(path):
@@ -20,11 +23,7 @@ def digest(path):
 
 
 def safe_paths(source, output):
-    source, output = Path(source).expanduser().absolute(), Path(output).expanduser().absolute()
-    for path in (source, output):
-        if any(p.is_symlink() for p in (path, *path.parents)):
-            raise ValueError("Source/output paths must not contain symlinks; use their real paths.")
-    source, output = source.resolve(), output.resolve()
+    source, output = checked_path(source), checked_path(output)
     if not source.is_dir():
         raise ValueError("Source must be an existing directory.")
     if source == output or source in output.parents or output in source.parents:
@@ -33,7 +32,6 @@ def safe_paths(source, output):
         raise ValueError(
             "Output already exists. Choose a new directory; existing files are never overwritten."
         )
-    # Prevent accidental publishing through the site's static tree or polluting Git internals.
     if any(part in {".git", "public"} for part in output.parts):
         raise ValueError("Output cannot be inside public/ or .git/.")
     return source, output
@@ -41,7 +39,11 @@ def safe_paths(source, output):
 
 def discover(source):
     paths, ignored = [], []
-    for root, dirs, files in os.walk(source, followlinks=False):
+
+    def onerror(error):
+        raise error  # An unreadable subtree must not silently appear to be an empty inbox.
+
+    for root, dirs, files in os.walk(source, followlinks=False, onerror=onerror):
         for name in sorted(dirs.copy()):
             path = Path(root) / name
             if path.is_symlink():
@@ -62,8 +64,11 @@ def discover(source):
     return paths, ignored
 
 
-def scan(source, output, events, window_hours=6):
+def scan(source, output, events, window_hours=6, workspace=None, cache_config=None):
     source, output = safe_paths(source, output)
+    workspace = workspace_path(workspace or output.parent / ".media-curator", source, output)
+    store = ReviewStore(workspace)
+    store.load()  # Malformed human state aborts BEFORE creating report/cache outputs.
     paths, ignored = discover(source)
     if any(p.suffix.lower() in VIDEOS for p in paths):
         missing = [name for name in ("ffprobe", "ffmpeg") if not shutil.which(name)]
@@ -75,65 +80,95 @@ def scan(source, output, events, window_hours=6):
 
             register_heif_opener()
         except ImportError:
-            pass  # Per-file unreadable warning; hash and source inventory still work.
+            pass
+    initialize(workspace)
+    cache = AnalysisCache(workspace, cache_config)
+    previous = cache.previous_paths(source)
     output.mkdir(parents=True, exist_ok=False, mode=0o700)
-    # All artifacts are private/local and ignored even for custom workdirs in a checkout.
     (output / ".gitignore").write_text("*\n", encoding="utf-8")
-    assets = output / "assets"
-    assets.mkdir(mode=0o700)
+    (output / "assets").mkdir(mode=0o700)
     items, seen = [], {}
+    counts = {
+        "discovered": len(paths),
+        "newly_analyzed": 0,
+        "reused": 0,
+        "changed": 0,
+        "ignored": len(ignored),
+    }
     for path in paths:
         relative = str(path.relative_to(source))
         before = path.stat()
         sha = digest(path)
-        item = extract(path)
-        item.update(id=hashlib.sha256(relative.encode()).hexdigest()[:16], relative_path=relative, sha256=sha)
-        item["match"] = match(item, events, window_hours)
-        if sha in seen:
-            item["exact_duplicate_of"] = seen[sha]["id"]
-            for key in (
-                "previews",
-                "contact_sheet",
-                "samples",
-                "sampled_scene_changes",
-                "highlights",
-                "technical",
-                "perceptual_hash",
-                "vision",
-            ):
-                if key in seen[sha]:
-                    item[key] = seen[sha][key]
+        kind = "video" if path.suffix.lower() in VIDEOS else "image"
+        counts["changed"] += int(relative in previous and previous[relative] != sha)
+        cached = cache.get(sha, kind)
+        if cached:
+            payload, directory = cached
+            item = filesystem_metadata(path) | payload
+            counts["reused"] += 1
         else:
+            directory = cache.begin(sha, kind)
+            item = extract(path)
+            # Asset filenames use content identity, not a prior path/occurrence identifier.
+            item["id"] = sha
             try:
-                item.update(review(item, path, assets))
+                item.update(review(item, path, directory / "assets"))
             except (OSError, ValueError, subprocess.TimeoutExpired):
                 item["warnings"].append("Review assets unavailable or timed out; inspect original manually.")
-            seen[sha] = item
+            item.pop("id")
+            counts["newly_analyzed"] += 1
         after = path.stat()
         if digest(path) != sha or (before.st_size, before.st_mtime_ns) != (after.st_size, after.st_mtime_ns):
             raise ValueError(
                 "A source changed during the scan. No completed manifest was written; retry on a stable inbox."
             )
-        item["source_verified_unchanged"] = True
+        if item.get("previews"):
+            if not cached:
+                cache.publish(sha, kind, item, directory)
+            cache.materialize(item, directory, output)
+        cache.checkpoint_path(source, relative, sha)
+        item.update(
+            id=hashlib.sha256((sha + ":" + relative).encode()).hexdigest()[:16],
+            content_id=sha,
+            relative_path=relative,
+            sha256=sha,
+            source_verified_unchanged=True,
+            analysis_source="CACHE" if cached else "NEW",
+        )
+        item["match"] = match(item, events, window_hours)
+        if sha in seen:
+            item["exact_duplicate_of"] = seen[sha]
+        else:
+            seen[sha] = item["id"]
         items.append(item)
     recommend(items)
+    for item in items:
+        item["auto_match"] = copy.deepcopy(item["match"])
+        item["auto_recommendation"] = item["status"]
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "source": str(source),
+        "workspace": str(workspace),
         "assumed_window_hours": window_hours,
         "events": events,
         "files": items,
         "ignored": ignored,
+        "counts": counts,
         "limitations": [
             "No vision, audio energy, or shake scoring.",
             "Sampled visual changes are not frame-accurate scene cuts.",
             "GPS matching requires optional coordinates in local event JSON.",
-            "No neighbor propagation: uncertain files remain review items.",
-            "Sources must remain stable during scanning; access times may change on reads.",
+            "Identical content shares human review decisions across paths.",
+            "Source access times may change on reads.",
         ],
     }
-    with (output / "manifest.json").open("x", encoding="utf-8") as out:
-        json.dump(manifest, out, indent=2, ensure_ascii=False, allow_nan=False)
+    # Reload at completion so human decisions saved while a long scan runs are not lost.
+    manifest = apply_reviews(manifest, store.load())
+    counts["needing_review"] = sum(
+        item["effective_approved"] is None or bool(item["review_warnings"]) for item in manifest["files"]
+    )
+    manifest["counts"] = counts
+    atomic_json(output / "manifest.json", manifest)
     with (output / "index.html").open("x", encoding="utf-8") as out:
         out.write(render(manifest))
     return manifest

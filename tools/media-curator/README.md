@@ -1,10 +1,10 @@
 # Local Media Curator
 
-Read-only DJ media inventory and review, independent of the Next.js runtime. Originals are never renamed, moved, edited, overwritten, transcoded in place, or deleted. This tool has no upload, database-write, publishing, or approval action.
+Read-only DJ media analysis with durable human corrections and resumable caching, separate from the Next.js runtime. Originals are never renamed, moved, edited, overwritten, transcoded in place, or deleted. Approving media means **local review only**; there is no upload, DB-write, editing, or publishing operation.
 
 ## Install
 
-Requires Python 3.11+ and Pillow. Video scanning requires `ffmpeg` and `ffprobe` on `PATH` (for example, install FFmpeg through your OS package manager). Missing video tools stop the scan before outputs are created. HEIC/HEIF decoding is optional; unreadable files still appear with hashes and warnings.
+Requires Python 3.11+ on macOS/Linux and Pillow. Video analysis requires `ffmpeg` and `ffprobe` on `PATH`; install FFmpeg through your OS package manager. Missing video prerequisites stop the scan before output creation. Optional `pillow-heif` enables HEIC/HEIF; otherwise unreadable items retain their hashes and warnings.
 
 From the repo root:
 
@@ -12,106 +12,153 @@ From the repo root:
 python3 -m venv tools/media-curator/.venv
 source tools/media-curator/.venv/bin/activate
 python -m pip install -e 'tools/media-curator[dev]'
-# Optional HEIC/HEIF support:
+# Optional:
 python -m pip install -e 'tools/media-curator[heif]'
 ```
 
-No npm dependencies, migrations, paid APIs, server, or background worker are added.
+No new dependencies were added for state, caching, or the UI. Local locking uses Python's standard-library `fcntl` (macOS/Linux). No npm packages, migrations, paid API, cloud service, or background daemon are involved.
 
-## Scan and review
+## First scan → review → rescan
+
+Keep the original inbox **outside** the workspace. Run from the same directory each time, or pass the same `--workspace` explicitly:
 
 ```sh
-media-curator scan '/path/to/DJ Media Inbox' --events /path/to/events.json
-# Or choose a NEW output directory outside the inbox:
-media-curator scan '/path/to/DJ Media Inbox' --events /path/to/events.json --output /path/to/review-run-001
+media-curator scan '/path/to/DJ Media Inbox' --events /path/to/events.json --workspace .media-curator
 ```
 
-Supported: JPEG, PNG, WebP, readable HEIC/HEIF, MP4, MOV, WebM. Traversal is recursive, sorted, and skips symlinks, non-regular files, and unsupported extensions. Keep the inbox stable while scanning.
+The CLI prints a new manifest/report path and a review command. Open the static `index.html` for a scan-time snapshot, or run the printed command to edit decisions:
 
-Default output is `.media-curator/run-<UTC timestamp>/` beneath your current directory:
+```sh
+media-curator review .media-curator/runs/run-EXAMPLE/manifest.json
+```
 
-- `manifest.json`: source paths, SHA-256 hashes, extracted metadata/provenance, suggested event IDs, alternatives, confidence/reasons, technical measurements, duplicates, recommendations, video samples and timestamp ranges
-- `index.html`: offline review grouped by suggested event, including NEEDS_REVIEW and UNMATCHED items
-- `assets/`: bounded JPEG previews and contact sheets
-- `.gitignore`: ignores all generated data, including in custom output directories
+Open the printed `http://127.0.0.1:<port>/` URL. This foreground server stops with Ctrl-C; it does not watch files or run in the background. Only loopback is supported; there is no network-bind option. `--port` selects a fixed local port when needed.
 
-Open `index.html` directly in a browser. No server is required. Paths/metadata are private: do not publish or commit the output. Reports use escaped text, no JavaScript, no remote fonts/images, and no source-media links. No original media is copied into the workbench.
+For each item:
 
-The output must be new, outside the source, and cannot contain the source. Existing output paths, symlinked source/output paths, and output under `public/` or `.git/` are rejected. Run again into a new directory. To remove generated data safely, delete only the specific review run directory shown by the CLI using your file manager. Never select the inbox. There is intentionally no cleanup command that could delete source files.
+- **Confirm suggested event**, **Change event**, **Mark unmatched**, or **Reject suggested event**. Choose a catalog event before Change event. Clear event corrections explicitly returns event assignment to automation.
+- Set **Hero**, **Gallery**, **Social candidate**, **Maybe**, **Skip**, or **Duplicate**. Choose AUTO to remove the status override.
+- **Approve**, **Reject**, or leave Pending; save notes alongside the decision.
+- For videos, approve/reject each candidate range or add a manual range using start/end seconds. Manual ranges are initially approved. No clip is cut or exported.
+- Click **Save review** after changing fields. Action buttons also save the other visible fields.
 
-## Event catalog
+Saves go to review state, not the report snapshot or originals. Reloading the UI reads current durable decisions. A stale browser tab is rejected instead of overwriting a newer save. Close/reopen the server at any time.
 
-Offline JSON is simplest and can include non-public events exported separately through an authorized workflow:
+Rescan using the same workspace and a new report directory (the default creates one):
+
+```sh
+media-curator scan '/path/to/DJ Media Inbox' --events /path/to/events.json --workspace .media-curator
+```
+
+Unchanged content reuses verified analysis; event matching/recommendations run again against the current catalog, then human decisions take precedence. The new static report/manifest incorporates those decisions. An older open review server keeps its original scan/catalog; reopen it on the new manifest to see new automatic results.
+
+The CLI reports discovered, newly analyzed, reused, changed-at-a-known-path, ignored, and needing-review counts. Newly analyzed + reused equals discovered. **Changed is a subset**, not another additive total. Needing review means pending approval or a warning about a saved decision. Approval/rejection is never an upload instruction.
+
+## Local files and privacy
+
+```text
+.media-curator/
+  .gitignore
+  state/
+    review.json                 # durable human decisions — preserve/back up separately
+    review.lock
+  cache/
+    paths.json                  # last observed path → content hash, by source root
+    entries/<analysis-key>/
+      current.json              # pointer to a completed generation
+      <generation>/analysis.json
+      <generation>/assets/     # verified generated JPEGs
+  runs/<run-id>/
+    manifest.json
+    index.html
+    assets/                    # copies, so reports survive cache reset
+```
+
+Custom workspaces write their own ignore-all `.gitignore`. Generated files include **local paths, GPS, capture times, event details, and review notes**. Keep them private; do not commit, publish, or share them unintentionally. New workspace/run/state files use private directory/file permissions. Source access times may change when files are read.
+
+Inputs: JPEG, PNG, WebP, readable HEIC/HEIF, MP4, MOV, WebM. Traversal is sorted and recursive; symlinks, non-regular files, and unsupported extensions are skipped. An unreadable subtree fails rather than silently disappearing. Keep the inbox stable while scanning.
+
+Source, workspace, and report safety checks reject symlinks and overlap with originals. Reports cannot overlap state/cache, reuse an existing output directory, or live under `public/` or `.git/`. All source accesses are reads. SHA-256, size, and mtime are checked after analysis on cache hits and misses. Concurrent modification aborts before publishing a completed manifest; completed cache entries remain reusable. Use a read-only filesystem mount for OS-enforced immutability.
+
+The review server serves only generated HTML and allowlisted JPEGs. It does not expose source files, manifests, notes/state files as endpoints, or arbitrary paths. It uses exact loopback Host checks, Origin checks, a session form token, escaped HTML, no JavaScript or remote assets, and no-store responses. Normal offline review has no network client, Supabase call, or DB write. Only your browser's loopback requests are needed.
+
+## Human state and stable identity
+
+Content SHA-256 is the primary identity. Moving/reorganizing a file retains its decisions and analysis if bytes are identical. Changed content gets a new identity and **does not inherit** the prior decision. Identical copies share decisions intentionally; path occurrences remain distinct rows and duplicate labels remain visible. Metadata edits also change bytes/identity.
+
+`state/review.json` is versioned separately from scan manifests:
 
 ```json
-[
-  {
-    "id": "existing-event-id",
-    "title": "Example Night",
-    "slug": "example-night",
-    "event_date": "2025-05-09T02:00:00Z",
-    "event_timezone": "America/Chicago",
-    "venue": "Example Venue",
-    "city": "Chicago"
+{
+  "schema_version": 1,
+  "reviews": {
+    "<64-character-content-sha256>": {
+      "event_id": "existing-event-id",
+      "rejected_event_ids": [],
+      "status": "HERO",
+      "approved": true,
+      "note": "best crowd shot",
+      "highlights": [{"start_seconds": 10, "end_seconds": 24, "approved": true}],
+      "last_known_relative_path": "event/clip.mov",
+      "updated_at": "2026-10-08T01:00:00+00:00",
+      "revision": 1
+    }
   }
-]
+}
 ```
 
-Use real existing event IDs. These seven fields match `lib/db/events.ts`. The current `events` schema has no end time or coordinates. You may add `duration_hours`, `latitude`, and `longitude` to **local JSON only**, if known. No geocoding or schema changes occur.
+Omitted `event_id` follows automation except for rejected event IDs; explicit `null` means intentionally unmatched. A rejected automatic assignment becomes effectively unmatched; an alternative is not silently substituted. Status null/omitted follows the recommendation. Approval null means pending. Range approval is independent of whole-file approval. `last_known_relative_path` records the path at manual review; current paths remain in each manifest and the cache path index.
 
-To read current public events directly, explicitly export the existing `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` into your shell, then run:
+Saves use a process lock, revision check, and atomic file replacement. Automatic scans never write human state. Malformed/unknown-version review state fails closed with an error and is never reset or silently discarded. Restore a known-good backup or correct it intentionally. Assignments absent from a newer catalog remain intact with a warning. Revisions prevent lost updates; this is a current-decision store, not a full historical revision log.
 
-```sh
-media-curator scan '/path/to/DJ Media Inbox' --supabase
+New manifests use `schema_version: 2`. Each item retains `auto_match`, `auto_recommendation`, `human_review`, `effective_event_id`, `effective_status`, `effective_approved`, `effective_highlights`, and `decision_source`. Legacy `match`/`status` remain the automatic values for compatibility. `content_id` is SHA-256; `id` only distinguishes report occurrences.
+
+- **AUTO**: no saved human review.
+- **HUMAN_CONFIRMED**: saved review agrees with current auto event/status (approval, notes, and ranges are still independently recorded).
+- **HUMAN_OVERRIDDEN**: saved review changes the effective event or status.
+
+Version-1 manifests can be opened with `media-curator review old/manifest.json --workspace .media-curator`. They already contain SHA-256, so an in-memory adapter adds the new concepts without rewriting the old report. Version-1 derived assets are served from their original report directory. Old reports are **not imported into the cache**; the first new scan populates it. A version-2 review server uses the workspace recorded by the scan unless explicitly overridden.
+
+## Cache validity, resuming, and reset
+
+Cache keys include content SHA-256, media kind, analysis schema, Pillow/optional HEIF version, FFmpeg/ffprobe versions, and hashes of the metadata/analysis implementation (including sampling settings). No matching/catalog results or human decisions are cached as analysis. Source paths and filesystem timestamps are refreshed on every scan.
+
+On reuse, the analysis record checksum, expected asset inventory, each asset SHA-256, and JPEG decoding are verified. Missing/corrupt records or assets trigger regeneration. Cache/schema/tool/config changes invalidate reuse. Failed/unreadable analysis is retried rather than permanently cached as success.
+
+Each completed file publishes an atomic pointer to its cache generation. After interruption, rerun the scan into a fresh report directory; previous complete files are reused. Partial report/cache generations may remain but are never trusted. Hashing still reads each original before/after analysis, so large videos have unavoidable disk-I/O cost even on reuse. There is no size/mtime-only identity shortcut.
+
+To reset generated analysis safely:
+
+1. Stop active scans/review sessions.
+2. In your file manager, remove **only `<workspace>/cache/`**. Existing reports contain independent copies of previews.
+3. Keep `<workspace>/state/` and the inbox. Next scan recomputes analysis and reapplies decisions.
+4. Optionally remove individual old `<workspace>/runs/<run-id>/` directories.
+
+To **intentionally reset all human decisions**, first back up `<workspace>/state/review.json` outside the state directory, then remove only that file while review servers are stopped. The next scan/review session treats all items as AUTO. Never delete the entire workspace to clear the cache: that would discard human state too. No automatic cleanup/delete command is provided.
+
+## Event catalog, including non-public events
+
+The existing `--events` option accepts an offline JSON array with existing event IDs:
+
+```json
+[{"id":"existing-event-id","title":"Example Night","slug":"example-night",
+  "event_date":"2025-05-09T02:00:00Z","event_timezone":"America/Chicago",
+  "venue":"Example Venue","city":"Chicago"}]
 ```
 
-The connector issues paginated HTTPS GET requests to `/rest/v1/events`, selecting only the seven fields above and `public=true`. It never uses the service-role key, loads `.env` automatically, reads bookings/clients, or follows redirects. Existing row-level permissions apply. Without a catalog, scanning still works and files remain UNMATCHED. No empty/error result is replaced with invented events.
+Create this file yourself through an **already authorized** admin export workflow. For example, in an existing authorized Supabase dashboard session, export the `events` table's `id,title,slug,event_date,event_timezone,venue,city` columns and convert that export to the JSON-array shape above locally. Include non-public events only if your existing access permits it. Exclude booking/client columns. No new permission, credential, or privileged connection is needed by this tool. Do not put exports in tracked folders; an ignored file under the workspace is suitable.
 
-## Matching and provenance
+Optional `duration_hours`, `latitude`, and `longitude` may be added to local JSON when known. They are local enrichment only; no schema changes/geocoding occur.
 
-Scores are deterministic evidence scores, **not statistical probabilities**:
+For current public events, export the existing `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` into your shell and explicitly use `--supabase`. It performs paginated HTTPS GETs for the seven columns with `public=true`. It never uses service-role credentials, automatically loads `.env`, reads bookings/clients, follows redirects, or writes. Without a catalog, automatic matches remain UNMATCHED; existing human assignments are preserved with absent-catalog warnings.
 
-- Zoned capture timestamp within event start minus 1 hour through start plus 6 hours: +75. Change the assumed duration with `--window-hours`; local `duration_hours` overrides it per event.
-- Within 24 hours but outside the window: +25.
-- Matching calendar date on a legacy/unreviewed timezone record: +35, review only.
-- Filename/relative-folder tokens matching event title, slug, venue, or city: +7 each, capped at +20.
-- GPS within 3 km of locally supplied coordinates: +15; beyond 50 km: −40 and manual review.
+## Existing analysis limits
 
-| Confidence | Meaning |
-| --- | --- |
-| HIGH_CONFIDENCE | At least 90 points, strong date/window evidence with explicit capture offset, high-reliability EXIF timestamp, corroboration, no conflict, and a 15-point lead over alternatives |
-| LIKELY | At least 70 points and strong date/window evidence, with no close competitor or known conflict; container creation time or assumed camera timezone caps confidence here |
-| NEEDS_REVIEW | Weak evidence, legacy timezone, conflicting timestamps/location, or another event within 15 points; displayed event is a suggestion |
-| UNMATCHED | No supported positive evidence |
+Matching is an evidence score, not a probability: +75 within start −1h to start +6h (override with `--window-hours` or local `duration_hours`), +25 within 24h outside the window, +35 for a matching unreviewed legacy calendar date, up to +20 for filename/folder clues, and +15/−40 for near/conflicting locally supplied GPS coordinates. HIGH_CONFIDENCE requires ≥90, reliable explicit-offset capture time, corroboration, and a ≥15-point lead. LIKELY requires ≥70 and strong time evidence. Conflicts, ties, or weak evidence require review. Filesystem timestamps are never capture-time substitutes; DST-ambiguous/nonexistent camera times are not trusted.
 
-EXIF original/digitized times and video container/stream creation tags retain their provenance. Container creation may represent export time, so it is lower reliability. Filesystem modified/birth times are stored **separately and never substituted for capture time**. Conflicting comparable embedded timestamps force review. Unzoned camera times assume each event's timezone and cannot yield HIGH_CONFIDENCE; ambiguous/nonexistent daylight-saving wall times are rejected. Unknown timezone records are never silently reinterpreted as local instants. Neighbor-based propagation is deferred to avoid amplifying a wrong match.
+Exact duplicates use SHA-256. Possible image duplicates use dHash distance ≤5 within an event group; no video near-duplicate analysis. Technical quality is 40% resolution, 30% unclipped exposure, 30% edge strength, with limitations for dark lighting and intentional focus. Automatic picks balance image/video and orientation, not semantic content.
 
-## Duplicates, quality, and selections
-
-Exact SHA-256 duplicates are labeled, never deleted. Images also use a difference hash (Hamming distance ≤5) for **possible** visual duplicates within an event group; false positives are possible. Video near-duplicate detection is deferred.
-
-Technical quality is a transparent heuristic: 40% usable resolution, 30% unclipped exposure, 30% edge strength. Intentional dark lighting, grain, shallow focus, and stage lighting can affect it. Portrait/landscape and duration are metadata, not content judgments. Shake and audio energy remain null.
-
-The `VisionAdapter` protocol in `analysis.py` is an extension point. There is no configured provider or CLI vision option. DJ visibility, crowd activity, dancing, reaction, venue, detail, performance, and social-content judgments remain null. No media is sent to a model.
-
-Selections rank technical quality, suppress exact/possible duplicates, and limit each suggested event to six picks and three of the same media type/orientation. This provides basic format diversity; semantic diversity requires future human or vision labels.
-
-| Status | Meaning |
-| --- | --- |
-| HERO | Highest-ranked usable representative for a likely/confident event; provisional |
-| GALLERY | Additional usable representative within diversity quotas |
-| SOCIAL_CANDIDATE | Portrait video candidate; no crop or social encode created |
-| MAYBE | Assignment, similarity, decoding, or selection quota needs review |
-| SKIP | Low technical score; original retained |
-| DUPLICATE | Exact content match to another file; original retained |
-
-Each video gets 3–24 evenly spaced samples, a labeled contact sheet, sampled visual-change intervals, and up to three nonoverlapping 14-second candidate ranges (clamped for short clips). These use sampled exposure, edges, and frame differences. **They are starting points for review, not verified highlights or frame-accurate scene cuts.** Sparse sampling can miss the best moment. FFmpeg reads sources and emits JPEGs through a pipe; no full proxies, audio analysis, edits, or encodes are generated.
-
-## Safety and scope
-
-The tool opens sources only for reading and hashes them before and after analysis, also comparing size and nanosecond mtime. A change aborts before writing a completed manifest. Read access can update filesystem access times. This is application-level immutability, not protection from another process changing the inbox; use a read-only filesystem mount for stronger OS enforcement. Partial derived assets may remain after interruption/failure, in that run directory only.
-
-This phase does not invoke the existing uploader or server actions, change `event_media`, store assets in `site-media`, revive PR #59, deploy, or publish. Future phases can consume `schema_version: 1`, `event_id`, and `media_type` after explicit human review.
+Videos get 3–24 samples, contact sheets, sampled visual-change signals, and up to three technical candidate ranges. These are **not verified highlights or frame-accurate scene cuts**. No vision/content judgments, audio/shake scoring, cutting, FFmpeg clip exports, social edits, uploads, cloud processing, DB writes, or publishing are added.
 
 ## Verify
 
@@ -121,4 +168,4 @@ ruff check tools/media-curator
 ruff format --check tools/media-curator
 ```
 
-Tests generate synthetic images/videos in temporary directories; no fixtures contain personal media. With FFmpeg installed, the suite includes a synthetic three-minute video, metadata extraction, contact sheet generation, candidate ranges, and before/after source hashes. It also covers timezones/DST, thresholds/conflicts, metadata absence, duplicates, path safety, GET pagination, HTML escaping, and unsupported/corrupt files. Without FFmpeg the video integration test is explicitly skipped. GitHub CI installs FFmpeg to require that coverage.
+Synthetic tests cover the MVP, durable review/moves/changed content, cache reuse/invalidation/missing assets/interrupted scans, immutable originals, malformed state, duplicate behavior, escaping, compatibility, and loopback review/security boundaries. No fixture contains personal media. CI installs FFmpeg for the synthetic video integration test.
