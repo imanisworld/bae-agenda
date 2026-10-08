@@ -50,7 +50,7 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 
 - Automatic Vercel Git deployments were disabled in PR #135.
 - Production is published deliberately after an intended batch is QA'd.
-- The latest verified application release includes Manager work through PR #139.
+- The latest verified application release is `11a81157285a748182aca18d9f48b258106e3b92` and includes the Public Vibe experience from PR #149 plus event-media lightbox fixes from PR #152.
 - Production database hardening from PR #101 is applied and verified.
 - Older Supabase migration-history drift still exists, so blanket `supabase db push` remains prohibited.
 
@@ -67,8 +67,9 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 
 ### Held / review-on-purpose work
 
-- PR #149: clean Public Vibe experience prototype — draft/preview-review only; replaces closed #142
-- PR #59: Full Portfolio Archive media galleries — held/separate
+- Public Vibe experience from PR #149 is live.
+- Event-media lightbox fixes from PR #152 are live; PR #151 was superseded.
+- PR #59: older Full Portfolio Archive media galleries implementation — held/separate while real photo/video media is prepared
 - Discovery Runs UI — parked
 - Manager bot-access/suggestions design — parked until there is a demonstrated need
 

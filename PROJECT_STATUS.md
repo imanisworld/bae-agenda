@@ -36,7 +36,7 @@ Automatic Vercel Git deployments were disabled in PR #135.
 
 Workflow: merge approved PRs into `main` without publishing, QA the intended batch, then create one deliberate production deployment from latest `main`. Do not use Redeploy to publish newly merged commits because it rebuilds an older deployment.
 
-Current production application deployment is `e4b4ae761b3a027b5efb2372c844ab559a68a775` (PR #139). PRs #140 and #101 changed documentation/database migration history only and did not require a new application deployment.
+Current production application deployment is `11a81157285a748182aca18d9f48b258106e3b92`, deliberately deployed on 2026-10-07 after PR #149 (Public Vibe experience) and PR #152 (event-media lightbox fixes) merged. No new photo/video media assets were included in that release.
 
 The payment-reminders cron remains configured against production.
 
@@ -72,12 +72,13 @@ Remaining unrelated advisor items:
 1. Follow up Silent Disco and Elevate Social on Oct 10.
 2. Let daily discovery runs collect data and evaluate source quality / response / booked economics.
 3. Decide whether to resume the parked Discovery Runs UI.
-4. Decide whether to resume PR #59 Full Portfolio Archive media galleries.
+4. Prepare and review real Portfolio photo/video media separately before publishing media assets.
 
 ## Open / Held
 
-- PR #149: clean Public Vibe experience prototype — draft/preview-review only; replaces closed #142 and stays separate until intentionally reviewed.
-- PR #59: Full Portfolio Archive media galleries — intentionally held/separate.
+- Public Vibe experience from PR #149 is live in production.
+- Event-media lightbox fixes from PR #152 are live in production; superseded PR #151 is closed.
+- PR #59: older Full Portfolio Archive media galleries branch — intentionally held/separate while real photo/video media is prepared.
 - Bot access for Manager — not started; approval-gated design only.
 - Discovery Runs UI branch — parked; backend/daily tracking logic already exists.
 
