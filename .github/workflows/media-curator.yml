@@ -1,0 +1,32 @@
+name: Media Curator
+
+on:
+  pull_request:
+    paths:
+      - 'tools/media-curator/**'
+      - '.github/workflows/media-curator.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'tools/media-curator/**'
+      - '.github/workflows/media-curator.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  local-tool:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install local analysis tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python3 -m venv /tmp/media-curator-venv
+          /tmp/media-curator-venv/bin/pip install -e 'tools/media-curator[dev]'
+      - name: Test and lint
+        run: |
+          /tmp/media-curator-venv/bin/python -m unittest discover -s tools/media-curator/tests -v
+          /tmp/media-curator-venv/bin/ruff check tools/media-curator
+          /tmp/media-curator-venv/bin/ruff format --check tools/media-curator
