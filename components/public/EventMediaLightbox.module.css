@@ -1,7 +1,8 @@
 .backdrop {
   position: fixed;
   inset: 0;
-  z-index: 120;
+  /* Above the floating nav dock (130) so it can't cover the thumbnails. */
+  z-index: 140;
   display: grid;
   place-items: center;
   padding: max(18px, env(safe-area-inset-top)) 18px max(18px, env(safe-area-inset-bottom));
@@ -216,10 +217,13 @@
 }
 
 .thumb img,
-.thumbActive img {
+.thumbActive img,
+.thumb video,
+.thumbActive video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  pointer-events: none;
 }
 
 .thumb span,
