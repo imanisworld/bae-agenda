@@ -11,10 +11,10 @@ const EXPERIENCE_ROUTES = new Set<string>(ROUTE_ORDER)
 const PAGE_PHOTOS: Record<(typeof ROUTE_ORDER)[number], string> = {
   '/': '/photos/rooms/home-plexmix.webp',
   '/events': '/photos/rooms/tile-booth.webp',
-  '/lab': '/photos/rooms/turntables-floor.webp',
+  '/lab': '/photos/rooms/lab-orange-albums.webp',
   '/portfolio': '/photos/rooms/work-booth.webp',
-  '/meet': '/photos/rooms/meet-wood-shelves.webp',
-  '/book': '/photos/rooms/book-blue-phones.webp',
+  '/meet': '/photos/rooms/meet-got-music.webp',
+  '/book': '/photos/rooms/book-warm-turntable.webp',
 }
 
 function usePreloadPagePhotos(pathname: string, enabled: boolean) {

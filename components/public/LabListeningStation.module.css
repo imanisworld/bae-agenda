@@ -2122,3 +2122,10 @@
   .station .console { gap: 6px; }
   .station .readout h2 { font-size: clamp(17px, 1.9vw, 23px); }
 }
+
+/* Lab: no detached shadow beneath the maroon timeline playhead. */
+.progress input::-webkit-slider-thumb,
+.progress input::-moz-range-thumb,
+.progress input:focus-visible::-webkit-slider-thumb,
+.progress input:focus-visible::-moz-range-thumb { box-shadow: none !important; }
+.progress input:focus-visible { outline: 2px solid #a84e65; outline-offset: 2px; }

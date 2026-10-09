@@ -10054,3 +10054,104 @@ a.admin-stat-card:focus-visible {
   body:has(.press-kit-page) .press-kit-logo { width: 80px !important; height: auto !important; }
   body:has(.press-kit-page) .press-kit-qr span { font-size: 9px !important; font-weight: 600 !important; }
 }
+
+/* Approved original room photographs; existing blur layer is unchanged. */
+.public-experience-shell .public-page-stage--experience[data-experience-route='/lab'] {
+  --page-photo: url('/photos/rooms/lab-orange-albums.webp');
+  --page-photo-position: center 49%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
+  --page-photo: url('/photos/rooms/meet-got-music.webp');
+  --page-photo-position: center 45%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
+  --page-photo: url('/photos/rooms/book-warm-turntable.webp');
+  --page-photo-position: center 48%;
+  --page-photo-blur: 6px;
+  --page-photo-brightness: .57;
+  --page-photo-saturate: .75;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book']:has(.book-experience--contact) {
+  --page-photo: url('/photos/rooms/contact-walnut-vinyl.webp');
+  --page-photo-position: center 49%;
+}
+.public-experience-shell .book-experience { background: linear-gradient(145deg,rgba(55,33,29,.38),rgba(39,26,24,.49)); }
+.public-experience-shell .book-experience-form,
+.public-experience-shell .book-experience-rail {
+  background: radial-gradient(ellipse at 32% 20%,rgba(118,76,51,.12),transparent 64%),
+              linear-gradient(150deg,rgba(59,35,33,.8),rgba(43,27,25,.81));
+}
+/* Actual transparent phone animation: no tile or colored block. */
+.public-experience-shell .book-experience-contact-bookings { padding-right: clamp(122px,12vw,150px) !important; }
+.public-experience-shell .book-experience-phone {
+  right: 4px; top: 50%; width: clamp(110px,10vw,143px);
+  height: auto; aspect-ratio: 1; border: 0 !important; border-radius: 0;
+  background: none !important; box-shadow: none !important;
+  filter: drop-shadow(0 7px 7px rgba(13,9,10,.28)); overflow: visible;
+  transform: translateY(-50%) rotate(4deg); pointer-events: none;
+}
+.public-experience-shell .book-experience-phone picture,
+.public-experience-shell .book-experience-phone picture img,
+.public-experience-shell .book-experience-phone > img {
+  display: block; width: 100%; height: 100%;
+  object-fit: contain; mix-blend-mode: normal; background: transparent;
+}
+.public-experience-shell .book-experience-phone .book-experience-phone-still { display: none; }
+@media (max-width:620px) {
+  .public-experience-shell .book-experience-contact-bookings { padding-right: 104px !important; }
+  .public-experience-shell .book-experience-phone { width: 106px; right: -5px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .public-experience-shell .book-experience-phone-motion { display: none; }
+  .public-experience-shell .book-experience-phone .book-experience-phone-still { display: block; }
+}
+/* Mobile route transitions: remove the overlapping vertical lift and
+   spring-like swipe arrival; keep the finger-driven swipe interaction. */
+@media (max-width:620px) {
+  .public-experience-shell:not(.public-experience-shell--pulling):not(.public-experience-shell--settling):not(.public-experience-shell--leaving):not(.public-experience-shell--arriving)
+  .public-page-stage--experience .public-page-stage-inner {
+    animation: mobile-room-fade 170ms ease-out both;
+  }
+  .public-experience-shell--arriving .public-page-stage--experience .public-page-stage-inner {
+    animation: mobile-room-fade 190ms ease-out both !important;
+    transform: none !important;
+  }
+  .public-experience-shell--leaving .public-page-stage--experience .public-page-stage-inner {
+    animation: none !important;
+    transform: translate3d(var(--route-pull-x),0,0) !important;
+    opacity: 0 !important; transition: opacity 160ms ease-out !important;
+  }
+  .public-experience-shell--settling .public-page-stage--experience .public-page-stage-inner {
+    animation: none !important;
+    transform: translate3d(0,0,0);
+    transition: transform 140ms ease-out !important;
+  }
+}
+@keyframes mobile-room-fade {
+  from { opacity: .35; transform: none; }
+  to { opacity: 1; transform: none; }
+}
+/* The webpage ends at the branded Press Kit footer. Letter sizing is print-only. */
+@media screen {
+  .public-site-shell:has(.press-kit-page) #main-content,
+  .public-site-shell:has(.press-kit-page) .public-page-stage { min-height: 0; height: auto; }
+  .press-kit-page { min-height: 0; padding-bottom: 0; }
+  .press-kit-wrap, .press-kit-sheet { min-height: 0; height: auto; }
+  .public-site-shell:has(.press-kit-page) .site-footer { display: none; }
+}
+.press-kit-work-heading span::before { content: '•'; margin-right: 7px; color: #deb98e; }
+.press-kit-work-copy p { line-height: 1.6; }
+.press-kit-footer { padding-block: 26px; }
+.press-kit-logo { width: 130px; }
+.press-kit-bio p:last-child { position: relative; border-left: none; padding-left: 31px; }
+.press-kit-bio p:last-child::before {
+  content: ''; position: absolute; left: 0; top: .75em;
+  width: 20px; height: 2px; background: #e4b979;
+}
+@media print {
+  body:has(.press-kit-page) .press-kit-bio p:last-child {
+    border-left: none !important; padding-left: 26px !important;
+  }
+  body:has(.press-kit-page) .press-kit-bio p:last-child::before { top: .6em; width: 18px; }
+  body:has(.press-kit-page) .press-kit-work-copy p { line-height: 1.43 !important; }
+}
