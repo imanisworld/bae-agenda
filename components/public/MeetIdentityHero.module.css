@@ -519,3 +519,14 @@
 @media (min-width: 861px) and (max-width: 1120px) {
   .copy h1 { font-size: clamp(34px, 3.2vw, 45px); }
 }
+
+/* The decorative glow sat over the copy on phones and swallowed taps on
+   Book DJ B.A.E. and Open Press Kit. It is decoration only. */
+.glow {
+  z-index: 0;
+  pointer-events: none;
+}
+.copy {
+  position: relative;
+  z-index: 2;
+}

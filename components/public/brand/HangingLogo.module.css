@@ -66,7 +66,8 @@
     100% 100%,
     0 100%
   );
-  filter: drop-shadow(0 10px 14px rgba(0,0,0,.5));
+  /* Tight and close to the tag; a wide soft shadow spread into a dark cloud. */
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,.38));
 }
 
 @keyframes hang-swing {

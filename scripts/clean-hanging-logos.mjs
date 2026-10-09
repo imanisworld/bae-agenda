@@ -69,6 +69,18 @@ for (const suffix of ['', '-gold', '-silver', '-chrome']) {
   await sharp(data, { raw: { width, height, channels: 4 } })
     .png({ compressionLevel: 9, adaptiveFiltering: true })
     .toFile(output)
+  // Small tag copy served as-is (unoptimized, lossless): the on-the-fly lossy WebP/AVIF
+  // re-encode smeared noise into the soft alpha edge and read as a matte.
+  // sharp resizes with premultiplied alpha, so no dark fringe; then drop the
+  // near-invisible haze pixels a drop-shadow would turn into a visible box.
+  const tag = await sharp(data, { raw: { width, height, channels: 4 } })
+    .resize({ width: 260 })
+    .raw()
+    .toBuffer({ resolveWithObject: true })
+  for (let i = 3; i < tag.data.length; i += 4) if (tag.data[i] <= 12) tag.data[i] = 0
+  await sharp(tag.data, { raw: tag.info })
+    .webp({ lossless: true, effort: 6 })
+    .toFile(path.join(outputDir, filename.replace('.png', '-tag.webp')))
   // Prove the four external corners no longer form an opaque rectangle.
   const corners=[0,width-1,(height-1)*width,count-1]
   if (corners.some(p=>data[p*4+3]!==0)) throw new Error(`Opaque corner remains: ${filename}`)

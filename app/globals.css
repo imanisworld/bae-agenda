@@ -9130,7 +9130,7 @@ a.admin-stat-card:focus-visible {
   inset: -48px;
   pointer-events: none;
   background: var(--page-photo, none) var(--page-photo-position, center) / cover no-repeat;
-  filter: blur(var(--page-photo-blur, 3px)) brightness(var(--page-photo-brightness, .85)) saturate(.85);
+  filter: blur(var(--page-photo-blur, 3px)) brightness(var(--page-photo-brightness, .85)) saturate(var(--page-photo-saturate, .85));
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
   --page-photo: url('/photos/rooms/phones-box.webp');
@@ -9490,4 +9490,21 @@ a.admin-stat-card:focus-visible {
   .public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
     --page-photo-position: 50% 42%;
   }
+}
+
+/* Book and Contact are one page (two tabs): same plum panel, same wash, and
+   the blue phone photo pushed back so the wine UI leads. */
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
+  --page-photo-blur: 6px;
+  --page-photo-brightness: .5;
+  --page-photo-saturate: .45;
+}
+.public-experience-shell .book-experience {
+  background:
+    radial-gradient(ellipse at 35% 20%, rgba(123,45,71,.2), transparent 65%),
+    linear-gradient(135deg, rgba(62,28,46,.62), rgba(40,22,38,.66));
+}
+.public-experience-shell .book-experience-form,
+.public-experience-shell .book-experience-rail {
+  background: linear-gradient(150deg, rgba(66,35,54,.8), rgba(43,26,45,.8));
 }

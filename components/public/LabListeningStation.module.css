@@ -2047,3 +2047,31 @@
   border-color: #8f354c;
   box-shadow: 0 9px 25px rgba(20,8,14,.4), 0 0 0 2px rgba(255,239,224,.38);
 }
+
+/* Shadow cleanup. Covers: no mauve block behind the sleeve; a tight, dark,
+   grounded shadow instead (rear covers lighter). Player: the controls row
+   clipped its buttons' shadows into a flat band, so give the shadows room
+   inside the clip and keep each one small and centred under its button. */
+.cover::after { display: none; }
+.cover,
+.carouselStage .cover {
+  box-shadow: 0 8px 14px -6px rgba(14,6,10,.42);
+}
+.coverFront,
+.carouselStage .coverFront {
+  box-shadow:
+    0 16px 22px -10px rgba(14,6,10,.62),
+    0 3px 6px rgba(14,6,10,.28),
+    0 0 0 1px rgba(255,240,230,.1);
+}
+.controls {
+  padding-block: 6px 12px;
+  margin-block: -6px -12px;
+}
+.transport .round {
+  box-shadow: 0 2px 4px rgba(20,8,14,.16);
+}
+.play,
+.transport .play {
+  box-shadow: 0 4px 9px -2px rgba(60,16,30,.36);
+}
