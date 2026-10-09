@@ -445,7 +445,14 @@
 
 /* Room photo backdrop: same light blur as the other pages so it reads. */
 .background {
-  object-position: center 55%;
-  filter: blur(3px) brightness(.8) saturate(.85);
+  /* Keep you at the decks in frame; you stand right of center. */
+  object-position: 70% 40%;
+  filter: blur(3px) brightness(1) saturate(.9);
   transform: scale(1.03);
+}
+/* Lighter wash so the booth photo reads; still darkest behind the copy. */
+.shade {
+  background:
+    linear-gradient(90deg, rgba(30,18,24,.72) 0%, rgba(30,18,24,.4) 40%, rgba(30,18,24,.08) 75%),
+    linear-gradient(0deg, rgba(30,18,24,.7) 0%, transparent 40%);
 }

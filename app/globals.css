@@ -9164,7 +9164,7 @@ a.admin-stat-card:focus-visible {
   --page-photo: url('/photos/PlexMix19-DJBAE.JPEG');
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/portfolio'] {
-  --page-photo: url('/photos/rooms/dj-setup.jpg');
+  --page-photo: url('/photos/rooms/work-booth.webp');
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/events'] {
   --page-photo: url('/photos/rooms/tile-booth.jpg');

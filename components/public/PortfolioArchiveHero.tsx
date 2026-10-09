@@ -69,7 +69,7 @@ export default function PortfolioArchiveHero({
   return (
     <section className={styles.hero} aria-labelledby="portfolio-title">
       <Image
-        src="/photos/rooms/dj-setup.jpg"
+        src="/photos/rooms/work-booth.webp"
         alt=""
         fill
         priority
