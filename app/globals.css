@@ -8989,3 +8989,56 @@ a.admin-stat-card:focus-visible {
     animation: none !important;
   }
 }
+
+
+/* Warm dark public gallery. Work's softly blurred, readable photo ambience
+   is the reference: deepen the Lab and unify the other six public routes.
+   Admin and utility pages are not affected. */
+.public-experience-shell {
+  --black: #38272f;
+  --off-black: #453139;
+  --surface: #50363f;
+  --muted: rgba(255,239,229,.87);
+  background:
+    radial-gradient(ellipse at 14% 12%, rgba(177,105,117,.23), transparent 56%),
+    radial-gradient(ellipse at 88% 85%, rgba(186,129,117,.14), transparent 57%),
+    #38272f;
+}
+.public-experience-shell .public-page-stage--experience {
+  background: #38272f;
+}
+.public-experience-shell .public-page-stage--experience:has(.lab-experience) {
+  background: #38272f;
+}
+.public-experience-shell .lab-experience {
+  color-scheme: dark;
+  background:
+    radial-gradient(ellipse at 85% 10%, rgba(154,79,101,.21), transparent 50%),
+    linear-gradient(155deg, #4c343e, #32252b);
+}
+.public-experience-shell .events-experience {
+  background:
+    radial-gradient(ellipse at 18% 18%, rgba(155,88,112,.18), transparent 52%),
+    linear-gradient(150deg, #4a323b, #33242c);
+}
+.public-experience-shell .book-experience {
+  background:
+    radial-gradient(ellipse at 80% 12%, rgba(200,139,112,.11), transparent 62%),
+    #43303a;
+}
+/* Cream player/deck remains a deliberate light contrast surface. On the
+   darker Lab page, headings and crate captions must switch back to ivory. */
+.public-experience-shell .lab-experience .header h1,
+.public-experience-shell .lab-experience .headerIdentity p,
+.public-experience-shell .lab-experience .crateCaption strong,
+.public-experience-shell .lab-experience .crateCaption small,
+.public-experience-shell .lab-experience .crateCaption span {
+  color: #f8eadd;
+}
+.public-experience-shell .lab-experience .header {
+  border-bottom-color: rgba(247,219,205,.23);
+}
+.public-experience-shell .lab-experience .deck .readout,
+.public-experience-shell .lab-experience .deck .readout h2 {
+  color: #432832;
+}
