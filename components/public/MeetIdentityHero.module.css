@@ -395,84 +395,6 @@
 }
 
 
-/* Fashion-editorial photo layers behind the main portrait.
-   The portrait remains the focal point, tilt target and readable image. */
-.collageFilm,
-.collageCrowd {
-  position: absolute;
-  z-index: 0;
-  display: block;
-  overflow: hidden;
-  border: 5px solid #f6ebdf;
-  background: #efe1d1;
-  box-shadow: 0 15px 30px rgba(32,19,25,.28);
-  pointer-events: none;
-  transform-origin: center;
-}
-.collageFilm img, .collageCrowd img { object-fit: cover; filter: saturate(.93) contrast(1.03); }
-.collageFilm {
-  left: -10%;
-  top: -8%;
-  width: 44%;
-  height: 59%;
-  transform: rotate(-9deg);
-}
-.collageCrowd {
-  right: -8%;
-  bottom: -6%;
-  width: 38%;
-  height: 44%;
-  transform: rotate(8deg);
-}
-.portrait { z-index: 2; }
-@media (max-width: 560px) {
-  .collageFilm { left: -6%; top: -5%; width: 34%; height: 49%; }
-  .collageCrowd { right: -5%; bottom: 3%; width: 34%; height: 38%; }
-  .collageFilm, .collageCrowd { border-width: 4px; }
-}
-
-
-/* One-photo editorial tear treatment — same source photo, different printing
-   tones. Preserve the existing tilting portrait, and no extra photo prints. */
-.portraitPaper { position: absolute; inset: 0; isolation: isolate; overflow: hidden; }
-.portraitPaper > img,
-.portraitPiece img { object-fit: cover; object-position: center; }
-.portraitPiece {
-  position: absolute; inset: 0; z-index: 1; overflow: hidden;
-  pointer-events: none;
-}
-.portraitPieceLeft {
-  clip-path: polygon(0 0, 30.8% 0, 29.9% 12%, 31.3% 22.4%, 29.7% 34%, 31% 46%, 29.5% 56%, 30.7% 67%, 29.1% 79.3%, 30% 100%, 0 100%);
-  filter: grayscale(1) brightness(.96) contrast(1.08);
-}
-.portraitPieceRight {
-  clip-path: polygon(76.4% 0, 100% 0, 100% 100%, 74.8% 100%, 77% 77%, 75.1% 62.7%, 77% 49.6%, 75.1% 38%, 76.6% 24.5%, 75.1% 13.6%);
-  filter: grayscale(.85) saturate(.35) brightness(.92) contrast(1.05);
-}
-.portraitTears { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
-.portraitTears path {
-  fill: none;
-  stroke: #f7eee0;
-  stroke-width: 3.7px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-  filter: drop-shadow(0 2px 1px rgba(31,17,20,.58));
-}
-.portraitTapeOne, .portraitTapeTwo {
-  position: absolute; z-index: 3; width: 16%; height: 7%;
-  background: rgba(234,212,185,.7);
-  box-shadow: 0 2px 6px rgba(34,21,24,.17);
-  clip-path: polygon(1% 0, 17% 4%, 38% 0, 56% 5%, 74% 0, 100% 3%, 97% 100%, 81% 96%, 60% 100%, 44% 96%, 20% 100%, 0 95%);
-  pointer-events: none;
-}
-.portraitTapeOne { top: 6%; left: 2%; rotate: -16deg; }
-.portraitTapeTwo { bottom: 7%; right: 3%; rotate: 13deg; }
-@media (max-width: 560px) {
-  .portraitTapeOne, .portraitTapeTwo { width: 14%; height: 6%; }
-}
-
-
 /* DESKTOP OVERFLOW FIX — contain the portrait and keep all copy in its own
    minmax(0,1fr) column. Prior absolute offsets hid text/CTAs off-screen. */
 @media (min-width: 861px) {
@@ -534,3 +456,41 @@
   filter: none;
 }
 .portraitTapeOne, .portraitTapeTwo { opacity: .52; }
+
+
+/* The actual approved torn-paper portrait, not reconstructed CSS seams.
+   Keep the complete printed square in view at every breakpoint. */
+.portrait {
+  aspect-ratio: 1 / 1;
+  background: #ede6dc;
+  border-radius: 4px;
+  box-shadow: 8px 10px 0 rgba(35,24,29,.42), 0 22px 50px rgba(17,8,14,.33);
+}
+.portrait::after { opacity: .13; }
+.portrait img.approvedCollage {
+  object-fit: contain;
+  object-position: center center;
+  filter: none;
+}
+@media (min-width: 861px) {
+  .portraitWrap {
+    width: min(100%, 480px);
+  }
+  .portrait {
+    aspect-ratio: 1 / 1;
+  }
+}
+@media (max-width: 860px) {
+  .portrait {
+    aspect-ratio: 1 / 1;
+  }
+}
+@media (max-width: 560px) {
+  .portraitWrap {
+    width: min(73%, 330px);
+    margin-left: 8%;
+  }
+  .portrait {
+    border-radius: 3px;
+  }
+}
