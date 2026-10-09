@@ -1755,3 +1755,28 @@
   .deck { grid-template-areas: 'readout readout' 'progress progress' 'controls controls'; }
   .turntable { display: none; }
 }
+
+
+/* A warm blush page connects the listening room to the plum editorial pages. */
+.station {
+  --lab-ink: #432832;
+  --lab-plum: #8f354c;
+  color: var(--lab-ink);
+}
+.header { border-bottom-color: rgba(98,63,70,.23); }
+.header h1,
+.crateCaption strong,
+.readout h2 { color: #432832; }
+.crateSwitch,
+.round,
+.deck,
+.links button,
+.links a {
+  border-color: rgba(118,74,84,.23);
+}
+.crateSwitch button[aria-pressed='true'],
+.play { background: #8f354c; color: #fff8ee; }
+.deck,
+.deckPlaying {
+  background: linear-gradient(130deg, #fff7ef, #f0dfd5);
+}
