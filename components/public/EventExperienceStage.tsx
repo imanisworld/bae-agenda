@@ -128,7 +128,7 @@ export default function EventExperienceStage({
             {list.map((event, i) => (
               <div
                 key={event.id}
-                className="events-carousel-slide"
+                className={`events-carousel-slide${i === index ? ' events-carousel-slide--active' : ''}`}
                 role="group"
                 aria-roledescription="slide"
                 aria-label={`${i + 1} of ${list.length}`}
