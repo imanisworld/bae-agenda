@@ -372,3 +372,19 @@
 .item.active[data-tone='oxblood'] {
   background: linear-gradient(145deg, #91384f, #602437);
 }
+
+
+/* Cohesive navigation: every page uses the same active burgundy treatment.
+   Keep the cream dock and a consistent active state rather than six tones. */
+.item.active[data-tone] {
+  color: #fff8ef;
+  background: linear-gradient(145deg, #a64c63, #762a40);
+  border-color: rgba(252,223,199,.42);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 6px 16px rgba(69,25,39,.23);
+}
+.item.active::after { background: #8d344b; }
+.item:not(.active):focus-visible,
+.item.active:focus-visible {
+  outline: 2px solid #c28a91;
+  outline-offset: 3px;
+}
