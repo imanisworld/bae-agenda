@@ -1780,3 +1780,29 @@
 .deckPlaying {
   background: linear-gradient(130deg, #fff7ef, #f0dfd5);
 }
+
+
+/* The longer track notes should be optional, not permanently clipped.
+   A short More/Less button expands the existing readout in place. */
+.descriptionToggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 30px; margin-top: 3px; padding: 2px 9px;
+  border: 1px solid rgba(145,66,88,.33); border-radius: 8px;
+  color: #823c50; background: rgba(255,245,234,.68);
+  font: inherit; font-size: 11px; font-weight: 700;
+  cursor: pointer; text-underline-offset: 3px;
+}
+.descriptionToggle:hover, .descriptionToggle:focus-visible {
+  color: #67293d; border-color: #8f354c; outline-offset: 2px;
+}
+.readout p.descriptionExpanded {
+  display: block !important;
+  overflow-y: auto; text-overflow: clip; white-space: normal;
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+  max-height: min(25vh, 190px);
+}
+@media (max-width: 620px) {
+  .descriptionToggle { min-height: 34px; margin-top: 2px; font-size: 11px; }
+  .readout p.descriptionExpanded { max-height: min(23vh, 140px); font-size: 11px; }
+}
