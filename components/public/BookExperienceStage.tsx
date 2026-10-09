@@ -19,7 +19,11 @@ export default function BookExperienceStage({
     }
     syncHash()
     window.addEventListener('hashchange', syncHash)
-    return () => window.removeEventListener('hashchange', syncHash)
+    window.addEventListener('popstate', syncHash)
+    return () => {
+      window.removeEventListener('hashchange', syncHash)
+      window.removeEventListener('popstate', syncHash)
+    }
   }, [])
 
   function choosePanel(next: 'inquiry' | 'contact', moveFocus = false) {
