@@ -510,3 +510,31 @@
     text-shadow: 0 2px 14px rgba(0,0,0,.58);
   }
 }
+
+
+/* Public contrast lift — lighten the actual home hero, not only its shell. */
+.hero {
+  background:
+    radial-gradient(ellipse at 17% 21%, rgba(183,95,112,.29), transparent 48%),
+    radial-gradient(ellipse at 78% 67%, rgba(213,154,124,.16), transparent 48%),
+    #443038;
+}
+.wordmark {
+  color: #b76073;
+  opacity: .78;
+}
+.wordmarkOutline {
+  color: transparent;
+  -webkit-text-stroke-color: rgba(245,172,183,.56);
+  opacity: .87;
+}
+.photoImage { filter: brightness(1.14) saturate(1.08) contrast(1.02); }
+.photoSheen { opacity: .48; }
+.copy h1 { color: #fff9f0; text-shadow: 0 3px 16px rgba(28,15,20,.4); }
+.eyebrow { color: #f0cca9; text-shadow: 0 1px 8px rgba(32,17,22,.28); }
+.meta { color: rgba(255,242,233,.89); }
+.rule { background: rgba(238,205,183,.24); }
+@media (max-width: 560px) {
+  .eyebrow { color: #f0cca9; }
+  .meta { color: rgba(255,242,233,.92); }
+}
