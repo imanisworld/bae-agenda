@@ -9879,26 +9879,52 @@ a.admin-stat-card:focus-visible {
 }
 
 
-/* Final Press Kit polish: stronger hierarchy, more breathing room, and no
-   visible white paper void beneath the branded print footer. Scoped only
-   to the Press Kit; all other routes and site navigation are unchanged. */
+/* Press Kit reading-flow polish: content-led height, stronger work labels,
+   a larger logo and an understated bio availability callout. */
+.press-kit-sheet { align-items: stretch; }
+.press-kit-sheet .press-kit-left { min-height: 0; height: 100%; }
+.press-kit-sheet .press-kit-right {
+  justify-content: flex-start;
+  align-content: start;
+  gap: clamp(14px, 1.9vw, 20px);
+}
+.press-kit-intro { gap: 8px; }
+.press-kit-bio, .press-kit-booking, .press-kit-selected { gap: 9px; }
+.press-kit-bio p:last-child {
+  padding-left: 11px;
+  border-left: 2px solid rgba(231,183,125,.75);
+  color: #f1dbcb;
+  font-size: 12px;
+}
 .press-kit-work-item {
-  padding-block: 15px;
-  gap: 14px;
+  grid-template-columns: 40px minmax(0,1fr);
+  gap: 16px;
+  padding-block: 13px;
+}
+.press-kit-work-number {
+  box-sizing: border-box;
+  width: 36px;
+  height: 38px;
+  padding: 7px;
+  display: grid;
+  place-items: center;
+  line-height: 1;
 }
 .press-kit-work-heading {
-  gap: 10px;
   justify-content: flex-start;
+  gap: 9px;
 }
 .press-kit-work-heading strong {
+  color: #fff7ed;
   font-size: 16px;
   font-weight: 750;
-  line-height: 1.3;
+  line-height: 1.25;
 }
-.press-kit-work-heading span {
-  color: #c4afa9;
-  font-size: 11px;
-  opacity: .9;
+.press-kit-work-heading span { color: #c8b5ac; font-size: 11px; opacity: .92; }
+.press-kit-work-copy small {
+  color: #dec4a7;
+  font-size: 9px;
+  letter-spacing: .1em;
 }
 .press-kit-photo-shade {
   background: linear-gradient(
@@ -9910,37 +9936,37 @@ a.admin-stat-card:focus-visible {
   );
 }
 .press-kit-photo-copy {
-  padding: clamp(28px,4.2vw,48px);
-  padding-bottom: clamp(28px,4.2vw,46px);
-  gap: 19px;
+  padding: clamp(26px,3.7vw,43px);
+  gap: 16px;
 }
 .press-kit-photo-kicker { color: #ffe4c7; }
-.press-kit-footer {
-  padding-block: 26px;
-  gap: clamp(20px,3vw,36px);
-}
-.press-kit-footer-actions { gap: 15px; }
+.press-kit-footer { padding-block: 23px; gap: clamp(18px,2.7vw,32px); }
+.press-kit-logo { width: 125px; height: auto; }
+.press-kit-footer-actions { gap: 13px; }
 .press-kit-qr { gap: 7px; }
-.press-kit-qr span {
-  color: #f7dbbf;
-  font-size: 11px;
-  font-weight: 600;
+.press-kit-qr span { color: #f7dbbf; font-size: 11px; font-weight: 600; }
+@media (max-width:900px) {
+  .press-kit-sheet .press-kit-left {
+    min-height: 260px;
+    height: clamp(260px,45svh,420px);
+  }
+  .press-kit-photo-copy { padding: 24px; }
+  .press-kit-footer { padding-block: 20px; }
+  .press-kit-work-item { padding-block: 12px; }
 }
-@media (max-width: 900px) {
-  .press-kit-work-item { padding-block: 13px; }
-  .press-kit-photo-copy { padding: 25px; }
-  .press-kit-footer { padding-block: 21px; }
-}
-@media (max-width: 520px) {
+@media (max-width:520px) {
   .press-kit-work-heading strong { font-size: 15px; }
   .press-kit-work-heading span { font-size: 10px; }
-  .press-kit-footer { padding-block: 20px; }
+  .press-kit-work-item { grid-template-columns: 34px minmax(0,1fr); gap: 12px; }
+  .press-kit-work-number { width: 32px; height: 34px; padding: 5px; }
+  .press-kit-logo { width: 96px; }
+  .press-kit-footer { padding-block: 18px; }
 }
 
-/* Paper is US Letter (11in) with .35in margins. Paint the entire usable
-   sheet in plum, and place the footer at its bottom. A slight safety gap
-   (10.05in vs 10.3in printable) avoids browser rounding creating page two.
-   Distribute the content inside the remainder rather than leaving a void. */
+/* US Letter print: the paper size remains fixed, not the content.
+   Previous min-height + 1fr + space-between stretched every section.
+   Preserve the dark page background; the content and footer now follow
+   each other naturally without artificial gaps. */
 @media print {
   html:has(.press-kit-page),
   body:has(.press-kit-page) {
@@ -9948,32 +9974,54 @@ a.admin-stat-card:focus-visible {
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
-  body:has(.press-kit-page) .press-kit-page,
+  body:has(.press-kit-page) .press-kit-page {
+    box-sizing: border-box !important;
+    min-height: 0 !important;
+    height: auto !important;
+    background: #35222e !important;
+  }
   body:has(.press-kit-page) .press-kit-wrap,
   body:has(.press-kit-page) .press-kit-sheet {
     box-sizing: border-box !important;
-    min-height: 10.05in !important;
+    min-height: 0 !important;
     height: auto !important;
   }
-  body:has(.press-kit-page) .press-kit-page,
-  body:has(.press-kit-page) .press-kit-wrap {
+  body:has(.press-kit-page) .press-kit-wrap { background: #35222e !important; }
+  body:has(.press-kit-page) .press-kit-sheet {
+    grid-template-rows: 142px auto auto !important;
+    align-content: start !important;
     background: #35222e !important;
   }
-  body:has(.press-kit-page) .press-kit-sheet {
-    grid-template-rows: 142px minmax(0,1fr) auto !important;
-    background: #35222e !important;
+  body:has(.press-kit-page) .press-kit-sheet .press-kit-left {
+    min-height: 0 !important;
+    height: 142px !important;
   }
   body:has(.press-kit-page) .press-kit-sheet .press-kit-right {
     display: flex !important;
     flex-direction: column !important;
-    justify-content: space-between !important;
-    align-self: stretch !important;
+    justify-content: flex-start !important;
+    align-self: start !important;
     gap: 8px !important;
+    min-height: 0 !important;
     background: #392630 !important;
   }
+  body:has(.press-kit-page) .press-kit-bio p:last-child {
+    padding-left: 7px !important;
+    border-left: 2px solid #d7aa74 !important;
+    font-size: 10px !important;
+    line-height: 1.28 !important;
+  }
   body:has(.press-kit-page) .press-kit-work-item {
-    padding-block: 8px !important;
-    gap: 9px !important;
+    grid-template-columns: 28px minmax(0,1fr) !important;
+    padding-block: 6px !important;
+    gap: 10px !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-number {
+    box-sizing: border-box !important;
+    width: 26px !important;
+    height: 29px !important;
+    padding: 3px !important;
+    line-height: 1 !important;
   }
   body:has(.press-kit-page) .press-kit-work-heading strong {
     font-size: 12px !important;
@@ -9981,6 +10029,9 @@ a.admin-stat-card:focus-visible {
   }
   body:has(.press-kit-page) .press-kit-work-heading span {
     color: #d0bdb3 !important;
+    font-size: 9px !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-copy small {
     font-size: 9px !important;
   }
   body:has(.press-kit-page) .press-kit-photo-shade {
@@ -9996,11 +10047,10 @@ a.admin-stat-card:focus-visible {
     gap: 4px !important;
   }
   body:has(.press-kit-page) .press-kit-footer {
-    padding: 13px 18px !important;
-    gap: 16px !important;
+    margin-top: 0 !important;
+    padding: 11px 18px !important;
+    gap: 15px !important;
   }
-  body:has(.press-kit-page) .press-kit-qr span {
-    font-size: 9px !important;
-    font-weight: 600 !important;
-  }
+  body:has(.press-kit-page) .press-kit-logo { width: 80px !important; height: auto !important; }
+  body:has(.press-kit-page) .press-kit-qr span { font-size: 9px !important; font-weight: 600 !important; }
 }
