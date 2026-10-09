@@ -19,7 +19,6 @@ export type ListeningMix = CrateMix
 
 const SOUNDCLOUD_PROFILE = 'https://soundcloud.com/deejaybae'
 const SWIPE_THRESHOLD = 40
-const COVERS_CUE = 'lab-covers'
 const RECORD_CUE = 'lab-record'
 
 function clamp(value: number, min: number, max: number) {
@@ -93,7 +92,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   const suppressDeckClick = useRef(false)
   const wheelLock = useRef(0)
   const turntableRef = useRef<HTMLButtonElement | null>(null)
-  const coversHint = useMotionHint(COVERS_CUE)
   const recordHint = useMotionHint(RECORD_CUE)
   const initialSelectionApplied = useRef(false)
 
@@ -187,8 +185,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   }
 
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
-    // A hint still sliding the covers would fight the finger: end it now.
-    coversHint.finish()
     // Preserve button clicks; capture only when a horizontal drag is detected.
     if (list.length < 2 || (event.pointerType === 'mouse' && event.button !== 0)) return
     drag.current = { x: event.clientX, moved: false, pointerId: event.pointerId }
@@ -221,7 +217,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
     }
 
     if (!cancelled && Math.abs(dx) > SWIPE_THRESHOLD) {
-      markCueUsed(COVERS_CUE)
       move(dx > 0 ? -1 : 1)
     }
 
@@ -296,7 +291,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
     const now = Date.now()
     if (now - wheelLock.current < 320) return
     wheelLock.current = now
-    markCueUsed(COVERS_CUE)
     move(event.deltaX > 0 ? 1 : -1)
   }
 
@@ -404,7 +398,7 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
       <div className={styles.crate}>
         <div
           key={crate?.key}
-          className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}${coversHint.active && list.length > 1 ? ` ${styles.coverflowHint}` : ''}`}
+          className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}`}
           role="listbox"
           data-route-swipe-block
           data-cue-host
@@ -417,9 +411,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
           onPointerUp={(event) => finishCoverDrag(event)}
           onPointerCancel={(event) => finishCoverDrag(event, true)}
           onWheel={onWheel}
-          onAnimationEnd={(event) => {
-            if ((event.target as HTMLElement).classList.contains(styles.cover)) coversHint.finish()
-          }}
         >
           {list.map((mix, index) => {
             const offset = index - focus
@@ -448,7 +439,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
               </button>
             )
           })}
-          {list.length > 1 ? <InteractionCue id={COVERS_CUE} label="Drag covers" className={styles.coversCue} /> : null}
         </div>
 
         <div className={styles.crateBar}>
@@ -459,8 +449,8 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
             <span>{list.length < 2
                 ? 'Tap the cover to play'
                 : focusedIsLoaded && onPlatter
-                  ? 'On the platter · drag or use arrows to browse'
-                  : `${focus + 1} of ${list.length} · drag or use arrows · tap center cover to play`}</span>
+                  ? 'Playing from this cover · use arrows or swipe to browse'
+                  : 'Swipe or use arrows to browse · tap a cover to play'}</span>
           </div>
           <button type="button" className={styles.round} onClick={() => move(1)} disabled={focus === list.length - 1} aria-label="Next cover">→</button>
         </div>
