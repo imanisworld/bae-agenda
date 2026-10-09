@@ -4,7 +4,6 @@ import { useRef, type CSSProperties } from 'react'
 import { usePathname } from 'next/navigation'
 import Nav from '@/components/public/Nav'
 import PublicPageStage from '@/components/public/PublicPageStage'
-import PublicRouteCurtain from '@/components/public/PublicRouteCurtain'
 import PlayerProvider from '@/components/public/player/PlayerProvider'
 import { ROUTE_ORDER, useRouteGestures } from '@/components/public/useRouteGestures'
 
@@ -54,7 +53,6 @@ export default function PublicExperienceShell({ children, footer, sticky }: { ch
           <PublicPageStage>{children}</PublicPageStage>
         </main>
         {!experienceMode ? footer : null}
-        {experienceMode ? <PublicRouteCurtain swipePhase={phase} /> : null}
       </div>
     </PlayerProvider>
   )
