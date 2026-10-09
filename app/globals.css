@@ -9115,3 +9115,43 @@ a.admin-stat-card:focus-visible {
     transform: none;
   }
 }
+
+/* Per-page room photo: one blurred, darkened photograph behind each page.
+   A page opts in by setting --page-photo on its route; its hero background
+   must be translucent for the photo to show through. */
+.public-experience-shell .public-page-stage--experience::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  inset: -48px;
+  pointer-events: none;
+  background: var(--page-photo, none) center / cover no-repeat;
+  filter: blur(var(--page-photo-blur, 3px)) brightness(var(--page-photo-brightness, .85)) saturate(.85);
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
+  --page-photo: url('/photos/rooms/phones.jpg');
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet']::after {
+  display: none;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
+  --page-photo: url('/photos/rooms/phones.jpg');
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/lab'] {
+  --page-photo: url('/photos/rooms/listening-bar.jpg');
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book']::after,
+.public-experience-shell .public-page-stage--experience[data-experience-route='/lab']::after {
+  display: none;
+}
+/* Translucent page backgrounds so the room photo shows; panels stay solid. */
+.public-experience-shell .book-experience {
+  background:
+    radial-gradient(ellipse at 80% 12%, rgba(200,139,112,.11), transparent 62%),
+    rgba(67,48,58,.28);
+}
+.public-experience-shell .lab-experience {
+  background:
+    radial-gradient(ellipse at 85% 10%, rgba(154,79,101,.21), transparent 50%),
+    linear-gradient(155deg, rgba(76,52,62,.3), rgba(50,37,43,.4));
+}

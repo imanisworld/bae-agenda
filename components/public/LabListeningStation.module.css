@@ -1806,3 +1806,18 @@
   .descriptionToggle { min-height: 34px; margin-top: 2px; font-size: 11px; }
   .readout p.descriptionExpanded { max-height: min(23vh, 140px); font-size: 11px; }
 }
+
+/* Over the Lab's room photo: light text with a soft shadow so headings and
+   crate captions read against records and shelves. */
+.header h1,
+.header p,
+.headerIdentity p,
+.headerNote,
+.crateCaption strong,
+.crateCaption small,
+.crateCaption span {
+  color: #fff7ee;
+  text-shadow: 0 1px 2px rgba(25,14,18,.7), 0 2px 14px rgba(25,14,18,.55);
+}
+.headerIdentity p,
+.crateCaption small { color: #f1cda8; }

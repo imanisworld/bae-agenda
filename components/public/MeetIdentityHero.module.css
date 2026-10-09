@@ -378,7 +378,8 @@
   background:
     radial-gradient(ellipse at 40% 50%, rgba(175,96,113,.27), transparent 52%),
     radial-gradient(ellipse at 90% 85%, rgba(210,157,125,.11), transparent 50%),
-    #453139;
+    /* Translucent so the page's room photo shows through. */
+    rgba(69,49,57,.28);
 }
 .glow { opacity: .65; }
 .summary { color: rgba(255,240,230,.9); }
