@@ -1,7 +1,7 @@
 'use client'
 
 import { HangFrom } from '@/components/public/brand/HangingLogo'
-import InteractionCue, { markCueUsed, useMotionHint } from '@/components/public/InteractionCue'
+import { markCueUsed, useMotionHint } from '@/components/public/InteractionCue'
 import Image from 'next/image'
 import { useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import styles from './MeetIdentityHero.module.css'
@@ -74,33 +74,16 @@ export default function MeetIdentityHero() {
         }}
       >
         <div className={styles.portrait}>
-          {/* Same portrait in every layer: a reconstructed torn magazine print,
-              never unrelated photos or separately generated faces. */}
-          <span className={styles.portraitPaper}>
-            <Image
-              src="/photos/images/portrait.jpg"
-              alt="DJ B.A.E. portrait"
-              fill
-              priority
-              sizes="(max-width: 760px) 88vw, 44vw"
-              quality={90}
-              draggable={false}
-            />
-            <span className={`${styles.portraitPiece} ${styles.portraitPieceLeft}`} aria-hidden="true">
-              <Image src="/photos/images/portrait.jpg" alt="" fill sizes="(max-width: 760px) 88vw, 44vw" draggable={false} />
-            </span>
-            <span className={`${styles.portraitPiece} ${styles.portraitPieceRight}`} aria-hidden="true">
-              <Image src="/photos/images/portrait.jpg" alt="" fill sizes="(max-width: 760px) 88vw, 44vw" draggable={false} />
-            </span>
-            <svg className={styles.portraitTears} viewBox="0 0 1000 750" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-              <path d="M308 -8 L299 90 L313 168 L297 255 L310 345 L295 420 L307 505 L291 595 L300 760" />
-              <path d="M764 -8 L751 102 L766 184 L752 286 L766 372 L751 470 L770 576 L748 760" />
-              <path d="M0 531 L121 516 L298 522 L414 511 L566 536 L681 522 L754 535 L879 517 L1000 528" />
-              <path d="M303 206 L397 197 L511 210 L637 195 L765 207" />
-            </svg>
-            <span className={styles.portraitTapeOne} aria-hidden="true" />
-            <span className={styles.portraitTapeTwo} aria-hidden="true" />
-          </span>
+          <Image
+            src="/photos/images/approved-torn-portrait.svg"
+            alt="DJ B.A.E. portrait as the approved torn-paper magazine collage"
+            fill
+            priority
+            unoptimized
+            sizes="(max-width: 760px) 80vw, 40vw"
+            draggable={false}
+            className={styles.approvedCollage}
+          />
         </div>
       </div>
 
