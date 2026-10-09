@@ -358,3 +358,17 @@
 :global(.public-experience-shell:has(.lab-experience)) .moreButtonActive {
   color: #40242e;
 }
+
+
+/* A dark active label on burgundy failed mobile contrast checks. */
+.item.active[data-tone='burgundy'],
+.item.active[data-tone='oxblood'],
+.item.active[data-tone='copper'] {
+  color: #fff6ec;
+}
+.item.active[data-tone='burgundy'] {
+  background: linear-gradient(145deg, #ac5068, #7e2d44);
+}
+.item.active[data-tone='oxblood'] {
+  background: linear-gradient(145deg, #91384f, #602437);
+}
