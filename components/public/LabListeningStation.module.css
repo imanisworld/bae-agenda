@@ -1859,3 +1859,90 @@
     /* light falling off toward the edges */
     radial-gradient(ellipse at 42% 36%, transparent 52%, rgba(22,12,10,.34) 100%);
 }
+
+/* A record sliding out of each sleeve: tucked in on the stacked covers,
+   pulled a third of the way out on the cover in front. */
+.coverDisc {
+  position: absolute;
+  top: 3%;
+  left: 3%;
+  width: 94%;
+  height: 94%;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translateX(0);
+  transition: transform 420ms cubic-bezier(.2,.8,.2,1);
+  box-shadow: 0 10px 24px rgba(0,0,0,.4);
+  background:
+    /* grooves and the shine across the vinyl */
+    repeating-radial-gradient(circle, rgba(255,255,255,.05) 0 1px, transparent 1px 3px),
+    conic-gradient(from 20deg, transparent 0 8%, rgba(255,255,255,.16) 12%, transparent 18% 50%, rgba(255,255,255,.1) 60%, transparent 66%),
+    var(--disc);
+}
+/* Centre label (its own circle so a label design stays on the label). */
+.coverDisc::before {
+  content: '';
+  position: absolute;
+  inset: 32.5%;
+  border-radius: 50%;
+  border: 1px solid var(--label-edge, rgba(0,0,0,.35));
+  background:
+    radial-gradient(circle, transparent 0 22%, var(--label-mark, transparent) 22% 30%, transparent 30%),
+    var(--label-design, linear-gradient(transparent, transparent)),
+    var(--label);
+}
+/* Spindle hole. */
+.coverDisc::after {
+  content: '';
+  position: absolute;
+  inset: 48.5%;
+  border-radius: 50%;
+  background: #120c0b;
+}
+.coverFront .coverDisc {
+  transform: translateX(44%);
+}
+@media (prefers-reduced-motion: reduce) {
+  .coverDisc { transition: none; }
+}
+
+/* Record styles: vinyl colour, label colour and a simple label design. */
+.disc0 { /* classic black, red label */
+  --disc: radial-gradient(circle, #1d1a1a, #070606 70%);
+  --label: #b0303f;
+  --label-mark: rgba(255,240,225,.75);
+}
+.disc1 { /* oxblood, cream label split in two */
+  --disc: radial-gradient(circle, #6e1b2c, #3a0b16 72%);
+  --label: #efe3cf;
+  --label-design: conic-gradient(from 90deg, transparent 0 50%, rgba(143,45,60,.85) 50% 100%);
+}
+.disc2 { /* smoke, black label with a gold ring */
+  --disc: radial-gradient(circle, rgba(110,104,110,.92), rgba(48,44,50,.96) 72%);
+  --label: #141012;
+  --label-mark: #c9a25c;
+}
+.disc3 { /* amber marble, black label */
+  --disc:
+    radial-gradient(circle at 30% 35%, rgba(255,214,140,.55), transparent 30%),
+    radial-gradient(circle at 70% 65%, rgba(120,58,14,.6), transparent 34%),
+    radial-gradient(circle, #c8862f, #7a4410 74%);
+  --label: #1a1312;
+  --label-mark: #e9b45f;
+}
+.disc4 { /* green splatter, pink label */
+  --disc:
+    radial-gradient(circle at 24% 30%, #e9f3c7 0 2%, transparent 2.5%),
+    radial-gradient(circle at 68% 22%, #1b2410 0 2.5%, transparent 3%),
+    radial-gradient(circle at 76% 70%, #e9f3c7 0 1.6%, transparent 2%),
+    radial-gradient(circle at 34% 78%, #1b2410 0 2%, transparent 2.5%),
+    radial-gradient(circle, #8fae35, #4e6a16 74%);
+  --label: #f2a6bd;
+  --label-mark: #2a1a20;
+}
+.disc5 { /* bone white, burgundy label with a stripe */
+  --disc: radial-gradient(circle, #f3ece0, #cfc3b0 74%);
+  --label: #7e2d44;
+  --label-design: linear-gradient(0deg, transparent 0 47%, rgba(246,226,210,.85) 47% 53%, transparent 53%);
+  --label-edge: rgba(126,45,68,.5);
+}

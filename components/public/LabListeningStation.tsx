@@ -41,6 +41,15 @@ function formatTime(ms: number) {
   return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`
 }
 
+// Each mix gets its own record (colour + centre label), picked from its id so
+// it is the same every visit. Styles: .disc0 … .disc5 in the module.
+const DISC_STYLES = 6
+function discStyle(id: string) {
+  let hash = 0
+  for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0
+  return hash % DISC_STYLES
+}
+
 function coverStyle(offset: number): CSSProperties {
   const abs = Math.abs(offset)
   const side = Math.sign(offset)
@@ -445,6 +454,7 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
                 style={coverStyle(offset)}
                 onClick={() => onCoverClick(index)}
               >
+                <span className={`${styles.coverDisc} ${styles[`disc${discStyle(mix.id)}`]}`} aria-hidden="true" />
                 <span className={`${styles.coverArt}${isBrandCardArtwork(mix.cover_url) ? ` ${styles.brandSleeve}` : ''}`}>
                   {/* Only covers near the front load an image; far ones are invisible anyway. */}
                   {mix.cover_url && Math.abs(offset) <= 3 ? (
