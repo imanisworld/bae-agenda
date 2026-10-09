@@ -190,9 +190,9 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
     // A hint still sliding the covers would fight the finger: end it now.
     coversHint.finish()
+    // Preserve button clicks; capture only when a horizontal drag is detected.
+    if (list.length < 2 || (event.pointerType === 'mouse' && event.button !== 0)) return
     drag.current = { x: event.clientX, moved: false, pointerId: event.pointerId }
-    setDraggingCovers(true)
-    event.currentTarget.setPointerCapture(event.pointerId)
     event.currentTarget.style.setProperty('--drag-px', '0px')
   }
 
@@ -200,7 +200,12 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
     const start = drag.current
     if (!start || start.pointerId !== event.pointerId) return
     const dx = event.clientX - start.x
-    if (Math.abs(dx) > 8) start.moved = true
+    if (!start.moved) {
+      if (Math.abs(dx) <= 8) return
+      start.moved = true
+      setDraggingCovers(true)
+      event.currentTarget.setPointerCapture(event.pointerId)
+    }
     event.currentTarget.style.setProperty('--drag-px', `${clamp(dx * .55, -86, 86)}px`)
   }
 
@@ -221,7 +226,9 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
       move(dx > 0 ? -1 : 1)
     }
 
-    window.setTimeout(() => { drag.current = null }, 0)
+    window.setTimeout(() => {
+      if (drag.current === start) drag.current = null
+    }, 0)
   }
 
   function recordPointerAngle(event: React.PointerEvent<HTMLSpanElement>) {
@@ -400,6 +407,7 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
           key={crate?.key}
           className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}${coversHint.active && list.length > 1 ? ` ${styles.coverflowHint}` : ''}`}
           role="listbox"
+          data-route-swipe-block
           data-cue-host
           aria-label={`${crate?.label ?? 'Mixes'} — use arrow keys or swipe to browse`}
           aria-activedescendant={focused ? `lab-cover-${focused.id}` : undefined}
@@ -441,7 +449,7 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
               </button>
             )
           })}
-          {list.length > 1 ? <InteractionCue id={COVERS_CUE} label="Swipe / drag" className={styles.coversCue} /> : null}
+          {list.length > 1 ? <InteractionCue id={COVERS_CUE} label="Drag covers" className={styles.coversCue} /> : null}
         </div>
 
         <div className={styles.crateBar}>
@@ -449,7 +457,11 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
           <div className={styles.crateCaption} aria-live="polite">
             <small>{String(focus + 1).padStart(3, '0')}{focused?.genre ? ` · ${focused.genre}` : ''}</small>
             <strong>{focused?.title}</strong>
-            <span>{focusedIsLoaded && onPlatter ? 'On the platter' : `${focus + 1} of ${list.length} · tap the cover to play`}</span>
+            <span>{list.length < 2
+                ? 'Tap the cover to play'
+                : focusedIsLoaded && onPlatter
+                  ? 'On the platter · drag or use arrows to browse'
+                  : `${focus + 1} of ${list.length} · drag or use arrows · tap center cover to play`}</span>
           </div>
           <button type="button" className={styles.round} onClick={() => move(1)} disabled={focus === list.length - 1} aria-label="Next cover">→</button>
         </div>
