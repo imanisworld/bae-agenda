@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="640" viewBox="0 0 480 640" role="img" aria-labelledby="title desc">
+  <title id="title">Club Cunt — November 21, 2026</title>
+  <desc id="desc">Temporary event placeholder. New flyer coming soon.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#361523"/>
+      <stop offset=".52" stop-color="#160d15"/>
+      <stop offset="1" stop-color="#31111d"/>
+    </linearGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#e1b986"/>
+      <stop offset="1" stop-color="#986d65"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="640" fill="url(#bg)"/>
+  <circle cx="422" cy="130" r="200" fill="none" stroke="#ac516d" stroke-opacity=".26" stroke-width="1.5"/>
+  <circle cx="422" cy="130" r="164" fill="none" stroke="#ac516d" stroke-opacity=".2" stroke-width="1.5"/>
+  <circle cx="52" cy="565" r="202" fill="none" stroke="#ac516d" stroke-opacity=".18" stroke-width="1.5"/>
+  <rect x="27" y="27" width="426" height="586" rx="2" fill="none" stroke="url(#line)" stroke-opacity=".62" stroke-width="1.5"/>
+  <path d="M51 63H429M51 574H429" stroke="#dbb98d" stroke-opacity=".26"/>
+  <g font-family="Arial, Helvetica, sans-serif" text-anchor="middle">
+    <text x="240" y="112" fill="#deb98c" font-size="13" font-weight="600" letter-spacing="5">SAVE THE DATE</text>
+    <text x="240" y="212" fill="#fff4ea" font-size="57" font-weight="800" letter-spacing="8">CLUB</text>
+    <text x="240" y="278" fill="#fff4ea" font-size="60" font-weight="800" letter-spacing="7">CUNT</text>
+    <path d="M102 320H378" stroke="#c69a7d" stroke-opacity=".55" />
+    <text x="240" y="389" fill="#e9c6a0" font-size="23" font-weight="700" letter-spacing="3">NOVEMBER 21</text>
+    <text x="240" y="425" fill="#e9c6a0" font-size="19" font-weight="600" letter-spacing="5">2026</text>
+    <rect x="72" y="469" width="336" height="73" rx="2" fill="#7c324c" fill-opacity=".4" stroke="#d9a889" stroke-opacity=".6"/>
+    <text x="240" y="497" fill="#fff4ea" font-size="16" font-weight="700" letter-spacing="2.5">NEW FLYER</text>
+    <text x="240" y="521" fill="#fff4ea" font-size="14" font-weight="700" letter-spacing="2">COMING SOON</text>
+    <text x="240" y="592" fill="#d9b39c" font-size="11" font-weight="600" letter-spacing="3">DJ B.A.E.</text>
+  </g>
+</svg>
