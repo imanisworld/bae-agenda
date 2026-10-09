@@ -9229,3 +9229,10 @@ a.admin-stat-card:focus-visible {
     flex-basis: 84%;
   }
 }
+/* The Lab photo's top is a bright white wall: shade it so the header reads. */
+.public-experience-shell .lab-experience {
+  background:
+    linear-gradient(180deg, rgba(50,37,43,.72) 0%, rgba(50,37,43,.3) 22%, transparent 40%),
+    radial-gradient(ellipse at 85% 10%, rgba(154,79,101,.21), transparent 50%),
+    linear-gradient(155deg, rgba(76,52,62,.3), rgba(50,37,43,.4));
+}

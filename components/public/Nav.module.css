@@ -348,16 +348,6 @@
   .dock { padding: 7px; gap: 5px; }
   .item { min-height: 45px; }
 }
-/* On the light Lab page the top-bar text should be dark and readable. */
-:global(.public-experience-shell:has(.lab-experience)) .topbar {
-  background: linear-gradient(180deg, rgba(242,233,223,.96), transparent);
-}
-:global(.public-experience-shell:has(.lab-experience)) .moreButton {
-  color: #61414a;
-}
-:global(.public-experience-shell:has(.lab-experience)) .moreButtonActive {
-  color: #40242e;
-}
 
 
 /* A dark active label on burgundy failed mobile contrast checks. */
