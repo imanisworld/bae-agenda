@@ -393,3 +393,40 @@
   .summary { color: rgba(255,243,235,.94); }
   .title > p { color: #f1cda8; }
 }
+
+
+/* Fashion-editorial photo layers behind the main portrait.
+   The portrait remains the focal point, tilt target and readable image. */
+.collageFilm,
+.collageCrowd {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  overflow: hidden;
+  border: 5px solid #f6ebdf;
+  background: #efe1d1;
+  box-shadow: 0 15px 30px rgba(32,19,25,.28);
+  pointer-events: none;
+  transform-origin: center;
+}
+.collageFilm img, .collageCrowd img { object-fit: cover; filter: saturate(.93) contrast(1.03); }
+.collageFilm {
+  left: -10%;
+  top: -8%;
+  width: 44%;
+  height: 59%;
+  transform: rotate(-9deg);
+}
+.collageCrowd {
+  right: -8%;
+  bottom: -6%;
+  width: 38%;
+  height: 44%;
+  transform: rotate(8deg);
+}
+.portrait { z-index: 2; }
+@media (max-width: 560px) {
+  .collageFilm { left: -6%; top: -5%; width: 34%; height: 49%; }
+  .collageCrowd { right: -5%; bottom: 3%; width: 34%; height: 38%; }
+  .collageFilm, .collageCrowd { border-width: 4px; }
+}
