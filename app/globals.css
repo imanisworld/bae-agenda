@@ -9630,3 +9630,250 @@ a.admin-stat-card:focus-visible {
     padding: 9px !important;
   }
 }
+
+/* ================================================================
+   PRESS KIT — branded listening-room editorial sheet
+   Existing site layout and PDF-specific page isolation remain intact.
+   ================================================================ */
+.press-kit-page {
+  background:
+    radial-gradient(ellipse at 85% 6%, rgba(135,66,87,.2), transparent 55%),
+    linear-gradient(145deg,#291a24,#43303b 70%,#2a1d25);
+  color:#f5ecdf;
+  padding:calc(var(--nav-height) + var(--safe-top) + 24px) max(18px,calc(var(--safe-right) + 16px))
+    max(42px,calc(var(--safe-bottom) + 24px)) max(18px,calc(var(--safe-left) + 16px));
+  min-height:100svh;
+}
+.press-kit-wrap { width:min(100%,1180px); margin:auto; display:grid; gap:20px; }
+.press-kit-toolbar {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; color:#e0c5b7; font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+}
+.press-kit-toolbar-back {
+  display:inline-flex; align-items:center; min-height:44px; padding:0 18px;
+  color:#fff1e1; background:rgba(23,14,20,.68);
+  border:1px solid rgba(244,216,194,.3); text-decoration:none;
+}
+.press-kit-sheet {
+  display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+  border:1px solid rgba(242,203,180,.27);
+  background:#3b2732; overflow:hidden;
+  box-shadow:0 24px 65px rgba(10,6,11,.28);
+}
+.press-kit-sheet .press-kit-left {
+  position:relative; top:auto; height:auto; min-height:760px;
+  max-height:none; width:100%; isolation:isolate; overflow:hidden;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  color:#fff5eb; background:#211821;
+}
+.press-kit-photo { object-fit:cover; object-position:center 18%; }
+.press-kit-photo-shade {
+  position:absolute; inset:0; z-index:1;
+  background:linear-gradient(180deg,rgba(20,12,20,.25) 0%,rgba(25,13,24,.08) 32%,rgba(25,12,24,.82) 100%);
+}
+.press-kit-photo-copy {
+  position:relative; z-index:2; padding:clamp(20px,3.8vw,40px);
+  display:grid; justify-items:start; gap:16px;
+  text-shadow:0 4px 18px rgba(0,0,0,.6);
+}
+.press-kit-photo-kicker {
+  color:#f2cfaa; font-size:11px; font-weight:700;
+  letter-spacing:.24em; text-transform:uppercase;
+}
+.press-kit-photo-copy strong {
+  font-family:Conthrax,sans-serif; font-size:clamp(38px,4.8vw,72px);
+  font-weight:600; line-height:1; letter-spacing:-.025em;
+}
+.press-kit-genre-chips { display:flex; gap:7px; flex-wrap:wrap; }
+.press-kit-genre-chips span {
+  padding:6px 9px; border:1px solid rgba(252,237,223,.48);
+  border-radius:4px; color:#fdf2e8; background:rgba(24,16,24,.43);
+  font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+}
+.press-kit-sheet .press-kit-right {
+  display:flex; flex-direction:column; align-content:initial;
+  gap:clamp(17px,2.25vw,25px); padding:clamp(22px,3vw,34px);
+  color:#f5ecdf;
+  background:linear-gradient(156deg,#4b313e 0%,#392530 56%,#32202b 100%);
+}
+.press-kit-intro { display:grid; gap:10px; }
+.press-kit-section-label {
+  display:flex; align-items:center; gap:9px;
+  color:#e2b783; font-size:10px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase;
+}
+.press-kit-section-label i {
+  width:20px; height:2px; flex:none; background:#e4b979;
+}
+.press-kit-intro h1 {
+  margin:0; color:#fff6eb; font-family:Conthrax,sans-serif;
+  font-size:clamp(24px,3vw,43px); line-height:1.05;
+  letter-spacing:-.025em; overflow-wrap:anywhere;
+}
+.press-kit-intro p { color:#ead6c9; font-size:13px; line-height:1.5; margin:0; }
+.press-kit-bio, .press-kit-booking, .press-kit-selected { display:grid; gap:10px; }
+.press-kit-bio p { margin:0; color:#f2e4d8; font-size:13px; line-height:1.55; }
+.press-kit-bio p:last-child { color:#ceb7b6; font-size:12px; }
+.press-kit-booking-card {
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:13px 14px; border:1px solid rgba(240,209,187,.43);
+  background:linear-gradient(130deg,rgba(25,14,23,.54),rgba(25,15,23,.27));
+  box-shadow:inset 0 1px 0 rgba(255,240,225,.05);
+}
+.press-kit-booking-card > div { display:grid; gap:5px; min-width:0; }
+.press-kit-booking-card > div > span {
+  color:#e6b98b; text-transform:uppercase; letter-spacing:.14em; font-size:10px;
+}
+.press-kit-email { color:#fff4e8; font-weight:700; font-size:13px; overflow-wrap:anywhere; }
+.press-kit-mail-cta, .press-kit-footer-book {
+  display:inline-flex; align-items:center; justify-content:center; gap:12px;
+  min-height:40px; padding:8px 13px; color:#452635; font-weight:700;
+  background:#f6e7d8; border:1px solid rgba(255,250,246,.85);
+  text-decoration:none; font-size:11px; white-space:nowrap;
+}
+.press-kit-mail-cta:hover, .press-kit-footer-book:hover { background:#fff9f2; }
+.press-kit-work-list { display:grid; gap:0; }
+.press-kit-work-item {
+  display:grid; grid-template-columns:37px minmax(0,1fr); align-items:start;
+  gap:12px; padding:11px 0; border-top:1px solid rgba(245,216,194,.21);
+}
+.press-kit-work-number {
+  display:grid; place-items:center; width:31px; height:36px;
+  border:1px solid rgba(238,193,148,.45); border-radius:3px;
+  color:#ebc397; background:rgba(27,15,25,.4);
+  font-size:10px; font-weight:700; letter-spacing:.06em;
+}
+.press-kit-work-copy { min-width:0; display:grid; gap:4px; }
+.press-kit-work-heading { display:flex; align-items:baseline; flex-wrap:wrap; gap:9px; }
+.press-kit-work-heading strong { color:#fff5e9; font-size:14px; }
+.press-kit-work-heading span { color:#d8ad80; font-size:11px; }
+.press-kit-work-copy small { color:#dfb68e; font-size:10px; letter-spacing:.1em; text-transform:uppercase; }
+.press-kit-work-copy p { margin:0; color:#e9d9d1; font-size:12px; line-height:1.48; }
+.press-kit-footer {
+  grid-column:1/-1; display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:22px;
+  padding:17px clamp(19px,3vw,33px); border-top:1px solid rgba(240,206,186,.3);
+  background:linear-gradient(120deg,#291923,#412a34 55%,#34222d);
+}
+.press-kit-signature { display:flex; align-items:center; gap:15px; min-width:0; }
+.press-kit-logo { width:110px; height:auto; object-fit:contain; filter:drop-shadow(0 6px 8px rgba(7,4,7,.26)); }
+.press-kit-signature div { display:grid; gap:5px; min-width:0; }
+.press-kit-signature strong { color:#fff3e8; font-family:Conthrax,sans-serif; font-size:16px; }
+.press-kit-signature span { color:#dfc6ba; font-size:11px; line-height:1.3; }
+.press-kit-footer-actions { display:grid; justify-items:start; gap:12px; }
+.press-kit-socials { display:flex; flex-wrap:wrap; gap:8px 13px; }
+.press-kit-socials a { color:#f5d1ae; text-decoration:underline; text-underline-offset:3px; font-size:11px; }
+.press-kit-qr { display:grid; justify-items:center; gap:5px; text-decoration:none; }
+.press-kit-qr img { display:block; width:76px; height:76px; border:4px solid #f5e9dc; }
+.press-kit-qr span { color:#f4d2b4; font-size:10px; }
+@media (max-width:950px) {
+  .press-kit-footer { grid-template-columns:minmax(0,1fr) auto; }
+  .press-kit-qr { display:none; }
+}
+@media (max-width:900px) {
+  .press-kit-sheet { grid-template-columns:1fr !important; }
+  .press-kit-sheet .press-kit-left {
+    position:relative; height:clamp(260px,45svh,420px);
+    min-height:260px; max-height:420px; top:auto;
+  }
+  .press-kit-photo-copy { gap:9px; }
+  .press-kit-footer { grid-template-columns:1fr auto; gap:16px; }
+}
+@media (max-width:520px) {
+  .press-kit-toolbar > span { display:none; }
+  .press-kit-right { padding:20px; }
+  .press-kit-footer { grid-template-columns:1fr; gap:13px; }
+  .press-kit-qr { display:none; }
+  .press-kit-signature { gap:8px; }
+  .press-kit-logo { width:82px; }
+  .press-kit-booking-card { align-items:flex-start; }
+}
+
+/* Print retains brand identity, actual hero photograph, contact action,
+   selected work, compact footer and scan code within one letter page. */
+@media print {
+  body:has(.press-kit-page) .press-kit-page { color:#f5ecdf !important; background:#392630 !important; }
+  body:has(.press-kit-page) .press-kit-sheet {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    background:#392630 !important;
+    color:#f5ecdf !important;
+    border:none !important;
+    overflow:visible !important;
+  }
+  body:has(.press-kit-page) .press-kit-sheet .press-kit-left {
+    min-height:0 !important; max-height:142px !important;
+    height:142px !important; position:relative !important;
+    overflow:hidden !important; display:flex !important;
+  }
+  body:has(.press-kit-page) .press-kit-photo-shade {
+    background:linear-gradient(0deg,rgba(19,10,19,.77),rgba(19,10,19,.03)) !important;
+  }
+  body:has(.press-kit-page) .press-kit-photo-copy {
+    padding:10px 16px !important; gap:2px !important;
+    display:grid !important;
+  }
+  body:has(.press-kit-page) .press-kit-photo-kicker { font-size:9px !important; }
+  body:has(.press-kit-page) .press-kit-photo-copy strong {
+    display:block !important; font-size:24px !important; line-height:1 !important;
+  }
+  body:has(.press-kit-page) .press-kit-genre-chips { display:none !important; }
+  body:has(.press-kit-page) .press-kit-sheet .press-kit-right {
+    padding:12px 18px 9px !important; gap:8px !important;
+    min-height:0 !important; background:#392630 !important; color:#f5ecdf !important;
+  }
+  body:has(.press-kit-page) .press-kit-intro { gap:5px !important; }
+  body:has(.press-kit-page) .press-kit-intro h1 {
+    color:#fff5e9 !important; font-size:23px !important;
+  }
+  body:has(.press-kit-page) .press-kit-intro p,
+  body:has(.press-kit-page) .press-kit-bio p,
+  body:has(.press-kit-page) .press-kit-work-copy p {
+    color:#f5e5da !important; font-size:10.5px !important; line-height:1.33 !important;
+  }
+  body:has(.press-kit-page) .press-kit-bio,
+  body:has(.press-kit-page) .press-kit-booking,
+  body:has(.press-kit-page) .press-kit-selected {
+    gap:4px !important;
+  }
+  body:has(.press-kit-page) .press-kit-section-label {
+    color:#e4b979 !important; font-size:9px !important; line-height:1.2 !important;
+  }
+  body:has(.press-kit-page) .press-kit-section-label i { background:#e4b979 !important; }
+  body:has(.press-kit-page) .press-kit-booking-card {
+    padding:7px 10px !important; gap:8px !important;
+    background:#261b24 !important; border-color:#a87876 !important;
+  }
+  body:has(.press-kit-page) .press-kit-email { color:#fff5e9 !important; font-size:11px !important; }
+  body:has(.press-kit-page) .press-kit-mail-cta {
+    min-height:28px !important; padding:5px 9px !important; font-size:10px !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-item {
+    grid-template-columns:26px minmax(0,1fr) !important;
+    gap:8px !important; padding:5px 0 !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-number {
+    width:22px !important; height:26px !important; font-size:9px !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-copy { gap:1px !important; }
+  body:has(.press-kit-page) .press-kit-work-heading strong { font-size:11px !important; }
+  body:has(.press-kit-page) .press-kit-work-heading span,
+  body:has(.press-kit-page) .press-kit-work-copy small { font-size:9px !important; }
+  body:has(.press-kit-page) .press-kit-footer {
+    grid-column:1 !important; grid-template-columns:minmax(0,1fr) auto auto !important;
+    padding:9px 16px !important; gap:13px !important;
+    break-inside:avoid !important; background:#281a25 !important;
+  }
+  body:has(.press-kit-page) .press-kit-logo { width:65px !important; height:auto !important; }
+  body:has(.press-kit-page) .press-kit-signature strong { font-size:11px !important; }
+  body:has(.press-kit-page) .press-kit-signature span { font-size:9px !important; }
+  body:has(.press-kit-page) .press-kit-socials { gap:6px !important; }
+  body:has(.press-kit-page) .press-kit-socials a { font-size:9px !important; }
+  body:has(.press-kit-page) .press-kit-footer-actions { gap:6px !important; }
+  body:has(.press-kit-page) .press-kit-footer-book {
+    padding:3px 8px !important; min-height:25px !important; font-size:9px !important;
+  }
+  body:has(.press-kit-page) .press-kit-qr { display:grid !important; gap:2px !important; }
+  body:has(.press-kit-page) .press-kit-qr img { width:54px !important; height:54px !important; border-width:2px !important; }
+  body:has(.press-kit-page) .press-kit-qr span { font-size:8px !important; }
+}

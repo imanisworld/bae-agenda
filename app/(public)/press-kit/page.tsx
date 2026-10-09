@@ -3,221 +3,137 @@ import Image from 'next/image'
 import Link from 'next/link'
 import PrintPressKitButton from '@/components/public/PrintPressKitButton'
 import { SELECTED_WORK } from '@/lib/portfolio-data'
+import { SOCIALS } from '@/lib/constants'
+import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
 import { getContentMap } from '@/lib/db/content'
 
-/** Served from cache and rebuilt in the background at most every 5 minutes; admin saves refresh it immediately (revalidatePath). */
 export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Press Kit',
-  alternates: {
-    canonical: '/press-kit',
-  },
+  alternates: { canonical: '/press-kit' },
   description: 'DJ B.A.E. press kit with artist bio, booking information, and selected work.',
 }
 
-const CONTENT_KEYS = [
-  'hero_title',
-  'hero_subtitle',
-  'booking_email',
-  'instagram_url',
-  'soundcloud_url',
-  'youtube_url',
-] as const
+const CONTENT_KEYS = ['hero_title', 'hero_subtitle', 'booking_email', 'instagram_url', 'soundcloud_url'] as const
+const FEATURED_SOCIALS = ['Instagram', 'TikTok', 'SoundCloud'] as const
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '9px', marginBottom: '2px' }}>
-      <div style={{ width: '18px', height: '2px', background: '#b8820e', flexShrink: 0 }} />
-      <div style={{ fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', color: '#b8820e', fontWeight: 600 }}>
-        {children}
-      </div>
-    </div>
-  )
+  return <div className="press-kit-section-label"><i aria-hidden="true" />{children}</div>
 }
 
 export default async function PressKitPage() {
   const content = await getContentMap([...CONTENT_KEYS])
-
-  const title = content.hero_title ?? 'THE BAE AGENDA'
-  const subtitle = content.hero_subtitle ?? 'Open-format DJ based in Indianapolis, with roots in Chicago.'
-  const about = 'From Chicago’s South Side and now based in Indianapolis, DJ B.A.E. is an open-format DJ shaped by music, visual art, and years spent around different scenes, including time in Boston. Her sets move through hip-hop, R&B, house, juke, club, jungle, bass, baile, and underground edits with a simple approach: read the room, respect the music, and make every transition make sense.'
-  const bookingEmail = content.booking_email ?? ''
+  const title = content.hero_title || 'THE BAE AGENDA'
+  const subtitle = content.hero_subtitle || 'Open-format DJ based in Indianapolis, with roots in Chicago.'
+  const bookingEmail = content.booking_email || DEFAULT_BOOKING_EMAIL
+  const socials = SOCIALS.filter((social) => FEATURED_SOCIALS.some((name) => name === social.label))
+    .map((social) => ({
+      ...social,
+      url: social.label === 'Instagram' ? content.instagram_url || social.url
+        : social.label === 'SoundCloud' ? content.soundcloud_url || social.url
+          : social.url,
+    }))
+  const about = 'From Chicago’s South Side and now based in Indianapolis, DJ B.A.E. draws on music, visual art, and years across different scenes, including time in Boston. Her sets move through hip-hop, R&B, house, juke, club, jungle, bass, baile, and underground edits with a simple approach: read the room, respect the music, and make every transition make sense.'
 
   return (
-    <div className="press-kit-page" style={{ background: '#ece8df', color: '#111', padding: `calc(var(--nav-height) + var(--safe-top) + clamp(20px, 5vw, 32px)) max(20px, calc(var(--safe-right) + 16px)) max(clamp(20px, 5vw, 40px), calc(var(--safe-bottom) + 20px)) max(20px, calc(var(--safe-left) + 16px))` }}>
-      <div style={{ maxWidth: '1180px', margin: '0 auto', display: 'grid', gap: '24px' }}>
-        <div className="print-hide" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
-          <Link
-            href="/meet"
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 18px',
-              minHeight: '44px',
-              background: '#111',
-              color: '#f4f1eb',
-              textDecoration: 'none',
-              border: '1px solid rgba(0,0,0,0.18)',
-              fontSize: '11px',
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-            }}
-          >
-            ← Meet
-          </Link>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#666' }}>
-              Press Kit
-            </div>
-            <PrintPressKitButton />
-          </div>
+    <div className="press-kit-page">
+      <div className="press-kit-wrap">
+        <div className="press-kit-toolbar print-hide">
+          <Link href="/meet" className="press-kit-toolbar-back">← Meet</Link>
+          <span>Official press kit</span>
+          <PrintPressKitButton />
         </div>
 
-        <article
-          className="press-kit-sheet"
-          style={{
-            background: '#f8f5ef',
-            border: '1px solid rgba(0,0,0,0.14)',
-            boxShadow: '0 18px 60px rgba(0,0,0,0.08)',
-            overflow: 'hidden',
-            display: 'grid',
-            gridTemplateColumns: 'minmax(320px, 0.95fr) minmax(0, 1.05fr)',
-          }}
-        >
-          <div
-            className="press-kit-left"
-            style={{
-              position: 'relative',
-              minHeight: '760px',
-              background: 'linear-gradient(180deg, rgba(16,16,20,0.16), rgba(16,16,20,0.4)), #111',
-              color: '#fffdfa',
-              display: 'grid',
-              alignContent: 'end',
-            }}
-          >
+        <article className="press-kit-sheet">
+          <div className="press-kit-left">
             <Image
               src="/photos/PlexMix19-DJBAE.JPEG"
-              alt="DJ B.A.E. press photo"
+              alt="DJ B.A.E. performing at Club Plex"
               fill
-              sizes="(max-width: 900px) 100vw, 420px"
-              quality={75}
-              style={{ objectFit: 'cover', objectPosition: 'center 18%' }}
+              sizes="(max-width: 900px) 100vw, 480px"
+              quality={80}
+              className="press-kit-photo"
             />
-            <div
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                background:
-                  'linear-gradient(180deg, rgba(20,20,24,0.06) 0%, rgba(20,20,24,0.18) 36%, rgba(20,20,24,0.82) 100%)',
-              }}
-            />
-            <div
-              style={{
-                position: 'relative',
-                zIndex: 1,
-                padding: '24px',
-                display: 'grid',
-                gap: '14px',
-              }}
-            >
-              <div style={{ fontSize: '10px', letterSpacing: '0.32em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.78)' }}>
-                Official Press Kit
-              </div>
-              <div style={{ display: 'grid', gap: '6px' }}>
-                <div style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(36px, 4.5vw, 68px)', lineHeight: 0.92 }}>
-                  DJ
-                  <br />
-                  B.A.E.
-                </div>
-              </div>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                {['Open Format', 'House', 'Hip-Hop', 'R&B', 'Afrobeats', 'Dancehall'].map((item) => (
-                  <span
-                    key={item}
-                    style={{
-                      fontSize: '10px',
-                      letterSpacing: '0.16em',
-                      textTransform: 'uppercase',
-                      padding: '6px 8px',
-                      border: '1px solid rgba(255,255,255,0.16)',
-                      background: 'rgba(255,255,255,0.06)',
-                    }}
-                  >
-                    {item}
-                  </span>
-                ))}
+            <div className="press-kit-photo-shade" aria-hidden="true" />
+            <div className="press-kit-photo-copy">
+              <span className="press-kit-photo-kicker">Official Press Kit</span>
+              <strong>DJ B.A.E.</strong>
+              <div className="press-kit-genre-chips">
+                <span>Open format</span><span>House</span><span>Hip-hop</span><span>R&B</span>
               </div>
             </div>
           </div>
 
-          <div
-            className="press-kit-right"
-            style={{
-              padding: 'clamp(20px, 3vw, 28px)',
-              display: 'grid',
-              gap: '18px',
-              background: 'linear-gradient(160deg, rgba(255,255,255,0.55) 0%, rgba(248,245,239,0.95) 100%)',
-            }}
-          >
-            <header style={{ display: 'grid', gap: '12px' }}>
+          <div className="press-kit-right">
+            <header className="press-kit-intro">
               <SectionLabel>Press Kit</SectionLabel>
-              <h1 style={{ fontFamily: 'Conthrax, sans-serif', fontSize: 'clamp(26px, 3.2vw, 46px)', lineHeight: 0.94, margin: 0 }}>
-                {title}
-              </h1>
-              <p style={{ fontSize: '13px', lineHeight: 1.65, color: '#262626', maxWidth: '560px', margin: 0 }}>
-                {subtitle}
-              </p>
+              <h1>{title}</h1>
+              <p>{subtitle}</p>
             </header>
 
-            <section style={{ display: 'grid', gap: '12px' }}>
+            <section className="press-kit-bio">
               <SectionLabel>Artist Bio</SectionLabel>
-              <p style={{ fontSize: '13px', lineHeight: 1.65, margin: 0, color: '#1f1f1f' }}>
-                {about}
-              </p>
-              <p style={{ fontSize: '12px', lineHeight: 1.6, margin: 0, color: '#444' }}>
-                Available for club nights, private events, weddings, brand activations, and other events that need a set tailored to the room.
-              </p>
+              <p>{about}</p>
+              <p>Available for club nights, private events, weddings, brand activations, and events that need a set tailored to the room.</p>
             </section>
 
-            <section style={{ display: 'grid', gap: '10px' }}>
+            <section className="press-kit-booking">
               <SectionLabel>Booking</SectionLabel>
-              <div style={{ background: 'rgba(17,17,17,0.04)', border: '1px solid rgba(0,0,0,0.1)', padding: '14px' }}>
-                <div style={{ fontSize: '10px', letterSpacing: '0.18em', textTransform: 'uppercase', color: '#7a7a7a', marginBottom: '8px' }}>
-                  Email
+              <div className="press-kit-booking-card">
+                <div>
+                  <span>Booking inquiries</span>
+                  <a href={`mailto:${bookingEmail}`} className="press-kit-email">{bookingEmail}</a>
                 </div>
-                <div style={{ fontSize: '12px', lineHeight: 1.6 }}>
-                  {bookingEmail ? (
-                    <a href={`mailto:${bookingEmail}`} style={{ color: '#111', textDecoration: 'none', fontWeight: 600 }}>
-                      {bookingEmail}
-                    </a>
-                  ) : (
-                    <span>Available on request</span>
-                  )}
-                </div>
+                <a className="press-kit-mail-cta" href={`mailto:${bookingEmail}?subject=DJ%20B.A.E.%20booking%20inquiry`}>Email to book <span aria-hidden="true">↗</span></a>
               </div>
             </section>
 
-            <section style={{ display: 'grid', gap: '14px' }}>
+            <section className="press-kit-selected">
               <SectionLabel>Selected Work</SectionLabel>
-              <div style={{ display: 'grid', gap: '12px' }}>
-                {SELECTED_WORK.map((item) => (
-                  <div key={item.id} style={{ padding: '14px 0', borderTop: '1px solid rgba(0,0,0,0.1)' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '6px' }}>
-                      <strong style={{ fontSize: '14px' }}>{item.title}</strong>
-                      <span style={{ fontSize: '12px', color: '#666' }}>{item.year}</span>
+              <div className="press-kit-work-list">
+                {SELECTED_WORK.map((item, index) => (
+                  <div className="press-kit-work-item" key={item.id}>
+                    <div className="press-kit-work-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</div>
+                    <div className="press-kit-work-copy">
+                      <div className="press-kit-work-heading">
+                        <strong>{item.title}</strong>
+                        <span>{item.year}</span>
+                      </div>
+                      <small>{item.category}</small>
+                      <p>{item.summary}</p>
                     </div>
-                    <div style={{ fontSize: '11px', letterSpacing: '0.14em', textTransform: 'uppercase', color: '#7a7a7a', marginBottom: '6px' }}>
-                      {item.category}
-                    </div>
-                    <p style={{ margin: 0, fontSize: '13px', lineHeight: 1.7, color: '#303030' }}>{item.summary}</p>
                   </div>
                 ))}
               </div>
             </section>
           </div>
+
+          <footer className="press-kit-footer">
+            <div className="press-kit-signature">
+              <Image
+                src="/brand/clean/dj-bae-logo-gold.png"
+                alt="DJ B.A.E. gold logo"
+                width={132}
+                height={97}
+                sizes="132px"
+                className="press-kit-logo"
+              />
+              <div><strong>DJ B.A.E.</strong><span>Selector. Genre Bender. Sound Architect.</span></div>
+            </div>
+            <div className="press-kit-footer-actions">
+              <nav className="press-kit-socials" aria-label="Press kit social links">
+                {socials.map((social) => (
+                  <a key={social.label} href={social.url} target="_blank" rel="noopener noreferrer">{social.label}</a>
+                ))}
+              </nav>
+              <Link href="/book" className="press-kit-footer-book">Book DJ B.A.E. <span aria-hidden="true">↗</span></Link>
+            </div>
+            <a className="press-kit-qr" href="https://thebaeagenda.com" aria-label="Visit thebaeagenda.com">
+              <Image src="/brand/press-kit-site-qr.png" width={80} height={80} alt="QR code linking to thebaeagenda.com" />
+              <span>Scan for more</span>
+            </a>
+          </footer>
         </article>
       </div>
     </div>
