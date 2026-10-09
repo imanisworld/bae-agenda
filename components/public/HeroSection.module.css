@@ -653,3 +653,79 @@
 @media (prefers-reduced-motion: reduce) {
   .tornPanel, .tornSeams { transition: none; }
 }
+
+
+/* DESKTOP OVERFLOW FIX — explicit two-column layout instead of percentage-
+   anchored absolute artwork/copy. Artwork can never steal the copy column. */
+@media (min-width: 901px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr);
+    align-items: center;
+    column-gap: clamp(42px, 4vw, 76px);
+    min-height: 100svh;
+    padding:
+      clamp(102px, 12vh, 160px)
+      clamp(36px, 5.5vw, 106px)
+      calc(120px + var(--safe-bottom, 0px));
+  }
+  .photo {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    top: auto;
+    left: auto;
+    justify-self: center;
+    width: min(100%, 520px);
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1;
+    margin: 0;
+  }
+  .albumStack {
+    inset: 0 auto 0 0;
+    height: min(100cqw, 100cqh);
+    width: min(100cqw, 100cqh);
+    margin: auto 0;
+  }
+  .copy {
+    --overhang: 0px;
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: break-word;
+  }
+  .copy h1 {
+    font-size: clamp(32px, 3.45vw, 56px);
+    line-height: 1.02;
+    letter-spacing: -.025em;
+  }
+  .eyebrow, .meta, .actions { padding-left: 0; }
+  .actions { gap: 12px; margin-top: 24px; }
+  .actions > * { max-width: 100%; }
+  .wordmark {
+    top: clamp(90px, 12vh, 145px);
+    left: clamp(24px, 4vw, 90px);
+    font-size: clamp(134px, 22vw, 335px);
+    opacity: .42;
+  }
+  .wordmarkOutline { opacity: .30; }
+}
+@media (min-width: 901px) and (max-width: 1170px) {
+  .hero { column-gap: 34px; padding-inline: 35px; }
+  .copy h1 { font-size: clamp(32px, 3.4vw, 44px); }
+  .actions { gap: 8px; }
+  .actions > * { padding-inline: 15px; }
+}
+/* The earlier 8px black/4px ivory rules made the cover look like white grid
+   tape rather than the paper tears in the approved example. Reduce sharply. */
+.tornEdgeShadow { stroke-width: 1.6px; stroke: rgba(31,23,21,.21); }
+.tornEdge { stroke-width: 1.35px; stroke: rgba(253,244,229,.7); stroke-dasharray: none; }
+.tornTapeTop, .tornTapeBottom { opacity: .52; }
