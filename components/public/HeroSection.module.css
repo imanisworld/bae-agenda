@@ -737,3 +737,21 @@
     radial-gradient(ellipse at 78% 67%, rgba(213,154,124,.16), transparent 48%),
     rgba(68,48,56,.3);
 }
+
+/* Wide screens: one outlined BAE, centred behind the sleeve and the copy.
+   The filled letters were cut into blocks by the sleeve and ran into the
+   headline, and the second outline copy drew lines across the photo. */
+@media (min-width: 901px) {
+  .wordmark {
+    top: 50%;
+    left: auto;
+    right: clamp(24px, 4vw, 90px);
+    transform: translateY(-58%);
+    white-space: nowrap;
+    font-size: clamp(150px, 17vw, 290px);
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(214,120,138,.42);
+    opacity: 1;
+  }
+  .wordmarkOutline { display: none; }
+}

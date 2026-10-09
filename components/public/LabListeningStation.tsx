@@ -85,6 +85,8 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   const [focus, setFocus] = useState(0)
   const [shareNote, setShareNote] = useState('')
   const [expandedMixId, setExpandedMixId] = useState<string | null>(null)
+  const [descriptionClipped, setDescriptionClipped] = useState(false)
+  const descriptionRef = useRef<HTMLParagraphElement | null>(null)
   const [draggingCovers, setDraggingCovers] = useState(false)
   const [scratching, setScratching] = useState(false)
   const drag = useRef<{ x: number; moved: boolean; pointerId: number } | null>(null)
@@ -147,8 +149,19 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   const position = loadedIsCurrent ? player.position : 0
   const progress = duration ? Math.min(1, position / duration) : 0
   const description = [loaded?.genre || 'Open format', loaded?.description].filter(Boolean).join(' · ')
-  const canExpandDescription = description.length > 74
   const descriptionExpanded = loaded?.id === expandedMixId
+  // Offer More only when the clamped text is actually cut off at this width.
+  const canExpandDescription = descriptionExpanded || descriptionClipped
+
+  useEffect(() => {
+    const el = descriptionRef.current
+    if (!el || descriptionExpanded) return
+    const measure = () => setDescriptionClipped(el.scrollHeight > el.clientHeight + 1)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [description, descriptionExpanded])
   const canPlay = Boolean(loaded)
   const loadedPermalink = loadedIsCurrent ? player.permalink : permalinkFor(loaded?.embed_url ?? null)
 
@@ -511,7 +524,7 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
               {player.status === 'loading' ? 'Dropping the needle' : playing ? 'Now spinning' : loadedIsCurrent && player.engaged ? 'Paused' : 'Cued up'}
             </span>
             <h2>{loaded.title}</h2>
-            <p id="lab-mix-description" className={descriptionExpanded ? styles.descriptionExpanded : undefined}>{description}</p>
+            <p id="lab-mix-description" ref={descriptionRef} className={descriptionExpanded ? styles.descriptionExpanded : undefined}>{description}</p>
             {canExpandDescription ? (
               <button
                 className={styles.descriptionToggle}

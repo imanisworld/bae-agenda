@@ -495,3 +495,19 @@
     border-radius: 3px;
   }
 }
+
+/* Open Press Kit sits over the phones photo: give it a solid dark backing,
+   a clear cream outline and full-strength text so it reads. */
+.actions :global(.btn-ghost) {
+  background: rgba(34,20,27,.82);
+  border: 1px solid rgba(246,226,210,.55);
+  color: #fff7ef;
+  font-weight: 500;
+  text-shadow: none;
+}
+.actions :global(.btn-ghost):hover,
+.actions :global(.btn-ghost):focus-visible {
+  background: rgba(48,28,37,.9);
+  border-color: rgba(246,226,210,.8);
+  color: #fff7ef;
+}
