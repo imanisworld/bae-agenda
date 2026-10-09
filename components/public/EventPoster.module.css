@@ -354,3 +354,29 @@
     transition: none;
   }
 }
+
+
+/* Public contrast lift — event photos can be seen, details stay readable. */
+.poster { background: #3d2d33; border-color: rgba(245,208,182,.22); }
+.image { filter: brightness(.96) saturate(.98) contrast(1.02); }
+.shade {
+  background:
+    linear-gradient(180deg, rgba(29,17,23,.2) 0%, transparent 34%),
+    linear-gradient(0deg, rgba(30,18,24,.88) 0%, rgba(30,18,24,.52) 27%, rgba(30,18,24,.04) 70%),
+    linear-gradient(90deg, rgba(39,22,30,.22) 0%, transparent 58%);
+}
+.date, .topline { color: #f1cb9c; }
+.location { color: rgba(255,242,232,.94); }
+.description { color: rgba(255,242,232,.86); }
+.past .image { filter: brightness(.86) saturate(.72) contrast(1.02); }
+/* Preserve enough darkness behind the real flyers so their text is clear. */
+.hasFlyer .image { filter: blur(28px) brightness(.46) saturate(1.04); }
+.past.hasFlyer .image { filter: blur(28px) brightness(.4) saturate(.72); }
+@media (max-width: 600px) {
+  .shade {
+    background:
+      linear-gradient(180deg, rgba(29,17,23,.28) 0%, transparent 32%),
+      linear-gradient(0deg, rgba(30,18,24,.93) 0%, rgba(30,18,24,.59) 29%, rgba(30,18,24,.06) 68%),
+      linear-gradient(90deg, rgba(39,22,30,.26) 0%, transparent 60%);
+  }
+}
