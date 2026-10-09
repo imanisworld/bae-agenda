@@ -7,7 +7,6 @@
  * turntable. Audio runs through the site-wide PlayerProvider so it keeps
  * playing after the visitor leaves the Lab.
  */
-import { HangFrom } from '@/components/public/brand/HangingLogo'
 import InteractionCue, { markCueUsed, useMotionHint } from '@/components/public/InteractionCue'
 import Image from 'next/image'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
@@ -337,8 +336,8 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   const header = (
     <header className={styles.header}>
       <div className={styles.headerIdentity}>
-        <p>Bae&apos;s in the Lab · Listening Room</p>
-        <h1>On wax<HangFrom finish="chrome" className={styles.titleTag}>.</HangFrom></h1>
+        <p>DJ B.A.E. / Listening Room</p>
+        <h1>The Lab</h1>
         <span className={styles.headerNote}>{crateNote}</span>
       </div>
       {crates.length > 1 ? (
