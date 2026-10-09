@@ -9,7 +9,11 @@
     "build:staging": "NEXT_PUBLIC_DEPLOYMENT_ENV=staging next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "predev": "node scripts/clean-hanging-logos.mjs",
+    "predev:staging": "node scripts/clean-hanging-logos.mjs",
+    "prebuild": "node scripts/clean-hanging-logos.mjs",
+    "prebuild:staging": "node scripts/clean-hanging-logos.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

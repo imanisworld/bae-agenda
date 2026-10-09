@@ -9453,3 +9453,41 @@ a.admin-stat-card:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .public-experience-shell .booking-calendar-nav-button { transition: none; }
 }
+
+/* Book photo: cyan/blue vintage phone collage, behind the existing wine UI.
+   The photo is decorative only, and does not alter the inquiry controls. */
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
+  --page-photo: url('/photos/rooms/book-blue-phones.webp');
+  --page-photo-position: center 46%;
+  --page-photo-blur: 4px;
+  --page-photo-brightness: .76;
+}
+.public-experience-shell .book-experience {
+  background:
+    radial-gradient(ellipse at 35% 20%, rgba(123,45,71,.18), transparent 65%),
+    linear-gradient(135deg, rgba(67,28,47,.4), rgba(42,24,45,.38));
+}
+.public-experience-shell .book-experience-form {
+  background:
+    radial-gradient(ellipse at 40% 8%, rgba(140,54,83,.17), transparent 64%),
+    linear-gradient(145deg, rgba(75,34,54,.55), rgba(45,24,44,.59));
+}
+.public-experience-shell .book-experience-rail {
+  background: linear-gradient(150deg, rgba(66,35,54,.77), rgba(43,26,45,.75));
+}
+/* The source phone loop has white matte; white is neutral when multiplied
+   against the surrounding dark-wine card so the phone appears integrated. */
+.public-experience-shell .book-experience-phone {
+  border: 0;
+  background-color: #503841;
+  background-blend-mode: multiply;
+  box-shadow: 0 8px 18px rgba(20,10,18,.18);
+}
+.public-experience-shell .book-experience-phone video {
+  mix-blend-mode: multiply;
+}
+@media (max-width: 620px) {
+  .public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
+    --page-photo-position: 50% 42%;
+  }
+}

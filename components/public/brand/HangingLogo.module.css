@@ -127,18 +127,6 @@
   .kicked { animation: none; rotate: -2deg; }
 }
 
-/* Crop the flat corners in the source artwork without recoloring the gold
-   lettering or changing the existing swing/clasp interaction. */
-.logo {
-  clip-path: polygon(
-    6% 0%, 27% 0%, 31% 8%, 30% 21%, 42% 25%,
-    62% 33%, 84% 43%, 97% 57%, 96% 72%, 87% 86%,
-    68% 94%, 43% 96%, 17% 88%, 5% 72%, 0% 52%,
-    8% 32%, 11% 13%
-  );
-}
-
-/* Gold tag: its dark backing is a baked-in photo matte, not a desired tile.
-   This keeps the full clasp and body while blending the dark matte into the
-   existing page. All other finishes remain unchanged. */
-.hanger[data-finish='gold'] .logo { mix-blend-mode: lighten; }
+/* Cleaned transparent source pixels replace the previous polygon crop
+   and blend trick; the front clasp gate cutout above is intentional. */
+.logo { background: transparent; mix-blend-mode: normal; }

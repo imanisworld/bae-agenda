@@ -2030,3 +2030,20 @@
   .station .coverflow { --cover: min(53vw, max(108px, 20vh)); height: calc(var(--cover) + 16px); }
   .station .deck { min-height: 0; }
 }
+
+/* Preserve the original cover art and give the sleeves and browse controls
+   enough depth/contrast to read over the Lab's photographic background. */
+.carouselStage .coverFront {
+  box-shadow: 0 28px 58px rgba(23,10,16,.5), 0 7px 12px rgba(20,9,15,.27), 0 0 0 1px rgba(242,213,197,.28);
+}
+.carouselStage .crateBar .round {
+  background: #fff8ee;
+  color: #482e37;
+  border: 1px solid rgba(111,70,84,.25);
+  box-shadow: 0 8px 20px rgba(20,8,14,.3), inset 0 1px 0 rgba(255,255,255,.88);
+}
+.carouselStage .crateBar .round:hover:not(:disabled),
+.carouselStage .crateBar .round:focus-visible {
+  border-color: #8f354c;
+  box-shadow: 0 9px 25px rgba(20,8,14,.4), 0 0 0 2px rgba(255,239,224,.38);
+}

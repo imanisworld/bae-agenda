@@ -6,10 +6,10 @@ import InteractionCue, { markCueUsed } from '@/components/public/InteractionCue'
 import styles from './HangingLogo.module.css'
 
 const FINISHES = {
-  red: { src: '/brand/dj-bae-logo.png', height: 659, clasp: '15.5%', slot: '14.8%' },
-  gold: { src: '/brand/dj-bae-logo-gold.png', height: 660, clasp: '15.8%', slot: '14.8%' },
-  silver: { src: '/brand/dj-bae-logo-silver.png', height: 673, clasp: '16.1%', slot: '17%' },
-  chrome: { src: '/brand/dj-bae-logo-chrome.png', height: 645, clasp: '17.1%', slot: '17.3%' },
+  red: { src: '/brand/clean/dj-bae-logo.png', height: 659, clasp: '15.5%', slot: '14.8%' },
+  gold: { src: '/brand/clean/dj-bae-logo-gold.png', height: 660, clasp: '15.8%', slot: '14.8%' },
+  silver: { src: '/brand/clean/dj-bae-logo-silver.png', height: 673, clasp: '16.1%', slot: '17%' },
+  chrome: { src: '/brand/clean/dj-bae-logo-chrome.png', height: 645, clasp: '17.1%', slot: '17.3%' },
 } as const
 
 const CUE_ID = 'hanging-logo'
