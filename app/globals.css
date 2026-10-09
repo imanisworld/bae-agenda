@@ -9042,3 +9042,76 @@ a.admin-stat-card:focus-visible {
 .public-experience-shell .lab-experience .deck .readout h2 {
   color: #432832;
 }
+
+
+/* Muted vinyl-room photographs supplied for the public-site redesign. The
+   tiny 2x2 atlas keeps this decorative effect lightweight; each public route
+   samples a different scene. All photos remain faint, softly blurred, and
+   completely non-interactive. */
+.public-experience-shell {
+  --black: #443039;
+  --off-black: #513a44;
+  --surface: #5a424d;
+  background: #443039;
+}
+.public-experience-shell .public-page-stage--experience {
+  position: relative;
+  background: #443039;
+}
+.public-experience-shell .public-page-stage--experience:has(.lab-experience) {
+  background: #49333f;
+}
+.public-experience-shell .lab-experience {
+  background:
+    radial-gradient(ellipse at 20% 12%, rgba(179,108,120,.19), transparent 58%),
+    linear-gradient(155deg, #503640, #382832);
+}
+/* Above opaque hero backgrounds, but barely visible: no change to hit targets
+   or input contrast. A soft top/side fade keeps headings and content dominant. */
+.public-experience-shell .public-page-stage--experience::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  inset: -10px;
+  background-image: url('/photos/decor/music-room-atlas.svg');
+  background-size: 200% 200%;
+  background-repeat: no-repeat;
+  background-position: 0% 0%;
+  opacity: .105;
+  filter: blur(13px) saturate(.58);
+  mask-image: linear-gradient(165deg, rgba(0,0,0,.9), rgba(0,0,0,.55) 55%, transparent 95%);
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/']::after {
+  background-position: 0% 0%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/events']::after {
+  background-position: 100% 0%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/lab']::after {
+  background-position: 0% 100%;
+  opacity: .09;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/portfolio']::after {
+  background-position: 100% 100%;
+  opacity: .065;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet']::after {
+  background-position: 100% 0%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book']::after {
+  background-position: 100% 100%;
+  opacity: .075;
+}
+@media (max-width: 620px) {
+  .public-experience-shell .public-page-stage--experience::after {
+    opacity: .08;
+    filter: blur(9px) saturate(.55);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-experience-shell .public-page-stage--experience::after {
+    animation: none;
+    transform: none;
+  }
+}
