@@ -8882,3 +8882,83 @@ a.admin-stat-card:focus-visible {
 .public-experience-shell .book-experience-switch button:not([aria-selected='true']) {
   color: rgba(255,238,224,.88);
 }
+
+
+/* ================================================================
+   COHESIVE PUBLIC DESIGN SYSTEM — warm plum / blush / cream / burgundy.
+   Public routes only: all admin selectors remain untouched.
+   ================================================================ */
+.public-experience-shell,
+.public-site-shell {
+  --public-plum: #443139;
+  --public-blush: #e9d9cf;
+  --public-cream: #fff7ee;
+  --public-burgundy: #8f354c;
+  --public-gold: #e8c19e;
+  --public-outline: rgba(247,222,203,.28);
+}
+/* Lab is the light listening surface within the same plum identity. */
+.public-experience-shell .lab-experience {
+  background:
+    radial-gradient(ellipse at 85% 4%, rgba(175,93,116,.16), transparent 46%),
+    linear-gradient(155deg, #eeded5 0%, #e3cfc7 100%);
+}
+.public-experience-shell .public-page-stage:has(.lab-experience) {
+  background: #ead8cf;
+}
+.public-experience-shell .events-experience-head,
+.public-experience-shell .book-experience-switch,
+.public-experience-shell .events-experience-tools {
+  color: var(--public-cream);
+}
+.public-experience-shell .events-view-switch {
+  background: rgba(54,35,43,.55);
+  border: 1px solid var(--public-outline);
+  border-radius: 14px;
+}
+.public-experience-shell .events-view-switch button {
+  color: #f0d9d0;
+  border-radius: 11px;
+  font-weight: 600;
+}
+.public-experience-shell .events-view-switch button[aria-pressed='true'] {
+  background: var(--public-burgundy);
+  color: var(--public-cream);
+}
+/* Booking inquiry / contact has the same selection language as Events and Lab. */
+@media (max-width: 900px) {
+  .public-experience-shell .book-experience-switch button {
+    border-color: var(--public-outline);
+    border-radius: 12px;
+    min-height: 42px;
+    color: #f5e5dc;
+  }
+  .public-experience-shell .book-experience-switch button[aria-selected='true'] {
+    background: var(--public-burgundy);
+    color: var(--public-cream);
+    border-color: rgba(250,221,204,.45);
+  }
+}
+.public-experience-shell .book-experience-contact > div {
+  border-radius: 11px;
+}
+.public-experience-shell .book-experience-faq details {
+  border-color: rgba(249,224,204,.2);
+}
+/* Preserve contrast over photographs, but make text and buttons feel uniform. */
+.public-experience-shell .btn-primary,
+.public-site-shell .btn-primary {
+  background: linear-gradient(145deg, #a64059, #792b41);
+  border: 1px solid rgba(236,177,162,.3);
+  color: var(--public-cream);
+}
+.public-experience-shell .btn-ghost,
+.public-site-shell .btn-ghost {
+  border-color: rgba(248,228,207,.43);
+  color: var(--public-cream);
+}
+.public-experience-shell .btn-primary:focus-visible,
+.public-experience-shell .btn-ghost:focus-visible {
+  outline: 3px solid #dfb895;
+  outline-offset: 3px;
+}
