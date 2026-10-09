@@ -102,7 +102,6 @@ export default function MeetIdentityHero() {
             <span className={styles.portraitTapeTwo} aria-hidden="true" />
           </span>
         </div>
-        <InteractionCue id="meet-portrait" label="Drag to tilt" className={styles.portraitCue} />
       </div>
 
       <div className={styles.copy}>
