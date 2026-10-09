@@ -755,3 +755,19 @@
   }
   .wordmarkOutline { display: none; }
 }
+
+/* Past Work matches Meet's Open Press Kit: solid dark backing and a clear
+   outline so it reads over the background photo. */
+.actions :global(.btn-ghost) {
+  background: rgba(34,20,27,.82);
+  border: 1px solid rgba(246,226,210,.55);
+  color: #fff7ef;
+  font-weight: 500;
+  text-shadow: none;
+}
+.actions :global(.btn-ghost):hover,
+.actions :global(.btn-ghost):focus-visible {
+  background: rgba(48,28,37,.9);
+  border-color: rgba(246,226,210,.8);
+  color: #fff7ef;
+}
