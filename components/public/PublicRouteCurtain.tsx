@@ -44,7 +44,7 @@ export default function PublicRouteCurtain({ swipePhase }: { swipePhase: string 
   const swipePhaseRef = useRef(swipePhase)
   const [state, setState] = useState<CurtainState>({ phase: 'idle', label: '' })
 
-  swipePhaseRef.current = swipePhase
+  useEffect(() => { swipePhaseRef.current = swipePhase }, [swipePhase])
 
   useEffect(() => {
     const clear = () => {
