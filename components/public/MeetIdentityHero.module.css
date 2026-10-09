@@ -371,3 +371,25 @@
     min-width: 240px;
   }
 }
+
+
+/* Public contrast lift — portrait, words and controls remain legible. */
+.hero {
+  background:
+    radial-gradient(ellipse at 40% 50%, rgba(175,96,113,.27), transparent 52%),
+    radial-gradient(ellipse at 90% 85%, rgba(210,157,125,.11), transparent 50%),
+    #453139;
+}
+.glow { opacity: .65; }
+.summary { color: rgba(255,240,230,.9); }
+.signals span {
+  color: #f8e3d5;
+  background: rgba(111,65,75,.32);
+  border-color: rgba(242,202,164,.35);
+}
+.copy h1 { color: #fff7ef; }
+.details { text-shadow: 0 2px 12px rgba(35,19,25,.38); }
+@media (max-width: 560px) {
+  .summary { color: rgba(255,243,235,.94); }
+  .title > p { color: #f1cda8; }
+}
