@@ -1821,3 +1821,41 @@
 }
 .headerIdentity p,
 .crateCaption small { color: #f1cda8; }
+
+/* Printed record sleeve: paper grain and offset-print dots, then ring wear
+   where the disc sits inside, a spine edge, scuffed corners, light falloff
+   and a band of shrink-wrap shine. Overlays only; the artwork is untouched. */
+.coverArt { border-radius: 2px; }
+.coverArt::before,
+.coverArt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.coverArt::before {
+  z-index: 2;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .45  0 0 0 0 .4  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    radial-gradient(rgba(25,15,12,.22) .55px, transparent .95px);
+  background-size: 140px 140px, 3px 3px;
+  mix-blend-mode: multiply;
+  opacity: .5;
+}
+.coverArt::after {
+  z-index: 3;
+  background:
+    /* shrink-wrap shine */
+    linear-gradient(118deg, transparent 28%, rgba(255,255,255,.14) 38%, rgba(255,255,255,.05) 44%, transparent 52%),
+    /* ring wear from the record inside */
+    radial-gradient(circle at 52% 50%, transparent 40%, rgba(255,246,230,.07) 41.5%, rgba(255,246,230,.15) 43%, rgba(255,246,230,.06) 44.5%, transparent 46%),
+    /* scuffed corners */
+    radial-gradient(circle at 0 0, rgba(255,244,228,.32), transparent 5%),
+    radial-gradient(circle at 100% 0, rgba(255,244,228,.24), transparent 4%),
+    radial-gradient(circle at 0 100%, rgba(255,244,228,.22), transparent 4%),
+    radial-gradient(circle at 100% 100%, rgba(255,244,228,.3), transparent 5%),
+    /* spine fold on the left edge */
+    linear-gradient(90deg, rgba(0,0,0,.34) 0, rgba(255,255,255,.12) 1.6%, rgba(0,0,0,.08) 3.2%, transparent 5%),
+    /* light falling off toward the edges */
+    radial-gradient(ellipse at 42% 36%, transparent 52%, rgba(22,12,10,.34) 100%);
+}
