@@ -4,7 +4,7 @@ Last reconciled: 2026-10-07.
 
 ## Current State
 
-Core public-site, booking, admin, payment, invoice, client-portal, email, analytics, and Manager workflows are implemented.
+Core public-site, booking, admin, payment, invoice, email, analytics, and Manager workflows are implemented. Client Portal code exists but sign-in is not operational for current client records; it is withheld from public navigation until end-to-end testing succeeds.
 
 Last audited GitHub `main` before this docs-only reconciliation: `ef24ed79f8225d892c382967e5c6720f3746c6f5` (PR #143). This is an audit anchor, not a live pointer; later merges may advance `main`.
 
@@ -66,6 +66,12 @@ Remaining unrelated advisor items:
 - leaked-password protection is disabled
 - service-role-only tables with RLS/no client policies generate informational advisor notices
 - existing unused-index and duplicate-permissive-policy performance notices remain separate cleanup work
+
+## Client Portal Release Gate (2026-10-09)
+
+The portal remains an unreleased feature. A source-only change removes its public More/footer link and the booking FAQ promise; direct routes and data remain intact for development. This is **not live** until deliberately deployed. It is not a security access restriction.
+
+Read-only checks found 3 clients associated with bookings, 0 stored client phone numbers, 1 stored client email, 0 active portal sessions, and 0 change requests. The production Vercel env list does not include the Twilio keys used by phone OTP. Fix an authenticated contact path and test client isolation before advertising the portal. See #157.
 
 ## Next
 
