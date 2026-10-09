@@ -73,6 +73,11 @@ The portal remains an unreleased feature. A source-only change removes its publi
 
 Read-only checks found 3 clients associated with bookings, 0 stored client phone numbers, 1 stored client email, 0 active portal sessions, and 0 change requests. The production Vercel env list does not include the Twilio keys used by phone OTP. Fix an authenticated contact path and test client isolation before advertising the portal. See #157.
 
+## Oct 9 Preview-only Fixes (NOT live)
+
+- Mobile Book dock: use native `/book` navigation, keep the gesture handler off interactive links/buttons; the booking tab resets correctly after Contact/FAQ. Requires real iPhone tap-through QA, and safe preview backend configuration for a non-production inquiry.
+- Club Cunt: the Oct 31 flyer reference is replaced with a dedicated **New flyer coming soon** placeholder; Vercel **preview only** overlays November 21, 2026 for the event's displayed date. The canonical `public.events` record remains Oct 31, 2026 until explicit production-release approval. **Before public production release, update the canonical event date and check the admin/booking calendar; do not rely on a production overlay.** The old slug is retained for link stability.
+
 ## Next
 
 1. Follow up Silent Disco and Elevate Social on Oct 10.
