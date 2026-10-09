@@ -82,6 +82,10 @@ export default function EventExperienceStage({
   return (
     <section className="events-experience" aria-label="Events">
       <div className="events-experience-head">
+        <div className="events-experience-title">
+          <p className="section-label">DJ B.A.E. / {isPast ? 'Past nights' : 'On the calendar'}</p>
+          <h1>Events</h1>
+        </div>
         <div className="events-experience-tools">
           {pastEvents.length > 0 ? (
             <div className="events-view-switch" role="group" aria-label="Show events">
@@ -108,7 +112,6 @@ export default function EventExperienceStage({
               >→</button>
             </div>
           ) : null}
-          <Link href="/book" className="btn-ghost">Book DJ B.A.E.</Link>
         </div>
       </div>
 

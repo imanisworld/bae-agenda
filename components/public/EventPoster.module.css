@@ -380,3 +380,10 @@
       linear-gradient(90deg, rgba(39,22,30,.26) 0%, transparent 60%);
   }
 }
+
+/* Info sits on one bottom gradient; the rest of the photo stays bright. */
+.shade,
+.past .shade {
+  background:
+    linear-gradient(0deg, rgba(26,15,20,.92) 0%, rgba(26,15,20,.7) 24%, rgba(26,15,20,.28) 44%, transparent 62%);
+}

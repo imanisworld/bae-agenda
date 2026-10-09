@@ -9125,7 +9125,7 @@ a.admin-stat-card:focus-visible {
   z-index: 0;
   inset: -48px;
   pointer-events: none;
-  background: var(--page-photo, none) center / cover no-repeat;
+  background: var(--page-photo, none) var(--page-photo-position, center) / cover no-repeat;
   filter: blur(var(--page-photo-blur, 3px)) brightness(var(--page-photo-brightness, .85)) saturate(.85);
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
@@ -9140,7 +9140,9 @@ a.admin-stat-card:focus-visible {
   --page-photo-brightness: .5;
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/lab'] {
-  --page-photo: url('/photos/rooms/listening-bar.jpg');
+  --page-photo: url('/photos/rooms/turntables-floor.webp');
+  /* The decks run down the right side of this overhead shot. */
+  --page-photo-position: 78% 55%;
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/book']::after,
 .public-experience-shell .public-page-stage--experience[data-experience-route='/lab']::after {
@@ -9179,4 +9181,51 @@ a.admin-stat-card:focus-visible {
 }
 .public-experience-shell .portfolio-experience {
   background: rgba(67,49,57,.3);
+}
+
+/* Events as an editorial gallery: a real page title, one control row, and a
+   featured card with the next event peeking in from the right. */
+.public-experience-shell .events-experience-head {
+  align-items: end;
+  flex-wrap: wrap;
+  row-gap: 14px;
+}
+.public-experience-shell .events-experience-title .section-label {
+  margin: 0 0 8px;
+  color: #f1cda8;
+}
+.public-experience-shell .events-experience-title h1 {
+  margin: 0;
+  color: #fff7ef;
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(38px, 5vw, 72px);
+  font-weight: 600;
+  line-height: .95;
+  letter-spacing: -.02em;
+  text-shadow: 0 2px 16px rgba(28,15,20,.45);
+}
+.public-experience-shell .events-experience-tools {
+  gap: 12px;
+  font-size: 11px;
+}
+.public-experience-shell .events-carousel {
+  gap: 16px;
+}
+.public-experience-shell .events-carousel--multi .events-carousel-slide {
+  flex-basis: min(80%, 1040px);
+}
+.public-experience-shell .events-carousel--multi .events-carousel-slide:last-child {
+  scroll-snap-align: end;
+}
+@media (max-width: 620px) {
+  .public-experience-shell .events-experience-title h1 {
+    font-size: clamp(34px, 11vw, 46px);
+  }
+  .public-experience-shell .events-experience-tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .public-experience-shell .events-carousel--multi .events-carousel-slide {
+    flex-basis: 84%;
+  }
 }
