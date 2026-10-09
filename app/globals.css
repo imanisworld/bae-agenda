@@ -5975,6 +5975,9 @@ body.has-custom-cursor * { cursor: none !important; }
   display: block;
   width: auto;
   height: 100%;
+  /* Reserve the phone's real shape so it never pops from a wide box to its
+     drawn size when the image arrives. */
+  aspect-ratio: 172 / 300;
 }
 
 .book-experience-rail-inner header > span,
@@ -9118,24 +9121,25 @@ a.admin-stat-card:focus-visible {
 
 /* Per-page room photo: one blurred, darkened photograph behind each page.
    A page opts in by setting --page-photo on its route; its hero background
-   must be translucent for the photo to show through. */
-.public-experience-shell .public-page-stage--experience::before {
+   must be translucent for the photo to show through. It sits on the page's
+   own layer (remounted per route) so it fades in with the page, not before. */
+.public-experience-shell .public-page-stage--experience .public-page-stage-inner::before {
   content: '';
   position: absolute;
-  z-index: 0;
+  z-index: -1;
   inset: -48px;
   pointer-events: none;
   background: var(--page-photo, none) var(--page-photo-position, center) / cover no-repeat;
   filter: blur(var(--page-photo-blur, 3px)) brightness(var(--page-photo-brightness, .85)) saturate(.85);
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
-  --page-photo: url('/photos/rooms/phones-box.jpg');
+  --page-photo: url('/photos/rooms/phones-box.webp');
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/meet']::after {
   display: none;
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
-  --page-photo: url('/photos/rooms/phones-grid.jpg');
+  --page-photo: url('/photos/rooms/phones-grid.webp');
   /* A white studio shot: darken it further than the others. */
   --page-photo-brightness: .5;
 }
@@ -9161,13 +9165,13 @@ a.admin-stat-card:focus-visible {
 }
 
 .public-experience-shell .public-page-stage--experience[data-experience-route='/'] {
-  --page-photo: url('/photos/PlexMix19-DJBAE.JPEG');
+  --page-photo: url('/photos/rooms/home-plexmix.webp');
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/portfolio'] {
   --page-photo: url('/photos/rooms/work-booth.webp');
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/events'] {
-  --page-photo: url('/photos/rooms/tile-booth.jpg');
+  --page-photo: url('/photos/rooms/tile-booth.webp');
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/']::after,
 .public-experience-shell .public-page-stage--experience[data-experience-route='/portfolio']::after,
