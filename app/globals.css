@@ -8957,3 +8957,35 @@ a.admin-stat-card:focus-visible {
   outline: 3px solid #dfb895;
   outline-offset: 3px;
 }
+
+
+/* Photo-card carousel: a small spring settle on the newly centered event.
+   Scroll snapping and poster links remain native and tappable. */
+.public-experience-shell .events-carousel-slide > article {
+  transform-origin: center bottom;
+  transition: transform 330ms cubic-bezier(.2, 1.25, .25, 1),
+              filter 280ms ease;
+}
+.public-experience-shell .events-carousel-slide:not(.events-carousel-slide--active) > article {
+  transform: translateY(5px) scale(.975);
+  filter: saturate(.93);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .public-experience-shell .events-carousel-slide--active > article {
+    animation: bae-photo-card-settle 430ms cubic-bezier(.25, .85, .3, 1) both;
+  }
+}
+@keyframes bae-photo-card-settle {
+  0%   { transform: translateY(8px) scale(.965); }
+  63%  { transform: translateY(-3px) scale(1.012); }
+  82%  { transform: translateY(1px) scale(.997); }
+  100% { transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-experience-shell .events-carousel-slide > article {
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
