@@ -31,6 +31,10 @@ const REFRESH_MAX = 110
 const LAB_CRATES_CACHE = 'bae-lab-crates-v1'
 
 const OWN_GESTURE = [
+  'a[href]',
+  'button',
+  'summary',
+  '[role="button"]',
   'input',
   'textarea',
   'select',
