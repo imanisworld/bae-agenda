@@ -2011,3 +2011,22 @@
   .controls { flex-wrap: wrap; }
   .links { margin-left: 0; }
 }
+
+/* Anchor controls to the covers themselves, never to changing crate content. */
+.carouselStage { position: relative; flex: none; width: 100%; min-width: 0; }
+.carouselStage .coverflow { width: 100%; }
+.carouselStage .crateBar {
+  position: absolute;
+  inset: 50% 0 auto;
+  bottom: auto;
+  transform: translateY(-50%);
+  margin: 0;
+  z-index: 40;
+}
+.station .deck { min-height: clamp(244px, 28vh, 296px); }
+.station .coverflow { --cover: clamp(132px, 19vh, 230px); height: calc(var(--cover) + 24px); }
+.station .crate { gap: 0; }
+@media (max-width: 620px) {
+  .station .coverflow { --cover: min(53vw, max(108px, 20vh)); height: calc(var(--cover) + 16px); }
+  .station .deck { min-height: 0; }
+}

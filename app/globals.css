@@ -9240,3 +9240,77 @@ a.admin-stat-card:focus-visible {
     radial-gradient(ellipse at 85% 10%, rgba(154,79,101,.21), transparent 50%),
     linear-gradient(155deg, rgba(76,52,62,.3), rgba(50,37,43,.4));
 }
+
+/* Book and Contact share one stage and heading alignment, rather than two
+   permanently split columns. Scoped to the public booking experience only. */
+.public-experience-shell .book-experience {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0;
+}
+.public-experience-shell .book-experience-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 12px;
+}
+.public-experience-shell .book-experience-switch button {
+  cursor: pointer;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid rgba(247,219,205,.4);
+  border-radius: 999px;
+  color: #f6e4d8;
+  background: rgba(67,43,53,.45);
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.public-experience-shell .book-experience-switch button[aria-selected='true'] {
+  background: #8f354c;
+  color: #fff7ee;
+  border-color: #e3b9a6;
+}
+.public-experience-shell .book-experience-switch button:focus-visible {
+  outline: 2px solid #f1cda8;
+  outline-offset: 2px;
+}
+.public-experience-shell .book-experience-form,
+.public-experience-shell .book-experience-rail {
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+.public-experience-shell .book-experience--inquiry .book-experience-form,
+.public-experience-shell .book-experience--contact .book-experience-rail {
+  display: block;
+  animation: book-panel-arrive 210ms cubic-bezier(.22,.76,.26,1) both;
+}
+.public-experience-shell .book-experience--inquiry .book-experience-rail,
+.public-experience-shell .book-experience--contact .book-experience-form { display: none; }
+.public-experience-shell .book-experience-rail-inner {
+  width: min(100%, 680px);
+  margin: 0 auto;
+  padding: 24px clamp(18px,3vw,34px) 42px;
+}
+.public-experience-shell .book-experience-rail-inner header h2 {
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: .95;
+}
+@keyframes book-panel-arrive {
+  from { opacity: .35; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 620px) {
+  .public-experience-shell .book-experience-switch { padding-inline: 6px; }
+  .public-experience-shell .book-experience-switch button { flex: 1; padding: 0 8px; min-width: 0; font-size: 10px; }
+  .public-experience-shell .book-experience-rail-inner header h2 { font-size: clamp(34px, 8.8vw, 48px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-experience-shell .book-experience--inquiry .book-experience-form,
+  .public-experience-shell .book-experience--contact .book-experience-rail { animation: none; }
+}

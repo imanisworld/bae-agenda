@@ -423,6 +423,7 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
 
       {/* ── Crate: 3D cover carousel ── */}
       <div className={styles.crate}>
+        <div className={styles.carouselStage}>
         <div
           key={crate?.key}
           className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}`}
@@ -483,6 +484,7 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
         <div className={styles.crateBar} role="group" aria-label="Browse record covers">
           <button type="button" className={styles.round} onClick={() => move(-1)} disabled={focus === 0} aria-label="Previous cover">←</button>
           <button type="button" className={styles.round} onClick={() => move(1)} disabled={focus === list.length - 1} aria-label="Next cover">→</button>
+        </div>
         </div>
       </div>
 

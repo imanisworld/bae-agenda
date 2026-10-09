@@ -156,20 +156,7 @@ export default function Nav() {
             const className = `${styles.item} ${active ? styles.active : ''}`
             const tone = TONES[index % TONES.length]
 
-            // The Book action must work even if a mobile client-side route transition stalls.
-            return item.href === '/book' ? (
-              <a
-                key={item.href}
-                href="/book"
-                aria-current={active ? 'page' : undefined}
-                aria-label={label}
-                className={className}
-                data-tone={tone}
-                onClick={dismissDockCue}
-              >
-                {content}
-              </a>
-            ) : (
+            return (
               <Link
                 key={item.href}
                 href={item.href}
