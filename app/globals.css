@@ -5075,6 +5075,61 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 }
 
+
+/* Isolate the Press Kit when printed: the interactive shell must never fill a
+   second PDF page. The screen site and other printable pages are unchanged. */
+@media print {
+  body:has(.press-kit-page) .chrome,
+  body:has(.press-kit-page) .skip-link,
+  body:has(.press-kit-page) .site-footer,
+  body:has(.press-kit-page) .sticky-booking-cta,
+  body:has(.press-kit-page) .public-page-stage-glow,
+  body:has(.press-kit-page) .public-page-stage-scan {
+    display: none !important;
+  }
+
+  body:has(.press-kit-page) .public-site-shell,
+  body:has(.press-kit-page) #main-content,
+  body:has(.press-kit-page) .public-page-stage,
+  body:has(.press-kit-page) .public-page-stage-inner {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+
+  body:has(.press-kit-page) .public-page-stage::before,
+  body:has(.press-kit-page) .public-page-stage::after,
+  body:has(.press-kit-page) .public-page-stage-inner::before,
+  body:has(.press-kit-page) .public-page-stage-inner::after {
+    display: none !important;
+  }
+
+  body:has(.press-kit-page) .press-kit-page {
+    position: static !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  body:has(.press-kit-page) .press-kit-sheet {
+    width: 100% !important;
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+}
+
 /* ─── Footer ─────────────────────────────────────────────────────────── */
 .footer-body {
   display: grid;
