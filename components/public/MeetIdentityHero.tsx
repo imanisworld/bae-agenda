@@ -73,6 +73,12 @@ export default function MeetIdentityHero() {
           if (event.pointerType === 'mouse' && pointerRef.current === null) finish()
         }}
       >
+        <span className={styles.collageFilm} aria-hidden="true">
+          <Image src="/photos/events/film-decks.jpg" alt="" fill sizes="(max-width: 860px) 40vw, 20vw" draggable={false} />
+        </span>
+        <span className={styles.collageCrowd} aria-hidden="true">
+          <Image src="/photos/events/duo-decks.jpg" alt="" fill sizes="(max-width: 860px) 36vw, 17vw" draggable={false} />
+        </span>
         <div className={styles.portrait}>
           <Image
             src="/photos/images/portrait.jpg"
