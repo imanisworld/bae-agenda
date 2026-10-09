@@ -1476,3 +1476,282 @@
     letter-spacing: .02em;
   }
 }
+
+
+/* ================================================================
+   LIGHT LISTENING ROOM — more room for the covers, less hardware
+   clutter. All listening, drag, transport and link behavior stays.
+   ================================================================ */
+.station {
+  color: #302027;
+  gap: clamp(9px, 1.5vh, 15px);
+}
+.station::before,
+.station::after {
+  display: none;
+}
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  flex: none;
+  padding: 0 0 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(77,48,56,.18);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.headerIdentity { padding-bottom: 0; }
+.headerIdentity p {
+  color: #805564;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .13em;
+}
+.header h1 {
+  margin: 5px 0 0;
+  font-size: clamp(26px, 3.7vw, 44px);
+  line-height: 1;
+  color: #45232e;
+  text-shadow: none;
+}
+.headerNote {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #725863;
+  text-transform: none;
+  letter-spacing: .01em;
+}
+.crateSwitch {
+  border: 1px solid #d8c7ba;
+  background: #fff8ef;
+  box-shadow: 0 2px 10px rgba(71,39,49,.06);
+}
+.crateSwitch button {
+  color: #533640;
+}
+.crateSwitch button small { color: #825967; }
+.crateSwitch button[aria-pressed='true'] {
+  color: #fff7ed;
+  background: #8f354c;
+  box-shadow: none;
+}
+.crateSwitch button[aria-pressed='true'] small { color: #ffe7d5; }
+.crate {
+  padding: 0;
+  border: none;
+  background: none;
+  justify-content: center;
+  gap: 7px;
+}
+.coverflow {
+  border-radius: 6px;
+  background: none;
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+.coverflow::before,
+.coverflow::after { display: none; }
+.cover { box-shadow: 0 12px 28px rgba(54,27,36,.19); }
+.cover::after { background: #6d5155; box-shadow: 4px 5px 13px rgba(54,27,36,.12); }
+.coverFront {
+  box-shadow: 0 18px 38px rgba(54,27,36,.24), 0 0 0 2px rgba(114,65,75,.25);
+}
+.coverFallback { color: #dbb387; }
+.crateBar {
+  max-width: 670px;
+  padding: 6px 2px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.crateCaption { gap: 2px; }
+.crateCaption small {
+  color: #876372;
+  font-size: 11px;
+}
+.crateCaption strong {
+  color: #40232e;
+  font-weight: 650;
+  font-size: 15px;
+}
+.crateCaption span { color: #725760; }
+.round {
+  border-color: #ccb9b5;
+  background: #fff9f3;
+  color: #4c2b36;
+  box-shadow: 0 2px 6px rgba(71,39,49,.07);
+}
+.round:disabled { opacity: .4; }
+.deck,
+.deckPlaying {
+  padding: 18px;
+  border: 1px solid #d8c6bd;
+  border-radius: 19px;
+  background: linear-gradient(135deg, #fffaf3, #f4e8dc);
+  box-shadow: 0 12px 28px rgba(60,38,45,.09);
+}
+.deck::before,
+.deck::after { display: none; }
+.deckPlate {
+  display: none;
+}
+.turntable {
+  border: 1px solid #d3bdb2;
+  background: #e7d7c8;
+  box-shadow: 0 6px 13px rgba(55,31,39,.12);
+}
+.platter { box-shadow: 0 6px 12px rgba(34,24,27,.3); }
+.console {
+  border: none;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
+.state {
+  color: #87566a;
+  font-size: 10px;
+  font-weight: 700;
+}
+.idleDot { background: #a8848c; }
+.readout h2 {
+  color: #36212a;
+  text-shadow: none;
+  margin-top: 5px;
+}
+.readout p { color: #69535c; }
+.times { color: #67535a; }
+.progress input::-webkit-slider-runnable-track {
+  background: linear-gradient(90deg, #9c4960 var(--progress), #d7c6be var(--progress));
+}
+.progress input::-moz-range-track {
+  background: linear-gradient(90deg, #9c4960 var(--progress), #d7c6be var(--progress));
+}
+.progress input::-webkit-slider-thumb,
+.progress input::-moz-range-thumb { background: #8f354c; }
+.play { background: #90354e; border-color: #90354e; }
+.links button,
+.links a {
+  color: #4e313b;
+  background: #fffaf3;
+  border-color: #cebcb4;
+}
+.links button:hover,
+.links a:hover { color: #77283d; }
+
+/* Short mobile screen: header, real cover-art area, streamlined deck. */
+@media (max-width: 620px) {
+  .station {
+    --cover-max: 53vw;
+    --deck: clamp(78px, 24vw, 112px);
+    width: calc(100% - 30px);
+    padding: calc(54px + var(--safe-top)) 0 calc(90px + var(--safe-bottom));
+    gap: 7px;
+  }
+  .header {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    gap: 9px;
+    padding: 0 0 9px;
+  }
+  .headerIdentity { padding: 0; }
+  .headerIdentity p {
+    display: block;
+    font-size: 9px;
+  }
+  .header h1 { font-size: 27px; margin-top: 3px; }
+  .headerNote { display: none; }
+  .crateSwitch {
+    width: 100%;
+    padding: 3px;
+    border-radius: 12px;
+  }
+  .crateSwitch button {
+    white-space: normal;
+    min-height: 36px;
+    font-size: 10px;
+    letter-spacing: .005em;
+    line-height: 1.2;
+    padding: 4px 5px;
+    border-radius: 9px;
+  }
+  .crate {
+    flex: 1 1 auto;
+    gap: 4px;
+    min-height: 0;
+    padding: 2px 0;
+  }
+  .coverflow {
+    --cover: min(var(--cover-max), max(108px, calc(100cqh - 63px)));
+    height: calc(var(--cover) + 16px);
+    min-height: 0;
+  }
+  .cover { top: 7px; }
+  .coversCue { bottom: 0; }
+  .crateBar {
+    gap: 7px;
+    padding: 3px 0;
+  }
+  .crateCaption { width: min(100%, 260px); }
+  .crateCaption small { font-size: 9px; }
+  .crateCaption strong { font-size: 12px; }
+  .crateCaption span { font-size: 10px; }
+  .crateBar .round {
+    width: 34px;
+    height: 34px;
+  }
+  .deck,
+  .deckPlaying {
+    grid-template-columns: var(--deck) minmax(0,1fr);
+    grid-template-areas:
+      'table readout'
+      'progress progress'
+      'controls controls';
+    gap: 8px 12px;
+    padding: 12px;
+    border-radius: 15px;
+  }
+  .turntable { width: var(--deck); height: var(--deck); grid-area: table; }
+  .console { display: contents; }
+  .readout { grid-area: readout; min-width: 0; align-self: center; }
+  .readout h2 {
+    font-size: clamp(14px, 4.4vw, 17px);
+    margin-top: 4px;
+  }
+  .readout p { font-size: 11px; line-height: 1.35; -webkit-line-clamp: 2; }
+  .state { font-size: 9px; letter-spacing: .08em; }
+  .progress { grid-area: progress; margin: 0; }
+  .times { font-size: 11px; }
+  .controls {
+    grid-area: controls;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+  .transport { gap: 7px; }
+  .play { width: 42px; height: 42px; }
+  .transport .round { width: 36px; height: 36px; }
+  .links { margin-left: auto; gap: 5px; }
+  .links button,
+  .links a {
+    min-height: 33px;
+    padding: 0 9px;
+    font-size: 9px;
+  }
+}
+@media (max-width: 360px) {
+  .station { width: calc(100% - 20px); }
+  .links button, .links a { font-size: 8px; padding: 0 7px; }
+}
+@media (max-width: 620px) and (max-height: 720px) {
+  .header p { display: block; }
+  .crateCaption span { display: none; }
+  .readout p { -webkit-line-clamp: 1; }
+}
+@media (max-width: 620px) and (max-height: 600px) {
+  .deck { grid-template-areas: 'readout readout' 'progress progress' 'controls controls'; }
+  .turntable { display: none; }
+}
