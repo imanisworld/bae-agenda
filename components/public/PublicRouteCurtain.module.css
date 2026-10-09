@@ -1,5 +1,6 @@
-/* CoMinVi-inspired three-part editorial cover / reveal.
-   Public-only; the nav dock stays visible above this layer. */
+/* One deterministic reveal per completed public route change.
+   All three panels start covering the destination, then slide away.
+   The dock stays in front and the curtain never catches a tap. */
 .curtain {
   position: fixed;
   inset: 0;
@@ -14,28 +15,21 @@
 
 .panel {
   display: block;
-  height: 100%;
   width: calc(100% + 1px);
-  transform: translate3d(0, 105%, 0);
+  height: 100%;
   background: #722e43;
+  animation: curtain-reveal 385ms cubic-bezier(.7, 0, .22, 1) both;
   will-change: transform;
 }
-
 .panel:first-child { background: #8f354c; }
-.panel:nth-child(2) { background: #722e43; }
-.panel:nth-child(3) { background: #4e2b3a; }
-
-.cover .panel {
-  animation: curtain-cover 190ms cubic-bezier(.56,0,.24,1) both;
+.panel:nth-child(2) {
+  background: #722e43;
+  animation-delay: 45ms;
 }
-.cover .panel:nth-child(2) { animation-delay: 27ms; }
-.cover .panel:nth-child(3) { animation-delay: 54ms; }
-
-.reveal .panel {
-  animation: curtain-reveal 370ms cubic-bezier(.72,0,.2,1) both;
+.panel:nth-child(3) {
+  background: #4e2b3a;
+  animation-delay: 90ms;
 }
-.reveal .panel:nth-child(2) { animation-delay: 40ms; }
-.reveal .panel:nth-child(3) { animation-delay: 75ms; }
 
 .label {
   position: absolute;
@@ -45,15 +39,13 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
+  gap: 12px;
   color: #fff6eb;
   text-align: center;
-  text-shadow: 0 3px 20px rgba(20,8,14,.18);
-  opacity: 0;
+  text-shadow: 0 3px 20px rgba(20,8,14,.2);
+  pointer-events: none;
+  animation: curtain-label 250ms ease-out both;
 }
-.cover .label { animation: curtain-label-in 160ms ease-out 85ms both; }
-.reveal .label { animation: curtain-label-out 250ms ease-in both; }
-
 .kicker {
   font: 600 11px/1.2 'DM Sans', sans-serif;
   letter-spacing: .28em;
@@ -74,21 +66,14 @@
   background: linear-gradient(90deg, transparent, #f2c7a5, transparent);
 }
 
-@keyframes curtain-cover {
-  from { transform: translate3d(0, 105%, 0); }
-  to   { transform: translate3d(0, 0, 0); }
-}
 @keyframes curtain-reveal {
   from { transform: translate3d(0, 0, 0); }
   to   { transform: translate3d(0, -105%, 0); }
 }
-@keyframes curtain-label-in {
-  from { opacity: 0; transform: translateY(9px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes curtain-label-out {
-  from { opacity: 1; transform: translateY(0); }
-  to   { opacity: 0; transform: translateY(-12px); }
+@keyframes curtain-label {
+  0% { opacity: 1; transform: translateY(0); }
+  45% { opacity: .95; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-12px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .curtain { display: none; }
