@@ -433,3 +433,30 @@
     display: none;
   }
 }
+
+
+/* Public contrast lift — preserve the dark listening mood, remove black voids. */
+.section {
+  background:
+    radial-gradient(circle at 15% 20%, rgba(180,102,116,.2), transparent 43%),
+    linear-gradient(160deg, #453139, #382930);
+  border-color: rgba(247,215,198,.18);
+}
+.stage {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(193,113,128,.16), transparent 48%),
+    linear-gradient(155deg, #543940, #3f2d35);
+  border-color: rgba(245,214,195,.24);
+}
+.stageNumber { color: rgba(255,241,231,.07); }
+.metaLabel { color: rgba(255,225,207,.7); }
+.projects {
+  background: linear-gradient(145deg, #503840, #3d2b32);
+}
+.projectCard {
+  background:
+    linear-gradient(165deg, rgba(226,165,154,.08), transparent 55%),
+    #4b363d;
+}
+.projectCard:hover { background: #593c45; }
+.projectIndex { color: rgba(255,229,215,.54); }
