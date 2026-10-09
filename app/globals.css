@@ -9348,3 +9348,108 @@ a.admin-stat-card:focus-visible {
   --page-photo-blur: 5px;
   --page-photo-brightness: .7;
 }
+
+
+/* Oct 2026 — scoped wine-depth polish for the Book inquiry; preserve its
+   animated logo, phone, layout, form validation and booking behavior. */
+.public-experience-shell .book-experience {
+  background:
+    radial-gradient(ellipse at 42% 22%, rgba(155,74,101,.22), transparent 62%),
+    linear-gradient(145deg, rgba(73,39,53,.74), rgba(48,26,38,.68));
+}
+.public-experience-shell .book-experience-form {
+  background:
+    radial-gradient(ellipse at 45% 8%, rgba(161,81,105,.25), transparent 66%),
+    linear-gradient(150deg, rgba(85,43,60,.75), rgba(53,29,42,.78));
+}
+.public-experience-shell .booking-form-embedded {
+  --booking-choice-bg: rgba(26,15,24,.48);
+  --booking-choice-selected: rgba(153,57,84,.56);
+  --booking-input-bg: rgba(25,14,24,.43);
+  --booking-calendar-bg: rgba(30,18,29,.54);
+  background: transparent;
+}
+.public-experience-shell .booking-hero-heading {
+  text-shadow: 0 8px 22px rgba(29,11,21,.4), 0 1px 0 rgba(255,239,223,.1);
+}
+.public-experience-shell .booking-form-embedded button[style*="--booking-choice"] {
+  border-radius: 9px;
+}
+.public-experience-shell .booking-form-embedded input,
+.public-experience-shell .booking-form-embedded select,
+.public-experience-shell .booking-form-embedded textarea {
+  border-radius: 8px;
+}
+.public-experience-shell .booking-form-embedded input:focus-visible,
+.public-experience-shell .booking-form-embedded select:focus-visible,
+.public-experience-shell .booking-form-embedded textarea:focus-visible {
+  outline: 2px solid #eac0a9;
+  outline-offset: 2px;
+}
+.public-experience-shell .booking-calendar-nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 7px 14px;
+  border: 1px solid rgba(247,220,204,.3);
+  border-radius: 999px;
+  background: rgba(255,240,227,.08);
+  color: #fff0e4;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.public-experience-shell .booking-calendar-nav-button:hover:not(:disabled) {
+  background: rgba(255,240,227,.16);
+  border-color: rgba(247,220,204,.58);
+}
+.public-experience-shell .booking-calendar-nav-button:focus-visible {
+  outline: 2px solid #f1cda8;
+  outline-offset: 2px;
+}
+.public-experience-shell .booking-calendar-nav-button:disabled {
+  cursor: default;
+  opacity: .4;
+}
+@media (max-width: 620px) {
+  .public-experience-shell .booking-calendar-nav-button {
+    padding-inline: 12px;
+    min-height: 40px;
+  }
+}
+/* Events controls: separate the toggle from paging, retain the same active hue. */
+.public-experience-shell .events-experience-tools {
+  column-gap: clamp(18px, 2.2vw, 30px);
+  row-gap: 12px;
+}
+.public-experience-shell .events-experience-pager {
+  gap: 12px;
+  padding-left: clamp(14px, 1.6vw, 22px);
+  border-left: 1px solid rgba(255,231,215,.26);
+}
+.public-experience-shell .events-experience-pager .experience-arrow {
+  background: rgba(255,248,236,.14);
+  border-color: rgba(255,243,230,.3);
+  color: #fff7ee;
+}
+.public-experience-shell .events-experience-pager .experience-arrow:hover:not(:disabled) {
+  background: rgba(255,248,236,.22);
+  border-color: rgba(255,243,230,.55);
+}
+.public-experience-shell .events-view-switch button[aria-pressed='true'] {
+  background: linear-gradient(150deg, #a54560, #7f2c43);
+  box-shadow: 0 4px 12px rgba(40,13,24,.22), inset 0 1px 0 rgba(255,233,220,.14);
+}
+@media (max-width: 620px) {
+  .public-experience-shell .events-experience-tools { gap: 10px; }
+  .public-experience-shell .events-experience-pager {
+    padding-left: 12px;
+    gap: 7px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-experience-shell .booking-calendar-nav-button { transition: none; }
+}

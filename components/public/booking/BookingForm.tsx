@@ -623,7 +623,7 @@ export default function BookingForm({ embedded = false, initialEventType = '', i
   }
 
   return (
-    <div className={embedded ? 'booking-form-embedded' : undefined} style={{ background: 'var(--off-black)', paddingTop: embedded ? 0 : '68px' }}>
+    <div className={embedded ? 'booking-form-embedded' : undefined} style={{ background: embedded ? 'transparent' : 'var(--off-black)', paddingTop: embedded ? 0 : '68px' }}>
       <div className="section-container" style={{ maxWidth: '680px', paddingTop: embedded ? '24px' : 0, paddingBottom: embedded ? '36px' : '64px' }}>
         {/* Title with the step tracker beside it; extra room underneath for the
             tag hanging off the "o". */}
@@ -634,7 +634,7 @@ export default function BookingForm({ embedded = false, initialEventType = '', i
           gap: '16px',
           marginBottom: 'clamp(78px, 8vw, 112px)',
         }}>
-          <h1 style={{
+          <h1 className={embedded ? 'booking-hero-heading' : undefined} style={{
             fontFamily: 'Conthrax, sans-serif',
             fontSize: 'clamp(40px, 6vw, 72px)',
             fontWeight: 600,
@@ -695,8 +695,8 @@ export default function BookingForm({ embedded = false, initialEventType = '', i
 
         <form ref={formRef} onSubmit={onSubmit} noValidate>
           <div style={{
-            background: 'var(--surface)',
-            border: '1px solid var(--border)',
+            background: embedded ? 'linear-gradient(145deg, rgba(70,37,51,.77), rgba(43,25,35,.68))' : 'var(--surface)',
+            border: embedded ? '1px solid rgba(255,235,219,.25)' : '1px solid var(--border)',
             padding: 'clamp(20px, 4vw, 32px)',
             display: 'grid',
             gap: '20px',
@@ -990,7 +990,7 @@ function EventStep({
                 fontSize: '11px',
                 letterSpacing: '0.08em',
                 textAlign: 'left',
-                background: form.eventType === type ? 'rgba(143,45,60,0.15)' : 'var(--off-black)',
+                background: form.eventType === type ? 'var(--booking-choice-selected, rgba(143,45,60,0.15))' : 'var(--booking-choice-bg, var(--off-black))',
                 border: `1px solid ${form.eventType === type ? 'var(--violet)' : 'var(--border)'}`,
                 color: form.eventType === type ? 'var(--white)' : 'var(--muted)',
                 cursor: 'pointer',
@@ -1022,17 +1022,15 @@ function EventStep({
               <button
                 type="button"
                 onClick={() => setCalendarMonth(addMonths(visibleMonth, -1))}
-                className="btn-ghost"
+                className="booking-calendar-nav-button"
                 disabled={isBefore(endOfMonth(addMonths(visibleMonth, -1)), today)}
-                style={{ minWidth: 'unset', padding: '8px 12px' }}
               >
                 Prev
               </button>
               <button
                 type="button"
                 onClick={() => setCalendarMonth(addMonths(visibleMonth, 1))}
-                className="btn-ghost"
-                style={{ minWidth: 'unset', padding: '8px 12px' }}
+                className="booking-calendar-nav-button"
               >
                 Next
               </button>
@@ -1403,7 +1401,7 @@ function DetailsStep({
 function inputStyle(hasError = false): React.CSSProperties {
   return {
     width: '100%',
-    background: 'var(--off-black)',
+    background: 'var(--booking-input-bg, var(--off-black))',
     border: `1px solid ${hasError ? '#e85d75' : 'var(--border)'}`,
     color: 'var(--white)',
     padding: '12px 14px',
@@ -1492,9 +1490,9 @@ function buildCalendarDays(month: Date) {
 
 function calendarShellStyle(hasError: boolean): React.CSSProperties {
   return {
-    background: 'var(--off-black)',
+    background: 'var(--booking-calendar-bg, var(--off-black))',
     border: `1px solid ${hasError ? '#e85d75' : 'var(--border)'}`,
-    padding: '14px',
+    padding: 'clamp(18px, 2.2vw, 26px)',
     display: 'grid',
     gap: '12px',
   }
