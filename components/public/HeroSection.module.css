@@ -729,3 +729,11 @@
 .tornEdgeShadow { stroke-width: 1.6px; stroke: rgba(31,23,21,.21); }
 .tornEdge { stroke-width: 1.35px; stroke: rgba(253,244,229,.7); stroke-dasharray: none; }
 .tornTapeTop, .tornTapeBottom { opacity: .52; }
+
+/* Translucent so the page's background photo shows through. */
+.hero {
+  background:
+    radial-gradient(ellipse at 17% 21%, rgba(183,95,112,.29), transparent 48%),
+    radial-gradient(ellipse at 78% 67%, rgba(213,154,124,.16), transparent 48%),
+    rgba(68,48,56,.3);
+}

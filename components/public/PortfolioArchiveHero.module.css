@@ -442,3 +442,10 @@
 @media (prefers-reduced-motion: reduce) {
   .print { transition: none; }
 }
+
+/* Room photo backdrop: same light blur as the other pages so it reads. */
+.background {
+  object-position: center 55%;
+  filter: blur(3px) brightness(.8) saturate(.85);
+  transform: scale(1.03);
+}

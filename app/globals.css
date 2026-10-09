@@ -9129,13 +9129,15 @@ a.admin-stat-card:focus-visible {
   filter: blur(var(--page-photo-blur, 3px)) brightness(var(--page-photo-brightness, .85)) saturate(.85);
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
-  --page-photo: url('/photos/rooms/phones.jpg');
+  --page-photo: url('/photos/rooms/phones-box.jpg');
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/meet']::after {
   display: none;
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
-  --page-photo: url('/photos/rooms/phones.jpg');
+  --page-photo: url('/photos/rooms/phones-grid.jpg');
+  /* A white studio shot: darken it further than the others. */
+  --page-photo-brightness: .5;
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/lab'] {
   --page-photo: url('/photos/rooms/listening-bar.jpg');
@@ -9154,4 +9156,27 @@ a.admin-stat-card:focus-visible {
   background:
     radial-gradient(ellipse at 85% 10%, rgba(154,79,101,.21), transparent 50%),
     linear-gradient(155deg, rgba(76,52,62,.3), rgba(50,37,43,.4));
+}
+
+.public-experience-shell .public-page-stage--experience[data-experience-route='/'] {
+  --page-photo: url('/photos/PlexMix19-DJBAE.JPEG');
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/portfolio'] {
+  --page-photo: url('/photos/rooms/dj-setup.jpg');
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/events'] {
+  --page-photo: url('/photos/rooms/tile-booth.jpg');
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/']::after,
+.public-experience-shell .public-page-stage--experience[data-experience-route='/portfolio']::after,
+.public-experience-shell .public-page-stage--experience[data-experience-route='/events']::after {
+  display: none;
+}
+.public-experience-shell .events-experience {
+  background:
+    radial-gradient(ellipse at 18% 18%, rgba(155,88,112,.18), transparent 52%),
+    linear-gradient(150deg, rgba(74,50,59,.3), rgba(51,36,44,.4));
+}
+.public-experience-shell .portfolio-experience {
+  background: rgba(67,49,57,.3);
 }
