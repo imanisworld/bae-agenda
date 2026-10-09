@@ -109,6 +109,7 @@ export function HangingLogo({ finish = 'red', className, cue = true }: Props) {
       data-cue-host={cue || undefined}
       style={{ '--clasp': tag.clasp, '--slot': tag.slot } as CSSProperties}
       aria-hidden="true"
+      data-finish={finish}
     >
       {copy(styles.back)}
       {copy(styles.front, true)}

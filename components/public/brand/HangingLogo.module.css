@@ -137,3 +137,8 @@
     8% 32%, 11% 13%
   );
 }
+
+/* Gold tag: its dark backing is a baked-in photo matte, not a desired tile.
+   This keeps the full clasp and body while blending the dark matte into the
+   existing page. All other finishes remain unchanged. */
+.hanger[data-finish='gold'] .logo { mix-blend-mode: lighten; }
