@@ -1900,7 +1900,7 @@
   background: #120c0b;
 }
 .coverFront .coverDisc {
-  transform: translateX(44%);
+  transform: translateX(22%);
 }
 @media (prefers-reduced-motion: reduce) {
   .coverDisc { transition: none; }
