@@ -417,8 +417,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
     )
   }
 
-  const focusedIsLoaded = focused?.id === loaded.id
-
   return (
     <section className={styles.station} aria-label="B.A.E. listening station">
       {header}
@@ -482,17 +480,8 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
           })}
         </div>
 
-        <div className={styles.crateBar}>
+        <div className={styles.crateBar} role="group" aria-label="Browse record covers">
           <button type="button" className={styles.round} onClick={() => move(-1)} disabled={focus === 0} aria-label="Previous cover">←</button>
-          <div className={styles.crateCaption} aria-live="polite">
-            <small>{String(focus + 1).padStart(3, '0')}{focused?.genre ? ` · ${focused.genre}` : ''}</small>
-            <strong>{focused?.title}</strong>
-            <span>{list.length < 2
-                ? 'Tap the cover to play'
-                : focusedIsLoaded && onPlatter
-                  ? 'Playing from this cover · use arrows or swipe to browse'
-                  : 'Swipe or use arrows to browse · tap a cover to play'}</span>
-          </div>
           <button type="button" className={styles.round} onClick={() => move(1)} disabled={focus === list.length - 1} aria-label="Next cover">→</button>
         </div>
       </div>
