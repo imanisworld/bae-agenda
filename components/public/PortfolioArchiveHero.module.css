@@ -402,3 +402,24 @@
     transition: none;
   }
 }
+
+
+/* Public contrast lift — reveal the photo without losing title contrast. */
+.hero { background: #443039; }
+.background {
+  filter: blur(12px) brightness(.76) saturate(.92) contrast(1.02);
+}
+.shade {
+  background:
+    linear-gradient(90deg, rgba(44,27,35,.88) 0%, rgba(47,29,36,.58) 33%, rgba(47,29,36,.15) 76%),
+    linear-gradient(0deg, rgba(39,24,31,.72) 0%, transparent 48%),
+    radial-gradient(circle at 25% 19%, rgba(165,77,98,.22), transparent 43%);
+}
+.copy > span { color: #f2cb9a; }
+.copy h1 { color: #fff6ed; }
+.copy p { color: rgba(255,245,235,.9); }
+.footerLine { color: rgba(255,237,217,.86); }
+@media (max-width: 560px) {
+  .copy p { color: rgba(255,245,235,.94); }
+  .footerLine { color: rgba(255,237,217,.9); }
+}
