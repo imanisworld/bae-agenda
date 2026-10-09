@@ -52,6 +52,13 @@ export default function HeroInteractivePhoto() {
       } as CSSProperties}
     >
       <span className={styles.albumStack}>
+        {/* Editorial print fragments sit behind the interactive record sleeve. */}
+        <span className={styles.collagePrintOne} aria-hidden="true">
+          <Image src="/photos/events/film-decks.jpg" alt="" fill sizes="(max-width: 900px) 38vw, 19vw" draggable={false} />
+        </span>
+        <span className={styles.collagePrintTwo} aria-hidden="true">
+          <Image src="/photos/events/outdoor-smile.jpg" alt="" fill sizes="(max-width: 900px) 34vw, 16vw" draggable={false} />
+        </span>
         <span className={styles.vinyl} aria-hidden="true">
           <span className={styles.vinylGrooves} />
           <span className={styles.vinylLabel}>
