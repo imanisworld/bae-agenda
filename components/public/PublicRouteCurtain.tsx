@@ -1,13 +1,15 @@
 'use client'
 
 /**
- * Branded public-route curtain, adapted from the CoMinVi page-transition
- * reference (a staggered cover / reveal, not a copy of its code or assets).
+ * Branded cover/reveal inspired by the CoMinVi page transition reference.
  *
- * Navigation starts immediately. We never preventDefault, postpone router
- * changes or intercept form submits; an unfinished navigation cannot trap the
- * visitor behind an overlay. Touch page-swipes retain their existing slide
- * transition to avoid two animations fighting each other.
+ * Run one animation AFTER a route changes. The previous two-phase attempt
+ * started an animation on click and restarted it when the route loaded,
+ * producing half-drawn panels and mismatched labels on rapid taps.
+ *
+ * Navigation is never delayed or intercepted. The curtain is decorative,
+ * ignores pointers, resets on each route change and auto-clears. The mobile
+ * swipe gesture keeps its existing slide instead of layering two effects.
  */
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
@@ -22,149 +24,107 @@ const TITLES: Record<string, string> = {
   '/book': 'Book',
 }
 const ROUTES = new Set(Object.keys(TITLES))
-const STORAGE_KEY = 'bae-page-curtain-next'
-const COVER_MS = 255
-const REVEAL_MS = 460
-const NAV_FAILSAFE_MS = 1600
-const ARRIVAL_TTL_MS = 5000
+const NATIVE_INTENT_KEY = 'bae-page-curtain-next'
+const INTENT_TTL_MS = 5000
+const REVEAL_MS = 550
 
-type Phase = 'idle' | 'cover' | 'reveal'
-type CurtainState = { phase: Phase; label: string }
+type Scene = { id: number; label: string }
 type Intent = { path: string; at: number }
 
-function reduceMotion() {
+function reducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
 export default function PublicRouteCurtain({ swipePhase }: { swipePhase: string }) {
   const pathname = usePathname()
   const previousPath = useRef(pathname)
-  const intentRef = useRef<Intent | null>(null)
-  const timers = useRef<number[]>([])
-  const swipePhaseRef = useRef(swipePhase)
-  const [state, setState] = useState<CurtainState>({ phase: 'idle', label: '' })
-
-  useEffect(() => { swipePhaseRef.current = swipePhase }, [swipePhase])
+  const mounted = useRef(false)
+  const nextId = useRef(0)
+  const clearTimer = useRef<number | null>(null)
+  const [scene, setScene] = useState<Scene | null>(null)
 
   useEffect(() => {
-    const clear = () => {
-      timers.current.forEach((id) => window.clearTimeout(id))
-      timers.current = []
-    }
-    const schedule = (fn: () => void, delay: number) => {
-      timers.current.push(window.setTimeout(fn, delay))
-    }
-
-    // A native Book CTA reloads the document. Pick up its arrival on the new
-    // document, but only once and never after an unrelated refresh.
-    try {
-      const stored = window.sessionStorage.getItem(STORAGE_KEY)
-      if (stored) {
-        window.sessionStorage.removeItem(STORAGE_KEY)
-        const next = JSON.parse(stored) as Intent
-        if (next.path === pathname && Date.now() - next.at < ARRIVAL_TTL_MS && !reduceMotion()) {
-          setState({ phase: 'reveal', label: TITLES[pathname] ?? '' })
-          schedule(() => setState({ phase: 'idle', label: '' }), REVEAL_MS)
-        }
-      }
-    } catch {
-      // Storage unavailable: all route links still work normally.
-    }
-
+    // A full document navigation unmounts the shell. Only remember the target,
+    // then render its arrival curtain after the new document mounts.
     function onClick(event: MouseEvent) {
       if (
         event.defaultPrevented || event.button !== 0 ||
-        event.metaKey || event.ctrlKey || event.altKey || event.shiftKey ||
-        reduceMotion()
+        event.metaKey || event.ctrlKey || event.altKey || event.shiftKey
       ) return
       const target = event.target
       if (!(target instanceof Element)) return
       const anchor = target.closest('a[href]')
       if (!(anchor instanceof HTMLAnchorElement)) return
       if (anchor.hasAttribute('download') || (anchor.target && anchor.target !== '_self')) return
-
       let url: URL
+      try { url = new URL(anchor.href) } catch { return }
+      if (
+        url.origin !== window.location.origin ||
+        !ROUTES.has(url.pathname) ||
+        url.pathname === window.location.pathname
+      ) return
       try {
-        url = new URL(anchor.href)
-      } catch {
-        return
-      }
-      if (url.origin !== window.location.origin || !ROUTES.has(url.pathname)) return
-      if (url.pathname === window.location.pathname) return
-      if (!ROUTES.has(window.location.pathname)) return
-
-      const intent = { path: url.pathname, at: Date.now() }
-      intentRef.current = intent
-      clear()
-      setState({ phase: 'cover', label: TITLES[url.pathname] })
-      try {
-        window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(intent))
-      } catch {
-        // Session storage is optional; never delay navigation.
-      }
-
-      // If a link fails, clear the curtain rather than hiding the page.
-      schedule(() => {
-        if (intentRef.current === intent) {
-          intentRef.current = null
-          setState({ phase: 'reveal', label: TITLES[url.pathname] })
-          schedule(() => setState({ phase: 'idle', label: '' }), REVEAL_MS)
-        }
-      }, NAV_FAILSAFE_MS)
+        window.sessionStorage.setItem(
+          NATIVE_INTENT_KEY,
+          JSON.stringify({ path: url.pathname, at: Date.now() } satisfies Intent),
+        )
+      } catch { /* Optional storage must never block navigation. */ }
     }
 
     document.addEventListener('click', onClick, true)
     return () => {
       document.removeEventListener('click', onClick, true)
-      clear()
+      if (clearTimer.current !== null) window.clearTimeout(clearTimer.current)
     }
-  // Attach delegated click handling once; pathname changes are handled below.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
-    if (pathname === previousPath.current) return
+    const firstMount = !mounted.current
+    mounted.current = true
+    const changed = pathname !== previousPath.current
     previousPath.current = pathname
 
-    // Existing touch-swipe already provides a live page slide. Avoid adding a
-    // curtain over that motion; dock links and browser navigations use curtain.
-    if (reduceMotion() || swipePhaseRef.current === 'leaving' || swipePhaseRef.current === 'arriving') {
-      intentRef.current = null
-      setState({ phase: 'idle', label: '' })
+    let nativeArrival = false
+    try {
+      const stored = window.sessionStorage.getItem(NATIVE_INTENT_KEY)
+      if (stored) {
+        window.sessionStorage.removeItem(NATIVE_INTENT_KEY)
+        const target = JSON.parse(stored) as Intent
+        nativeArrival = firstMount &&
+          target.path === pathname &&
+          Date.now() - target.at >= 0 &&
+          Date.now() - target.at < INTENT_TTL_MS
+      }
+    } catch { /* Ignore missing/invalid storage. */ }
+
+    if (!changed && !nativeArrival) return
+    if (!ROUTES.has(pathname) || reducedMotion() ||
+        swipePhase === 'arriving' || swipePhase === 'leaving') {
+      if (clearTimer.current !== null) window.clearTimeout(clearTimer.current)
+      setScene(null)
       return
     }
 
-    const intent = intentRef.current
-    intentRef.current = null
-    try { window.sessionStorage.removeItem(STORAGE_KEY) } catch { /* optional */ }
-    const hold = intent?.path === pathname ? Math.max(0, COVER_MS - (Date.now() - intent.at)) : 0
+    // A new completed navigation supersedes an older animation immediately.
+    const id = ++nextId.current
+    if (clearTimer.current !== null) window.clearTimeout(clearTimer.current)
+    setScene({ id, label: TITLES[pathname] })
+    clearTimer.current = window.setTimeout(() => {
+      setScene((current) => current?.id === id ? null : current)
+      clearTimer.current = null
+    }, REVEAL_MS)
+  }, [pathname, swipePhase])
 
-    const reveal = () => {
-      setState({ phase: 'reveal', label: TITLES[pathname] ?? '' })
-      const idle = window.setTimeout(() => setState({ phase: 'idle', label: '' }), REVEAL_MS)
-      timers.current.push(idle)
-    }
-    const timer = window.setTimeout(reveal, hold)
-    timers.current.push(timer)
-    return () => {
-      window.clearTimeout(timer)
-    }
-  }, [pathname])
-
-  if (!ROUTES.has(pathname) || state.phase === 'idle') return null
+  if (!scene || !ROUTES.has(pathname)) return null
 
   return (
-    <div
-      aria-hidden="true"
-      className={`${styles.curtain} ${state.phase === 'cover' ? styles.cover : styles.reveal}`}
-      data-page-transition={state.phase}
-    >
+    <div key={scene.id} className={styles.curtain} aria-hidden="true" data-page-transition="reveal">
       <span className={styles.panel} />
       <span className={styles.panel} />
       <span className={styles.panel} />
       <div className={styles.label}>
         <span className={styles.kicker}>DJ B.A.E.</span>
-        <strong>{state.label}</strong>
+        <strong>{scene.label}</strong>
         <span className={styles.rule} />
       </div>
     </div>
