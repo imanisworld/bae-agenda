@@ -51,6 +51,7 @@ export default async function PressKitPage() {
               src="/photos/PlexMix19-DJBAE.JPEG"
               alt="DJ B.A.E. performing at Club Plex"
               fill
+              priority
               sizes="(max-width: 900px) 100vw, 480px"
               quality={80}
               className="press-kit-photo"
@@ -130,7 +131,7 @@ export default async function PressKitPage() {
               <Link href="/book" className="press-kit-footer-book">Book DJ B.A.E. <span aria-hidden="true">↗</span></Link>
             </div>
             <a className="press-kit-qr" href="https://thebaeagenda.com" aria-label="Visit thebaeagenda.com">
-              <Image src="/brand/press-kit-site-qr.png" width={80} height={80} alt="QR code linking to thebaeagenda.com" />
+              <Image src="/brand/press-kit-site-qr.png" width={80} height={80} unoptimized alt="QR code linking to thebaeagenda.com" />
               <span>Scan for more</span>
             </a>
           </footer>

@@ -2,37 +2,45 @@
 
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
+import { ROUTE_ORDER } from './useRouteGestures'
 
-const EXPERIENCE_ROUTES = new Set(['/', '/events', '/lab', '/portfolio', '/meet', '/book'])
+const EXPERIENCE_ROUTES = new Set<string>(ROUTE_ORDER)
 
-// Each page's background photo (set per route in globals.css). Warmed once the
-// first page is idle so the next page's photo is ready when you tap to it.
-const PAGE_PHOTOS = [
-  '/photos/rooms/home-plexmix.webp',
-  '/photos/rooms/tile-booth.webp',
-  '/photos/rooms/turntables-floor.webp',
-  '/photos/rooms/work-booth.webp',
-  '/photos/rooms/phones-box.webp',
-  '/photos/rooms/phones-grid.webp',
-]
+// The route backdrops in globals.css. Warm only the adjacent routes rather than
+// fetching all six photos after every page entry (including obsolete variants).
+const PAGE_PHOTOS: Record<(typeof ROUTE_ORDER)[number], string> = {
+  '/': '/photos/rooms/home-plexmix.webp',
+  '/events': '/photos/rooms/tile-booth.webp',
+  '/lab': '/photos/rooms/turntables-floor.webp',
+  '/portfolio': '/photos/rooms/work-booth.webp',
+  '/meet': '/photos/rooms/meet-wood-shelves.webp',
+  '/book': '/photos/rooms/book-blue-phones.webp',
+}
 
-function usePreloadPagePhotos(enabled: boolean) {
+function usePreloadPagePhotos(pathname: string, enabled: boolean) {
   useEffect(() => {
     if (!enabled) return
-    const warm = () => PAGE_PHOTOS.forEach((src) => { new Image().src = src })
+    const routeIndex = ROUTE_ORDER.indexOf(pathname as (typeof ROUTE_ORDER)[number])
+    if (routeIndex < 0) return
+
+    const warm = () => {
+      for (const route of [ROUTE_ORDER[routeIndex - 1], ROUTE_ORDER[routeIndex + 1]]) {
+        if (route) new Image().src = PAGE_PHOTOS[route]
+      }
+    }
     if ('requestIdleCallback' in window) {
       const id = window.requestIdleCallback(warm, { timeout: 4000 })
       return () => window.cancelIdleCallback(id)
     }
     const id = setTimeout(warm, 2500)
     return () => clearTimeout(id)
-  }, [enabled])
+  }, [pathname, enabled])
 }
 
 export default function PublicPageStage({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const experienceMode = EXPERIENCE_ROUTES.has(pathname)
-  usePreloadPagePhotos(experienceMode)
+  usePreloadPagePhotos(pathname, experienceMode)
 
   return (
     <div
