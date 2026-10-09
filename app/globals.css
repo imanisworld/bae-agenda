@@ -8811,3 +8811,42 @@ a.admin-stat-card:focus-visible {
     rotate: none !important;
   }
 }
+
+
+/* ================================================================
+   WARMER PUBLIC CANVAS — preview design pass (admin is unchanged).
+   Warm plum rather than pure black; maintain photo depth/contrast.
+   ================================================================ */
+.public-experience-shell,
+.public-site-shell {
+  --black: #322427;
+  --off-black: #3b2b2e;
+  --surface: #4a3539;
+  --border: rgba(255,237,224,.22);
+  --muted: rgba(255,244,233,.84);
+  --white: #fff4e8;
+  background:
+    radial-gradient(ellipse 85% 65% at 3% 14%, rgba(184,116,122,.17), transparent 68%),
+    radial-gradient(ellipse 75% 70% at 95% 88%, rgba(207,158,122,.1), transparent 70%),
+    #322427;
+}
+.public-experience-shell .public-page-stage,
+.public-site-shell .public-page-stage {
+  background: transparent;
+}
+.public-experience-shell .public-page-stage-glow,
+.public-site-shell .public-page-stage-glow {
+  background:
+    radial-gradient(ellipse 85% 70% at 6% 0%, rgba(176,109,118,.19), transparent 60%),
+    radial-gradient(ellipse 60% 65% at 95% 90%, rgba(210,153,123,.14), transparent 65%);
+}
+/* The Lab is a warm, light gallery rather than a dark rack of equipment. */
+.public-experience-shell .lab-experience {
+  color-scheme: light;
+  background:
+    radial-gradient(ellipse at 75% 0%, rgba(212,168,149,.26), transparent 50%),
+    linear-gradient(170deg, #f2e9df, #e7d9cb);
+}
+.public-experience-shell .public-page-stage:has(.lab-experience) {
+  background: #f2e9df;
+}
