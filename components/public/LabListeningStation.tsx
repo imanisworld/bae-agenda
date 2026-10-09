@@ -54,7 +54,10 @@ function coverStyle(offset: number): CSSProperties {
   const abs = Math.abs(offset)
   const side = Math.sign(offset)
   // Center cover faces forward; the rest angle toward it and step back in depth.
-  const x = offset === 0 ? 0 : side * (0.64 + (abs - 1) * 0.3)
+  // Covers to the right step over to leave a clear gap for the record sliding
+  // out of the front sleeve: nothing may overlap it, because Safari (and some
+  // Chromium builds) ignore zIndex/page order for these tilted 3D covers.
+  const x = offset === 0 ? 0 : side * (0.64 + (abs - 1) * 0.3) + (side > 0 ? 0.44 : 0)
   return {
     '--x': x,
     '--z': offset === 0 ? 1 : -abs,
@@ -438,7 +441,19 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
           onPointerCancel={(event) => finishCoverDrag(event, true)}
           onWheel={onWheel}
         >
-          {list.map((mix, index) => {
+          {/* Paint farthest covers first and the front cover last, with the front
+              sleeve's record just before it. Browsers paint these 3D-tilted covers
+              in page order (not by zIndex), so this keeps the record under the
+              front sleeve but over the stack. Keyed by mix so it slides out. */}
+          {[...list.keys()]
+            .sort((a, b) => Math.abs(b - focus) - Math.abs(a - focus))
+            .flatMap((index) => index === focus && focused
+              ? [<span key={`disc-${focused.id}`} className={`${styles.coverDisc} ${styles[`disc${discStyle(focused.id)}`]}`} aria-hidden="true" />, index]
+              : [index])
+            .map((entry) => {
+            if (typeof entry !== 'number') return entry
+            const index = entry
+            const mix = list[index]
             const offset = index - focus
             const isLoaded = index === loadedIndex
             return (
@@ -454,7 +469,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
                 style={coverStyle(offset)}
                 onClick={() => onCoverClick(index)}
               >
-                <span className={`${styles.coverDisc} ${styles[`disc${discStyle(mix.id)}`]}`} aria-hidden="true" />
                 <span className={`${styles.coverArt}${isBrandCardArtwork(mix.cover_url) ? ` ${styles.brandSleeve}` : ''}`}>
                   {/* Only covers near the front load an image; far ones are invisible anyway. */}
                   {mix.cover_url && Math.abs(offset) <= 3 ? (

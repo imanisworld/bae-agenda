@@ -1860,18 +1860,23 @@
     radial-gradient(ellipse at 42% 36%, transparent 52%, rgba(22,12,10,.34) 100%);
 }
 
-/* A record sliding out of each sleeve: tucked in on the stacked covers,
-   pulled a third of the way out on the cover in front. */
+/* The record sliding out of the front sleeve. It sits where the front cover
+   sits (same depth, same stacking level) and slides out to the right. */
 .coverDisc {
+  --disc-size: calc(var(--cover) * .94);
   position: absolute;
-  top: 3%;
-  left: 3%;
-  width: 94%;
-  height: 94%;
+  z-index: 20;
+  top: calc(var(--cover-top, 12px) + var(--cover) * .03);
+  left: 50%;
+  width: var(--disc-size);
+  height: var(--disc-size);
+  margin-left: calc(var(--disc-size) / -2);
   border-radius: 50%;
   pointer-events: none;
-  transform: translateX(0);
-  transition: transform 420ms cubic-bezier(.2,.8,.2,1);
+  transform:
+    translateX(calc(var(--cover) * .2 + var(--drag-px, 0px)))
+    translateZ(60px);
+  animation: disc-slide-out 460ms cubic-bezier(.2,.8,.2,1) both;
   box-shadow: 0 10px 24px rgba(0,0,0,.4);
   background:
     /* grooves and the shine across the vinyl */
@@ -1899,11 +1904,15 @@
   border-radius: 50%;
   background: #120c0b;
 }
-.coverFront .coverDisc {
-  transform: translateX(22%);
+@keyframes disc-slide-out {
+  from { translate: calc(var(--cover) * -.2) 0; }
+  to   { translate: 0 0; }
+}
+@media (max-width: 620px) {
+  .coverDisc { --cover-top: 7px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .coverDisc { transition: none; }
+  .coverDisc { animation: none; }
 }
 
 /* Record styles: vinyl colour, label colour and a simple label design. */
