@@ -539,45 +539,117 @@
   .meta { color: rgba(255,242,233,.92); }
 }
 
-
-/* Editorial photo collage: supporting performance frames are layered BEHIND
-   the familiar interactive record sleeve. The main image and tap behavior stay. */
-.collagePrintOne,
-.collagePrintTwo {
+/* Torn-paper vinyl artwork — one photograph inside a rigid, square sleeve.
+   Never layer unrelated images outside the physical sleeve. */
+.coverArtwork {
   position: absolute;
-  z-index: 0;
-  display: block;
+  inset: 0;
+  isolation: isolate;
   overflow: hidden;
-  padding: 0;
-  background: #eaded1;
-  border: clamp(3px, .7cqw, 7px) solid #f7efe3;
-  box-shadow: 0 14px 30px rgba(31,16,23,.3);
-  pointer-events: none;
+  background: #3a302d;
+  box-shadow: inset 0 0 0 1px rgba(255,249,238,.6);
+}
+
+.coverArtwork .photoImage,
+.tornPhoto {
+  object-fit: cover;
+  object-position: center 46%;
   backface-visibility: hidden;
 }
-.collagePrintOne img,
-.collagePrintTwo img {
-  object-fit: cover;
-  filter: saturate(.94) contrast(1.04);
+
+.coverArtwork .photoImage {
+  filter: brightness(1.12) saturate(1.07) contrast(1.03);
+  transform: none;
 }
-.collagePrintOne {
-  width: 47%;
-  height: 56%;
-  left: -15%;
-  top: -8%;
-  transform: rotate(-11deg);
+
+.tornPanel {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  /* Image is exactly aligned with the underlying photo; only tone/edge
+     changes. The central DJ subject stays in full color. */
 }
-.collagePrintTwo {
-  width: 41%;
-  height: 45%;
-  right: -12%;
-  bottom: -8%;
-  transform: rotate(10deg);
+
+.tornPanelLeft {
+  clip-path: polygon(0 0, 30% 0, 29.3% 9%, 31.1% 16%, 29.4% 23%, 30.8% 30.7%, 28.9% 38.7%, 30.1% 46.8%, 28.5% 54.1%, 30.3% 61.9%, 29.1% 69.7%, 30% 76.1%, 28.4% 84.4%, 29.6% 100%, 0 100%);
+  filter: grayscale(.94) saturate(.56) contrast(1.08) brightness(.93);
 }
-@media (max-width: 560px) {
-  .collagePrintOne { left: -12%; top: -5%; width: 40%; height: 49%; }
-  .collagePrintTwo { right: -9%; bottom: -5%; width: 36%; height: 41%; }
+
+.tornPanelRight {
+  clip-path: polygon(76.5% 0, 100% 0, 100% 100%, 74.8% 100%, 75.8% 83.5%, 74.8% 73.4%, 76.4% 64.9%, 75.5% 54.7%, 76.7% 45%, 75% 35.2%, 76.8% 26.4%, 75.4% 17.6%, 77.1% 9.6%);
+  filter: grayscale(.88) saturate(.4) contrast(1.08) brightness(.9);
 }
+
+.tornPanelTop {
+  clip-path: polygon(30% 0, 76.5% 0, 76.8% 26.4%, 70.5% 29.4%, 63.2% 30.8%, 53.9% 29.2%, 45.6% 30.4%, 37.3% 28.9%, 29.5% 29.3%);
+  filter: saturate(.66) sepia(.18) contrast(1.05);
+}
+
+.tornSeams {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.tornEdgeShadow,
+.tornEdge {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.tornEdgeShadow { stroke: rgba(35,20,20,.46); stroke-width: 8px; }
+.tornEdge {
+  stroke: #f7eee1;
+  stroke-width: 3.5px;
+  stroke-dasharray: 19 1.5 43 1 12 1.5;
+}
+
+.tornTapeTop,
+.tornTapeBottom {
+  position: absolute;
+  z-index: 3;
+  width: 15%;
+  height: 5.5%;
+  background: rgba(236,216,183,.66);
+  border: 1px solid rgba(255,247,228,.19);
+  box-shadow: 0 1px 4px rgba(30,18,18,.2);
+  pointer-events: none;
+  clip-path: polygon(0 2%, 9% 0, 17% 4%, 29% 1%, 41% 6%, 55% 1%, 73% 4%, 87% 0, 100% 5%, 97% 100%, 83% 95%, 68% 100%, 55% 96%, 42% 100%, 29% 95%, 17% 100%, 5% 96%);
+}
+.tornTapeTop { left: 5%; top: 9%; rotate: -15deg; }
+.tornTapeBottom { right: 6%; bottom: 7%; rotate: 9deg; }
+
+/* The sleeve is still a perfect square with a real cream paper edge,
+   and the burgundy record remains behind it with the original tap action. */
+.photoFrame {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  border-color: #f8eee1;
+}
+.photo .photoSheen { opacity: .33; }
+
+@media (hover: hover) {
+  .photo:hover .photoImage {
+    transform: none;
+    filter: brightness(1.12) saturate(1.07) contrast(1.03);
+  }
+}
+
+/* Desktop copy must never disappear behind the cover or right viewport edge. */
+@media (min-width: 901px) {
+  .copy h1 {
+    font-size: clamp(38px, 4.15vw, 70px);
+    letter-spacing: -.035em;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .collagePrintOne, .collagePrintTwo { transition: none; }
+  .tornPanel, .tornSeams { transition: none; }
 }
