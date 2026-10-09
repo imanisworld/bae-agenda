@@ -471,3 +471,66 @@
 @media (max-width: 560px) {
   .portraitTapeOne, .portraitTapeTwo { width: 14%; height: 6%; }
 }
+
+
+/* DESKTOP OVERFLOW FIX — contain the portrait and keep all copy in its own
+   minmax(0,1fr) column. Prior absolute offsets hid text/CTAs off-screen. */
+@media (min-width: 861px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.03fr) minmax(0, .97fr);
+    align-items: center;
+    column-gap: clamp(36px, 4vw, 72px);
+    min-height: 100svh;
+    padding:
+      clamp(110px, 13vh, 170px)
+      clamp(36px, 5vw, 100px)
+      calc(120px + var(--safe-bottom, 0px));
+  }
+  .portraitWrap {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    top: auto;
+    left: auto;
+    width: min(100%, 560px);
+    min-width: 0;
+    margin: 0 auto;
+    justify-self: center;
+  }
+  .portrait { width: 100%; aspect-ratio: 4 / 3; }
+  .copy {
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+  }
+  .copy h1 {
+    font-size: clamp(26px, 2.7vw, 47px);
+    line-height: 1.08;
+    overflow-wrap: break-word;
+  }
+  .summary { max-width: 100%; font-size: clamp(14px, 1.2vw, 17px); }
+  .details { padding-top: clamp(30px, 3vw, 48px); }
+  .actions { gap: 10px; }
+  .actions > * { max-width: 100%; }
+  .title .titleTag { --size: clamp(48px, 4vw, 70px); }
+}
+@media (min-width: 861px) and (max-width: 1120px) {
+  .hero { column-gap: 28px; padding-inline: 32px; }
+  .copy h1 { font-size: clamp(26px, 2.7vw, 34px); }
+  .actions > * { padding-inline: 14px; }
+}
+/* Keep the editorial tonal layers but eliminate the thick geometric grid. */
+.portraitTears path {
+  stroke: rgba(248,236,217,.68);
+  stroke-width: 1.35px;
+  filter: none;
+}
+.portraitTapeOne, .portraitTapeTwo { opacity: .52; }
