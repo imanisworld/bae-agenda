@@ -8819,16 +8819,16 @@ a.admin-stat-card:focus-visible {
    ================================================================ */
 .public-experience-shell,
 .public-site-shell {
-  --black: #322427;
-  --off-black: #3b2b2e;
-  --surface: #4a3539;
-  --border: rgba(255,237,224,.22);
-  --muted: rgba(255,244,233,.84);
+  --black: #433138;
+  --off-black: #4a363e;
+  --surface: #59414a;
+  --border: rgba(255,237,224,.25);
+  --muted: rgba(255,244,233,.9);
   --white: #fff4e8;
   background:
-    radial-gradient(ellipse 85% 65% at 3% 14%, rgba(184,116,122,.17), transparent 68%),
-    radial-gradient(ellipse 75% 70% at 95% 88%, rgba(207,158,122,.1), transparent 70%),
-    #322427;
+    radial-gradient(ellipse 85% 65% at 3% 14%, rgba(199,125,137,.2), transparent 68%),
+    radial-gradient(ellipse 75% 70% at 95% 88%, rgba(223,177,142,.13), transparent 70%),
+    #433138;
 }
 .public-experience-shell .public-page-stage,
 .public-site-shell .public-page-stage {
@@ -8837,8 +8837,8 @@ a.admin-stat-card:focus-visible {
 .public-experience-shell .public-page-stage-glow,
 .public-site-shell .public-page-stage-glow {
   background:
-    radial-gradient(ellipse 85% 70% at 6% 0%, rgba(176,109,118,.19), transparent 60%),
-    radial-gradient(ellipse 60% 65% at 95% 90%, rgba(210,153,123,.14), transparent 65%);
+    radial-gradient(ellipse 85% 70% at 6% 0%, rgba(205,127,144,.24), transparent 60%),
+    radial-gradient(ellipse 60% 65% at 95% 90%, rgba(227,179,147,.16), transparent 65%);
 }
 /* The Lab is a warm, light gallery rather than a dark rack of equipment. */
 .public-experience-shell .lab-experience {
@@ -8849,4 +8849,36 @@ a.admin-stat-card:focus-visible {
 }
 .public-experience-shell .public-page-stage:has(.lab-experience) {
   background: #f2e9df;
+}
+
+
+/* Public-only surfaces that previously stayed near-black despite theme tokens.
+   Do not scope these rules to body/admin: the admin remains unchanged. */
+.public-experience-shell .events-experience {
+  background:
+    radial-gradient(ellipse at 60% 0%, rgba(186,121,133,.16), transparent 58%),
+    #423037;
+}
+.public-experience-shell .portfolio-experience {
+  background: #433139;
+}
+.public-experience-shell .book-experience {
+  background: rgba(238,201,177,.21);
+}
+.public-experience-shell .book-experience-rail {
+  background: #47323a;
+}
+.public-experience-shell .book-experience-contact > div {
+  background: #503841;
+}
+.public-experience-shell .book-experience-contact-note,
+.public-experience-shell .book-experience-rail-inner header p,
+.public-experience-shell .book-experience-faq p {
+  color: rgba(255,239,227,.86);
+}
+.public-experience-shell .book-experience-socials a {
+  color: rgba(255,239,227,.9);
+}
+.public-experience-shell .book-experience-switch button:not([aria-selected='true']) {
+  color: rgba(255,238,224,.88);
 }
