@@ -423,3 +423,22 @@
   .copy p { color: rgba(255,245,235,.94); }
   .footerLine { color: rgba(255,237,217,.9); }
 }
+
+
+/* Printed-photo collage has a gentle physical spring, not perpetual motion.
+   Reuses the existing pointer tilt and press variables. */
+.print {
+  border: 5px solid #fff5e8;
+  border-bottom-width: 7px;
+  border-radius: 3px;
+  box-shadow: 0 22px 48px rgba(26,14,20,.34);
+  transition: transform 390ms cubic-bezier(.2, 1.35, .24, 1),
+              box-shadow 240ms ease;
+}
+.printImage { border-radius: 1px; }
+@media (max-width: 560px) {
+  .print { border-width: 3px; border-bottom-width: 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .print { transition: none; }
+}
