@@ -98,21 +98,27 @@ export default function PublicRouteCurtain({ swipePhase }: { swipePhase: string 
     } catch { /* Ignore missing/invalid storage. */ }
 
     if (!changed && !nativeArrival) return
+    if (clearTimer.current !== null) window.clearTimeout(clearTimer.current)
+
     if (!ROUTES.has(pathname) || reducedMotion() ||
         swipePhase === 'arriving' || swipePhase === 'leaving') {
-      if (clearTimer.current !== null) window.clearTimeout(clearTimer.current)
-      setScene(null)
+      clearTimer.current = window.setTimeout(() => {
+        setScene(null)
+        clearTimer.current = null
+      }, 0)
       return
     }
 
-    // A new completed navigation supersedes an older animation immediately.
+    // React state updates run asynchronously; rapid route changes cancel the
+    // previous pending animation before it can flash old destination panels.
     const id = ++nextId.current
-    if (clearTimer.current !== null) window.clearTimeout(clearTimer.current)
-    setScene({ id, label: TITLES[pathname] })
     clearTimer.current = window.setTimeout(() => {
-      setScene((current) => current?.id === id ? null : current)
-      clearTimer.current = null
-    }, REVEAL_MS)
+      setScene({ id, label: TITLES[pathname] })
+      clearTimer.current = window.setTimeout(() => {
+        setScene((current) => current?.id === id ? null : current)
+        clearTimer.current = null
+      }, REVEAL_MS)
+    }, 0)
   }, [pathname, swipePhase])
 
   if (!scene || !ROUTES.has(pathname)) return null
