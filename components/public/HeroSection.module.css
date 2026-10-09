@@ -538,3 +538,46 @@
   .eyebrow { color: #f0cca9; }
   .meta { color: rgba(255,242,233,.92); }
 }
+
+
+/* Editorial photo collage: supporting performance frames are layered BEHIND
+   the familiar interactive record sleeve. The main image and tap behavior stay. */
+.collagePrintOne,
+.collagePrintTwo {
+  position: absolute;
+  z-index: 0;
+  display: block;
+  overflow: hidden;
+  padding: 0;
+  background: #eaded1;
+  border: clamp(3px, .7cqw, 7px) solid #f7efe3;
+  box-shadow: 0 14px 30px rgba(31,16,23,.3);
+  pointer-events: none;
+  backface-visibility: hidden;
+}
+.collagePrintOne img,
+.collagePrintTwo img {
+  object-fit: cover;
+  filter: saturate(.94) contrast(1.04);
+}
+.collagePrintOne {
+  width: 47%;
+  height: 56%;
+  left: -15%;
+  top: -8%;
+  transform: rotate(-11deg);
+}
+.collagePrintTwo {
+  width: 41%;
+  height: 45%;
+  right: -12%;
+  bottom: -8%;
+  transform: rotate(10deg);
+}
+@media (max-width: 560px) {
+  .collagePrintOne { left: -12%; top: -5%; width: 40%; height: 49%; }
+  .collagePrintTwo { right: -9%; bottom: -5%; width: 36%; height: 41%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .collagePrintOne, .collagePrintTwo { transition: none; }
+}
