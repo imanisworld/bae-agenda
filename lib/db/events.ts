@@ -18,6 +18,17 @@ export type EventMedia = Pick<
   'id' | 'event_id' | 'media_type' | 'media_url' | 'poster_url' | 'caption' | 'sort_order'
 >
 
+// Preview-only correction so the public preview shows the rescheduled date
+// without silently changing live event data. Update the canonical database
+// record on production approval; this overlay is intentionally not production.
+const CLUB_CUNT_EVENT_ID = '372bf342-7e6b-4202-9e81-a55cf279f5c0'
+const CLUB_CUNT_PREVIEW_DATE = '2026-11-21T00:00:00.000Z'
+
+function withPreviewEventCorrection(event: Event): Event {
+  if (process.env.VERCEL_ENV !== 'preview' || event.id !== CLUB_CUNT_EVENT_ID) return event
+  return { ...event, event_date: CLUB_CUNT_PREVIEW_DATE }
+}
+
 const PUBLIC_EVENT_COLUMNS =
   'id,title,slug,event_date,event_timezone,venue,city,description,public,featured,show_description,created_at,updated_at' as const
 
@@ -40,7 +51,11 @@ async function loadUpcomingCandidates(limit: number, featuredOnly = false): Prom
   }
 
   const now = new Date()
-  return ((data ?? []) as Event[]).filter((event) => isUpcomingEventRecord(event, now)).slice(0, limit)
+  return ((data ?? []) as Event[])
+    .map(withPreviewEventCorrection)
+    .filter((event) => isUpcomingEventRecord(event, now))
+    .sort((a, b) => a.event_date.localeCompare(b.event_date))
+    .slice(0, limit)
 }
 
 /**
@@ -80,7 +95,11 @@ export async function getPastEvents(limit = 20): Promise<Event[]> {
     }
 
     const now = new Date()
-    return ((data ?? []) as Event[]).filter((event) => !isUpcomingEventRecord(event, now)).slice(0, limit)
+    return ((data ?? []) as Event[])
+      .map(withPreviewEventCorrection)
+      .filter((event) => !isUpcomingEventRecord(event, now))
+      .sort((a, b) => b.event_date.localeCompare(a.event_date))
+      .slice(0, limit)
   } catch (err) {
     console.error('[getPastEvents] unexpected error:', err)
     return []
@@ -135,7 +154,7 @@ export async function getPublicEventBySlug(slug: string): Promise<Event | null> 
       return null
     }
 
-    return (data as Event | null) ?? null
+    return data ? withPreviewEventCorrection(data as Event) : null
   } catch (err) {
     console.error('[getPublicEventBySlug] unexpected error:', err)
     return null

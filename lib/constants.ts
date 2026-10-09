@@ -19,7 +19,6 @@ export const PUBLIC_SECONDARY_NAV = [
   { label: 'Contact',       href: '/book#contact' },
   { label: 'Built',         href: '/built'        },
   { label: 'Press Kit',     href: '/press-kit'    },
-  { label: 'Client Portal', href: '/portal/login' },
 ] as const
 
 export const PUBLIC_LEGAL_NAV = [

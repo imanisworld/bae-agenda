@@ -2,7 +2,6 @@
  * Approved homepage hero — Editorial Cutout.
  * One performance image, oversized BAE typography, and restrained brand copy.
  */
-import Link from 'next/link'
 import HeroInteractivePhoto from '@/components/public/HeroInteractivePhoto'
 import styles from './HeroSection.module.css'
 
@@ -36,8 +35,8 @@ export default function HeroSection({ content = {} }: Props) {
         <p className={styles.meta}>Indianapolis · Open format</p>
 
         <div className={styles.actions}>
-          <Link href="/book" className="btn-primary">Book DJ B.A.E. →</Link>
-          <Link href="/portfolio" className="btn-ghost">Past Work</Link>
+          <a href="/book#inquiry" className="btn-primary" data-route-swipe-block>Book DJ B.A.E. →</a>
+          <a href="/portfolio" className="btn-ghost">Past Work</a>
         </div>
       </div>
 

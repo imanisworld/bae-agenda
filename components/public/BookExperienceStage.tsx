@@ -15,11 +15,15 @@ export default function BookExperienceStage({
   // hash target scrolled the Inquiry/Contact switch off screen on phones.
   useEffect(() => {
     const syncHash = () => {
-      if (window.location.hash === '#contact') setPanel('contact')
+      setPanel(window.location.hash === '#contact' ? 'contact' : 'inquiry')
     }
     syncHash()
     window.addEventListener('hashchange', syncHash)
-    return () => window.removeEventListener('hashchange', syncHash)
+    window.addEventListener('popstate', syncHash)
+    return () => {
+      window.removeEventListener('hashchange', syncHash)
+      window.removeEventListener('popstate', syncHash)
+    }
   }, [])
 
   function choosePanel(next: 'inquiry' | 'contact', moveFocus = false) {

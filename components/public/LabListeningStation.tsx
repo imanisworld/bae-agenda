@@ -7,7 +7,6 @@
  * turntable. Audio runs through the site-wide PlayerProvider so it keeps
  * playing after the visitor leaves the Lab.
  */
-import { HangFrom } from '@/components/public/brand/HangingLogo'
 import InteractionCue, { markCueUsed, useMotionHint } from '@/components/public/InteractionCue'
 import Image from 'next/image'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
@@ -20,7 +19,6 @@ export type ListeningMix = CrateMix
 
 const SOUNDCLOUD_PROFILE = 'https://soundcloud.com/deejaybae'
 const SWIPE_THRESHOLD = 40
-const COVERS_CUE = 'lab-covers'
 const RECORD_CUE = 'lab-record'
 
 function clamp(value: number, min: number, max: number) {
@@ -43,11 +41,23 @@ function formatTime(ms: number) {
   return h > 0 ? `${h}:${String(m).padStart(2, '0')}:${s}` : `${m}:${s}`
 }
 
+// Each mix gets its own record (colour + centre label), picked from its id so
+// it is the same every visit. Styles: .disc0 … .disc5 in the module.
+const DISC_STYLES = 6
+function discStyle(id: string) {
+  let hash = 0
+  for (const char of id) hash = (hash * 31 + char.charCodeAt(0)) >>> 0
+  return hash % DISC_STYLES
+}
+
 function coverStyle(offset: number): CSSProperties {
   const abs = Math.abs(offset)
   const side = Math.sign(offset)
   // Center cover faces forward; the rest angle toward it and step back in depth.
-  const x = offset === 0 ? 0 : side * (0.64 + (abs - 1) * 0.3)
+  // Covers to the right step over to leave a clear gap for the record sliding
+  // out of the front sleeve: nothing may overlap it, because Safari (and some
+  // Chromium builds) ignore zIndex/page order for these tilted 3D covers.
+  const x = offset === 0 ? 0 : side * (0.64 + (abs - 1) * 0.3) + (side > 0 ? 0.44 : 0)
   return {
     '--x': x,
     '--z': offset === 0 ? 1 : -abs,
@@ -86,6 +96,9 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   const [crateKey, setCrateKey] = useState<string | null>(null)
   const [focus, setFocus] = useState(0)
   const [shareNote, setShareNote] = useState('')
+  const [expandedMixId, setExpandedMixId] = useState<string | null>(null)
+  const [descriptionClipped, setDescriptionClipped] = useState(false)
+  const descriptionRef = useRef<HTMLParagraphElement | null>(null)
   const [draggingCovers, setDraggingCovers] = useState(false)
   const [scratching, setScratching] = useState(false)
   const drag = useRef<{ x: number; moved: boolean; pointerId: number } | null>(null)
@@ -94,7 +107,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   const suppressDeckClick = useRef(false)
   const wheelLock = useRef(0)
   const turntableRef = useRef<HTMLButtonElement | null>(null)
-  const coversHint = useMotionHint(COVERS_CUE)
   const recordHint = useMotionHint(RECORD_CUE)
   const initialSelectionApplied = useRef(false)
 
@@ -148,6 +160,20 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   const duration = loadedIsCurrent && player.duration ? player.duration : (loaded?.duration ?? 0) * 1000
   const position = loadedIsCurrent ? player.position : 0
   const progress = duration ? Math.min(1, position / duration) : 0
+  const description = [loaded?.genre || 'Open format', loaded?.description].filter(Boolean).join(' · ')
+  const descriptionExpanded = loaded?.id === expandedMixId
+  // Offer More only when the clamped text is actually cut off at this width.
+  const canExpandDescription = descriptionExpanded || descriptionClipped
+
+  useEffect(() => {
+    const el = descriptionRef.current
+    if (!el || descriptionExpanded) return
+    const measure = () => setDescriptionClipped(el.scrollHeight > el.clientHeight + 1)
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [description, descriptionExpanded])
   const canPlay = Boolean(loaded)
   const loadedPermalink = loadedIsCurrent ? player.permalink : permalinkFor(loaded?.embed_url ?? null)
 
@@ -188,11 +214,9 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   }
 
   function onPointerDown(event: React.PointerEvent<HTMLDivElement>) {
-    // A hint still sliding the covers would fight the finger: end it now.
-    coversHint.finish()
+    // Preserve button clicks; capture only when a horizontal drag is detected.
+    if (list.length < 2 || (event.pointerType === 'mouse' && event.button !== 0)) return
     drag.current = { x: event.clientX, moved: false, pointerId: event.pointerId }
-    setDraggingCovers(true)
-    event.currentTarget.setPointerCapture(event.pointerId)
     event.currentTarget.style.setProperty('--drag-px', '0px')
   }
 
@@ -200,7 +224,12 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
     const start = drag.current
     if (!start || start.pointerId !== event.pointerId) return
     const dx = event.clientX - start.x
-    if (Math.abs(dx) > 8) start.moved = true
+    if (!start.moved) {
+      if (Math.abs(dx) <= 8) return
+      start.moved = true
+      setDraggingCovers(true)
+      event.currentTarget.setPointerCapture(event.pointerId)
+    }
     event.currentTarget.style.setProperty('--drag-px', `${clamp(dx * .55, -86, 86)}px`)
   }
 
@@ -217,11 +246,12 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
     }
 
     if (!cancelled && Math.abs(dx) > SWIPE_THRESHOLD) {
-      markCueUsed(COVERS_CUE)
       move(dx > 0 ? -1 : 1)
     }
 
-    window.setTimeout(() => { drag.current = null }, 0)
+    window.setTimeout(() => {
+      if (drag.current === start) drag.current = null
+    }, 0)
   }
 
   function recordPointerAngle(event: React.PointerEvent<HTMLSpanElement>) {
@@ -290,7 +320,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
     const now = Date.now()
     if (now - wheelLock.current < 320) return
     wheelLock.current = now
-    markCueUsed(COVERS_CUE)
     move(event.deltaX > 0 ? 1 : -1)
   }
 
@@ -330,8 +359,8 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
   const header = (
     <header className={styles.header}>
       <div className={styles.headerIdentity}>
-        <p>Bae&apos;s in the Lab · Listening Room</p>
-        <h1>On wax<HangFrom finish="chrome" className={styles.titleTag}>.</HangFrom></h1>
+        <p>DJ B.A.E. / Listening Room</p>
+        <h1>The Lab</h1>
         <span className={styles.headerNote}>{crateNote}</span>
       </div>
       {crates.length > 1 ? (
@@ -398,8 +427,9 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
       <div className={styles.crate}>
         <div
           key={crate?.key}
-          className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}${coversHint.active && list.length > 1 ? ` ${styles.coverflowHint}` : ''}`}
+          className={`${styles.coverflow}${draggingCovers ? ` ${styles.coverflowDragging}` : ''}`}
           role="listbox"
+          data-route-swipe-block
           data-cue-host
           aria-label={`${crate?.label ?? 'Mixes'} — use arrow keys or swipe to browse`}
           aria-activedescendant={focused ? `lab-cover-${focused.id}` : undefined}
@@ -410,11 +440,20 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
           onPointerUp={(event) => finishCoverDrag(event)}
           onPointerCancel={(event) => finishCoverDrag(event, true)}
           onWheel={onWheel}
-          onAnimationEnd={(event) => {
-            if ((event.target as HTMLElement).classList.contains(styles.cover)) coversHint.finish()
-          }}
         >
-          {list.map((mix, index) => {
+          {/* Paint farthest covers first and the front cover last, with the front
+              sleeve's record just before it. Browsers paint these 3D-tilted covers
+              in page order (not by zIndex), so this keeps the record under the
+              front sleeve but over the stack. Keyed by mix so it slides out. */}
+          {[...list.keys()]
+            .sort((a, b) => Math.abs(b - focus) - Math.abs(a - focus))
+            .flatMap((index) => index === focus && focused
+              ? [<span key={`disc-${focused.id}`} className={`${styles.coverDisc} ${styles[`disc${discStyle(focused.id)}`]}`} aria-hidden="true" />, index]
+              : [index])
+            .map((entry) => {
+            if (typeof entry !== 'number') return entry
+            const index = entry
+            const mix = list[index]
             const offset = index - focus
             const isLoaded = index === loadedIndex
             return (
@@ -441,7 +480,6 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
               </button>
             )
           })}
-          {list.length > 1 ? <InteractionCue id={COVERS_CUE} label="Swipe / drag" className={styles.coversCue} /> : null}
         </div>
 
         <div className={styles.crateBar}>
@@ -449,7 +487,11 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
           <div className={styles.crateCaption} aria-live="polite">
             <small>{String(focus + 1).padStart(3, '0')}{focused?.genre ? ` · ${focused.genre}` : ''}</small>
             <strong>{focused?.title}</strong>
-            <span>{focusedIsLoaded && onPlatter ? 'On the platter' : `${focus + 1} of ${list.length} · tap the cover to play`}</span>
+            <span>{list.length < 2
+                ? 'Tap the cover to play'
+                : focusedIsLoaded && onPlatter
+                  ? 'Playing from this cover · use arrows or swipe to browse'
+                  : 'Swipe or use arrows to browse · tap a cover to play'}</span>
           </div>
           <button type="button" className={styles.round} onClick={() => move(1)} disabled={focus === list.length - 1} aria-label="Next cover">→</button>
         </div>
@@ -506,7 +548,18 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
               {player.status === 'loading' ? 'Dropping the needle' : playing ? 'Now spinning' : loadedIsCurrent && player.engaged ? 'Paused' : 'Cued up'}
             </span>
             <h2>{loaded.title}</h2>
-            <p>{[loaded.genre || 'Open format', loaded.description].filter(Boolean).join(' · ')}</p>
+            <p id="lab-mix-description" ref={descriptionRef} className={descriptionExpanded ? styles.descriptionExpanded : undefined}>{description}</p>
+            {canExpandDescription ? (
+              <button
+                className={styles.descriptionToggle}
+                type="button"
+                aria-expanded={descriptionExpanded}
+                aria-controls="lab-mix-description"
+                onClick={() => setExpandedMixId(descriptionExpanded ? null : loaded.id)}
+              >
+                {descriptionExpanded ? 'Less' : 'More'}
+              </button>
+            ) : null}
           </div>
 
           <div className={styles.progress}>

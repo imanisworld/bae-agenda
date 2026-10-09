@@ -35,7 +35,7 @@
 .header > span {
   margin: 0;
   color: #d2b17d;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: .18em;
   text-transform: uppercase;
@@ -72,9 +72,9 @@
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: rgba(246,241,232,.64);
+  color: rgba(246,241,232,.88);
   font: inherit;
-  font-size: 10px;
+  font-size: 11.5px;
   letter-spacing: .14em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -317,8 +317,9 @@
 }
 
 .crateCaption span {
-  color: rgba(246,241,232,.56);
-  font-size: 11px;
+  color: rgba(246,241,232,.84);
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 /* Loading placeholders while the playlists come in from SoundCloud. */
@@ -675,8 +676,8 @@
   display: flex;
   justify-content: space-between;
   margin-top: 2px;
-  color: rgba(246,241,232,.6);
-  font-size: 11px;
+  color: rgba(246,241,232,.84);
+  font-size: 12px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1045,8 +1046,8 @@
 .headerNote {
   display: block;
   margin-top: 8px;
-  color: rgba(246,241,232,.54);
-  font-size: 10px;
+  color: rgba(246,241,232,.84);
+  font-size: 12px;
   letter-spacing: .08em;
   line-height: 1.4;
   text-transform: uppercase;
@@ -1167,7 +1168,7 @@
 }
 
 .crateCaption span {
-  color: rgba(246,241,232,.62);
+  color: rgba(246,241,232,.84);
 }
 
 .deck {
@@ -1208,8 +1209,8 @@
   display: flex;
   justify-content: space-between;
   gap: 18px;
-  color: rgba(246,241,232,.3);
-  font-size: 7px;
+  color: rgba(246,241,232,.7);
+  font-size: 9px;
   font-weight: 600;
   letter-spacing: .17em;
   line-height: 1;
@@ -1274,7 +1275,7 @@
 }
 
 .readout p {
-  color: rgba(246,241,232,.72);
+  color: rgba(246,241,232,.85);
 }
 
 .controls {
@@ -1471,7 +1472,486 @@
   .crateSwitch button {
     min-height: 34px;
     padding-inline: 8px;
-    font-size: 8.5px;
-    letter-spacing: .07em;
+    font-size: 11px;
+    letter-spacing: .02em;
   }
+}
+
+
+/* ================================================================
+   LIGHT LISTENING ROOM — more room for the covers, less hardware
+   clutter. All listening, drag, transport and link behavior stays.
+   ================================================================ */
+.station {
+  color: #302027;
+  gap: clamp(9px, 1.5vh, 15px);
+}
+.station::before,
+.station::after {
+  display: none;
+}
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 24px;
+  flex: none;
+  padding: 0 0 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(77,48,56,.18);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+}
+.headerIdentity { padding-bottom: 0; }
+.headerIdentity p {
+  color: #805564;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .13em;
+}
+.header h1 {
+  margin: 5px 0 0;
+  font-size: clamp(26px, 3.7vw, 44px);
+  line-height: 1;
+  color: #45232e;
+  text-shadow: none;
+}
+.headerNote {
+  margin-top: 4px;
+  font-size: 11px;
+  color: #725863;
+  text-transform: none;
+  letter-spacing: .01em;
+}
+.crateSwitch {
+  border: 1px solid #d8c7ba;
+  background: #fff8ef;
+  box-shadow: 0 2px 10px rgba(71,39,49,.06);
+}
+.crateSwitch button {
+  color: #533640;
+}
+.crateSwitch button small { color: #825967; }
+.crateSwitch button[aria-pressed='true'] {
+  color: #fff7ed;
+  background: #8f354c;
+  box-shadow: none;
+}
+.crateSwitch button[aria-pressed='true'] small { color: #ffe7d5; }
+.crate {
+  padding: 0;
+  border: none;
+  background: none;
+  justify-content: center;
+  gap: 7px;
+}
+.coverflow {
+  border-radius: 6px;
+  background: none;
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+.coverflow::before,
+.coverflow::after { display: none; }
+.cover { box-shadow: 0 12px 28px rgba(54,27,36,.19); }
+.cover::after { background: #6d5155; box-shadow: 4px 5px 13px rgba(54,27,36,.12); }
+.coverFront {
+  box-shadow: 0 18px 38px rgba(54,27,36,.24), 0 0 0 2px rgba(114,65,75,.25);
+}
+.coverFallback { color: #dbb387; }
+.crateBar {
+  max-width: 670px;
+  padding: 6px 2px;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+.crateCaption { gap: 2px; }
+.crateCaption small {
+  color: #876372;
+  font-size: 11px;
+}
+.crateCaption strong {
+  color: #40232e;
+  font-weight: 650;
+  font-size: 15px;
+}
+.crateCaption span { color: #725760; }
+.round {
+  border-color: #ccb9b5;
+  background: #fff9f3;
+  color: #4c2b36;
+  box-shadow: 0 2px 6px rgba(71,39,49,.07);
+}
+.round:disabled { opacity: .4; }
+.deck,
+.deckPlaying {
+  padding: 18px;
+  border: 1px solid #d8c6bd;
+  border-radius: 19px;
+  background: linear-gradient(135deg, #fffaf3, #f4e8dc);
+  box-shadow: 0 12px 28px rgba(60,38,45,.09);
+}
+.deck::before,
+.deck::after { display: none; }
+.deckPlate {
+  display: none;
+}
+.turntable {
+  border: 1px solid #d3bdb2;
+  background: #e7d7c8;
+  box-shadow: 0 6px 13px rgba(55,31,39,.12);
+}
+.platter { box-shadow: 0 6px 12px rgba(34,24,27,.3); }
+.console {
+  border: none;
+  background: none;
+  box-shadow: none;
+  padding: 0;
+}
+.state {
+  color: #87566a;
+  font-size: 10px;
+  font-weight: 700;
+}
+.idleDot { background: #a8848c; }
+.readout h2 {
+  color: #36212a;
+  text-shadow: none;
+  margin-top: 5px;
+}
+.readout p { color: #69535c; }
+.times { color: #67535a; }
+.progress input::-webkit-slider-runnable-track {
+  background: linear-gradient(90deg, #9c4960 var(--progress), #d7c6be var(--progress));
+}
+.progress input::-moz-range-track {
+  background: linear-gradient(90deg, #9c4960 var(--progress), #d7c6be var(--progress));
+}
+.progress input::-webkit-slider-thumb,
+.progress input::-moz-range-thumb { background: #8f354c; }
+.play { background: #90354e; border-color: #90354e; }
+.links button,
+.links a {
+  color: #4e313b;
+  background: #fffaf3;
+  border-color: #cebcb4;
+}
+.links button:hover,
+.links a:hover { color: #77283d; }
+
+/* Short mobile screen: header, real cover-art area, streamlined deck. */
+@media (max-width: 620px) {
+  .station {
+    --cover-max: 53vw;
+    --deck: clamp(78px, 24vw, 112px);
+    width: calc(100% - 30px);
+    padding: calc(54px + var(--safe-top)) 0 calc(90px + var(--safe-bottom));
+    gap: 7px;
+  }
+  .header {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    gap: 9px;
+    padding: 0 0 9px;
+  }
+  .headerIdentity { padding: 0; }
+  .headerIdentity p {
+    display: block;
+    font-size: 9px;
+  }
+  .header h1 { font-size: 27px; margin-top: 3px; }
+  .headerNote { display: none; }
+  .crateSwitch {
+    width: 100%;
+    padding: 3px;
+    border-radius: 12px;
+  }
+  .crateSwitch button {
+    white-space: normal;
+    min-height: 36px;
+    font-size: 10px;
+    letter-spacing: .005em;
+    line-height: 1.2;
+    padding: 4px 5px;
+    border-radius: 9px;
+  }
+  .crate {
+    flex: 1 1 auto;
+    gap: 4px;
+    min-height: 0;
+    padding: 2px 0;
+  }
+  .coverflow {
+    --cover: min(var(--cover-max), max(108px, calc(100cqh - 63px)));
+    height: calc(var(--cover) + 16px);
+    min-height: 0;
+  }
+  .cover { top: 7px; }
+  .coversCue { bottom: 0; }
+  .crateBar {
+    gap: 7px;
+    padding: 3px 0;
+  }
+  .crateCaption { width: min(100%, 260px); }
+  .crateCaption small { font-size: 9px; }
+  .crateCaption strong { font-size: 12px; }
+  .crateCaption span { font-size: 10px; }
+  .crateBar .round {
+    width: 34px;
+    height: 34px;
+  }
+  .deck,
+  .deckPlaying {
+    grid-template-columns: var(--deck) minmax(0,1fr);
+    grid-template-areas:
+      'table readout'
+      'progress progress'
+      'controls controls';
+    gap: 8px 12px;
+    padding: 12px;
+    border-radius: 15px;
+  }
+  .turntable { width: var(--deck); height: var(--deck); grid-area: table; }
+  .console { display: contents; }
+  .readout { grid-area: readout; min-width: 0; align-self: center; }
+  .readout h2 {
+    font-size: clamp(14px, 4.4vw, 17px);
+    margin-top: 4px;
+  }
+  .readout p { font-size: 11px; line-height: 1.35; -webkit-line-clamp: 2; }
+  .state { font-size: 9px; letter-spacing: .08em; }
+  .progress { grid-area: progress; margin: 0; }
+  .times { font-size: 11px; }
+  .controls {
+    grid-area: controls;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+  }
+  .transport { gap: 7px; }
+  .play { width: 42px; height: 42px; }
+  .transport .round { width: 36px; height: 36px; }
+  .links { margin-left: auto; gap: 5px; }
+  .links button,
+  .links a {
+    min-height: 33px;
+    padding: 0 9px;
+    font-size: 9px;
+  }
+}
+@media (max-width: 360px) {
+  .station { width: calc(100% - 20px); }
+  .links button, .links a { font-size: 8px; padding: 0 7px; }
+}
+@media (max-width: 620px) and (max-height: 720px) {
+  .header p { display: block; }
+  .crateCaption span { display: none; }
+  .readout p { -webkit-line-clamp: 1; }
+}
+@media (max-width: 620px) and (max-height: 600px) {
+  .deck { grid-template-areas: 'readout readout' 'progress progress' 'controls controls'; }
+  .turntable { display: none; }
+}
+
+
+/* A warm blush page connects the listening room to the plum editorial pages. */
+.station {
+  --lab-ink: #432832;
+  --lab-plum: #8f354c;
+  color: var(--lab-ink);
+}
+.header { border-bottom-color: rgba(98,63,70,.23); }
+.header h1,
+.crateCaption strong,
+.readout h2 { color: #432832; }
+.crateSwitch,
+.round,
+.deck,
+.links button,
+.links a {
+  border-color: rgba(118,74,84,.23);
+}
+.crateSwitch button[aria-pressed='true'],
+.play { background: #8f354c; color: #fff8ee; }
+.deck,
+.deckPlaying {
+  background: linear-gradient(130deg, #fff7ef, #f0dfd5);
+}
+
+
+/* The longer track notes should be optional, not permanently clipped.
+   A short More/Less button expands the existing readout in place. */
+.descriptionToggle {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 30px; margin-top: 3px; padding: 2px 9px;
+  border: 1px solid rgba(145,66,88,.33); border-radius: 8px;
+  color: #823c50; background: rgba(255,245,234,.68);
+  font: inherit; font-size: 11px; font-weight: 700;
+  cursor: pointer; text-underline-offset: 3px;
+}
+.descriptionToggle:hover, .descriptionToggle:focus-visible {
+  color: #67293d; border-color: #8f354c; outline-offset: 2px;
+}
+.readout p.descriptionExpanded {
+  display: block !important;
+  overflow-y: auto; text-overflow: clip; white-space: normal;
+  -webkit-line-clamp: unset !important;
+  line-clamp: unset !important;
+  max-height: min(25vh, 190px);
+}
+@media (max-width: 620px) {
+  .descriptionToggle { min-height: 34px; margin-top: 2px; font-size: 11px; }
+  .readout p.descriptionExpanded { max-height: min(23vh, 140px); font-size: 11px; }
+}
+
+/* Over the Lab's room photo: light text with a soft shadow so headings and
+   crate captions read against records and shelves. */
+.header h1,
+.header p,
+.headerIdentity p,
+.headerNote,
+.crateCaption strong,
+.crateCaption small,
+.crateCaption span {
+  color: #fff7ee;
+  text-shadow: 0 1px 2px rgba(25,14,18,.7), 0 2px 14px rgba(25,14,18,.55);
+}
+.headerIdentity p,
+.crateCaption small { color: #f1cda8; }
+
+/* Printed record sleeve: paper grain and offset-print dots, then ring wear
+   where the disc sits inside, a spine edge, scuffed corners, light falloff
+   and a band of shrink-wrap shine. Overlays only; the artwork is untouched. */
+.coverArt { border-radius: 2px; }
+.coverArt::before,
+.coverArt::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.coverArt::before {
+  z-index: 2;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5  0 0 0 0 .45  0 0 0 0 .4  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    radial-gradient(rgba(25,15,12,.22) .55px, transparent .95px);
+  background-size: 140px 140px, 3px 3px;
+  mix-blend-mode: multiply;
+  opacity: .5;
+}
+.coverArt::after {
+  z-index: 3;
+  background:
+    /* shrink-wrap shine */
+    linear-gradient(118deg, transparent 28%, rgba(255,255,255,.14) 38%, rgba(255,255,255,.05) 44%, transparent 52%),
+    /* ring wear from the record inside */
+    radial-gradient(circle at 52% 50%, transparent 40%, rgba(255,246,230,.07) 41.5%, rgba(255,246,230,.15) 43%, rgba(255,246,230,.06) 44.5%, transparent 46%),
+    /* scuffed corners */
+    radial-gradient(circle at 0 0, rgba(255,244,228,.32), transparent 5%),
+    radial-gradient(circle at 100% 0, rgba(255,244,228,.24), transparent 4%),
+    radial-gradient(circle at 0 100%, rgba(255,244,228,.22), transparent 4%),
+    radial-gradient(circle at 100% 100%, rgba(255,244,228,.3), transparent 5%),
+    /* spine fold on the left edge */
+    linear-gradient(90deg, rgba(0,0,0,.34) 0, rgba(255,255,255,.12) 1.6%, rgba(0,0,0,.08) 3.2%, transparent 5%),
+    /* light falling off toward the edges */
+    radial-gradient(ellipse at 42% 36%, transparent 52%, rgba(22,12,10,.34) 100%);
+}
+
+/* The record sliding out of the front sleeve. It sits where the front cover
+   sits (same depth, same stacking level) and slides out to the right. */
+.coverDisc {
+  --disc-size: calc(var(--cover) * .94);
+  position: absolute;
+  z-index: 20;
+  top: calc(var(--cover-top, 12px) + var(--cover) * .03);
+  left: 50%;
+  width: var(--disc-size);
+  height: var(--disc-size);
+  margin-left: calc(var(--disc-size) / -2);
+  border-radius: 50%;
+  pointer-events: none;
+  transform:
+    translateX(calc(var(--cover) * .2 + var(--drag-px, 0px)))
+    translateZ(60px);
+  animation: disc-slide-out 460ms cubic-bezier(.2,.8,.2,1) both;
+  box-shadow: 0 10px 24px rgba(0,0,0,.4);
+  background:
+    /* grooves and the shine across the vinyl */
+    repeating-radial-gradient(circle, rgba(255,255,255,.05) 0 1px, transparent 1px 3px),
+    conic-gradient(from 20deg, transparent 0 8%, rgba(255,255,255,.16) 12%, transparent 18% 50%, rgba(255,255,255,.1) 60%, transparent 66%),
+    var(--disc);
+}
+/* Centre label (its own circle so a label design stays on the label). */
+.coverDisc::before {
+  content: '';
+  position: absolute;
+  inset: 32.5%;
+  border-radius: 50%;
+  border: 1px solid var(--label-edge, rgba(0,0,0,.35));
+  background:
+    radial-gradient(circle, transparent 0 22%, var(--label-mark, transparent) 22% 30%, transparent 30%),
+    var(--label-design, linear-gradient(transparent, transparent)),
+    var(--label);
+}
+/* Spindle hole. */
+.coverDisc::after {
+  content: '';
+  position: absolute;
+  inset: 48.5%;
+  border-radius: 50%;
+  background: #120c0b;
+}
+@keyframes disc-slide-out {
+  from { translate: calc(var(--cover) * -.2) 0; }
+  to   { translate: 0 0; }
+}
+@media (max-width: 620px) {
+  .coverDisc { --cover-top: 7px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .coverDisc { animation: none; }
+}
+
+/* Record styles: vinyl colour, label colour and a simple label design. */
+.disc0 { /* classic black, red label */
+  --disc: radial-gradient(circle, #1d1a1a, #070606 70%);
+  --label: #b0303f;
+  --label-mark: rgba(255,240,225,.75);
+}
+.disc1 { /* oxblood, cream label split in two */
+  --disc: radial-gradient(circle, #6e1b2c, #3a0b16 72%);
+  --label: #efe3cf;
+  --label-design: conic-gradient(from 90deg, transparent 0 50%, rgba(143,45,60,.85) 50% 100%);
+}
+.disc2 { /* smoke, black label with a gold ring */
+  --disc: radial-gradient(circle, rgba(110,104,110,.92), rgba(48,44,50,.96) 72%);
+  --label: #141012;
+  --label-mark: #c9a25c;
+}
+.disc3 { /* amber marble, black label */
+  --disc:
+    radial-gradient(circle at 30% 35%, rgba(255,214,140,.55), transparent 30%),
+    radial-gradient(circle at 70% 65%, rgba(120,58,14,.6), transparent 34%),
+    radial-gradient(circle, #c8862f, #7a4410 74%);
+  --label: #1a1312;
+  --label-mark: #e9b45f;
+}
+.disc4 { /* green splatter, pink label */
+  --disc:
+    radial-gradient(circle at 24% 30%, #e9f3c7 0 2%, transparent 2.5%),
+    radial-gradient(circle at 68% 22%, #1b2410 0 2.5%, transparent 3%),
+    radial-gradient(circle at 76% 70%, #e9f3c7 0 1.6%, transparent 2%),
+    radial-gradient(circle at 34% 78%, #1b2410 0 2%, transparent 2.5%),
+    radial-gradient(circle, #8fae35, #4e6a16 74%);
+  --label: #f2a6bd;
+  --label-mark: #2a1a20;
+}
+.disc5 { /* bone white, burgundy label with a stripe */
+  --disc: radial-gradient(circle, #f3ece0, #cfc3b0 74%);
+  --label: #7e2d44;
+  --label-design: linear-gradient(0deg, transparent 0 47%, rgba(246,226,210,.85) 47% 53%, transparent 53%);
+  --label-edge: rgba(126,45,68,.5);
 }

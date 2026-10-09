@@ -141,24 +141,46 @@ export default function Nav() {
             <span className={styles.cueArrow}>↓</span>
           </div>
         ) : null}
-        <nav className={styles.dock} aria-label="Primary navigation">
+        <nav className={styles.dock} aria-label="Primary navigation" data-route-swipe-block>
           {PUBLIC_NAV.map((item, index) => {
             const active = isActive(item.href)
-            return (
+            const label = DOCK_LABELS[item.label] ? `${DOCK_LABELS[item.label]} (${item.label})` : item.label
+            const content = (
+              <>
+                <span className={styles.glyph} aria-hidden="true">{DOCK_LABELS[item.label] ?? item.label}</span>
+                {DOCK_LABELS[item.label] && (
+                  <span className={styles.tip} aria-hidden="true">{item.label}</span>
+                )}
+              </>
+            )
+            const className = `${styles.item} ${active ? styles.active : ''}`
+            const tone = TONES[index % TONES.length]
+
+            // The Book action must work even if a mobile client-side route transition stalls.
+            return item.href === '/book' ? (
+              <a
+                key={item.href}
+                href="/book"
+                aria-current={active ? 'page' : undefined}
+                aria-label={label}
+                className={className}
+                data-tone={tone}
+                onClick={dismissDockCue}
+              >
+                {content}
+              </a>
+            ) : (
               <Link
                 key={item.href}
                 href={item.href}
                 prefetch
                 aria-current={active ? 'page' : undefined}
-                aria-label={DOCK_LABELS[item.label] ? `${DOCK_LABELS[item.label]} (${item.label})` : item.label}
-                className={`${styles.item} ${active ? styles.active : ''}`}
-                data-tone={TONES[index % TONES.length]}
+                aria-label={label}
+                className={className}
+                data-tone={tone}
                 onClick={dismissDockCue}
               >
-                <span className={styles.glyph} aria-hidden="true">{DOCK_LABELS[item.label] ?? item.label}</span>
-                {DOCK_LABELS[item.label] && (
-                  <span className={styles.tip} aria-hidden="true">{item.label}</span>
-                )}
+                {content}
               </Link>
             )
           })}

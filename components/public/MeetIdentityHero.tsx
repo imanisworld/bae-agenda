@@ -1,9 +1,8 @@
 'use client'
 
 import { HangFrom } from '@/components/public/brand/HangingLogo'
-import InteractionCue, { markCueUsed, useMotionHint } from '@/components/public/InteractionCue'
+import { markCueUsed, useMotionHint } from '@/components/public/InteractionCue'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import styles from './MeetIdentityHero.module.css'
 
@@ -76,16 +75,16 @@ export default function MeetIdentityHero() {
       >
         <div className={styles.portrait}>
           <Image
-            src="/photos/images/portrait.jpg"
-            alt="DJ B.A.E. portrait"
+            src="/photos/images/meet-collage.webp"
+            alt="DJ B.A.E. portrait as a torn-paper photo collage"
             fill
             priority
-            sizes="(max-width: 760px) 88vw, 44vw"
+            sizes="(max-width: 760px) 80vw, 40vw"
             quality={90}
             draggable={false}
+            className={styles.approvedCollage}
           />
         </div>
-        <InteractionCue id="meet-portrait" label="Drag to tilt" className={styles.portraitCue} />
       </div>
 
       <div className={styles.copy}>
@@ -105,8 +104,8 @@ export default function MeetIdentityHero() {
           </div>
 
           <div className={styles.actions}>
-            <Link href="/book" className="btn-primary">Book DJ B.A.E.</Link>
-            <Link href="/press-kit" className="btn-ghost">Open Press Kit</Link>
+            <a href="/book#inquiry" className="btn-primary" data-route-swipe-block>Book DJ B.A.E.</a>
+            <a href="/press-kit" className="btn-ghost">Open Press Kit</a>
           </div>
         </div>
       </div>

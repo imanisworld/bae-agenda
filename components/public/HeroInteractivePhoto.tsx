@@ -61,15 +61,18 @@ export default function HeroInteractivePhoto() {
         </span>
 
         <span className={styles.photoFrame}>
-          <Image
-            src="/photos/images/outside.jpg"
-            alt="DJ B.A.E. performing"
-            fill
-            priority
-            sizes="(max-width: 900px) 72vw, 40vw"
-            quality={90}
-            className={styles.photoImage}
-          />
+          <span className={styles.coverArtwork}>
+            <Image
+              src="/photos/images/home-collage.webp"
+              alt="DJ B.A.E. performing, as a torn-paper photo collage"
+              fill
+              priority
+              draggable={false}
+              sizes="(max-width: 900px) 72vw, 40vw"
+              quality={90}
+              className={styles.photoImage}
+            />
+          </span>
           <span className={styles.photoSheen} aria-hidden="true" />
         </span>
         <InteractionCue id="home-sleeve" label="Tap" className={styles.sleeveCue} />

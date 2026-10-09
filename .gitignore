@@ -79,6 +79,7 @@ next-env.d.ts
 !/public/photos/outdoor-night-set-pook.png
 !/public/photos/images/
 !/public/photos/images/outside.jpg
+!/public/photos/rooms/
 
 # public videos — allow only the live site assets
 /public/videos/*

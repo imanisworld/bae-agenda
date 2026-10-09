@@ -8,7 +8,9 @@ step with `app/` when pages are added, moved or removed.
 # Public site
 
 Main nav (dock): Home, Events, Lab, Portfolio, Meet, Book.
-More menu and footer: Contact, Built, Press Kit, Client Portal, Privacy, Terms, Accessibility.
+More menu and footer: Contact, Built, Press Kit, Privacy, Terms, Accessibility.
+
+The unfinished Client Portal is temporarily unlinked from public navigation and booking copy. Its routes and code remain available for internal testing; hiding its links does not disable direct URL access.
 
 | Route | What it is |
 | --- | --- |
@@ -40,8 +42,8 @@ More menu and footer: Contact, Built, Press Kit, Client Portal, Privacy, Terms, 
 | Route | What it is |
 | --- | --- |
 | `/pay/[id]` | Deposit payment page for one booking (link shared with the client) |
-| `/portal/login` | Client portal sign-in (email link) |
-| `/portal/verify` | Finishes the email sign-in |
+| `/portal/login` | Unlisted client portal phone sign-in (not ready for public use) |
+| `/portal/verify` | Unlisted phone verification step (not ready for public use) |
 | `/portal` | Client's bookings |
 | `/portal/bookings/[id]` | One booking: details, payments, change or cancel requests |
 

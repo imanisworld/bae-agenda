@@ -94,3 +94,8 @@
     font-size: 11px;
   }
 }
+
+
+/* Public contrast lift — the proof strip no longer drops to near-black. */
+.band { background: #49333a; border-color: rgba(245,208,182,.21); }
+.fact span, .proofItem span { color: rgba(255,225,209,.75); }

@@ -305,3 +305,76 @@
   .item { transition: none; }
   .cueArrow { animation: none; }
 }
+
+
+/* Cream controls lighten every public page, while keeping active tones. */
+.dock {
+  border-color: rgba(105,71,75,.3);
+  background: rgba(246,235,222,.94);
+  box-shadow: 0 14px 36px rgba(30,14,22,.27), inset 0 1px 0 rgba(255,255,255,.75);
+}
+.item,
+.item:not(.active) {
+  color: #412932;
+  border-color: rgba(96,59,68,.13);
+  background: linear-gradient(155deg, #fff9ef, #e8d9cb);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 3px 8px rgba(88,49,57,.1);
+}
+.item:not(.active):hover,
+.item:not(.active):focus-visible {
+  background: linear-gradient(145deg, #fffdf5, #edddd0);
+  border-color: rgba(143,45,60,.36);
+}
+.item.active[data-tone='ink'] {
+  color: #412932;
+  background: linear-gradient(145deg, #f4ddc3, #d9bda9);
+}
+.item.active[data-tone='champagne'] {
+  color: #412932;
+  background: linear-gradient(145deg, #fffaf0, #d7bdb0);
+}
+.item.active[data-tone='gold'] {
+  color: #412932;
+  background: linear-gradient(145deg, #f8e5ba, #c8a976);
+}
+.active::after { background: #93405a; }
+.topbar {
+  background: linear-gradient(180deg, rgba(52,36,39,.33), transparent);
+}
+.moreButton { color: #efd9c4; font-size: 10px; }
+.moreButtonActive,
+.moreButton[aria-expanded='true'] { color: #fff7ec; }
+@media (max-width: 620px) {
+  .dock { padding: 7px; gap: 5px; }
+  .item { min-height: 45px; }
+}
+
+
+/* A dark active label on burgundy failed mobile contrast checks. */
+.item.active[data-tone='burgundy'],
+.item.active[data-tone='oxblood'],
+.item.active[data-tone='copper'] {
+  color: #fff6ec;
+}
+.item.active[data-tone='burgundy'] {
+  background: linear-gradient(145deg, #ac5068, #7e2d44);
+}
+.item.active[data-tone='oxblood'] {
+  background: linear-gradient(145deg, #91384f, #602437);
+}
+
+
+/* Cohesive navigation: every page uses the same active burgundy treatment.
+   Keep the cream dock and a consistent active state rather than six tones. */
+.item.active[data-tone] {
+  color: #fff8ef;
+  background: linear-gradient(145deg, #a64c63, #762a40);
+  border-color: rgba(252,223,199,.42);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 6px 16px rgba(69,25,39,.23);
+}
+.item.active::after { background: #8d344b; }
+.item:not(.active):focus-visible,
+.item.active:focus-visible {
+  outline: 2px solid #c28a91;
+  outline-offset: 3px;
+}

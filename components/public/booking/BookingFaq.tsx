@@ -19,7 +19,7 @@ export const BOOKING_FAQ = [
   {
     question: 'How does payment work?',
     answer:
-      'Once the details are confirmed, a deposit holds your date. The remaining balance is due before the event. Invoices come by email, and the client portal keeps your deposit, balance, and receipts in one place.',
+      'Once the details are confirmed, a deposit holds your date. The remaining balance is due before the event. Invoices and payment details come by email. If you need an updated balance or receipt, contact me directly.',
   },
   {
     question: 'What kinds of events do you play?',

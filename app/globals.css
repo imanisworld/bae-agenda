@@ -5975,6 +5975,9 @@ body.has-custom-cursor * { cursor: none !important; }
   display: block;
   width: auto;
   height: 100%;
+  /* Reserve the phone's real shape so it never pops from a wide box to its
+     drawn size when the image arrives. */
+  aspect-ratio: 172 / 300;
 }
 
 .book-experience-rail-inner header > span,
@@ -8810,4 +8813,430 @@ a.admin-stat-card:focus-visible {
   .route-refresh-icon {
     rotate: none !important;
   }
+}
+
+
+/* ================================================================
+   WARMER PUBLIC CANVAS — preview design pass (admin is unchanged).
+   Warm plum rather than pure black; maintain photo depth/contrast.
+   ================================================================ */
+.public-experience-shell,
+.public-site-shell {
+  --black: #433138;
+  --off-black: #4a363e;
+  --surface: #59414a;
+  --border: rgba(255,237,224,.25);
+  --muted: rgba(255,244,233,.9);
+  --white: #fff4e8;
+  background:
+    radial-gradient(ellipse 85% 65% at 3% 14%, rgba(199,125,137,.2), transparent 68%),
+    radial-gradient(ellipse 75% 70% at 95% 88%, rgba(223,177,142,.13), transparent 70%),
+    #433138;
+}
+.public-experience-shell .public-page-stage,
+.public-site-shell .public-page-stage {
+  background: transparent;
+}
+.public-experience-shell .public-page-stage-glow,
+.public-site-shell .public-page-stage-glow {
+  background:
+    radial-gradient(ellipse 85% 70% at 6% 0%, rgba(205,127,144,.24), transparent 60%),
+    radial-gradient(ellipse 60% 65% at 95% 90%, rgba(227,179,147,.16), transparent 65%);
+}
+/* The Lab is a warm, light gallery rather than a dark rack of equipment. */
+.public-experience-shell .lab-experience {
+  color-scheme: light;
+  background:
+    radial-gradient(ellipse at 75% 0%, rgba(212,168,149,.26), transparent 50%),
+    linear-gradient(170deg, #f2e9df, #e7d9cb);
+}
+.public-experience-shell .public-page-stage:has(.lab-experience) {
+  background: #f2e9df;
+}
+
+
+/* Public-only surfaces that previously stayed near-black despite theme tokens.
+   Do not scope these rules to body/admin: the admin remains unchanged. */
+.public-experience-shell .events-experience {
+  background:
+    radial-gradient(ellipse at 60% 0%, rgba(186,121,133,.16), transparent 58%),
+    #423037;
+}
+.public-experience-shell .portfolio-experience {
+  background: #433139;
+}
+.public-experience-shell .book-experience {
+  background: rgba(238,201,177,.21);
+}
+.public-experience-shell .book-experience-rail {
+  background: #47323a;
+}
+.public-experience-shell .book-experience-contact > div {
+  background: #503841;
+}
+.public-experience-shell .book-experience-contact-note,
+.public-experience-shell .book-experience-rail-inner header p,
+.public-experience-shell .book-experience-faq p {
+  color: rgba(255,239,227,.86);
+}
+.public-experience-shell .book-experience-socials a {
+  color: rgba(255,239,227,.9);
+}
+.public-experience-shell .book-experience-switch button:not([aria-selected='true']) {
+  color: rgba(255,238,224,.88);
+}
+
+
+/* ================================================================
+   COHESIVE PUBLIC DESIGN SYSTEM — warm plum / blush / cream / burgundy.
+   Public routes only: all admin selectors remain untouched.
+   ================================================================ */
+.public-experience-shell,
+.public-site-shell {
+  --public-plum: #443139;
+  --public-blush: #e9d9cf;
+  --public-cream: #fff7ee;
+  --public-burgundy: #8f354c;
+  --public-gold: #e8c19e;
+  --public-outline: rgba(247,222,203,.28);
+}
+/* Lab is the light listening surface within the same plum identity. */
+.public-experience-shell .lab-experience {
+  background:
+    radial-gradient(ellipse at 85% 4%, rgba(175,93,116,.16), transparent 46%),
+    linear-gradient(155deg, #eeded5 0%, #e3cfc7 100%);
+}
+.public-experience-shell .public-page-stage:has(.lab-experience) {
+  background: #ead8cf;
+}
+.public-experience-shell .events-experience-head,
+.public-experience-shell .book-experience-switch,
+.public-experience-shell .events-experience-tools {
+  color: var(--public-cream);
+}
+.public-experience-shell .events-view-switch {
+  background: rgba(54,35,43,.55);
+  border: 1px solid var(--public-outline);
+  border-radius: 14px;
+}
+.public-experience-shell .events-view-switch button {
+  color: #f0d9d0;
+  border-radius: 11px;
+  font-weight: 600;
+}
+.public-experience-shell .events-view-switch button[aria-pressed='true'] {
+  background: var(--public-burgundy);
+  color: var(--public-cream);
+}
+/* Booking inquiry / contact has the same selection language as Events and Lab. */
+@media (max-width: 900px) {
+  .public-experience-shell .book-experience-switch button {
+    border-color: var(--public-outline);
+    border-radius: 12px;
+    min-height: 42px;
+    color: #f5e5dc;
+  }
+  .public-experience-shell .book-experience-switch button[aria-selected='true'] {
+    background: var(--public-burgundy);
+    color: var(--public-cream);
+    border-color: rgba(250,221,204,.45);
+  }
+}
+.public-experience-shell .book-experience-contact > div {
+  border-radius: 11px;
+}
+.public-experience-shell .book-experience-faq details {
+  border-color: rgba(249,224,204,.2);
+}
+/* Preserve contrast over photographs, but make text and buttons feel uniform. */
+.public-experience-shell .btn-primary,
+.public-site-shell .btn-primary {
+  background: linear-gradient(145deg, #a64059, #792b41);
+  border: 1px solid rgba(236,177,162,.3);
+  color: var(--public-cream);
+}
+.public-experience-shell .btn-primary:focus-visible,
+.public-experience-shell .btn-ghost:focus-visible {
+  outline: 3px solid #dfb895;
+  outline-offset: 3px;
+}
+
+
+/* Photo-card carousel: a small spring settle on the newly centered event.
+   Scroll snapping and poster links remain native and tappable. */
+.public-experience-shell .events-carousel-slide > article {
+  transform-origin: center bottom;
+  transition: transform 330ms cubic-bezier(.2, 1.25, .25, 1),
+              filter 280ms ease;
+}
+.public-experience-shell .events-carousel-slide:not(.events-carousel-slide--active) > article {
+  transform: translateY(5px) scale(.975);
+  filter: saturate(.93);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .public-experience-shell .events-carousel-slide--active > article {
+    animation: bae-photo-card-settle 430ms cubic-bezier(.25, .85, .3, 1) both;
+  }
+}
+@keyframes bae-photo-card-settle {
+  0%   { transform: translateY(8px) scale(.965); }
+  63%  { transform: translateY(-3px) scale(1.012); }
+  82%  { transform: translateY(1px) scale(.997); }
+  100% { transform: translateY(0) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-experience-shell .events-carousel-slide > article {
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+
+/* Warm dark public gallery. Work's softly blurred, readable photo ambience
+   is the reference: deepen the Lab and unify the other six public routes.
+   Admin and utility pages are not affected. */
+.public-experience-shell {
+  --black: #38272f;
+  --off-black: #453139;
+  --surface: #50363f;
+  --muted: rgba(255,239,229,.87);
+  background:
+    radial-gradient(ellipse at 14% 12%, rgba(177,105,117,.23), transparent 56%),
+    radial-gradient(ellipse at 88% 85%, rgba(186,129,117,.14), transparent 57%),
+    #38272f;
+}
+.public-experience-shell .public-page-stage--experience {
+  background: #38272f;
+}
+.public-experience-shell .public-page-stage--experience:has(.lab-experience) {
+  background: #38272f;
+}
+.public-experience-shell .lab-experience {
+  color-scheme: dark;
+  background:
+    radial-gradient(ellipse at 85% 10%, rgba(154,79,101,.21), transparent 50%),
+    linear-gradient(155deg, #4c343e, #32252b);
+}
+.public-experience-shell .events-experience {
+  background:
+    radial-gradient(ellipse at 18% 18%, rgba(155,88,112,.18), transparent 52%),
+    linear-gradient(150deg, #4a323b, #33242c);
+}
+.public-experience-shell .book-experience {
+  background:
+    radial-gradient(ellipse at 80% 12%, rgba(200,139,112,.11), transparent 62%),
+    #43303a;
+}
+/* Cream player/deck remains a deliberate light contrast surface. On the
+   darker Lab page, headings and crate captions must switch back to ivory. */
+.public-experience-shell .lab-experience .header h1,
+.public-experience-shell .lab-experience .headerIdentity p,
+.public-experience-shell .lab-experience .crateCaption strong,
+.public-experience-shell .lab-experience .crateCaption small,
+.public-experience-shell .lab-experience .crateCaption span {
+  color: #f8eadd;
+}
+.public-experience-shell .lab-experience .header {
+  border-bottom-color: rgba(247,219,205,.23);
+}
+.public-experience-shell .lab-experience .deck .readout,
+.public-experience-shell .lab-experience .deck .readout h2 {
+  color: #432832;
+}
+
+
+/* Muted vinyl-room photographs supplied for the public-site redesign. The
+   tiny 2x2 atlas keeps this decorative effect lightweight; each public route
+   samples a different scene. All photos remain faint, softly blurred, and
+   completely non-interactive. */
+.public-experience-shell {
+  --black: #443039;
+  --off-black: #513a44;
+  --surface: #5a424d;
+  background: #443039;
+}
+.public-experience-shell .public-page-stage--experience {
+  position: relative;
+  background: #443039;
+}
+.public-experience-shell .public-page-stage--experience:has(.lab-experience) {
+  background: #49333f;
+}
+.public-experience-shell .lab-experience {
+  background:
+    radial-gradient(ellipse at 20% 12%, rgba(179,108,120,.19), transparent 58%),
+    linear-gradient(155deg, #503640, #382832);
+}
+/* Above opaque hero backgrounds, but barely visible: no change to hit targets
+   or input contrast. A soft top/side fade keeps headings and content dominant. */
+.public-experience-shell .public-page-stage--experience::after {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  pointer-events: none;
+  inset: -10px;
+  background-image: url('/photos/decor/music-room-atlas.svg');
+  background-size: 200% 200%;
+  background-repeat: no-repeat;
+  background-position: 0% 0%;
+  opacity: .105;
+  filter: blur(13px) saturate(.58);
+  mask-image: linear-gradient(165deg, rgba(0,0,0,.9), rgba(0,0,0,.55) 55%, transparent 95%);
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/']::after {
+  background-position: 0% 0%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/events']::after {
+  background-position: 100% 0%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/lab']::after {
+  background-position: 0% 100%;
+  opacity: .09;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/portfolio']::after {
+  background-position: 100% 100%;
+  opacity: .065;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet']::after {
+  background-position: 100% 0%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book']::after {
+  background-position: 100% 100%;
+  opacity: .075;
+}
+@media (max-width: 620px) {
+  .public-experience-shell .public-page-stage--experience::after {
+    opacity: .08;
+    filter: blur(9px) saturate(.55);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-experience-shell .public-page-stage--experience::after {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* Per-page room photo: one blurred, darkened photograph behind each page.
+   A page opts in by setting --page-photo on its route; its hero background
+   must be translucent for the photo to show through. It sits on the page's
+   own layer (remounted per route) so it fades in with the page, not before. */
+.public-experience-shell .public-page-stage--experience .public-page-stage-inner::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -48px;
+  pointer-events: none;
+  background: var(--page-photo, none) var(--page-photo-position, center) / cover no-repeat;
+  filter: blur(var(--page-photo-blur, 3px)) brightness(var(--page-photo-brightness, .85)) saturate(.85);
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
+  --page-photo: url('/photos/rooms/phones-box.webp');
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet']::after {
+  display: none;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
+  --page-photo: url('/photos/rooms/phones-grid.webp');
+  /* A white studio shot: darken it further than the others. */
+  --page-photo-brightness: .5;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/lab'] {
+  --page-photo: url('/photos/rooms/turntables-floor.webp');
+  /* The decks run down the right side of this overhead shot. */
+  --page-photo-position: 78% 55%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book']::after,
+.public-experience-shell .public-page-stage--experience[data-experience-route='/lab']::after {
+  display: none;
+}
+/* Translucent page backgrounds so the room photo shows; panels stay solid. */
+.public-experience-shell .book-experience {
+  background:
+    radial-gradient(ellipse at 80% 12%, rgba(200,139,112,.11), transparent 62%),
+    rgba(67,48,58,.28);
+}
+.public-experience-shell .lab-experience {
+  background:
+    radial-gradient(ellipse at 85% 10%, rgba(154,79,101,.21), transparent 50%),
+    linear-gradient(155deg, rgba(76,52,62,.3), rgba(50,37,43,.4));
+}
+
+.public-experience-shell .public-page-stage--experience[data-experience-route='/'] {
+  --page-photo: url('/photos/rooms/home-plexmix.webp');
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/portfolio'] {
+  --page-photo: url('/photos/rooms/work-booth.webp');
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/events'] {
+  --page-photo: url('/photos/rooms/tile-booth.webp');
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/']::after,
+.public-experience-shell .public-page-stage--experience[data-experience-route='/portfolio']::after,
+.public-experience-shell .public-page-stage--experience[data-experience-route='/events']::after {
+  display: none;
+}
+.public-experience-shell .events-experience {
+  background:
+    radial-gradient(ellipse at 18% 18%, rgba(155,88,112,.18), transparent 52%),
+    linear-gradient(150deg, rgba(74,50,59,.3), rgba(51,36,44,.4));
+}
+.public-experience-shell .portfolio-experience {
+  background: rgba(67,49,57,.3);
+}
+
+/* Events as an editorial gallery: a real page title, one control row, and a
+   featured card with the next event peeking in from the right. */
+.public-experience-shell .events-experience-head {
+  align-items: end;
+  flex-wrap: wrap;
+  row-gap: 14px;
+}
+.public-experience-shell .events-experience-title .section-label {
+  margin: 0 0 8px;
+  color: #f1cda8;
+}
+.public-experience-shell .events-experience-title h1 {
+  margin: 0;
+  color: #fff7ef;
+  font-family: Conthrax, sans-serif;
+  font-size: clamp(38px, 5vw, 72px);
+  font-weight: 600;
+  line-height: .95;
+  letter-spacing: -.02em;
+  text-shadow: 0 2px 16px rgba(28,15,20,.45);
+}
+.public-experience-shell .events-experience-tools {
+  gap: 12px;
+  font-size: 11px;
+}
+.public-experience-shell .events-carousel {
+  gap: 16px;
+}
+.public-experience-shell .events-carousel--multi .events-carousel-slide {
+  flex-basis: min(80%, 1040px);
+}
+.public-experience-shell .events-carousel--multi .events-carousel-slide:last-child {
+  scroll-snap-align: end;
+}
+@media (max-width: 620px) {
+  .public-experience-shell .events-experience-title h1 {
+    font-size: clamp(34px, 11vw, 46px);
+  }
+  .public-experience-shell .events-experience-tools {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .public-experience-shell .events-carousel--multi .events-carousel-slide {
+    flex-basis: 84%;
+  }
+}
+/* The Lab photo's top is a bright white wall: shade it so the header reads. */
+.public-experience-shell .lab-experience {
+  background:
+    linear-gradient(180deg, rgba(50,37,43,.72) 0%, rgba(50,37,43,.3) 22%, transparent 40%),
+    radial-gradient(ellipse at 85% 10%, rgba(154,79,101,.21), transparent 50%),
+    linear-gradient(155deg, rgba(76,52,62,.3), rgba(50,37,43,.4));
 }

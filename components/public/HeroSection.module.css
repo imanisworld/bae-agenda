@@ -510,3 +510,264 @@
     text-shadow: 0 2px 14px rgba(0,0,0,.58);
   }
 }
+
+
+/* Public contrast lift — lighten the actual home hero, not only its shell. */
+.hero {
+  background:
+    radial-gradient(ellipse at 17% 21%, rgba(183,95,112,.29), transparent 48%),
+    radial-gradient(ellipse at 78% 67%, rgba(213,154,124,.16), transparent 48%),
+    #443038;
+}
+.wordmark {
+  color: #b76073;
+  opacity: .78;
+}
+.wordmarkOutline {
+  color: transparent;
+  -webkit-text-stroke-color: rgba(245,172,183,.56);
+  opacity: .87;
+}
+.photoImage { filter: brightness(1.14) saturate(1.08) contrast(1.02); }
+.photoSheen { opacity: .48; }
+.copy h1 { color: #fff9f0; text-shadow: 0 3px 16px rgba(28,15,20,.4); }
+.eyebrow { color: #f0cca9; text-shadow: 0 1px 8px rgba(32,17,22,.28); }
+.meta { color: rgba(255,242,233,.89); }
+.rule { background: rgba(238,205,183,.24); }
+@media (max-width: 560px) {
+  .eyebrow { color: #f0cca9; }
+  .meta { color: rgba(255,242,233,.92); }
+}
+
+/* Torn-paper vinyl artwork — one photograph inside a rigid, square sleeve.
+   Never layer unrelated images outside the physical sleeve. */
+.coverArtwork {
+  position: absolute;
+  inset: 0;
+  isolation: isolate;
+  overflow: hidden;
+  background: #3a302d;
+  box-shadow: inset 0 0 0 1px rgba(255,249,238,.6);
+}
+
+.coverArtwork .photoImage,
+.tornPhoto {
+  object-fit: cover;
+  object-position: center 46%;
+  backface-visibility: hidden;
+}
+
+.coverArtwork .photoImage {
+  filter: brightness(1.12) saturate(1.07) contrast(1.03);
+  transform: none;
+}
+
+.tornPanel {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  /* Image is exactly aligned with the underlying photo; only tone/edge
+     changes. The central DJ subject stays in full color. */
+}
+
+.tornPanelLeft {
+  clip-path: polygon(0 0, 30% 0, 29.3% 9%, 31.1% 16%, 29.4% 23%, 30.8% 30.7%, 28.9% 38.7%, 30.1% 46.8%, 28.5% 54.1%, 30.3% 61.9%, 29.1% 69.7%, 30% 76.1%, 28.4% 84.4%, 29.6% 100%, 0 100%);
+  filter: grayscale(.94) saturate(.56) contrast(1.08) brightness(.93);
+}
+
+.tornPanelRight {
+  clip-path: polygon(76.5% 0, 100% 0, 100% 100%, 74.8% 100%, 75.8% 83.5%, 74.8% 73.4%, 76.4% 64.9%, 75.5% 54.7%, 76.7% 45%, 75% 35.2%, 76.8% 26.4%, 75.4% 17.6%, 77.1% 9.6%);
+  filter: grayscale(.88) saturate(.4) contrast(1.08) brightness(.9);
+}
+
+.tornPanelTop {
+  clip-path: polygon(30% 0, 76.5% 0, 76.8% 26.4%, 70.5% 29.4%, 63.2% 30.8%, 53.9% 29.2%, 45.6% 30.4%, 37.3% 28.9%, 29.5% 29.3%);
+  filter: saturate(.66) sepia(.18) contrast(1.05);
+}
+
+.tornSeams {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.tornEdgeShadow,
+.tornEdge {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.tornEdgeShadow { stroke: rgba(35,20,20,.46); stroke-width: 8px; }
+.tornEdge {
+  stroke: #f7eee1;
+  stroke-width: 3.5px;
+  stroke-dasharray: 19 1.5 43 1 12 1.5;
+}
+
+.tornTapeTop,
+.tornTapeBottom {
+  position: absolute;
+  z-index: 3;
+  width: 15%;
+  height: 5.5%;
+  background: rgba(236,216,183,.66);
+  border: 1px solid rgba(255,247,228,.19);
+  box-shadow: 0 1px 4px rgba(30,18,18,.2);
+  pointer-events: none;
+  clip-path: polygon(0 2%, 9% 0, 17% 4%, 29% 1%, 41% 6%, 55% 1%, 73% 4%, 87% 0, 100% 5%, 97% 100%, 83% 95%, 68% 100%, 55% 96%, 42% 100%, 29% 95%, 17% 100%, 5% 96%);
+}
+.tornTapeTop { left: 5%; top: 9%; rotate: -15deg; }
+.tornTapeBottom { right: 6%; bottom: 7%; rotate: 9deg; }
+
+/* The sleeve is still a perfect square with a real cream paper edge,
+   and the burgundy record remains behind it with the original tap action. */
+.photoFrame {
+  aspect-ratio: 1;
+  border-radius: 2px;
+  border-color: #f8eee1;
+}
+.photo .photoSheen { opacity: .33; }
+
+@media (hover: hover) {
+  .photo:hover .photoImage {
+    transform: none;
+    filter: brightness(1.12) saturate(1.07) contrast(1.03);
+  }
+}
+
+/* Desktop copy must never disappear behind the cover or right viewport edge. */
+@media (min-width: 901px) {
+  .copy h1 {
+    font-size: clamp(38px, 4.15vw, 70px);
+    letter-spacing: -.035em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tornPanel, .tornSeams { transition: none; }
+}
+
+
+/* DESKTOP OVERFLOW FIX — explicit two-column layout instead of percentage-
+   anchored absolute artwork/copy. Artwork can never steal the copy column. */
+@media (min-width: 901px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr);
+    align-items: center;
+    column-gap: clamp(42px, 4vw, 76px);
+    min-height: 100svh;
+    padding:
+      clamp(102px, 12vh, 160px)
+      clamp(36px, 5.5vw, 106px)
+      calc(120px + var(--safe-bottom, 0px));
+  }
+  .photo {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    top: auto;
+    left: auto;
+    justify-self: center;
+    width: min(100%, 520px);
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 1;
+    margin: 0;
+  }
+  .albumStack {
+    inset: 0 auto 0 0;
+    height: min(100cqw, 100cqh);
+    width: min(100cqw, 100cqh);
+    margin: auto 0;
+  }
+  .copy {
+    --overhang: 0px;
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: break-word;
+  }
+  .copy h1 {
+    font-size: clamp(32px, 3.45vw, 56px);
+    line-height: 1.02;
+    letter-spacing: -.025em;
+  }
+  .eyebrow, .meta, .actions { padding-left: 0; }
+  .actions { gap: 12px; margin-top: 24px; }
+  .actions > * { max-width: 100%; }
+  .wordmark {
+    top: clamp(90px, 12vh, 145px);
+    left: clamp(24px, 4vw, 90px);
+    font-size: clamp(134px, 22vw, 335px);
+    opacity: .42;
+  }
+  .wordmarkOutline { opacity: .30; }
+}
+@media (min-width: 901px) and (max-width: 1170px) {
+  .hero { column-gap: 34px; padding-inline: 35px; }
+  .copy h1 { font-size: clamp(32px, 3.4vw, 44px); }
+  .actions { gap: 8px; }
+  .actions > * { padding-inline: 15px; }
+}
+/* The earlier 8px black/4px ivory rules made the cover look like white grid
+   tape rather than the paper tears in the approved example. Reduce sharply. */
+.tornEdgeShadow { stroke-width: 1.6px; stroke: rgba(31,23,21,.21); }
+.tornEdge { stroke-width: 1.35px; stroke: rgba(253,244,229,.7); stroke-dasharray: none; }
+.tornTapeTop, .tornTapeBottom { opacity: .52; }
+
+/* Translucent so the page's background photo shows through. */
+.hero {
+  background:
+    radial-gradient(ellipse at 17% 21%, rgba(183,95,112,.29), transparent 48%),
+    radial-gradient(ellipse at 78% 67%, rgba(213,154,124,.16), transparent 48%),
+    rgba(68,48,56,.3);
+}
+
+/* Wide screens: one outlined BAE, centred behind the sleeve and the copy.
+   The filled letters were cut into blocks by the sleeve and ran into the
+   headline, and the second outline copy drew lines across the photo. */
+@media (min-width: 901px) {
+  .wordmark {
+    top: 50%;
+    left: auto;
+    right: clamp(24px, 4vw, 90px);
+    transform: translateY(-58%);
+    white-space: nowrap;
+    font-size: clamp(150px, 17vw, 290px);
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(214,120,138,.42);
+    opacity: 1;
+  }
+  .wordmarkOutline { display: none; }
+}
+
+/* Past Work matches Meet's Open Press Kit: solid dark backing and a clear
+   outline so it reads over the background photo. */
+.actions :global(.btn-ghost) {
+  background: rgba(34,20,27,.82);
+  border: 1px solid rgba(246,226,210,.55);
+  color: #fff7ef;
+  font-weight: 500;
+  text-shadow: none;
+}
+.actions :global(.btn-ghost):hover,
+.actions :global(.btn-ghost):focus-visible {
+  background: rgba(48,28,37,.9);
+  border-color: rgba(246,226,210,.8);
+  color: #fff7ef;
+}

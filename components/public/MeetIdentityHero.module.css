@@ -371,3 +371,143 @@
     min-width: 240px;
   }
 }
+
+
+/* Public contrast lift — portrait, words and controls remain legible. */
+.hero {
+  background:
+    radial-gradient(ellipse at 40% 50%, rgba(175,96,113,.27), transparent 52%),
+    radial-gradient(ellipse at 90% 85%, rgba(210,157,125,.11), transparent 50%),
+    /* Translucent so the page's room photo shows through. */
+    rgba(69,49,57,.28);
+}
+.glow { opacity: .65; }
+.summary { color: rgba(255,240,230,.9); }
+.signals span {
+  color: #f8e3d5;
+  background: rgba(111,65,75,.32);
+  border-color: rgba(242,202,164,.35);
+}
+.copy h1 { color: #fff7ef; }
+.details { text-shadow: 0 2px 12px rgba(35,19,25,.38); }
+@media (max-width: 560px) {
+  .summary { color: rgba(255,243,235,.94); }
+  .title > p { color: #f1cda8; }
+}
+
+
+/* DESKTOP OVERFLOW FIX — contain the portrait and keep all copy in its own
+   minmax(0,1fr) column. Prior absolute offsets hid text/CTAs off-screen. */
+@media (min-width: 861px) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.03fr) minmax(0, .97fr);
+    align-items: center;
+    column-gap: clamp(36px, 4vw, 72px);
+    min-height: 100svh;
+    padding:
+      clamp(110px, 13vh, 170px)
+      clamp(36px, 5vw, 100px)
+      calc(120px + var(--safe-bottom, 0px));
+  }
+  .portraitWrap {
+    position: relative;
+    grid-column: 1;
+    grid-row: 1;
+    top: auto;
+    left: auto;
+    width: min(100%, 560px);
+    min-width: 0;
+    margin: 0 auto;
+    justify-self: center;
+  }
+  .portrait { width: 100%; aspect-ratio: 4 / 3; }
+  .copy {
+    position: relative;
+    grid-column: 2;
+    grid-row: 1;
+    top: auto;
+    left: auto;
+    right: auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin: 0;
+  }
+  .copy h1 {
+    font-size: clamp(26px, 2.7vw, 47px);
+    line-height: 1.08;
+    overflow-wrap: break-word;
+  }
+  .summary { max-width: 100%; font-size: clamp(14px, 1.2vw, 17px); }
+  .details { padding-top: clamp(30px, 3vw, 48px); }
+  .actions { gap: 10px; }
+  .actions > * { max-width: 100%; }
+  .title .titleTag { --size: clamp(48px, 4vw, 70px); }
+}
+@media (min-width: 861px) and (max-width: 1120px) {
+  .hero { column-gap: 28px; padding-inline: 32px; }
+  .copy h1 { font-size: clamp(26px, 2.7vw, 34px); }
+  .actions > * { padding-inline: 14px; }
+}
+/* Keep the editorial tonal layers but eliminate the thick geometric grid. */
+.portraitTears path {
+  stroke: rgba(248,236,217,.68);
+  stroke-width: 1.35px;
+  filter: none;
+}
+.portraitTapeOne, .portraitTapeTwo { opacity: .52; }
+
+
+/* The actual approved torn-paper portrait, not reconstructed CSS seams.
+   Keep the complete printed square in view at every breakpoint. */
+.portrait {
+  aspect-ratio: 1 / 1;
+  background: #ede6dc;
+  border-radius: 4px;
+  box-shadow: 8px 10px 0 rgba(35,24,29,.42), 0 22px 50px rgba(17,8,14,.33);
+}
+.portrait::after { opacity: .13; }
+.portrait img.approvedCollage {
+  object-fit: contain;
+  object-position: center center;
+  filter: none;
+}
+@media (min-width: 861px) {
+  .portraitWrap {
+    width: min(100%, 480px);
+  }
+  .portrait {
+    aspect-ratio: 1 / 1;
+  }
+}
+@media (max-width: 860px) {
+  .portrait {
+    aspect-ratio: 1 / 1;
+  }
+}
+@media (max-width: 560px) {
+  .portraitWrap {
+    width: min(73%, 330px);
+    margin-left: 8%;
+  }
+  .portrait {
+    border-radius: 3px;
+  }
+}
+
+/* Open Press Kit sits over the phones photo: give it a solid dark backing,
+   a clear cream outline and full-strength text so it reads. */
+.actions :global(.btn-ghost) {
+  background: rgba(34,20,27,.82);
+  border: 1px solid rgba(246,226,210,.55);
+  color: #fff7ef;
+  font-weight: 500;
+  text-shadow: none;
+}
+.actions :global(.btn-ghost):hover,
+.actions :global(.btn-ghost):focus-visible {
+  background: rgba(48,28,37,.9);
+  border-color: rgba(246,226,210,.8);
+  color: #fff7ef;
+}
