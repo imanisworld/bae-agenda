@@ -3,7 +3,6 @@
 import { HangFrom } from '@/components/public/brand/HangingLogo'
 import InteractionCue, { markCueUsed, useMotionHint } from '@/components/public/InteractionCue'
 import Image from 'next/image'
-import Link from 'next/link'
 import { useRef, useState, type CSSProperties, type PointerEvent } from 'react'
 import styles from './MeetIdentityHero.module.css'
 
@@ -105,8 +104,8 @@ export default function MeetIdentityHero() {
           </div>
 
           <div className={styles.actions}>
-            <Link href="/book" className="btn-primary">Book DJ B.A.E.</Link>
-            <Link href="/press-kit" className="btn-ghost">Open Press Kit</Link>
+            <a href="/book#inquiry" className="btn-primary" data-route-swipe-block>Book DJ B.A.E.</a>
+            <a href="/press-kit" className="btn-ghost">Open Press Kit</a>
           </div>
         </div>
       </div>
