@@ -456,3 +456,45 @@
     linear-gradient(90deg, rgba(30,18,24,.72) 0%, rgba(30,18,24,.4) 40%, rgba(30,18,24,.08) 75%),
     linear-gradient(0deg, rgba(30,18,24,.7) 0%, transparent 40%);
 }
+
+/* Logo, settled into the scene: ~30% smaller, a slow small float instead of
+   a big bounce, a dark glow behind it and a soft grounded shadow, with the
+   chrome toned slightly toward the room's light. */
+.logoSpin { width: min(30vw, 400px); }
+@media (min-width: 761px) {
+  /* Lower right, clear of the face in the booth photo. */
+  .logoSpin { top: 68%; }
+}
+.logoSpin::before {
+  content: '';
+  position: absolute;
+  inset: -22% -18%;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(20,11,15,.62), rgba(20,11,15,.28) 60%, transparent);
+  pointer-events: none;
+}
+.logoBounce {
+  animation-name: logo-float;
+  animation-duration: 2.6s;
+  filter: brightness(.92) saturate(.88) drop-shadow(0 14px 18px rgba(10,5,8,.45));
+}
+.logoShadow { animation-duration: 2.6s; animation-name: logo-float-shadow; }
+@keyframes logo-float {
+  from { translate: 0 0; }
+  to   { translate: 0 -10px; }
+}
+@keyframes logo-float-shadow {
+  from { scale: 1; opacity: .9; }
+  to   { scale: .88; opacity: .65; }
+}
+@media (max-width: 760px) {
+  /* Lower, so the clasp clears the Instagram link above it. */
+  .logoSpin { width: min(55vw, 250px); bottom: 128px; }
+}
+@media (max-width: 760px) and (max-height: 720px) {
+  .logoSpin { width: min(40vw, 170px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logoBounce, .logoShadow { animation: none; }
+}
