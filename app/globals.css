@@ -9563,3 +9563,70 @@ a.admin-stat-card:focus-visible {
 .public-experience-shell .book-experience-rail {
   background: linear-gradient(150deg, rgba(66,35,54,.8), rgba(43,26,45,.8));
 }
+
+
+/* Oct 2026: Press Kit print-only refinement — preserve the actual photo,
+   omit both navigation surfaces and interaction prompts, and fit one page. */
+@media print {
+  body:has(.press-kit-page) .public-navigation-chrome,
+  body:has(.press-kit-page) [class*="dockCue"],
+  body:has(.press-kit-page) .skip-link {
+    display: none !important;
+  }
+  body:has(.press-kit-page) .press-kit-sheet {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    break-inside: avoid !important;
+  }
+  body:has(.press-kit-page) .press-kit-left {
+    display: grid !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 150px !important;
+    min-height: 0 !important;
+    max-height: 150px !important;
+    top: auto !important;
+    overflow: hidden !important;
+    align-content: end !important;
+    break-inside: avoid !important;
+  }
+  body:has(.press-kit-page) .press-kit-left > div:last-child {
+    padding: 9px 16px !important;
+    gap: 4px !important;
+  }
+  body:has(.press-kit-page) .press-kit-left > div:last-child > div:nth-child(2) {
+    display: none !important;
+  }
+  body:has(.press-kit-page) .press-kit-left > div:last-child > div:last-child {
+    display: none !important;
+  }
+  body:has(.press-kit-page) .press-kit-right {
+    padding: 11px 18px !important;
+    gap: 5px !important;
+    min-height: 0 !important;
+    align-content: start !important;
+  }
+  body:has(.press-kit-page) .press-kit-right header {
+    gap: 5px !important;
+  }
+  body:has(.press-kit-page) .press-kit-right section {
+    gap: 5px !important;
+  }
+  body:has(.press-kit-page) .press-kit-right p {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+  body:has(.press-kit-page) .press-kit-right section:last-child > div {
+    gap: 0 !important;
+  }
+  body:has(.press-kit-page) .press-kit-right section:last-child > div > div {
+    padding-block: 5px !important;
+  }
+  body:has(.press-kit-page) .press-kit-right section:last-child p {
+    font-size: 10.5px !important;
+    line-height: 1.32 !important;
+  }
+  body:has(.press-kit-page) .press-kit-right section > div[style*="padding: 14px"] {
+    padding: 9px !important;
+  }
+}

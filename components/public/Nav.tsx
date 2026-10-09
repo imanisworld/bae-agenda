@@ -96,7 +96,7 @@ export default function Nav() {
     'DJ B.A.E.'
 
   return (
-    <div className={styles.chrome}>
+    <div className={`${styles.chrome} public-navigation-chrome`}>
       <div className={styles.topbar}>
         {/* The logo now hangs from each page's own art (see brand/HangingLogo). */}
         <div className={styles.more} ref={moreRef}>
