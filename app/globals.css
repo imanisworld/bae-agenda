@@ -8952,11 +8952,6 @@ a.admin-stat-card:focus-visible {
   border: 1px solid rgba(236,177,162,.3);
   color: var(--public-cream);
 }
-.public-experience-shell .btn-ghost,
-.public-site-shell .btn-ghost {
-  border-color: rgba(248,228,207,.43);
-  color: var(--public-cream);
-}
 .public-experience-shell .btn-primary:focus-visible,
 .public-experience-shell .btn-ghost:focus-visible {
   outline: 3px solid #dfb895;
