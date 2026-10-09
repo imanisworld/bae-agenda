@@ -1955,3 +1955,123 @@
   --label-design: linear-gradient(0deg, transparent 0 47%, rgba(246,226,210,.85) 47% 53%, transparent 53%);
   --label-edge: rgba(126,45,68,.5);
 }
+
+/* Oct 2026: Lab-only carousel/deck containment. The track data and artwork are unchanged. */
+.station { box-sizing: border-box; min-width: 0; max-width: 100%; }
+.crate {
+  justify-content: flex-end;
+  position: relative;
+  padding-bottom: 0;
+}
+.coverflow { flex-shrink: 0; }
+.crateBar {
+  position: absolute;
+  z-index: 40;
+  top: auto;
+  bottom: calc((var(--cover-max) + 24px) / 2 - 19px);
+  left: 0;
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 clamp(8px, 2vw, 28px);
+  pointer-events: none;
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+.crateBar .round { pointer-events: auto; width: 42px; height: 42px; flex-shrink: 0; }
+.coverFront {
+  box-shadow: 0 22px 54px rgba(35,16,25,.42), 0 0 0 2px rgba(108,57,71,.3), 0 3px 5px rgba(20,8,13,.22);
+}
+.coverFront .coverArt { box-shadow: inset 0 0 0 3px rgba(255,249,234,.1); }
+.deck, .console, .readout, .progress, .controls { box-sizing: border-box; min-width: 0; max-width: 100%; }
+.deck { width: 100%; overflow: hidden; grid-template-columns: minmax(0,var(--deck)) minmax(0,1fr); }
+.console { width: 100%; }
+.readout h2 { max-width: 100%; overflow-wrap: anywhere; white-space: normal; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; line-height: 1.17; }
+.readout p { line-height: 1.6; }
+.state { align-items: center; line-height: 1.25; }
+.state i { flex-shrink: 0; }
+.progress { width: 100%; overflow: hidden; }
+.progress input { display: block; box-sizing: border-box; width: 100%; max-width: 100%; height: 24px; }
+.progress input::-webkit-slider-runnable-track { height: 6px; }
+.progress input::-moz-range-track { height: 6px; }
+.progress input::-webkit-slider-thumb { width: 18px; height: 18px; margin-top: -6px; }
+.progress input::-moz-range-thumb { width: 18px; height: 18px; }
+.controls { overflow: hidden; flex-wrap: wrap; }
+.links { min-width: 0; flex-wrap: wrap; max-width: 100%; }
+.links button, .links a { white-space: nowrap; }
+.grooves { box-shadow: inset 0 0 15px rgba(0,0,0,.26), inset 0 2px 8px rgba(255,255,255,.06); }
+@media (max-width: 620px) {
+  .crateBar { bottom: calc((min(var(--cover-max), max(108px, 100cqh - 63px)) + 16px) / 2 - 19px); padding: 0 2px; }
+  .crateBar .round { width: 36px; height: 36px; }
+  .deck { grid-template-columns: var(--deck) minmax(0,1fr); }
+  .readout h2 { font-size: clamp(13px, 4vw, 17px); }
+  .controls { flex-wrap: wrap; }
+  .links { margin-left: 0; }
+}
+
+/* Anchor controls to the covers themselves, never to changing crate content. */
+.carouselStage { position: relative; flex: none; width: 100%; min-width: 0; }
+.carouselStage .coverflow { width: 100%; }
+.carouselStage .crateBar {
+  position: absolute;
+  inset: 50% 0 auto;
+  bottom: auto;
+  transform: translateY(-50%);
+  margin: 0;
+  z-index: 40;
+}
+.station .deck { min-height: clamp(244px, 28vh, 296px); }
+.station .coverflow { --cover: clamp(132px, 19vh, 230px); height: calc(var(--cover) + 24px); }
+.station .crate { gap: 0; }
+@media (max-width: 620px) {
+  .station .coverflow { --cover: min(53vw, max(108px, 20vh)); height: calc(var(--cover) + 16px); }
+  .station .deck { min-height: 0; }
+}
+
+/* Preserve the original cover art and give the sleeves and browse controls
+   enough depth/contrast to read over the Lab's photographic background. */
+.carouselStage .coverFront {
+  box-shadow: 0 28px 58px rgba(23,10,16,.5), 0 7px 12px rgba(20,9,15,.27), 0 0 0 1px rgba(242,213,197,.28);
+}
+.carouselStage .crateBar .round {
+  background: #fff8ee;
+  color: #482e37;
+  border: 1px solid rgba(111,70,84,.25);
+  box-shadow: 0 8px 20px rgba(20,8,14,.3), inset 0 1px 0 rgba(255,255,255,.88);
+}
+.carouselStage .crateBar .round:hover:not(:disabled),
+.carouselStage .crateBar .round:focus-visible {
+  border-color: #8f354c;
+  box-shadow: 0 9px 25px rgba(20,8,14,.4), 0 0 0 2px rgba(255,239,224,.38);
+}
+
+/* Shadow cleanup. Covers: no mauve block behind the sleeve; a tight, dark,
+   grounded shadow instead (rear covers lighter). Player: the controls row
+   clipped its buttons' shadows into a flat band, so give the shadows room
+   inside the clip and keep each one small and centred under its button. */
+.cover::after { display: none; }
+.cover,
+.carouselStage .cover {
+  box-shadow: 0 8px 14px -6px rgba(14,6,10,.42);
+}
+.coverFront,
+.carouselStage .coverFront {
+  box-shadow:
+    0 16px 22px -10px rgba(14,6,10,.62),
+    0 3px 6px rgba(14,6,10,.28),
+    0 0 0 1px rgba(255,240,230,.1);
+}
+.controls {
+  padding-block: 6px 12px;
+  margin-block: -6px -12px;
+}
+.transport .round {
+  box-shadow: 0 2px 4px rgba(20,8,14,.16);
+}
+.play,
+.transport .play {
+  box-shadow: 0 4px 9px -2px rgba(60,16,30,.36);
+}

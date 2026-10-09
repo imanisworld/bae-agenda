@@ -9130,7 +9130,7 @@ a.admin-stat-card:focus-visible {
   inset: -48px;
   pointer-events: none;
   background: var(--page-photo, none) var(--page-photo-position, center) / cover no-repeat;
-  filter: blur(var(--page-photo-blur, 3px)) brightness(var(--page-photo-brightness, .85)) saturate(.85);
+  filter: blur(var(--page-photo-blur, 3px)) brightness(var(--page-photo-brightness, .85)) saturate(var(--page-photo-saturate, .85));
 }
 .public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
   --page-photo: url('/photos/rooms/phones-box.webp');
@@ -9239,4 +9239,272 @@ a.admin-stat-card:focus-visible {
     linear-gradient(180deg, rgba(50,37,43,.72) 0%, rgba(50,37,43,.3) 22%, transparent 40%),
     radial-gradient(ellipse at 85% 10%, rgba(154,79,101,.21), transparent 50%),
     linear-gradient(155deg, rgba(76,52,62,.3), rgba(50,37,43,.4));
+}
+
+/* Book and Contact share one stage and heading alignment, rather than two
+   permanently split columns. Scoped to the public booking experience only. */
+.public-experience-shell .book-experience {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0;
+}
+.public-experience-shell .book-experience-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 8px 12px;
+}
+.public-experience-shell .book-experience-switch button {
+  cursor: pointer;
+  min-height: 40px;
+  padding: 0 18px;
+  border: 1px solid rgba(247,219,205,.4);
+  border-radius: 999px;
+  color: #f6e4d8;
+  background: rgba(67,43,53,.45);
+  font: inherit;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.public-experience-shell .book-experience-switch button[aria-selected='true'] {
+  background: #8f354c;
+  color: #fff7ee;
+  border-color: #e3b9a6;
+}
+.public-experience-shell .book-experience-switch button:focus-visible {
+  outline: 2px solid #f1cda8;
+  outline-offset: 2px;
+}
+.public-experience-shell .book-experience-form,
+.public-experience-shell .book-experience-rail {
+  grid-column: 1;
+  grid-row: 2;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+.public-experience-shell .book-experience--inquiry .book-experience-form,
+.public-experience-shell .book-experience--contact .book-experience-rail {
+  display: block;
+  animation: book-panel-arrive 210ms cubic-bezier(.22,.76,.26,1) both;
+}
+.public-experience-shell .book-experience--inquiry .book-experience-rail,
+.public-experience-shell .book-experience--contact .book-experience-form { display: none; }
+.public-experience-shell .book-experience-rail-inner {
+  width: min(100%, 680px);
+  margin: 0 auto;
+  padding: 24px clamp(18px,3vw,34px) 42px;
+}
+.public-experience-shell .book-experience-rail-inner header h2 {
+  font-size: clamp(40px, 6vw, 72px);
+  line-height: .95;
+}
+@keyframes book-panel-arrive {
+  from { opacity: .35; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 620px) {
+  .public-experience-shell .book-experience-switch { padding-inline: 6px; }
+  .public-experience-shell .book-experience-switch button { flex: 1; padding: 0 8px; min-width: 0; font-size: 10px; }
+  .public-experience-shell .book-experience-rail-inner header h2 { font-size: clamp(34px, 8.8vw, 48px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-experience-shell .book-experience--inquiry .book-experience-form,
+  .public-experience-shell .book-experience--contact .book-experience-rail { animation: none; }
+}
+
+/* Contact decorative phone loop, intentionally confined to its booking card. */
+.public-experience-shell .book-experience-contact-bookings { padding-right: clamp(102px, 12vw, 138px) !important; }
+.public-experience-shell .book-experience-phone {
+  right: 14px; top: 50%;
+  width: clamp(86px, 8vw, 108px);
+  height: auto;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid rgba(255,245,230,.3);
+  border-radius: 13px;
+  background: #f7f5f0 url('/media/contact-phone-poster.webp') center / cover no-repeat;
+  transform: translateY(-50%) rotate(4deg);
+  filter: drop-shadow(0 8px 10px rgba(0,0,0,.27));
+  pointer-events: none;
+}
+.public-experience-shell .book-experience-phone video {
+  display: block;
+  width: 100%; height: 100%; object-fit: cover;
+}
+@media (max-width:620px) {
+  .public-experience-shell .book-experience-contact-bookings { padding-right: 96px !important; }
+  .public-experience-shell .book-experience-phone { right: 8px; width: 76px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-experience-shell .book-experience-phone video { display: none; }
+}
+/* New wooden listening-room image from the provided Meet reference. */
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
+  --page-photo: url('/photos/rooms/meet-wood-shelves.webp');
+  --page-photo-position: center 48%;
+  --page-photo-blur: 5px;
+  --page-photo-brightness: .7;
+}
+
+
+/* Oct 2026 — scoped wine-depth polish for the Book inquiry; preserve its
+   animated logo, phone, layout, form validation and booking behavior. */
+.public-experience-shell .book-experience {
+  background:
+    radial-gradient(ellipse at 42% 22%, rgba(155,74,101,.22), transparent 62%),
+    linear-gradient(145deg, rgba(73,39,53,.74), rgba(48,26,38,.68));
+}
+.public-experience-shell .book-experience-form {
+  background:
+    radial-gradient(ellipse at 45% 8%, rgba(161,81,105,.25), transparent 66%),
+    linear-gradient(150deg, rgba(85,43,60,.75), rgba(53,29,42,.78));
+}
+.public-experience-shell .booking-form-embedded {
+  --booking-choice-bg: rgba(26,15,24,.48);
+  --booking-choice-selected: rgba(153,57,84,.56);
+  --booking-input-bg: rgba(25,14,24,.43);
+  --booking-calendar-bg: rgba(30,18,29,.54);
+  background: transparent;
+}
+.public-experience-shell .booking-hero-heading {
+  text-shadow: 0 8px 22px rgba(29,11,21,.4), 0 1px 0 rgba(255,239,223,.1);
+}
+.public-experience-shell .booking-form-embedded button[style*="--booking-choice"] {
+  border-radius: 9px;
+}
+.public-experience-shell .booking-form-embedded input,
+.public-experience-shell .booking-form-embedded select,
+.public-experience-shell .booking-form-embedded textarea {
+  border-radius: 8px;
+}
+.public-experience-shell .booking-form-embedded input:focus-visible,
+.public-experience-shell .booking-form-embedded select:focus-visible,
+.public-experience-shell .booking-form-embedded textarea:focus-visible {
+  outline: 2px solid #eac0a9;
+  outline-offset: 2px;
+}
+.public-experience-shell .booking-calendar-nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 7px 14px;
+  border: 1px solid rgba(247,220,204,.3);
+  border-radius: 999px;
+  background: rgba(255,240,227,.08);
+  color: #fff0e4;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+.public-experience-shell .booking-calendar-nav-button:hover:not(:disabled) {
+  background: rgba(255,240,227,.16);
+  border-color: rgba(247,220,204,.58);
+}
+.public-experience-shell .booking-calendar-nav-button:focus-visible {
+  outline: 2px solid #f1cda8;
+  outline-offset: 2px;
+}
+.public-experience-shell .booking-calendar-nav-button:disabled {
+  cursor: default;
+  opacity: .4;
+}
+@media (max-width: 620px) {
+  .public-experience-shell .booking-calendar-nav-button {
+    padding-inline: 12px;
+    min-height: 40px;
+  }
+}
+/* Events controls: separate the toggle from paging, retain the same active hue. */
+.public-experience-shell .events-experience-tools {
+  column-gap: clamp(18px, 2.2vw, 30px);
+  row-gap: 12px;
+}
+.public-experience-shell .events-experience-pager {
+  gap: 12px;
+  padding-left: clamp(14px, 1.6vw, 22px);
+  border-left: 1px solid rgba(255,231,215,.26);
+}
+.public-experience-shell .events-experience-pager .experience-arrow {
+  background: rgba(255,248,236,.14);
+  border-color: rgba(255,243,230,.3);
+  color: #fff7ee;
+}
+.public-experience-shell .events-experience-pager .experience-arrow:hover:not(:disabled) {
+  background: rgba(255,248,236,.22);
+  border-color: rgba(255,243,230,.55);
+}
+.public-experience-shell .events-view-switch button[aria-pressed='true'] {
+  background: linear-gradient(150deg, #a54560, #7f2c43);
+  box-shadow: 0 4px 12px rgba(40,13,24,.22), inset 0 1px 0 rgba(255,233,220,.14);
+}
+@media (max-width: 620px) {
+  .public-experience-shell .events-experience-tools { gap: 10px; }
+  .public-experience-shell .events-experience-pager {
+    padding-left: 12px;
+    gap: 7px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .public-experience-shell .booking-calendar-nav-button { transition: none; }
+}
+
+/* Book photo: cyan/blue vintage phone collage, behind the existing wine UI.
+   The photo is decorative only, and does not alter the inquiry controls. */
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
+  --page-photo: url('/photos/rooms/book-blue-phones.webp');
+  --page-photo-position: center 46%;
+  --page-photo-blur: 4px;
+  --page-photo-brightness: .76;
+}
+.public-experience-shell .book-experience {
+  background:
+    radial-gradient(ellipse at 35% 20%, rgba(123,45,71,.18), transparent 65%),
+    linear-gradient(135deg, rgba(67,28,47,.4), rgba(42,24,45,.38));
+}
+.public-experience-shell .book-experience-form {
+  background:
+    radial-gradient(ellipse at 40% 8%, rgba(140,54,83,.17), transparent 64%),
+    linear-gradient(145deg, rgba(75,34,54,.55), rgba(45,24,44,.59));
+}
+.public-experience-shell .book-experience-rail {
+  background: linear-gradient(150deg, rgba(66,35,54,.77), rgba(43,26,45,.75));
+}
+/* The source phone loop has white matte; white is neutral when multiplied
+   against the surrounding dark-wine card so the phone appears integrated. */
+.public-experience-shell .book-experience-phone {
+  border: 0;
+  background-color: #503841;
+  background-blend-mode: multiply;
+  box-shadow: 0 8px 18px rgba(20,10,18,.18);
+}
+.public-experience-shell .book-experience-phone video {
+  mix-blend-mode: multiply;
+}
+@media (max-width: 620px) {
+  .public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
+    --page-photo-position: 50% 42%;
+  }
+}
+
+/* Book and Contact are one page (two tabs): same plum panel, same wash, and
+   the blue phone photo pushed back so the wine UI leads. */
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
+  --page-photo-blur: 6px;
+  --page-photo-brightness: .5;
+  --page-photo-saturate: .45;
+}
+.public-experience-shell .book-experience {
+  background:
+    radial-gradient(ellipse at 35% 20%, rgba(123,45,71,.2), transparent 65%),
+    linear-gradient(135deg, rgba(62,28,46,.62), rgba(40,22,38,.66));
+}
+.public-experience-shell .book-experience-form,
+.public-experience-shell .book-experience-rail {
+  background: linear-gradient(150deg, rgba(66,35,54,.8), rgba(43,26,45,.8));
 }
