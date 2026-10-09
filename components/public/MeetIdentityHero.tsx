@@ -75,12 +75,12 @@ export default function MeetIdentityHero() {
       >
         <div className={styles.portrait}>
           <Image
-            src="/photos/images/approved-torn-portrait.svg"
-            alt="DJ B.A.E. portrait as the approved torn-paper magazine collage"
+            src="/photos/images/meet-collage.webp"
+            alt="DJ B.A.E. portrait as a torn-paper photo collage"
             fill
             priority
-            unoptimized
             sizes="(max-width: 760px) 80vw, 40vw"
+            quality={90}
             draggable={false}
             className={styles.approvedCollage}
           />
