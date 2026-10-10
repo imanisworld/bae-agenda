@@ -10184,10 +10184,19 @@ a.admin-stat-card:focus-visible {
     margin-bottom: 0 !important;
   }
 }
-/* The printed PDF is an 8.5in-wide *content-height* editorial sheet,
-   not a Letter sheet with a large unprinted maroon tail. */
+/* Press Kit only: an approximately content-height PDF sheet. Ordinary
+   printing stays US Letter; the named print page avoids changing legal pages.
+   Verified the named-page sizing mechanism in Chromium. */
+@page {
+  size: letter portrait;
+  margin: .35in;
+}
+@page presskit {
+  size: 8.5in 7.95in;
+  margin: .24in;
+}
 @media print {
-  @page { size: 8.5in 8.3in; margin: .3in; }
+  .press-kit-page { page: presskit; }
 }
 
 /* Legal pages missed in the previous release: same soft, darkened room-photo
