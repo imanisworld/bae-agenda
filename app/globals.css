@@ -10344,3 +10344,20 @@ a.admin-stat-card:focus-visible {
     letter-spacing: -.01em;
   }
 }
+
+/* Slightly softer room photos on every public page (adds to each page's own blur). */
+.public-experience-shell .public-page-stage--experience .public-page-stage-inner::before {
+  filter: blur(calc(var(--page-photo-blur, 3px) + 1.5px)) brightness(var(--page-photo-brightness, .85)) saturate(var(--page-photo-saturate, .85));
+}
+
+/* Book (Inquiry) uses the same warm frame and card tones as Contact. The
+   form panel's color is set inline by BookingForm, hence !important. */
+.public-experience-shell .booking-form-embedded form > div:first-of-type {
+  background: rgba(43,27,27,.23) !important;
+  border-color: rgba(233,207,187,.31) !important;
+}
+.public-experience-shell .booking-form-embedded {
+  --booking-choice-bg: rgba(28,17,20,.52);
+  --booking-input-bg: rgba(28,17,20,.52);
+  --booking-calendar-bg: rgba(28,17,20,.52);
+}
