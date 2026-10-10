@@ -49,6 +49,7 @@ export function eventArtwork(event: Event) {
 function parts(event: Event) {
   const validZone = event.event_timezone && isValidTimeZone(event.event_timezone)
   const timeZone = validZone ? event.event_timezone! : 'UTC'
+  if (!event.event_date) return { dateLabel: 'Date TBA', timeLabel: null }
   const date = new Date(event.event_date)
 
   const dateLabel = new Intl.DateTimeFormat('en-US', {
@@ -91,7 +92,7 @@ export default function EventPoster({
 }) {
   const { dateLabel, timeLabel } = parts(event)
   const Heading = headingLevel
-  const location = [event.venue, event.city].filter(Boolean).join(' · ')
+  const location = event.event_date ? [event.venue, event.city].filter(Boolean).join(' · ') : 'Location TBA'
   const photo = posterPhoto(event)
   const flyer = FLYERS[event.slug]
 

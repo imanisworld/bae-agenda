@@ -5075,6 +5075,61 @@ body.has-custom-cursor * { cursor: none !important; }
   }
 }
 
+
+/* Isolate the Press Kit when printed: the interactive shell must never fill a
+   second PDF page. The screen site and other printable pages are unchanged. */
+@media print {
+  body:has(.press-kit-page) .chrome,
+  body:has(.press-kit-page) .skip-link,
+  body:has(.press-kit-page) .site-footer,
+  body:has(.press-kit-page) .sticky-booking-cta,
+  body:has(.press-kit-page) .public-page-stage-glow,
+  body:has(.press-kit-page) .public-page-stage-scan {
+    display: none !important;
+  }
+
+  body:has(.press-kit-page) .public-site-shell,
+  body:has(.press-kit-page) #main-content,
+  body:has(.press-kit-page) .public-page-stage,
+  body:has(.press-kit-page) .public-page-stage-inner {
+    display: block !important;
+    position: static !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: #fff !important;
+    transform: none !important;
+    filter: none !important;
+    animation: none !important;
+    box-shadow: none !important;
+  }
+
+  body:has(.press-kit-page) .public-page-stage::before,
+  body:has(.press-kit-page) .public-page-stage::after,
+  body:has(.press-kit-page) .public-page-stage-inner::before,
+  body:has(.press-kit-page) .public-page-stage-inner::after {
+    display: none !important;
+  }
+
+  body:has(.press-kit-page) .press-kit-page {
+    position: static !important;
+    min-height: 0 !important;
+    height: auto !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  body:has(.press-kit-page) .press-kit-sheet {
+    width: 100% !important;
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
+  }
+}
+
 /* ─── Footer ─────────────────────────────────────────────────────────── */
 .footer-body {
   display: grid;
@@ -9507,4 +9562,630 @@ a.admin-stat-card:focus-visible {
 .public-experience-shell .book-experience-form,
 .public-experience-shell .book-experience-rail {
   background: linear-gradient(150deg, rgba(66,35,54,.8), rgba(43,26,45,.8));
+}
+
+
+/* Oct 2026: Press Kit print-only refinement — preserve the actual photo,
+   omit both navigation surfaces and interaction prompts, and fit one page. */
+@media print {
+  body:has(.press-kit-page) .public-navigation-chrome,
+  body:has(.press-kit-page) [class*="dockCue"],
+  body:has(.press-kit-page) .skip-link {
+    display: none !important;
+  }
+  body:has(.press-kit-page) .press-kit-sheet {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    break-inside: avoid !important;
+  }
+  body:has(.press-kit-page) .press-kit-left {
+    display: grid !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 150px !important;
+    min-height: 0 !important;
+    max-height: 150px !important;
+    top: auto !important;
+    overflow: hidden !important;
+    align-content: end !important;
+    break-inside: avoid !important;
+  }
+  body:has(.press-kit-page) .press-kit-left > div:last-child {
+    padding: 9px 16px !important;
+    gap: 4px !important;
+  }
+  body:has(.press-kit-page) .press-kit-left > div:last-child > div:nth-child(2) {
+    display: none !important;
+  }
+  body:has(.press-kit-page) .press-kit-left > div:last-child > div:last-child {
+    display: none !important;
+  }
+  body:has(.press-kit-page) .press-kit-right {
+    padding: 11px 18px !important;
+    gap: 5px !important;
+    min-height: 0 !important;
+    align-content: start !important;
+  }
+  body:has(.press-kit-page) .press-kit-right header {
+    gap: 5px !important;
+  }
+  body:has(.press-kit-page) .press-kit-right section {
+    gap: 5px !important;
+  }
+  body:has(.press-kit-page) .press-kit-right p {
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+  }
+  body:has(.press-kit-page) .press-kit-right section:last-child > div {
+    gap: 0 !important;
+  }
+  body:has(.press-kit-page) .press-kit-right section:last-child > div > div {
+    padding-block: 5px !important;
+  }
+  body:has(.press-kit-page) .press-kit-right section:last-child p {
+    font-size: 10.5px !important;
+    line-height: 1.32 !important;
+  }
+  body:has(.press-kit-page) .press-kit-right section > div[style*="padding: 14px"] {
+    padding: 9px !important;
+  }
+}
+
+/* ================================================================
+   PRESS KIT — branded listening-room editorial sheet
+   Existing site layout and PDF-specific page isolation remain intact.
+   ================================================================ */
+.press-kit-page {
+  background:
+    radial-gradient(ellipse at 85% 6%, rgba(135,66,87,.2), transparent 55%),
+    linear-gradient(145deg,#291a24,#43303b 70%,#2a1d25);
+  color:#f5ecdf;
+  padding:calc(var(--nav-height) + var(--safe-top) + 24px) max(18px,calc(var(--safe-right) + 16px))
+    max(42px,calc(var(--safe-bottom) + 24px)) max(18px,calc(var(--safe-left) + 16px));
+  min-height:100svh;
+}
+.press-kit-wrap { width:min(100%,1180px); margin:auto; display:grid; gap:20px; }
+.press-kit-toolbar {
+  display:flex; align-items:center; justify-content:space-between;
+  gap:16px; color:#e0c5b7; font-size:11px; letter-spacing:.16em; text-transform:uppercase;
+}
+.press-kit-toolbar-back {
+  display:inline-flex; align-items:center; min-height:44px; padding:0 18px;
+  color:#fff1e1; background:rgba(23,14,20,.68);
+  border:1px solid rgba(244,216,194,.3); text-decoration:none;
+}
+.press-kit-sheet {
+  display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);
+  border:1px solid rgba(242,203,180,.27);
+  background:#3b2732; overflow:hidden;
+  box-shadow:0 24px 65px rgba(10,6,11,.28);
+}
+.press-kit-sheet .press-kit-left {
+  position:relative; top:auto; height:auto; min-height:760px;
+  max-height:none; width:100%; isolation:isolate; overflow:hidden;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  color:#fff5eb; background:#211821;
+}
+.press-kit-photo { object-fit:cover; object-position:center 18%; }
+.press-kit-photo-shade {
+  position:absolute; inset:0; z-index:1;
+  background:linear-gradient(180deg,rgba(20,12,20,.25) 0%,rgba(25,13,24,.08) 32%,rgba(25,12,24,.82) 100%);
+}
+.press-kit-photo-copy {
+  position:relative; z-index:2; padding:clamp(20px,3.8vw,40px);
+  display:grid; justify-items:start; gap:16px;
+  text-shadow:0 4px 18px rgba(0,0,0,.6);
+}
+.press-kit-photo-kicker {
+  color:#f2cfaa; font-size:11px; font-weight:700;
+  letter-spacing:.24em; text-transform:uppercase;
+}
+.press-kit-photo-copy strong {
+  font-family:Conthrax,sans-serif; font-size:clamp(38px,4.8vw,72px);
+  font-weight:600; line-height:1; letter-spacing:-.025em;
+}
+.press-kit-genre-chips { display:flex; gap:7px; flex-wrap:wrap; }
+.press-kit-genre-chips span {
+  padding:6px 9px; border:1px solid rgba(252,237,223,.48);
+  border-radius:4px; color:#fdf2e8; background:rgba(24,16,24,.43);
+  font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+}
+.press-kit-sheet .press-kit-right {
+  display:flex; flex-direction:column; align-content:initial;
+  gap:clamp(17px,2.25vw,25px); padding:clamp(22px,3vw,34px);
+  color:#f5ecdf;
+  background:linear-gradient(156deg,#4b313e 0%,#392530 56%,#32202b 100%);
+}
+.press-kit-intro { display:grid; gap:10px; }
+.press-kit-section-label {
+  display:flex; align-items:center; gap:9px;
+  color:#e2b783; font-size:10px; font-weight:700;
+  letter-spacing:.2em; text-transform:uppercase;
+}
+.press-kit-section-label i {
+  width:20px; height:2px; flex:none; background:#e4b979;
+}
+.press-kit-intro h1 {
+  margin:0; color:#fff6eb; font-family:Conthrax,sans-serif;
+  font-size:clamp(24px,3vw,43px); line-height:1.05;
+  letter-spacing:-.025em; overflow-wrap:anywhere;
+}
+.press-kit-intro p { color:#ead6c9; font-size:13px; line-height:1.5; margin:0; }
+.press-kit-bio, .press-kit-booking, .press-kit-selected { display:grid; gap:10px; }
+.press-kit-bio p { margin:0; color:#f2e4d8; font-size:13px; line-height:1.55; }
+.press-kit-bio p:last-child { color:#ceb7b6; font-size:12px; }
+.press-kit-booking-card {
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+  padding:13px 14px; border:1px solid rgba(240,209,187,.43);
+  background:linear-gradient(130deg,rgba(25,14,23,.54),rgba(25,15,23,.27));
+  box-shadow:inset 0 1px 0 rgba(255,240,225,.05);
+}
+.press-kit-booking-card > div { display:grid; gap:5px; min-width:0; }
+.press-kit-booking-card > div > span {
+  color:#e6b98b; text-transform:uppercase; letter-spacing:.14em; font-size:10px;
+}
+.press-kit-email { color:#fff4e8; font-weight:700; font-size:13px; overflow-wrap:anywhere; }
+.press-kit-mail-cta, .press-kit-footer-book {
+  display:inline-flex; align-items:center; justify-content:center; gap:12px;
+  min-height:40px; padding:8px 13px; color:#452635; font-weight:700;
+  background:#f6e7d8; border:1px solid rgba(255,250,246,.85);
+  text-decoration:none; font-size:11px; white-space:nowrap;
+}
+.press-kit-mail-cta:hover, .press-kit-footer-book:hover { background:#fff9f2; }
+.press-kit-work-list { display:grid; gap:0; }
+.press-kit-work-item {
+  display:grid; grid-template-columns:37px minmax(0,1fr); align-items:start;
+  gap:12px; padding:11px 0; border-top:1px solid rgba(245,216,194,.21);
+}
+.press-kit-work-number {
+  display:grid; place-items:center; width:31px; height:36px;
+  border:1px solid rgba(238,193,148,.45); border-radius:3px;
+  color:#ebc397; background:rgba(27,15,25,.4);
+  font-size:10px; font-weight:700; letter-spacing:.06em;
+}
+.press-kit-work-copy { min-width:0; display:grid; gap:4px; }
+.press-kit-work-heading { display:flex; align-items:baseline; flex-wrap:wrap; gap:9px; }
+.press-kit-work-heading strong { color:#fff5e9; font-size:14px; }
+.press-kit-work-heading span { color:#d8ad80; font-size:11px; }
+.press-kit-work-copy small { color:#dfb68e; font-size:10px; letter-spacing:.1em; text-transform:uppercase; }
+.press-kit-work-copy p { margin:0; color:#e9d9d1; font-size:12px; line-height:1.48; }
+.press-kit-footer {
+  grid-column:1/-1; display:grid;
+  grid-template-columns:minmax(0,1fr) auto auto; align-items:center; gap:22px;
+  padding:17px clamp(19px,3vw,33px); border-top:1px solid rgba(240,206,186,.3);
+  background:linear-gradient(120deg,#291923,#412a34 55%,#34222d);
+}
+.press-kit-signature { display:flex; align-items:center; gap:15px; min-width:0; }
+.press-kit-logo { width:110px; height:auto; object-fit:contain; filter:drop-shadow(0 6px 8px rgba(7,4,7,.26)); }
+.press-kit-signature div { display:grid; gap:5px; min-width:0; }
+.press-kit-signature strong { color:#fff3e8; font-family:Conthrax,sans-serif; font-size:16px; }
+.press-kit-signature span { color:#dfc6ba; font-size:11px; line-height:1.3; }
+.press-kit-footer-actions { display:grid; justify-items:start; gap:12px; }
+.press-kit-socials { display:flex; flex-wrap:wrap; gap:8px 13px; }
+.press-kit-socials a { color:#f5d1ae; text-decoration:underline; text-underline-offset:3px; font-size:11px; }
+.press-kit-qr { display:grid; justify-items:center; gap:5px; text-decoration:none; }
+.press-kit-qr img { display:block; width:76px; height:76px; border:4px solid #f5e9dc; }
+.press-kit-qr span { color:#f4d2b4; font-size:10px; }
+@media (max-width:950px) {
+  .press-kit-footer { grid-template-columns:minmax(0,1fr) auto; }
+  .press-kit-qr { display:none; }
+}
+@media (max-width:900px) {
+  .press-kit-sheet { grid-template-columns:1fr !important; }
+  .press-kit-sheet .press-kit-left {
+    position:relative; height:clamp(260px,45svh,420px);
+    min-height:260px; max-height:420px; top:auto;
+  }
+  .press-kit-photo-copy { gap:9px; }
+  .press-kit-footer { grid-template-columns:1fr auto; gap:16px; }
+}
+@media (max-width:520px) {
+  .press-kit-toolbar > span { display:none; }
+  .press-kit-right { padding:20px; }
+  .press-kit-footer { grid-template-columns:1fr; gap:13px; }
+  .press-kit-qr { display:none; }
+  .press-kit-signature { gap:8px; }
+  .press-kit-logo { width:82px; }
+  .press-kit-booking-card { align-items:flex-start; }
+}
+
+/* Print retains brand identity, actual hero photograph, contact action,
+   selected work, compact footer and scan code within one letter page. */
+@media print {
+  body:has(.press-kit-page) .press-kit-page { color:#f5ecdf !important; background:#392630 !important; }
+  body:has(.press-kit-page) .press-kit-sheet {
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    background:#392630 !important;
+    color:#f5ecdf !important;
+    border:none !important;
+    overflow:visible !important;
+  }
+  body:has(.press-kit-page) .press-kit-sheet .press-kit-left {
+    min-height:0 !important; max-height:142px !important;
+    height:142px !important; position:relative !important;
+    overflow:hidden !important; display:flex !important;
+  }
+  body:has(.press-kit-page) .press-kit-photo-shade {
+    background:linear-gradient(0deg,rgba(19,10,19,.77),rgba(19,10,19,.03)) !important;
+  }
+  body:has(.press-kit-page) .press-kit-photo-copy {
+    padding:10px 16px !important; gap:2px !important;
+    display:grid !important;
+  }
+  body:has(.press-kit-page) .press-kit-photo-kicker { font-size:9px !important; }
+  body:has(.press-kit-page) .press-kit-photo-copy strong {
+    display:block !important; font-size:24px !important; line-height:1 !important;
+  }
+  body:has(.press-kit-page) .press-kit-genre-chips { display:none !important; }
+  body:has(.press-kit-page) .press-kit-sheet .press-kit-right {
+    padding:12px 18px 9px !important; gap:8px !important;
+    min-height:0 !important; background:#392630 !important; color:#f5ecdf !important;
+  }
+  body:has(.press-kit-page) .press-kit-intro { gap:5px !important; }
+  body:has(.press-kit-page) .press-kit-intro h1 {
+    color:#fff5e9 !important; font-size:23px !important;
+  }
+  body:has(.press-kit-page) .press-kit-intro p,
+  body:has(.press-kit-page) .press-kit-bio p,
+  body:has(.press-kit-page) .press-kit-work-copy p {
+    color:#f5e5da !important; font-size:10.5px !important; line-height:1.33 !important;
+  }
+  body:has(.press-kit-page) .press-kit-bio,
+  body:has(.press-kit-page) .press-kit-booking,
+  body:has(.press-kit-page) .press-kit-selected {
+    gap:4px !important;
+  }
+  body:has(.press-kit-page) .press-kit-section-label {
+    color:#e4b979 !important; font-size:9px !important; line-height:1.2 !important;
+  }
+  body:has(.press-kit-page) .press-kit-section-label i { background:#e4b979 !important; }
+  body:has(.press-kit-page) .press-kit-booking-card {
+    padding:7px 10px !important; gap:8px !important;
+    background:#261b24 !important; border-color:#a87876 !important;
+  }
+  body:has(.press-kit-page) .press-kit-email { color:#fff5e9 !important; font-size:11px !important; }
+  body:has(.press-kit-page) .press-kit-mail-cta {
+    min-height:28px !important; padding:5px 9px !important; font-size:10px !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-item {
+    grid-template-columns:26px minmax(0,1fr) !important;
+    gap:8px !important; padding:5px 0 !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-number {
+    width:22px !important; height:26px !important; font-size:9px !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-copy { gap:1px !important; }
+  body:has(.press-kit-page) .press-kit-work-heading strong { font-size:11px !important; }
+  body:has(.press-kit-page) .press-kit-work-heading span,
+  body:has(.press-kit-page) .press-kit-work-copy small { font-size:9px !important; }
+  body:has(.press-kit-page) .press-kit-footer {
+    grid-column:1 !important; grid-template-columns:minmax(0,1fr) auto auto !important;
+    padding:9px 16px !important; gap:13px !important;
+    break-inside:avoid !important; background:#281a25 !important;
+  }
+  body:has(.press-kit-page) .press-kit-logo { width:65px !important; height:auto !important; }
+  body:has(.press-kit-page) .press-kit-signature strong { font-size:11px !important; }
+  body:has(.press-kit-page) .press-kit-signature span { font-size:9px !important; }
+  body:has(.press-kit-page) .press-kit-socials { gap:6px !important; }
+  body:has(.press-kit-page) .press-kit-socials a { font-size:9px !important; }
+  body:has(.press-kit-page) .press-kit-footer-actions { gap:6px !important; }
+  body:has(.press-kit-page) .press-kit-footer-book {
+    padding:3px 8px !important; min-height:25px !important; font-size:9px !important;
+  }
+  body:has(.press-kit-page) .press-kit-qr { display:grid !important; gap:2px !important; }
+  body:has(.press-kit-page) .press-kit-qr img { width:54px !important; height:54px !important; border-width:2px !important; }
+  body:has(.press-kit-page) .press-kit-qr span { font-size:8px !important; }
+}
+
+
+/* Press Kit reading-flow polish: content-led height, stronger work labels,
+   a larger logo and an understated bio availability callout. */
+.press-kit-sheet { align-items: stretch; }
+.press-kit-sheet .press-kit-left { min-height: 0; height: 100%; }
+.press-kit-sheet .press-kit-right {
+  justify-content: flex-start;
+  align-content: start;
+  gap: clamp(14px, 1.9vw, 20px);
+}
+.press-kit-intro { gap: 8px; }
+.press-kit-bio, .press-kit-booking, .press-kit-selected { gap: 9px; }
+.press-kit-bio p:last-child {
+  padding-left: 11px;
+  border-left: 2px solid rgba(231,183,125,.75);
+  color: #f1dbcb;
+  font-size: 12px;
+}
+.press-kit-work-item {
+  grid-template-columns: 40px minmax(0,1fr);
+  gap: 16px;
+  padding-block: 13px;
+}
+.press-kit-work-number {
+  box-sizing: border-box;
+  width: 36px;
+  height: 38px;
+  padding: 7px;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+.press-kit-work-heading {
+  justify-content: flex-start;
+  gap: 9px;
+}
+.press-kit-work-heading strong {
+  color: #fff7ed;
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.25;
+}
+.press-kit-work-heading span { color: #c8b5ac; font-size: 11px; opacity: .92; }
+.press-kit-work-copy small {
+  color: #dec4a7;
+  font-size: 9px;
+  letter-spacing: .1em;
+}
+.press-kit-photo-shade {
+  background: linear-gradient(
+    180deg,
+    rgba(17,10,19,.22) 0%,
+    rgba(17,10,19,.18) 28%,
+    rgba(24,10,23,.45) 57%,
+    rgba(20,9,20,.94) 100%
+  );
+}
+.press-kit-photo-copy {
+  padding: clamp(26px,3.7vw,43px);
+  gap: 16px;
+}
+.press-kit-photo-kicker { color: #ffe4c7; }
+.press-kit-footer { padding-block: 23px; gap: clamp(18px,2.7vw,32px); }
+.press-kit-logo { width: 125px; height: auto; }
+.press-kit-footer-actions { gap: 13px; }
+.press-kit-qr { gap: 7px; }
+.press-kit-qr span { color: #f7dbbf; font-size: 11px; font-weight: 600; }
+@media (max-width:900px) {
+  .press-kit-sheet .press-kit-left {
+    min-height: 260px;
+    height: clamp(260px,45svh,420px);
+  }
+  .press-kit-photo-copy { padding: 24px; }
+  .press-kit-footer { padding-block: 20px; }
+  .press-kit-work-item { padding-block: 12px; }
+}
+@media (max-width:520px) {
+  .press-kit-work-heading strong { font-size: 15px; }
+  .press-kit-work-heading span { font-size: 10px; }
+  .press-kit-work-item { grid-template-columns: 34px minmax(0,1fr); gap: 12px; }
+  .press-kit-work-number { width: 32px; height: 34px; padding: 5px; }
+  .press-kit-logo { width: 96px; }
+  .press-kit-footer { padding-block: 18px; }
+}
+
+/* US Letter print: the paper size remains fixed, not the content.
+   Previous min-height + 1fr + space-between stretched every section.
+   Preserve the dark page background; the content and footer now follow
+   each other naturally without artificial gaps. */
+@media print {
+  html:has(.press-kit-page),
+  body:has(.press-kit-page) {
+    background: #35222e !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  body:has(.press-kit-page) .press-kit-page {
+    box-sizing: border-box !important;
+    min-height: 0 !important;
+    height: auto !important;
+    background: #35222e !important;
+  }
+  body:has(.press-kit-page) .press-kit-wrap,
+  body:has(.press-kit-page) .press-kit-sheet {
+    box-sizing: border-box !important;
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  body:has(.press-kit-page) .press-kit-wrap { background: #35222e !important; }
+  body:has(.press-kit-page) .press-kit-sheet {
+    grid-template-rows: 142px auto auto !important;
+    align-content: start !important;
+    background: #35222e !important;
+  }
+  body:has(.press-kit-page) .press-kit-sheet .press-kit-left {
+    min-height: 0 !important;
+    height: 142px !important;
+  }
+  body:has(.press-kit-page) .press-kit-sheet .press-kit-right {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-self: start !important;
+    gap: 8px !important;
+    min-height: 0 !important;
+    background: #392630 !important;
+  }
+  body:has(.press-kit-page) .press-kit-bio p:last-child {
+    padding-left: 7px !important;
+    border-left: 2px solid #d7aa74 !important;
+    font-size: 10px !important;
+    line-height: 1.28 !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-item {
+    grid-template-columns: 28px minmax(0,1fr) !important;
+    padding-block: 6px !important;
+    gap: 10px !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-number {
+    box-sizing: border-box !important;
+    width: 26px !important;
+    height: 29px !important;
+    padding: 3px !important;
+    line-height: 1 !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-heading strong {
+    font-size: 12px !important;
+    font-weight: 750 !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-heading span {
+    color: #d0bdb3 !important;
+    font-size: 9px !important;
+  }
+  body:has(.press-kit-page) .press-kit-work-copy small {
+    font-size: 9px !important;
+  }
+  body:has(.press-kit-page) .press-kit-photo-shade {
+    background: linear-gradient(
+      180deg,
+      rgba(20,10,20,.23) 0%,
+      rgba(20,10,20,.25) 35%,
+      rgba(20,10,20,.9) 100%
+    ) !important;
+  }
+  body:has(.press-kit-page) .press-kit-photo-copy {
+    padding: 14px 20px !important;
+    gap: 4px !important;
+  }
+  body:has(.press-kit-page) .press-kit-footer {
+    margin-top: 0 !important;
+    padding: 11px 18px !important;
+    gap: 15px !important;
+  }
+  body:has(.press-kit-page) .press-kit-logo { width: 80px !important; height: auto !important; }
+  body:has(.press-kit-page) .press-kit-qr span { font-size: 9px !important; font-weight: 600 !important; }
+}
+
+/* Approved original room photographs; existing blur layer is unchanged. */
+.public-experience-shell .public-page-stage--experience[data-experience-route='/lab'] {
+  --page-photo: url('/photos/rooms/lab-orange-albums.webp');
+  --page-photo-position: center 49%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
+  --page-photo: url('/photos/rooms/meet-got-music.webp');
+  --page-photo-position: center 45%;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book'] {
+  --page-photo: url('/photos/rooms/book-warm-turntable.webp');
+  --page-photo-position: center 48%;
+  --page-photo-blur: 6px;
+  --page-photo-brightness: .57;
+  --page-photo-saturate: .75;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book']:has(.book-experience--contact) {
+  --page-photo: url('/photos/rooms/contact-walnut-vinyl.webp');
+  --page-photo-position: center 49%;
+}
+.public-experience-shell .book-experience { background: linear-gradient(145deg,rgba(55,33,29,.38),rgba(39,26,24,.49)); }
+.public-experience-shell .book-experience-form,
+.public-experience-shell .book-experience-rail {
+  background: radial-gradient(ellipse at 32% 20%,rgba(118,76,51,.12),transparent 64%),
+              linear-gradient(150deg,rgba(59,35,33,.8),rgba(43,27,25,.81));
+}
+/* Actual transparent phone animation: no tile or colored block. */
+.public-experience-shell .book-experience-contact-bookings { padding-right: clamp(122px,12vw,150px) !important; }
+.public-experience-shell .book-experience-phone {
+  right: 4px; top: 50%; width: clamp(110px,10vw,143px);
+  height: auto; aspect-ratio: 1; border: 0 !important; border-radius: 0;
+  background: none !important; box-shadow: none !important;
+  filter: drop-shadow(0 7px 7px rgba(13,9,10,.28)); overflow: visible;
+  transform: translateY(-50%) rotate(4deg); pointer-events: none;
+}
+.public-experience-shell .book-experience-phone picture,
+.public-experience-shell .book-experience-phone picture img,
+.public-experience-shell .book-experience-phone > img {
+  display: block; width: 100%; height: 100%;
+  object-fit: contain; mix-blend-mode: normal; background: transparent;
+}
+.public-experience-shell .book-experience-phone .book-experience-phone-still { display: none; }
+@media (max-width:620px) {
+  .public-experience-shell .book-experience-contact-bookings { padding-right: 104px !important; }
+  .public-experience-shell .book-experience-phone { width: 106px; right: -5px; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .public-experience-shell .book-experience-phone-motion { display: none; }
+  .public-experience-shell .book-experience-phone .book-experience-phone-still { display: block; }
+}
+/* Mobile route transitions: remove the overlapping vertical lift and
+   spring-like swipe arrival; keep the finger-driven swipe interaction. */
+@media (max-width:620px) {
+  .public-experience-shell:not(.public-experience-shell--pulling):not(.public-experience-shell--settling):not(.public-experience-shell--leaving):not(.public-experience-shell--arriving)
+  .public-page-stage--experience .public-page-stage-inner {
+    animation: mobile-room-fade 170ms ease-out both;
+  }
+  .public-experience-shell--arriving .public-page-stage--experience .public-page-stage-inner {
+    animation: mobile-room-fade 190ms ease-out both !important;
+    transform: none !important;
+  }
+  .public-experience-shell--leaving .public-page-stage--experience .public-page-stage-inner {
+    animation: none !important;
+    transform: translate3d(var(--route-pull-x),0,0) !important;
+    opacity: 0 !important; transition: opacity 160ms ease-out !important;
+  }
+  .public-experience-shell--settling .public-page-stage--experience .public-page-stage-inner {
+    animation: none !important;
+    transform: translate3d(0,0,0);
+    transition: transform 140ms ease-out !important;
+  }
+}
+@keyframes mobile-room-fade {
+  from { opacity: .35; transform: none; }
+  to { opacity: 1; transform: none; }
+}
+/* The webpage ends at the branded Press Kit footer. Letter sizing is print-only. */
+@media screen {
+  .public-site-shell:has(.press-kit-page) #main-content,
+  .public-site-shell:has(.press-kit-page) .public-page-stage { min-height: 0; height: auto; }
+  .press-kit-page { min-height: 0; padding-bottom: 0; }
+  .press-kit-wrap, .press-kit-sheet { min-height: 0; height: auto; }
+  .public-site-shell:has(.press-kit-page) .site-footer { display: none; }
+}
+.press-kit-work-heading span::before { content: '•'; margin-right: 7px; color: #deb98e; }
+.press-kit-work-copy p { line-height: 1.6; }
+.press-kit-footer { padding-block: 26px; }
+.press-kit-logo { width: 130px; }
+.press-kit-bio p:last-child { position: relative; border-left: none; padding-left: 31px; }
+.press-kit-bio p:last-child::before {
+  content: ''; position: absolute; left: 0; top: .75em;
+  width: 20px; height: 2px; background: #e4b979;
+}
+@media print {
+  body:has(.press-kit-page) .press-kit-bio p:last-child {
+    border-left: none !important; padding-left: 26px !important;
+  }
+  body:has(.press-kit-page) .press-kit-bio p:last-child::before { top: .6em; width: 18px; }
+  body:has(.press-kit-page) .press-kit-work-copy p { line-height: 1.43 !important; }
+}
+
+/* Release finish: Meet's quieter DJ stage photograph replaces the huge
+   lettering crop. Inquiry and Contact intentionally share one backdrop. */
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
+  --page-photo: url('/photos/rooms/meet-dark-stage.webp');
+  --page-photo-position: center 52%;
+  --page-photo-blur: 5px;
+  --page-photo-brightness: .74;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book'],
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book']:has(.book-experience--contact) {
+  --page-photo: url('/photos/rooms/book-warm-turntable.webp');
+  --page-photo-position: center 48%;
+}
+/* The public web sheet ends after the Press Kit footer. */
+@media screen {
+  .public-site-shell:has(.press-kit-page),
+  .public-site-shell:has(.press-kit-page) #main-content,
+  .public-site-shell:has(.press-kit-page) .public-page-stage,
+  .public-site-shell:has(.press-kit-page) .public-page-stage-inner {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  .public-site-shell:has(.press-kit-page) .press-kit-page {
+    min-height: 0 !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
+/* The printed PDF is an 8.5in-wide *content-height* editorial sheet,
+   not a Letter sheet with a large unprinted maroon tail. */
+@media print {
+  @page { size: 8.5in 8.3in; margin: .3in; }
 }

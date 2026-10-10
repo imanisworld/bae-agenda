@@ -30,16 +30,13 @@ export default async function BookExperienceRail() {
           <small>Bookings</small>
           <a href={`mailto:${bookingEmail}`}>{bookingEmail}</a>
           <div className="book-experience-phone" aria-hidden="true">
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              poster="/media/contact-phone-poster.webp"
-            >
-              <source src="/media/contact-phone.mp4" type="video/mp4" />
-            </video>
+            <picture className="book-experience-phone-motion">
+              <source srcSet="/media/contact-phone-transparent.webp" type="image/webp" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/media/contact-phone-transparent.gif" alt="" width={220} height={220} loading="lazy" decoding="async" />
+            </picture>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img className="book-experience-phone-still" src="/media/contact-phone-static.png" alt="" width={220} height={220} loading="lazy" decoding="async" />
           </div>
         </div>
         <div>

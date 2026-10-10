@@ -43,7 +43,7 @@ export async function generateMetadata({
   }
 
   const canonical = `/events/${event.slug}`
-  const date = eventDateLabel(event.event_date, event.event_timezone)
+  const date = event.event_date ? eventDateLabel(event.event_date, event.event_timezone) : 'Date TBA'
   const location = [event.venue, event.city].filter(Boolean).join(', ')
   const description =
     event.show_description && event.description
@@ -83,7 +83,7 @@ export default async function EventDetailPage({
   const event = await getPublicEventBySlug(slug)
   if (!event) notFound()
 
-  const past = !isUpcomingEventRecord(event, new Date())
+  const past = event.event_date ? !isUpcomingEventRecord(event, new Date()) : false
   const validTimeZone = Boolean(event.event_timezone && isValidTimeZone(event.event_timezone))
   const hasLocation = Boolean(event.venue || event.city)
   const canonicalUrl = `${SITE_URL}/events/${event.slug}`

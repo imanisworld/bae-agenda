@@ -140,7 +140,6 @@ export default function EventExperienceStage({
                   event={event}
                   priority={i === 0}
                   past={isPast}
-                  showDetailsLink
                   onArchiveClick={isPast ? () => setArchiveEvent(event) : undefined}
                   mediaCount={mediaByEvent.get(event.id)?.length ?? 0}
                 />
