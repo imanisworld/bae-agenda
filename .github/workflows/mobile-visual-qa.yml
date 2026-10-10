@@ -1,0 +1,45 @@
+name: Public mobile visual QA
+on:
+  push:
+    branches:
+      - fix/restore-public-visuals-20261009
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mobile-visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:1
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: local-visual-test-only
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Install browser driver
+        run: npm install --no-save --no-package-lock playwright-core@1.56.1
+      - name: Build test site
+        run: npm run build
+      - name: Serve local build
+        run: |
+          npx next start -p 3407 > /tmp/public-mobile-server.log 2>&1 &
+          echo $! > /tmp/public-mobile-server.pid
+          for i in $(seq 1 45); do curl -fsS http://127.0.0.1:3407/press-kit >/dev/null && exit 0; sleep 2; done
+          cat /tmp/public-mobile-server.log
+          exit 1
+      - name: Audit mobile and printable Press Kit
+        run: node scripts/mobile-visual-check.mjs
+      - name: Keep responsive screenshots and PDF
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-layout-evidence
+          path: test-results/mobile-visual
+          if-no-files-found: ignore
