@@ -10326,11 +10326,16 @@ a.admin-stat-card:focus-visible {
     min-height: 153px;
     align-content: end;
   }
+  .public-experience-shell .book-experience--contact .book-experience-contact-bookings small {
+    position: absolute;
+    left: 12px;
+    top: 20px;
+  }
   .public-experience-shell .book-experience--contact .book-experience-phone {
-    width: 63px;
-    height: 63px;
-    top: 8px;
-    right: 9px;
+    width: 83px;
+    height: 83px;
+    top: 0;
+    right: 8px;
     transform: rotate(4deg);
   }
   .public-experience-shell .book-experience--contact .book-experience-contact-bookings a {
