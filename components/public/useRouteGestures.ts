@@ -23,9 +23,9 @@ export type RefreshState = { pull: number; ready: boolean; refreshing: boolean }
 const INTENT_PX = 12
 /** iOS / Android use the screen edges for their own back / forward swipe. */
 const EDGE_PX = 22
-const EXIT_MS = 260
-const ARRIVE_MS = 420
-const SETTLE_MS = 200
+const EXIT_MS = 160
+const ARRIVE_MS = 200
+const SETTLE_MS = 140
 const REFRESH_AT = 70
 const REFRESH_MAX = 110
 const LAB_CRATES_CACHE = 'bae-lab-crates-v1'

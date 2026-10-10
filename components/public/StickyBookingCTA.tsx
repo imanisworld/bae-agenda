@@ -59,6 +59,7 @@ export default function StickyBookingCTA() {
 
   return (
     <div
+      className="sticky-booking-cta"
       aria-hidden={!visible}
       style={{
         position: 'fixed',
