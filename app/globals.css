@@ -10308,3 +10308,34 @@ a.admin-stat-card:focus-visible {
     font-size: 15px;
   }
 }
+
+/* The Press Kit has its own Back link. Hide only the fixed navigation dock,
+   retaining the site's accessible topbar / More menu. The dock obscures
+   editorial content on 320–430px displays while scrolling. */
+@media screen {
+  body:has(.press-kit-page) .public-navigation-chrome [class*="dockWrap"] {
+    display: none !important;
+  }
+}
+
+/* Put the phone above the booking address on the narrowest phones.
+   Reserve the full card width for the email, rather than a 104px gutter. */
+@media (max-width: 350px) {
+  .public-experience-shell .book-experience--contact .book-experience-contact-bookings {
+    padding: 77px 12px 18px !important;
+    min-height: 153px;
+    align-content: end;
+  }
+  .public-experience-shell .book-experience--contact .book-experience-phone {
+    width: 63px;
+    height: 63px;
+    top: 8px;
+    right: 9px;
+    transform: rotate(4deg);
+  }
+  .public-experience-shell .book-experience--contact .book-experience-contact-bookings a {
+    white-space: nowrap;
+    font-size: clamp(12px, 3.9vw, 14px);
+    letter-spacing: -.01em;
+  }
+}

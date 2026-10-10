@@ -38,6 +38,9 @@ try {
     }))
     console.log('PRESS KIT', width, JSON.stringify(data))
     assert(resp?.ok(), 'Press Kit HTTP ' + width)
+    const dockVisible = await page.locator('.public-navigation-chrome [class*="dockWrap"]').evaluateAll(nodes =>
+      nodes.some(node => getComputedStyle(node).display !== 'none' && !!node.getClientRects().length))
+    assert(!dockVisible, 'Press Kit fixed dock hidden ' + width)
     assert(data.docWidth <= data.viewport + 2, 'Press Kit no horizontal scrolling ' + width, data.docWidth + ' > ' + data.viewport)
     assert(data.hero >= 200 && data.hero <= 530, 'Press Kit hero height ' + width, String(data.hero))
     assert(data.sheetWidth <= width, 'Press Kit sheet fits ' + width, String(data.sheetWidth))
@@ -66,6 +69,11 @@ try {
     assert(data.docWidth <= data.viewport + 2, 'Contact no horizontal scrolling ' + width, data.docWidth + ' > ' + data.viewport)
     assert(!data.formVisible, 'Inquiry hidden while Contact selected ' + width)
     assert(withinScreen(await box(page.locator('.book-experience-contact-panel')), width), 'Contact panel fits ' + width)
+    const bookingEmail = await box(page.locator('.book-experience-contact-bookings a'))
+    assert(!!bookingEmail && bookingEmail.height < 28 &&
+      withinScreen(bookingEmail, width),
+      'Contact booking address is one line within viewport ' + width,
+      JSON.stringify(bookingEmail))
     assert(withinScreen(await box(page.locator('.book-experience-socials')), width), 'Social links fit ' + width)
     await page.close()
   }
