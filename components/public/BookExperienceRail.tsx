@@ -25,6 +25,7 @@ export default async function BookExperienceRail() {
         <h2>C<HangFrom finish="gold" cue={false}>o</HangFrom>ntact</h2>
       </header>
 
+      <div className="book-experience-contact-panel">
       <div className="book-experience-contact">
         <div className="book-experience-contact-bookings">
           <small>Bookings</small>
@@ -73,6 +74,7 @@ export default async function BookExperienceRail() {
           <p>Leave a review.</p>
         </div>
         <ReviewDrawer />
+      </div>
       </div>
     </div>
   )

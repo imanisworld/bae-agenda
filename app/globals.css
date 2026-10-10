@@ -10244,3 +10244,67 @@ a.admin-stat-card:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .utility-page[data-utility-route]::before { filter: blur(7px) brightness(.49) saturate(.76); }
 }
+
+/* Contact: echo Inquiry's framed form rather than two floating full-width
+   blocks. Scoped entirely to the Contact tab; Inquiry geometry is unchanged. */
+.public-experience-shell .book-experience--contact .book-experience-rail-inner {
+  width: min(100%, 1120px);
+  padding: 24px clamp(18px, 3vw, 40px) 70px;
+}
+.public-experience-shell .book-experience--contact .book-experience-contact-panel {
+  border: 1px solid rgba(233, 207, 187, .31);
+  background: rgba(43, 27, 27, .23);
+  padding: clamp(18px, 2.8vw, 38px);
+  min-width: 0;
+}
+.public-experience-shell .book-experience--contact .book-experience-contact {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(10px, 1.2vw, 16px);
+  margin-top: 0;
+  background: transparent;
+}
+.public-experience-shell .book-experience--contact .book-experience-contact > div {
+  align-content: center;
+  min-width: 0;
+  min-height: 144px;
+  padding: 22px clamp(16px, 2vw, 28px);
+  background: rgba(28, 17, 20, .52);
+  border: 1px solid rgba(235, 209, 193, .34);
+  border-radius: 11px;
+}
+.public-experience-shell .book-experience--contact .book-experience-contact a {
+  font-size: clamp(14px, 1.45vw, 19px);
+  line-height: 1.35;
+}
+.public-experience-shell .book-experience--contact .book-experience-socials {
+  margin-top: 22px;
+}
+.public-experience-shell .book-experience--contact .book-experience-socials a {
+  background: rgba(28, 17, 20, .3);
+  border-color: rgba(235, 209, 193, .28);
+}
+.public-experience-shell .book-experience--contact .book-experience-contact-note {
+  margin-top: 24px;
+}
+.public-experience-shell .book-experience--contact .book-experience-faq {
+  border-color: rgba(235, 209, 193, .22);
+}
+@media (max-width: 700px) {
+  .public-experience-shell .book-experience--contact .book-experience-rail-inner {
+    padding: 20px 14px 72px;
+  }
+  .public-experience-shell .book-experience--contact .book-experience-contact-panel {
+    padding: 16px;
+  }
+  .public-experience-shell .book-experience--contact .book-experience-contact {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .public-experience-shell .book-experience--contact .book-experience-contact > div {
+    min-height: 112px;
+    padding: 18px;
+  }
+  .public-experience-shell .book-experience--contact .book-experience-contact a {
+    font-size: 15px;
+  }
+}
