@@ -530,3 +530,8 @@
   position: relative;
   z-index: 2;
 }
+
+/* Get to know: the gold tag sits clean on the page, no dark shadow behind it. */
+.title .titleTag img {
+  filter: none;
+}
