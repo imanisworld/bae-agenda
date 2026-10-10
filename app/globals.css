@@ -10155,3 +10155,37 @@ a.admin-stat-card:focus-visible {
   body:has(.press-kit-page) .press-kit-bio p:last-child::before { top: .6em; width: 18px; }
   body:has(.press-kit-page) .press-kit-work-copy p { line-height: 1.43 !important; }
 }
+
+/* Release finish: Meet's quieter DJ stage photograph replaces the huge
+   lettering crop. Inquiry and Contact intentionally share one backdrop. */
+.public-experience-shell .public-page-stage--experience[data-experience-route='/meet'] {
+  --page-photo: url('/photos/rooms/meet-dark-stage.webp');
+  --page-photo-position: center 52%;
+  --page-photo-blur: 5px;
+  --page-photo-brightness: .74;
+}
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book'],
+.public-experience-shell .public-page-stage--experience[data-experience-route='/book']:has(.book-experience--contact) {
+  --page-photo: url('/photos/rooms/book-warm-turntable.webp');
+  --page-photo-position: center 48%;
+}
+/* The public web sheet ends after the Press Kit footer. */
+@media screen {
+  .public-site-shell:has(.press-kit-page),
+  .public-site-shell:has(.press-kit-page) #main-content,
+  .public-site-shell:has(.press-kit-page) .public-page-stage,
+  .public-site-shell:has(.press-kit-page) .public-page-stage-inner {
+    min-height: 0 !important;
+    height: auto !important;
+  }
+  .public-site-shell:has(.press-kit-page) .press-kit-page {
+    min-height: 0 !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+  }
+}
+/* The printed PDF is an 8.5in-wide *content-height* editorial sheet,
+   not a Letter sheet with a large unprinted maroon tail. */
+@media print {
+  @page { size: 8.5in 8.3in; margin: .3in; }
+}

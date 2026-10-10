@@ -13,7 +13,7 @@ const PAGE_PHOTOS: Record<(typeof ROUTE_ORDER)[number], string> = {
   '/events': '/photos/rooms/tile-booth.webp',
   '/lab': '/photos/rooms/lab-orange-albums.webp',
   '/portfolio': '/photos/rooms/work-booth.webp',
-  '/meet': '/photos/rooms/meet-got-music.webp',
+  '/meet': '/photos/rooms/meet-dark-stage.webp',
   '/book': '/photos/rooms/book-warm-turntable.webp',
 }
 
