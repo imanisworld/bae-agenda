@@ -17,7 +17,6 @@ export const PUBLIC_NAV = [
 /** Pages that exist outside the dock. Shown in the More menu and the footer. */
 export const PUBLIC_SECONDARY_NAV = [
   { label: 'Contact',       href: '/book#contact' },
-  { label: 'Built',         href: '/built'        },
   { label: 'Press Kit',     href: '/press-kit'    },
 ] as const
 
