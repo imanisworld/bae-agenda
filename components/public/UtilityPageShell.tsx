@@ -18,7 +18,7 @@ export default function UtilityPageShell({
   currentPath,
 }: Props) {
   return (
-    <main className="utility-page">
+    <main className="utility-page" data-utility-route={currentPath}>
       <div className="utility-page-atmosphere" aria-hidden="true" />
       <div className="utility-page-inner">
         <header className="utility-page-hero">
