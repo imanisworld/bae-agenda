@@ -10201,6 +10201,13 @@ a.admin-stat-card:focus-visible {
 
 /* Legal pages missed in the previous release: same soft, darkened room-photo
    atmosphere as the public site, without touching policy text or page grid. */
+/* Non-experience page entrance transforms otherwise make CSS 'fixed'
+   backdrops size to the entire document instead of the visible viewport. */
+.public-site-shell:has(.utility-page[data-utility-route]) .public-page-stage-inner {
+  animation: none;
+  transform: none;
+  will-change: auto;
+}
 .utility-page[data-utility-route] {
   isolation: isolate;
   background: #1a1212;
