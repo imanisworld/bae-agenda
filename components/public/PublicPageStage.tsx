@@ -13,8 +13,8 @@ const PAGE_PHOTOS: Record<(typeof ROUTE_ORDER)[number], string> = {
   '/events': '/photos/rooms/tile-booth.webp',
   '/lab': '/photos/rooms/lab-orange-albums.webp',
   '/portfolio': '/photos/rooms/work-booth.webp',
-  '/meet': '/photos/rooms/meet-dark-stage.webp',
-  '/book': '/photos/rooms/book-warm-turntable.webp',
+  '/meet': '/photos/rooms/meet-wood-shelves.webp',
+  '/book': '/photos/rooms/contact-walnut-vinyl.webp',
 }
 
 function usePreloadPagePhotos(pathname: string, enabled: boolean) {
