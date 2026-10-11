@@ -82,6 +82,10 @@ ruff check tools/media-curator-hyperframes
 
 See [FINDINGS.md](./FINDINGS.md) for the synthetic end-to-end render notes from this branch.
 
+## Experiment checklist
+
+Track open work in [TODO.md](./TODO.md).
+
 ## Safety
 
 - Read-only on curator manifests, review state, and inbox originals.
