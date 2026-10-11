@@ -1,0 +1,237 @@
+{
+  "system": "current-manager-research",
+  "tool_calls": {
+    "http_fetches": 36,
+    "web_searches": 11,
+    "fastbrowse_runs": 0
+  },
+  "cost": null,
+  "metrics": {
+    "tasks": [
+      {
+        "task_id": "t1-indy-opportunities",
+        "useful_leads": 3,
+        "valid_original_sources": 3,
+        "duplicates": 0,
+        "stale_or_expired": 0,
+        "false_positives": 0,
+        "unsupported_or_invented_details": 0,
+        "buyer_contact_clarity": {
+          "evidenced": 3,
+          "claimed_without_evidence": 0,
+          "unknown": 0
+        },
+        "requirements_completeness": {
+          "with_asks": 0,
+          "empty": 3
+        },
+        "annual_or_recurring_detection": {
+          "labeled_recurring": 3,
+          "code_agrees": 2,
+          "code_disagrees": 1
+        },
+        "code_would_create_opportunity": 0,
+        "code_blocked_opportunity": 3
+      },
+      {
+        "task_id": "t2-annual-warm-rebook",
+        "useful_leads": 2,
+        "valid_original_sources": 2,
+        "duplicates": 0,
+        "stale_or_expired": 1,
+        "false_positives": 0,
+        "unsupported_or_invented_details": 0,
+        "buyer_contact_clarity": {
+          "evidenced": 2,
+          "claimed_without_evidence": 0,
+          "unknown": 0
+        },
+        "requirements_completeness": {
+          "with_asks": 1,
+          "empty": 1
+        },
+        "annual_or_recurring_detection": {
+          "labeled_recurring": 1,
+          "code_agrees": 1,
+          "code_disagrees": 1
+        },
+        "code_would_create_opportunity": 0,
+        "code_blocked_opportunity": 2
+      },
+      {
+        "task_id": "t3-who-books",
+        "useful_leads": 1,
+        "valid_original_sources": 2,
+        "duplicates": 0,
+        "stale_or_expired": 1,
+        "false_positives": 0,
+        "unsupported_or_invented_details": 0,
+        "buyer_contact_clarity": {
+          "evidenced": 2,
+          "claimed_without_evidence": 0,
+          "unknown": 0
+        },
+        "requirements_completeness": {
+          "with_asks": 1,
+          "empty": 1
+        },
+        "annual_or_recurring_detection": {
+          "labeled_recurring": 0,
+          "code_agrees": 2,
+          "code_disagrees": 0
+        },
+        "code_would_create_opportunity": 0,
+        "code_blocked_opportunity": 2
+      },
+      {
+        "task_id": "t4-direct-buyer-filter",
+        "useful_leads": 0,
+        "valid_original_sources": 3,
+        "duplicates": 0,
+        "stale_or_expired": 0,
+        "false_positives": 0,
+        "unsupported_or_invented_details": 0,
+        "buyer_contact_clarity": {
+          "evidenced": 3,
+          "claimed_without_evidence": 0,
+          "unknown": 0
+        },
+        "requirements_completeness": {
+          "with_asks": 1,
+          "empty": 2
+        },
+        "annual_or_recurring_detection": {
+          "labeled_recurring": 0,
+          "code_agrees": 3,
+          "code_disagrees": 0
+        },
+        "code_would_create_opportunity": 0,
+        "code_blocked_opportunity": 3
+      },
+      {
+        "task_id": "t5-still-active",
+        "useful_leads": 0,
+        "valid_original_sources": 2,
+        "duplicates": 0,
+        "stale_or_expired": 2,
+        "false_positives": 0,
+        "unsupported_or_invented_details": 0,
+        "buyer_contact_clarity": {
+          "evidenced": 2,
+          "claimed_without_evidence": 0,
+          "unknown": 0
+        },
+        "requirements_completeness": {
+          "with_asks": 2,
+          "empty": 0
+        },
+        "annual_or_recurring_detection": {
+          "labeled_recurring": 1,
+          "code_agrees": 1,
+          "code_disagrees": 1
+        },
+        "code_would_create_opportunity": 0,
+        "code_blocked_opportunity": 2
+      },
+      {
+        "task_id": "t6-enrich-sparse",
+        "useful_leads": 0,
+        "valid_original_sources": 1,
+        "duplicates": 0,
+        "stale_or_expired": 1,
+        "false_positives": 0,
+        "unsupported_or_invented_details": 0,
+        "buyer_contact_clarity": {
+          "evidenced": 1,
+          "claimed_without_evidence": 0,
+          "unknown": 0
+        },
+        "requirements_completeness": {
+          "with_asks": 0,
+          "empty": 1
+        },
+        "annual_or_recurring_detection": {
+          "labeled_recurring": 0,
+          "code_agrees": 1,
+          "code_disagrees": 0
+        },
+        "code_would_create_opportunity": 0,
+        "code_blocked_opportunity": 1
+      },
+      {
+        "task_id": "t7-duplicates",
+        "useful_leads": 0,
+        "valid_original_sources": 2,
+        "duplicates": 1,
+        "stale_or_expired": 0,
+        "false_positives": 0,
+        "unsupported_or_invented_details": 0,
+        "buyer_contact_clarity": {
+          "evidenced": 3,
+          "claimed_without_evidence": 0,
+          "unknown": 2
+        },
+        "requirements_completeness": {
+          "with_asks": 0,
+          "empty": 5
+        },
+        "annual_or_recurring_detection": {
+          "labeled_recurring": 0,
+          "code_agrees": 5,
+          "code_disagrees": 0
+        },
+        "code_would_create_opportunity": 0,
+        "code_blocked_opportunity": 3
+      }
+    ],
+    "totals": {
+      "task_id": "all",
+      "useful_leads": 6,
+      "valid_original_sources": 15,
+      "duplicates": 1,
+      "stale_or_expired": 5,
+      "false_positives": 0,
+      "unsupported_or_invented_details": 0,
+      "buyer_contact_clarity": {
+        "evidenced": 16,
+        "claimed_without_evidence": 0,
+        "unknown": 2
+      },
+      "requirements_completeness": {
+        "with_asks": 5,
+        "empty": 13
+      },
+      "annual_or_recurring_detection": {
+        "labeled_recurring": 5,
+        "code_agrees": 15,
+        "code_disagrees": 3
+      },
+      "code_would_create_opportunity": 0,
+      "code_blocked_opportunity": 16
+    },
+    "source_quality": {
+      "total": 18,
+      "useful": 14,
+      "ignored": 4,
+      "converted": 0,
+      "yieldPercent": 78,
+      "health": "productive"
+    },
+    "duplicate_groups": [
+      [
+        "fringe-a",
+        "fringe-b"
+      ]
+    ],
+    "false_positive_ids": [],
+    "unsupported_fields": []
+  },
+  "claims": {
+    "total": 6,
+    "evidenced": 2,
+    "contradicted": 3,
+    "inference": 0,
+    "unknown": 1,
+    "missing_quote": []
+  }
+}
