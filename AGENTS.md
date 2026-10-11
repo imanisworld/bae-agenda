@@ -100,6 +100,7 @@ Daily Discovery Runs/source tracking already exist. Do not add a duplicate gener
 - favor targeted edits over rewrites
 - do not add tools or automation without a concrete workflow gap
 - keep experimental public-site work separate until intentionally reviewed
+- Public-facing copy: avoid negation-to-redefinition phrasing (e.g. “it's not X, it's Y,” “not just X,” or “more than X”). Say what the offering actually is in direct DJ B.A.E. language. Preserve necessary factual and legal negations.
 
 ## Definition of done
 
