@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bae-media-curator-hyperframes"
+version = "0.1.0"
+description = "Isolated experiment: Media Curator approved highlights to HyperFrames promo projects"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["ruff>=0.12,<1"]
+
+[project.scripts]
+media-curator-hyperframes = "media_curator_hyperframes.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["media_curator_hyperframes*"]
+
+[tool.ruff]
+line-length = 110
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I", "B"]
