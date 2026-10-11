@@ -31,3 +31,15 @@ The Jev yes threshold is 0.8, chosen before any Jev response because that is Abi
 ## Results
 
 `results/baseline.json` is the measured current workflow. `results/abide.json` and `results/jev.json` record the blocker from this environment. `results/comparison.json` holds the verdict.
+
+## To-do
+
+The verdict is TEST FURTHER. These steps still have to run on a machine that has a key. Do not change `cases.ts` or the 0.8 threshold after a model responds.
+
+- [ ] Keep the TypeSafe key out of git. `.env.local` is already ignored.
+- [ ] Export `TYPESAFE_API_KEY` for the Jev harness.
+- [ ] Export `TYPESAFE_AI_API_KEY`, or `AI_GATEWAY_API_KEY`, for Abide. Abide does not read `TYPESAFE_API_KEY`.
+- [ ] Run `npm run eval:agent-workflow:record`.
+- [ ] Read the new `results/comparison.json` verdict. ADOPT only if a measured catch rate beats the baseline and false blocks stay at 0.
+- [ ] Leave Abide uninstalled for Cursor. Version 0.0.11 hooks Claude Code, Codex, OpenCode, and Pi only.
+- [ ] Do not deploy this experiment. Merging does not publish the app.
