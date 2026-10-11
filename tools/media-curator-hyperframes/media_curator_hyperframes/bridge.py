@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import html
 import json
 import re
 import shutil
@@ -40,12 +41,7 @@ def load_manifest(manifest_path: Path, workspace: Path | None) -> dict:
 
 def approved_highlights(item: dict) -> list[dict]:
     segments = item.get("effective_highlights") or item.get("highlights") or []
-    approved = [segment for segment in segments if segment.get("approved") is True]
-    if approved:
-        return approved
-    if item.get("effective_approved") is True and segments:
-        return [segments[0]]
-    return []
+    return [segment for segment in segments if segment.get("approved") is True]
 
 
 def pick_item(manifest: dict, content_id: str | None) -> dict:
@@ -62,8 +58,7 @@ def pick_item(manifest: dict, content_id: str | None) -> dict:
     preferred = [
         item
         for item in videos
-        if item.get("effective_approved") is True
-        and (item.get("effective_status") in PROMO_STATUSES or item.get("status") in PROMO_STATUSES)
+        if item.get("effective_approved") is True and item.get("effective_status") in PROMO_STATUSES
     ]
     pool = preferred or [item for item in videos if item.get("effective_approved") is True] or videos
     if not pool:
@@ -139,6 +134,8 @@ def composition_html(
     subtitle: str,
     project_id: str,
 ) -> str:
+    title = html.escape(title, quote=True)
+    subtitle = html.escape(subtitle, quote=True)
     title_block = (
         f'<p id="subtitle" class="clip" data-start="0.2" data-duration="2.5" data-track-index="1">{subtitle}</p>'
         if subtitle
