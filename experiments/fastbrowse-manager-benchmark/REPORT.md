@@ -10,11 +10,11 @@ Fastbrowse did not run the frozen tasks. There is no measured improvement, so th
 
 ## 2. Pull request
 
-The PR URL is on the GitHub pull request for this branch.
+Opened from `cursor/fastbrowse-manager-benchmark-3d1d` into `main`. The GitHub URL is in the pull request body.
 
 ## 3. Commit
 
-The recorded SHA is the branch head after this report.
+Benchmark commit: `e7f0d5fba1a34b082698d700346bb0475e5fc365`
 
 ## 4. Files
 
