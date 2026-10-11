@@ -10,11 +10,12 @@ Fastbrowse did not run the frozen tasks. There is no measured improvement, so th
 
 ## 2. Pull request
 
-Opened from `cursor/fastbrowse-manager-benchmark-3d1d` into `main`. The GitHub URL is in the pull request body.
+https://github.com/imanisworld/bae-agenda/pull/180
 
 ## 3. Commit
 
-Benchmark commit: `e7f0d5fba1a34b082698d700346bb0475e5fc365`
+- Benchmark data: `e7f0d5fba1a34b082698d700346bb0475e5fc365`
+- Report SHA line: `5a069e90a8cce3051fb2944e9c12508b3b6b1626`
 
 ## 4. Files
 
