@@ -21,6 +21,7 @@ This list is reconciled against the current Manager state and DJ B.A.E. preferen
 - [ ] Oct 10, 2026: follow up Elevate Social if no reply.
 - [ ] Consider the GANGGANG Artist Directory after reviewing its current terms.
 - [ ] Consider the free Indy Arts Council Artist Directory listing.
+- [ ] Fastbrowse discovery benchmark is TEST FURTHER, not adopted (draft PR #180). Rerun `experiments/fastbrowse-manager-benchmark/tasks.json` on this Mac only if a Fastbrowse model key is already available. Use `--local`, a dollar cap, and no `--authorize`. Do not send forms, outreach, or applications. Adopt it only if that rerun measures an improvement.
 
 ## Scheduled warm rebooks
 
