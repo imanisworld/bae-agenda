@@ -538,7 +538,7 @@ export default function LabListeningStation({ mixes, initialTrackUrl = null }: {
               <i className={playing ? styles.liveDot : styles.idleDot} />
               {player.status === 'loading' ? 'Dropping the needle' : playing ? 'Now spinning' : loadedIsCurrent && player.engaged ? 'Paused' : 'Cued up'}
             </span>
-            <h2>{loaded.title}</h2>
+            <h2 key={loaded.id}>{loaded.title}</h2>
             <p id="lab-mix-description" ref={descriptionRef} className={descriptionExpanded ? styles.descriptionExpanded : undefined}>{description}</p>
             {canExpandDescription ? (
               <button

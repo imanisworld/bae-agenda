@@ -8776,7 +8776,7 @@ a.admin-stat-card:focus-visible {
 .public-experience-shell--settling .public-page-stage--experience .public-page-stage-inner {
   animation: none;
   transform: translate3d(0, 0, 0);
-  transition: transform 200ms cubic-bezier(.22,1,.36,1);
+  transition: transform 140ms cubic-bezier(.22,1,.36,1);
 }
 
 /* …or carries on off-screen, and the next page slides in from the other side. */
@@ -8785,7 +8785,7 @@ a.admin-stat-card:focus-visible {
   opacity: .7;
   filter: none;
   pointer-events: none;
-  transition: transform 260ms cubic-bezier(.58,0,.22,1), opacity 220ms ease;
+  transition: transform 160ms cubic-bezier(.58,0,.22,1), opacity 160ms ease;
 }
 
 .public-experience-shell--leaving[data-route-direction='next'] .public-page-stage--experience .public-page-stage-inner {
@@ -8797,11 +8797,11 @@ a.admin-stat-card:focus-visible {
 }
 
 .public-experience-shell--arriving[data-route-direction='next'] .public-page-stage--experience .public-page-stage-inner {
-  animation: route-arrive-next 380ms cubic-bezier(.22,1,.36,1) both;
+  animation: route-arrive-next 200ms cubic-bezier(.22,1,.36,1) both;
 }
 
 .public-experience-shell--arriving[data-route-direction='prev'] .public-page-stage--experience .public-page-stage-inner {
-  animation: route-arrive-prev 380ms cubic-bezier(.22,1,.36,1) both;
+  animation: route-arrive-prev 200ms cubic-bezier(.22,1,.36,1) both;
 }
 
 @keyframes route-arrive-next {
@@ -10126,7 +10126,7 @@ a.admin-stat-card:focus-visible {
     animation: mobile-room-fade 170ms ease-out both;
   }
   .public-experience-shell--arriving .public-page-stage--experience .public-page-stage-inner {
-    animation: mobile-room-fade 190ms ease-out both !important;
+    animation: mobile-room-fade 200ms ease-out both !important;
     transform: none !important;
   }
   .public-experience-shell--leaving .public-page-stage--experience .public-page-stage-inner {
@@ -10360,4 +10360,19 @@ a.admin-stat-card:focus-visible {
   --booking-choice-bg: rgba(28,17,20,.52);
   --booking-input-bg: rgba(28,17,20,.52);
   --booking-calendar-bg: rgba(28,17,20,.52);
+}
+
+/* Preview-only phone fixes, 2026-10-13.
+   Book tabs sit beneath the fixed More header and the device safe area.
+   Remove the extra blank root-scroll runway; the site already owns its
+   pull-to-refresh gesture in useRouteGestures. Test on actual Safari before release. */
+@media (max-width: 620px) {
+  .public-experience-shell .book-experience {
+    padding-top: max(110px, calc(var(--safe-top) + 54px));
+  }
+}
+@media (max-width: 900px) and (pointer: coarse) {
+  .public-experience-shell {
+    min-height: 100dvh;
+  }
 }
