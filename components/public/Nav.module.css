@@ -385,3 +385,17 @@
   .item:active { transform: scale(.96); transition-duration: 90ms; }
   .moreButton:active { opacity: .72; }
 }
+
+/* Phone-sized touch target without making the More label look larger.
+   The fixed topbar has 46px of content height, so this fits without shifting
+   the shared navigation or changing the dropdown's anchor. */
+@media (max-width: 620px) and (pointer: coarse) {
+  .moreButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0 8px;
+  }
+}
