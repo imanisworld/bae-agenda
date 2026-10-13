@@ -2,6 +2,32 @@
 
 **Scope:** One-time review of the 70 existing `public.portfolio_entries`, comparison with 14 `public.events` and 5 `public.bookings`, plus publicly indexed historic lineups. **This is a candidate-evidence ledger, not a second source of truth or approval to publish unverified performances.** Database remains authoritative; never overwrite a recorded venue/date with general festival calendar details. Evidence of an announced lineup proves a scheduled appearance, not completion, fee, or preference to return.
 
+## Subsequent user-confirmed updates — October 13, 2026 (verified live)
+
+Following the initial evidence pass documented below, the owner **confirmed the researched event matches and authorized narrow existing-row corrections**. Fifteen `portfolio_entries` rows were updated with a guarded transaction (all expected originals had blank dates and venues), and a fresh read verified each new value. **No rows were created, merged, deleted or automatically published, and no outreach was sent.**
+
+The **current live portfolio totals** are: **70 entries; 12 with both exact date and venue; 20 missing only an exact date; 38 missing both an exact date and venue**. Thus **58 lack an exact date, 38 lack a venue**. Earlier baseline totals and the 70-row table below represent the **pre-approval snapshot** and are preserved for historical provenance; they must not be mistaken for current stored field values.
+
+| Existing 2022–2025 entry | New venue | New event date | Notes |
+|---|---|---|---|
+| Damien Center & IYG Garage Dance Party (2024) | 416 Wabash | 2024-04-06 | Artist-specific organizer announcement; [Damien Center](https://damien.org/events/garage-party) |
+| Rock N Roll Festival (2024) | American Legion Mall | 2024-05-18 | DJ-specific [I Made Rock N Roll lineup](https://www.jambase.com/festival/i-made-rock-n-roll-festival-2024) |
+| Boss Babe Brunch (2024) | Madam Walker Legacy Center | 2024-06-02 | [Organizer's exact-year listing](https://embossnetwork.com/upcoming-events/boss-babe-brunch-2023-6lzll) |
+| Boss Ladies Gala (2024) | 502 East Event Centre | 2024-03-15 | **City corrected to Carmel, IN**; [local contemporary listing](https://youarecurrent.com/2024/02/26/carmel-community-events-march-2024/) |
+| Nourishing Well (2024) | Madam Walker Legacy Center | 2024-06-06 | [Exact exhibition opening](https://mirrorindy.org/madam-walker-indianapolis-poetry-arts-event/) |
+| MELT Butter Official Afterparty (2024) | The Vogue | 2024-08-31 | [BUTTER 2024 FAQ](https://butterartfair.com/faq/) |
+| Indy Pride Festival (2024) | Military Park | 2024-06-08 | [Same-year festival listing](https://mokbpresents.com/event/indy-pride-festival-2024/) |
+| Lafayette Pride (2024) | Downtown Lafayette (OUTfest) | 2024-08-17 | [City street-festival notice](https://www.lafayette.in.gov/Calendar.aspx?EID=3731&calType=0&day=3&month=8&year=2024) |
+| Indy Sleaze (2024) | Black Circle Brewing | 2024-07-05 | [Venue's dated SLEAZE/Club Cunt party](https://www.blackcirclebrewing.com/events/indy-sleze-club-cnt-present-sleaze-queer-dance-party) |
+| Trap X Tacos (2024) | CoHatch (49 W. Maryland St.) | 2024-02-17 | [Contemporaneous All-Star weekend listing](https://midwestleak.com/2024/02/indy-allstar-2024-event-list/) |
+| Butter 2024 Art Festival (2024) | The Stutz | *Unresolved* | Multiple-day venue; preserve separate entry |
+| Butter Art Fair (2024) | The Stutz | *Unresolved* | Preserve separate entry; no invented date |
+| Butter Art Fair (2022) | The Stutz | *Unresolved* | [Historical multi-day venue](https://downtownindy.org/do/second-annual-butter-a-fine-art-fair) |
+| Sundry & Vice (2025) | Sundry & Vice | *Unresolved* | Venue name verified, no address/date assigned |
+| Club Cunt (2025) | Black Circle | *Unresolved* | Multiple historical listings; do not pick one date for a series |
+
+**Evidence interpretation:** The owner confirmed matches, but event calendars alone do not independently establish completion or compensation. Do not equate multi-day event windows or a recurring-series schedule with one DJ set; determine distinct performance dates from first-party history or flyers. The temporary 58-row correction worksheet remains local to the user, not an additional database. No Manager sourcing workflow, Supabase schema, cron or website deployment was changed in this pass.
+
 ## Results and status
 
 - Portfolio baseline before reconciliation: **70 rows**; **16** with venue, **1** with exact date; **54** venue missing, **69** exact date missing. No existing `portfolio_media` rows or portfolio `notes` at baseline. Post-write verification 2026-10-13: **70 rows**, **17** with venue, **2** with exact date, **53** missing venue, **68** missing date, and **1** provenance note added.
