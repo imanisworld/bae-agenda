@@ -1,6 +1,6 @@
 # Operations Checklist
 
-Last reconciled: 2026-10-07.
+Last reconciled: 2026-10-13 for Manager discovery/follow-up review; other production-state checks retain their original dates.
 
 This file tracks the current operating model for Bae Agenda and the best future automation targets.
 
@@ -12,7 +12,10 @@ This file tracks the current operating model for Bae Agenda and the best future 
 - Review recent email activity before manual follow-ups
 - Check upcoming events and confirmed bookings
 - Review Manager Today for follow-ups, negotiations, outreach-ready leads, and blocked leads
-- Let Manager Discovery Runs collect source-quality history; do not create a duplicate generic discovery scheduler
+- Review any **overdue** Manager follow-up against actual communications **before** resending, not solely the `next_action_at` or `contacted` status.
+- Let Manager Discovery Runs collect source-quality history; do not create a duplicate generic discovery scheduler.
+- Before adding or ranking discoveries, consult `docs/MANAGER_EXPANDED_DISCOVERY.md` for first-party portfolio/booking history, prior introducers, hard user-excluded aliases and source cadence. Preserve inactive/ignored exclusions.
+- Use `docs/GROK_MANAGER_SCOUT_PROMPT.md` as a **read-only** secondary X/social research lane. Verify source evidence, existing opportunity links, the real buyer/payer, and feasible travel before recommending a paid booking. No Grok-side Supabase writes or messages.
 
 ## Booking Detail Actions
 
@@ -43,6 +46,8 @@ Do not rebuild these as new schedulers unless the current workflow fails.
 - Use a manual final-payment reminder only when the balance is still outstanding and the automated reminder is not sufficient.
 - Keep money-sensitive or ambiguous messages manual.
 - Manager outreach remains user-controlled; Manager may research/draft/record but must not autonomously send or submit.
+- Daily discovery creates **one** run row per pass and records only observed coverage/counters; do not invent a successful check when an official/social page is blocked, or duplicate a previously saved signal/relationship.
+- Previous appearances, shared flyers and tags do not establish artist preferences, favorable pay or a currently active booking relationship.
 
 ## Best Automation Candidates Later
 
