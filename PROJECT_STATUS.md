@@ -6,16 +6,18 @@ Last reconciled: 2026-10-13 (GitHub, Vercel, and read-only Manager database chec
 
 - Public site, booking intake, protected admin, invoice/payment operations, email tracking, and DJ Manager workflows are implemented. Booking/Lab end-to-end device QA remains open under issue #157.
 - The Client Portal routes and server code exist, but sign-in is not usable for current client records. Portal links and booking-copy promises are withheld. Do not call this feature released or assume hiding navigation protects direct routes.
-- The current production release includes the public-site visual work from merged PRs #170, #173, #174, #176, #177 and the targeted wording correction in #178. The Built page is no longer publicly routed; redesign is future issue #175.
+- The current production release includes the public-site visual work from merged PRs #170, #173, #174, #176, #177, the wording correction in #178, and approved mobile usability refinements from #191. The Built page remains unrouted; redesign is future issue #175.
 - Media Curator scan, human review, and resumable cache (PRs #154/#155) are merged as **local-only** tooling. A real-media pilot is still unverified. No automatic editing/upload/publishing is provided.
 
 ## Verified Deployment — October 13
 
-- PR #178 production application commit: `5ab6f49b10ec8692b4def20044e9d15eef90db29` (squash merge). Later docs-only commits can advance `main` without changing this production SHA.
-- Vercel production deployment `dpl_6rNrj7TsjfVjSXMCwQsMnVXbTL33` is `READY`, assigned to `thebaeagenda.com`, and explicitly reports that exact Git commit SHA.
+- **Latest targeted release:** PR #191 was squash-merged and deliberately deployed from `main` commit `727e39c149d6264c93fb7e3b64b60b72a916f950`. Vercel production deployment `dpl_9DkapbZYi5U3WpSu3xXh4tNZFCs5` is `READY`; Vercel's alias lookup confirms `thebaeagenda.com` points to that deployment, with the exact commit SHA. The approved changes cover Book/Portfolio phone spacing, Lab layout/motion, page-transition/preloading timings, and the 44 × 44px More touch target. PR CI passed and the owner approved the phone preview.
+- **Verification boundary for #191:** merge, SHA, Vercel build, deployment readiness, and live-domain alias are verified. External direct HTTP checks of `/api/health`, `/book`, and protected admin were inaccessible from this session; no fresh live route/health or end-to-end booking/portal pass is claimed. Vercel returned no application logs for the new deployment in the checked window. Issue #157 remains open.
+- **Earlier targeted release:** PR #178 production application commit: `5ab6f49b10ec8692b4def20044e9d15eef90db29` (squash merge).
+- Earlier PR #178 production deployment `dpl_6rNrj7TsjfVjSXMCwQsMnVXbTL33` was `READY` and reported that exact Git commit SHA; the live alias now points to PR #191's deployment.
 - The deliberate same-SHA preview was also `READY`; GitHub CI for PR #178 succeeded.
 - PR #178 changed only `components/public/VibeExperience.tsx` and `AGENTS.md`: the two rejected homepage negation-style passages were replaced, and the public-copy writing rule now applies to all agents.
-- **Verification boundary:** source diff, CI, Vercel build/alias and release SHA are verified. This October 13 check could not fetch a fresh browser-rendered homepage or `/api/health`; it does not establish current visual QA, booking submission, Lab interactions, client-portal login, or post-release runtime-log health.
+- **Earlier #178 verification boundary:** source diff, CI, Vercel build/alias and release SHA were verified. That prior check could not fetch a fresh browser-rendered homepage or `/api/health`; it did not establish current visual QA, booking submission, Lab interactions, client-portal login, or post-release runtime-log health.
 - The last recorded full public/admin smoke audit was October 7: main public routes and health returned HTTP 200, protected admin redirected unauthenticated visitors, and the audited runtime-log window showed no new warning/error/fatal logs. Do not mislabel that historical audit as a check of today's release.
 - Automatic Vercel Git deployments remain disabled by `vercel.json` (`git.deploymentEnabled: false`). Merge does not deploy. Docs-only changes need no production release.
 
@@ -36,7 +38,7 @@ Last reconciled: 2026-10-13 (GitHub, Vercel, and read-only Manager database chec
 3. Make client-portal contact verification usable and test an authorized client's own booking/payment access and denial of other-client records; keep public links hidden until it passes.
 4. Collect fresh public routes, `/api/health`, protected-admin, relevant logs, and final visual QA evidence before calling the **full site acceptance** complete.
 
-PR #178's copy-only deployment is completed separately and does **not** close any of these gates. Closed, unmerged preview PRs #156/#158 are not outstanding PRs; validate behavior in current `main` rather than trying to merge superseded code.
+PRs #178 and #191 were completed as targeted releases; neither closes these full-site gates. Closed, unmerged preview PRs #156/#158 are not outstanding PRs; validate behavior in current `main` rather than trying to merge superseded code.
 
 ## Events, Media, and Held Work
 

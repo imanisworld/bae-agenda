@@ -153,7 +153,7 @@ Open/click tracking is intentionally excluded.
 
 ## Release Status / Acceptance
 
-- Public site design and homepage wording cleanup are deployed through commit `5ab6f49` (PR #178, October 13); see `PROJECT_STATUS.md` for the verified Vercel deployment ID. The Built page is currently unlisted/unrouted.
+- Public site design, homepage wording, and approved mobile smoothness/layout fixes are deployed through commit `727e39c` (PR #191, October 13); see `PROJECT_STATUS.md` for the verified Vercel deployment ID and live-verification limits. The Built page remains unlisted/unrouted.
 - Full booking/Lab device and safe inquiry tests remain open under [issue #157](https://github.com/imanisworld/bae-agenda/issues/157).
 - Public event TBA notices are code-level placeholders; the future admin-managed date/signup model is [issue #171](https://github.com/imanisworld/bae-agenda/issues/171).
 - For public-facing writing, follow the direct-copy rule in `AGENTS.md`; do not reintroduce rejected negation-to-redefinition wording.
