@@ -109,6 +109,16 @@ Columns are **existing** stored values, except Review Notes which are evidence o
 | 69 | 2018 | Indiana State University Homecoming | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
 | 70 | 2018 | Sycamore Sessions | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
 
+## Follow-up evidence pass — 2026-10-13
+
+Searched publicly indexed event recaps, Instagram-post snippets, images/video references, and available connected first-party Google Drive records for the four unadded historical appearances (2023 Spot June, 2023 HI-FI Dec, 2023 Spot NYE, and BUTTER 2025). **No verified after-event image, video, receipt, or completed-performance record for those exact four appearances was found in accessible sources.** Direct Instagram history could not be fully accessed, and the user's remote Mac was offline. Absence of indexed media is not proof the performance did not occur.
+
+- Connected Drive holds a May 2023 **“2023 Show Schedule – DJ B.A.E.”** with a booked/planned **“lafayette pride”** on **June 2, 2023**. A contemporaneous published [The Spot Patio Friday lineup](https://www.basedinlafayette.com/p/tims-picks-summer-sounds-mostly-outside) names DJ B.A.E. at The Spot Tavern in Lafayette on that day. Same date and city corroborate a scheduled Lafayette appearance, but differently named engagements should not be mechanically merged. **Do not claim payment received or performance completion.** Private financial amounts and the connected file URL are intentionally excluded here.
+- An original June 2023 **Indy Pride Artist Advance & All Schedules** document, accessible through the connected Google Drive, names DJ B.A.E. for the DJ stage on **June 10, 2023, 4:30–5:30 PM**. The private first-party show schedule independently lists an “Indy Pride” booking on June 10. There is no 2023 portfolio year in the current 70 rows. **New candidate for user confirmation**, not an authorized public portfolio addition. No other private advance details reproduced.
+- The available connected Drive “Performance Flyers” directory has generic media files, and the “Performance” directory contains videos but neither offers metadata linking any of the four target appearances to a completed set. Do not tag these unrelated files to historical gigs without provenance.
+- The 2023 first-party sheet also mentions other potential planned performances; a scheduled/planned row, even with a target quote, is not a paid/completed gig. Avoid importing them without corroboration.
+- Public sources still verify **four scheduled lineup appearances** as previously documented, but completed status remains unverified. Avoid repeated generic searches unless new original media, an email invoice/payment receipt, a direct recap, or access to the historical Instagram archive becomes available.
+
 ## Bounded next actions
 
 1. Confirm four still-unmatched scheduled-appearance candidates (three 2023 and one 2025) against proof of performance before adding them to the portfolio. Existing 2024 Legacy Festival is now reconciled.
