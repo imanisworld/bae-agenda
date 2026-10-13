@@ -1,6 +1,6 @@
 # DJ B.A.E. Manager — Ordered Agenda
 
-Last reconciled: 2026-10-07.
+Last reconciled: 2026-10-13.
 
 ## Standing rules
 
@@ -26,10 +26,10 @@ Manager Today is live and prioritizes:
 
 ## 2. Work eligible live leads — ACTIVE
 
-Current state as of 2026-10-07:
+Current state reconciled 2026-10-13:
 
-- Silent Disco (Oct 23, Westfield): contacted 2026-10-05 via Craigslist reply asking about gear, pickup/return, venue, and preferred music. Follow-up Oct 10 if no reply. Re-check economics against any response.
-- Elevate Social: contacted 2026-10-05 via partner form with a Chicago-leaning pitch. Follow-up Oct 10 if no reply.
+- Silent Disco (Oct 23, Westfield): contacted 2026-10-05 via Craigslist reply asking about gear, pickup/return, venue, and preferred music. An Oct 10 follow-up was due, but this docs pass did not verify whether it was sent or whether a reply arrived. Verify the current thread before any further outreach and re-check economics against any response.
+- Elevate Social: contacted 2026-10-05 via partner form with a Chicago-leaning pitch. An Oct 10 follow-up was due, but this docs pass did not verify whether it was sent or whether a reply arrived. Verify the current thread before any further outreach.
 - Jazz Is Dead: passed 2026-10-05 because no Indianapolis date/open DJ slot was verified.
 - Punch Bowl Social: the Galentine's 2026 booking came through Rich the Kid. Ask Rich before direct outreach about future Punch Bowl DJ nights.
 
@@ -63,6 +63,16 @@ For warm rebooks, reference the prior relationship. Do not cold-pitch or invent 
 - deduplicate and suppress noisy/stale sources
 - keep speculative relationship leads out of Outreach Ready
 - track discovery-run output so source quality can be measured over time
+- fix recurrence detection for recurring-language forms the benchmark missed
+- reconcile older excluded-source records that already advanced before current agency guardrails
+
+### Browser-assisted research evaluation
+
+- **Ego Lite is the next candidate to test** against the frozen PR #180 Manager benchmark because it can use the owner's local logged-in browser and does not require adopting another discovery scheduler.
+- Run it research-only: no submit/send/apply/purchase actions and no autonomous outreach.
+- Preserve source evidence and run all findings through the same Manager direct-buyer, freshness, dedupe, and verification rules.
+- Keep **agent-labs-dev/fastbrowse** at **TEST FURTHER** until a completed frozen benchmark proves material improvement. A compatible model key was unavailable in the first run.
+- `UnmappedStack/FastBrowse` is unrelated Windows file-manager software and is not part of the Manager tooling evaluation.
 
 ### Discovery Runs
 
@@ -144,6 +154,7 @@ Keep this separate from Manager business-development logic.
 
 - **Bot access for Manager.** Give Claude, Grok, and ChatGPT separate private keys, switchable off. Bots may read Manager and submit suggested changes for approval. Bots must never send outreach, delete records, or touch bookings, invoices, or payments. This remains parked until there is a clear need.
 - **Discovery Runs UI.** Backend and tracking are already live; UI remains parked until enough run data exists to justify finishing it.
+- **Browser-research tooling.** Ego Lite is test-only; agent-labs Fastbrowse remains TEST FURTHER. Neither is approved as a production Manager dependency until the frozen benchmark demonstrates a material gain.
 
 ## Outreach facts confirmed by Imani
 
