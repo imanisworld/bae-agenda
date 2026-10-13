@@ -4,21 +4,21 @@
 
 ## Results and status
 
-- Portfolio inventory: **70 rows**; **16** with venue, **1** with exact date; **54** venue missing, **69** exact date missing. No existing `portfolio_media` rows or portfolio `notes`.
+- Portfolio baseline before reconciliation: **70 rows**; **16** with venue, **1** with exact date; **54** venue missing, **69** exact date missing. No existing `portfolio_media` rows or portfolio `notes` at baseline. Post-write verification 2026-10-13: **70 rows**, **17** with venue, **2** with exact date, **53** missing venue, **68** missing date, and **1** provenance note added.
 - **One exact cross-table correction applied and verified:** Events row `3076943c-514d-4abe-9deb-952d7a20ed6a` (“Host/EMCEE for the 1st Annual Level Up Walkathon,” 2026-09-26) originally had null venue/city. First-party portfolio row `32e3ffb0-3e3c-40a9-9e45-ae0a0acdd2fb` is the same event/date, identifying **Pike High School, Indianapolis**. Those two missing Events fields were populated with no change to date, description, or portfolio. Post-update database read confirmed both values. Reverse operation, if needed: set only that Events row's venue and city back to NULL, guarded by currently matching values.
-- **No portfolio rows created, merged, or edited.** General event dates and venues must not silently become DJ B.A.E.'s specific set dates/venues.
+- **One existing portfolio row amended, no rows created/merged/deleted:** 2024 `Legacy Festival` (id `25580e3c-2058-44df-8e67-8ebf95944e67`) now has date `2024-06-22`, venue `Madam Walker Legacy Center`, and a provenance note referencing [historical lineup](https://hot1009.com/events/madam-cj-walker-legacy-fest-block-party/), which names DJ B.A.E. on June 22, 2024 at 2–2:30pm. Match is supported by name/year/city and DJ-specific lineup; evidence establishes scheduled performance, not independently completed work or pay. SQL updated only when event name/year/city/id, null venue/date/notes matched; fresh Supabase read verified 17 venues/2 dates. Reverse, if required: set only date/venue/notes on that row back to NULL, guarded by the exact current values. Do not assign generic calendar dates to other rows.
 - **Public Instagram is incomplete:** Accessible indexed results do not establish full account chronology, stories, DMs, or private tagging history. A true IG archival reconciliation needs accessible exact posts/flyers or first-party exports, not invented dates.
 - **No preference judgments:** Past booking does not imply suitable venue, fair fee, good treatment, or wish to return. No inferred blacklist.
-- **Remaining unresolved:** 54 venue fields and 69 dates in the portfolio. Resolving these needs individual flyer/post/invoice-level evidence, not a guessed date based on event series.
+- **Remaining unresolved:** 53 venue fields and 68 exact dates. Resolving these needs individual flyer/post/invoice-level evidence, not a guessed date based on event series.
 
-## Verifiable public scheduled appearances missing or ambiguous in the 70-row archive
+## Verifiable public scheduled appearances absent, ambiguous, or newly reconciled
 
 These are **review candidates**, never published automatically:
 
 1. **2023-06-02 — Spot Patio Friday**: DJ B.A.E. listed at **The Spot Tavern, 409 S Fourth St, Lafayette**, alongside Circle T, Sweater Disco, Genderotic and Kyle Robert Paquin. [Local contemporaneous article](https://www.basedinlafayette.com/p/tims-picks-summer-sounds-mostly-outside). No 2023 portfolio rows.
 2. **2023-12-09 — Public Universal Friend at HI-FI**: HI-FI's original concert archive lists IV King and DJ B.A.E. [Venue 10th Anniversary concert log](https://hifiindy.com/10th-anniversary/). No 2023 portfolio rows.
 3. **2023-12-31 — The Spot Tavern New Year's Eve**: locally published lineup names DJ B.A.E. and Sweater Disco at The Spot, Lafayette. [Contemporaneous article](https://www.basedinlafayette.com/p/tims-picks-whats-up-heading-into). No 2023 portfolio rows.
-4. **2024-06-22 — Madam Walker Legacy Fest Block Party**: public 2024 radio/talent schedule lists DJ B.A.E. 2:00–2:30pm at Madam Walker Legacy Center. [Historical public lineup](https://hot1009.com/events/madam-cj-walker-legacy-fest-block-party/). **May be the existing 2024 “Legacy Festival” row**; verify alias before updating or adding.
+4. **2024-06-22 — Madam Walker Legacy Fest Block Party**: radio/talent schedule lists DJ B.A.E. 2:00–2:30pm at Madam Walker Legacy Center. [Historical public lineup](https://hot1009.com/events/madam-cj-walker-legacy-fest-block-party/). **Reconciled to existing 2024 “Legacy Festival” portfolio row**; no duplicate added. This remains evidence of the lineup, not proof of completion or compensation.
 5. **2025-08-31 — BUTTER Fine Art Fair**: official schedule includes B.A.E. 12–1pm in the **10th Street DJs** lineup. [Official 2025 lineup](https://butterartfair.com/schedule-2025/). Existing portfolio has BUTTER entries for 2022 and two for 2024, but **none for 2025**.
 
 These lineups support date/place of a *scheduled* set. They do not independently prove a completed performance or compensation. Before adding to a public portfolio, confirm performance from user media, post-event organizer recap, invoice, or a first-party record.
@@ -72,7 +72,7 @@ Columns are **existing** stored values, except Review Notes which are evidence o
 | 32 | 2024 | J.U.I.C.Y | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
 | 33 | 2024 | Juneteenth Columbus Festival | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
 | 34 | 2024 | Lafayette Pride | — | — | Year + city only | Pride Lafayette OUTfest held Aug 17, 2024; determine whether this portfolio entry refers to that specific event. [source](https://lafayette.in.gov/Calendar.aspx?EID=3731&calType=0&day=3&month=8&year=2024) |
-| 35 | 2024 | Legacy Festival | — | — | Year + city only | Candidate match: Madam Walker Legacy Fest, June 22, 2024. Official DJ B.A.E. lineup; event identity still needs confirmation. [source](https://hot1009.com/events/madam-cj-walker-legacy-fest-block-party/) |
+| 35 | 2024 | Legacy Festival | 2024-06-22 | Madam Walker Legacy Center | Date + venue | Reconciled 2026-10-13 using named DJ B.A.E. 2–2:30 PM on [2024 Legacy Fest lineup](https://hot1009.com/events/madam-cj-walker-legacy-fest-block-party/). Performance completion/pay unverified. |
 | 36 | 2024 | Melt Butter Official Afterparty | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
 | 37 | 2024 | MilkTooth Butter Mixer | — | MilkTooth | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
 | 38 | 2024 | Nourishing Well: Black Women and the Poetics of Sacred Space | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
@@ -111,7 +111,7 @@ Columns are **existing** stored values, except Review Notes which are evidence o
 
 ## Bounded next actions
 
-1. Confirm five public scheduled-appearance candidates above against proof of performance; for Legacy Festival, resolve identity first.
+1. Confirm four still-unmatched scheduled-appearance candidates (three 2023 and one 2025) against proof of performance before adding them to the portfolio. Existing 2024 Legacy Festival is now reconciled.
 2. Reconcile the two booking/event date conflicts from event confirmation evidence.
 3. For each remaining undated row, search the exact public flyer/tag/photo or ask for original evidence; mark “unresolved” if unavailable.
 4. Apply only verified narrow database changes with original-value backup and post-write verification, preserving distinct performances; any public-portfolio publication needs confirmed performance.
