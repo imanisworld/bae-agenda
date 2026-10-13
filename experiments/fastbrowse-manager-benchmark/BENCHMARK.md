@@ -1,5 +1,7 @@
 # Fastbrowse versus Manager discovery
 
+> **Historical, frozen experiment (October 11, 2026).** These fixtures, counts, URLs and baseline outcomes describe the October 11 snapshot, not today's live Manager watchlist, exclusions, or paid opportunities. Apply the current permanent user exclusions and first-party history rules from `docs/MANAGER_EXPANDED_DISCOVERY.md` before any comparison or research reuse. Fastbrowse was **not adopted**; no completed comparative run demonstrates an improvement. Do not add another scheduler or outreach path.
+
 Frozen on 2026-10-11. This is a controlled comparison. It does not replace Manager, add a scheduler, write to production, send outreach, or deploy.
 
 ## What the current workflow actually is
