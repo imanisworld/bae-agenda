@@ -1,6 +1,6 @@
 # Bae Agenda Roadmap
 
-Last reconciled: 2026-10-07.
+Last reconciled: 2026-10-13.
 
 ## Rule
 
@@ -58,18 +58,27 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 
 ### Manager real-use pass
 
-- follow up Silent Disco and Elevate Social on Oct 10 if there is no reply
+- verify the current Silent Disco and Elevate Social thread state before any further message; the Oct 10 follow-up outcomes are not verified in this reconciliation
 - prioritize verified warm rebooks over equivalent cold leads
 - let daily Discovery Runs collect data
 - measure which sources, pitches, and economics produce responses/bookings
 - keep weak/speculative relationship leads out of Outreach Ready
+- fix recurrence detection for common recurring-language forms that the benchmark missed
+- reconcile the pre-existing converted agency signal so excluded agency data cannot remain misleadingly advanced
 - improve discovery quality before adding volume
+- benchmark Ego Lite against the frozen PR #180 Manager research tasks before adding another browser-research dependency
 
 ### Held / review-on-purpose work
 
 - Public Vibe experience from PR #149 is live.
 - Event-media lightbox fixes from PR #152 are live; PR #151 was superseded.
 - PR #59: older Full Portfolio Archive media galleries implementation — held/separate while real photo/video media is prepared
+- PR #179 HyperFrames experiment — held until a real local-media run proves meaningful editing savings
+- PR #180 agent-labs Fastbrowse benchmark — TEST FURTHER; do not adopt without a completed frozen benchmark showing material improvement
+- PR #181 Abide/Jev policy eval — TEST FURTHER; frozen harness exists, external arms remain unmeasured
+- PR #183 fast-jev-codex retention eval — TEST FURTHER; frozen harness exists, live comparison remains unmeasured
+- Ego Lite — next browser-research candidate; test with the same PR #180 benchmark, research-only, in the owner's local logged-in browser
+- PR #182 deterministic CI guardrails — review separately because it addresses proven repo-rule enforcement gaps without paid/model dependencies
 - Discovery Runs UI — parked
 - Manager bot-access/suggestions design — parked until there is a demonstrated need
 
