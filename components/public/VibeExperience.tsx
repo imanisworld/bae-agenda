@@ -165,7 +165,7 @@ export default function VibeExperience({ initialVibe }: { initialVibe?: string |
             <span className={styles.kicker}>Choose the room</span>
             <h2 id="vibe-heading">What are we doing tonight?</h2>
             <p>
-              Pick a lane. This is not a fixed playlist — it&apos;s how DJ B.A.E. thinks about pacing, context, and the crowd.
+              Pick a lane. DJ B.A.E. builds each set around the room, the moment, and the people in it.
             </p>
           </div>
 
@@ -270,7 +270,7 @@ export default function VibeExperience({ initialVibe }: { initialVibe?: string |
           <div className={styles.projectsHeader}>
             <div>
               <span className={styles.kicker}>From the booth</span>
-              <h2 id="projects-heading">Not just gigs.</h2>
+              <h2 id="projects-heading">Ongoing projects.</h2>
             </div>
             <p>Recurring nights, mashups, and listening projects are part of the same point of view.</p>
           </div>
