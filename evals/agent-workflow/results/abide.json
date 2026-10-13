@@ -1,0 +1,56 @@
+{
+  "phase": "abide",
+  "generatedAt": "2026-10-11T14:12:15.138Z",
+  "measured": false,
+  "summary": null,
+  "frozenSuiteExecuted": false,
+  "frozenSuiteReason": "audit judges repository files and replay reads Claude, Codex, OpenCode, or Pi session logs. Neither command scores these 20 transcripts.",
+  "availability": {
+    "status": "blocked",
+    "packageName": "@coldtea/abide@0.0.11",
+    "missing": [
+      "TYPESAFE_AI_API_KEY",
+      "AI_GATEWAY_API_KEY"
+    ],
+    "hosts": [
+      "claude",
+      "codex",
+      "opencode",
+      "pi"
+    ],
+    "cursorHookSupported": false,
+    "note": "Abide audit and replay need TYPESAFE_AI_API_KEY or AI_GATEWAY_API_KEY. Neither is set. No score was produced."
+  },
+  "commands": [
+    {
+      "args": [
+        "audit",
+        "--json",
+        "--max-files",
+        "1",
+        "AGENTS.md"
+      ],
+      "exitCode": 1,
+      "signal": null,
+      "elapsedMs": 1141,
+      "stdout": "╭─────────────────────────────────────────────────────────────────────────╮\n│ ✗ No API key, so nothing can be checked                                 │\n│ No API key found. Run \"abide login\" with your TypeSafe key, or put      │\n│ TYPESAFE_AI_API_KEY in the environment or a .env file at the repo root. │\n│ NO_API_KEY                                                              │\n╰─────────────────────────────────────────────────────────────────────────╯\n\n",
+      "stderr": "",
+      "error": null
+    },
+    {
+      "args": [
+        "replay",
+        "claude",
+        "--json",
+        "--max-sessions",
+        "1"
+      ],
+      "exitCode": 1,
+      "signal": null,
+      "elapsedMs": 1035,
+      "stdout": "╭─────────────────────────────────────────────────────────────────────────╮\n│ ✗ No API key, so nothing can be checked                                 │\n│ No API key found. Run \"abide login\" with your TypeSafe key, or put      │\n│ TYPESAFE_AI_API_KEY in the environment or a .env file at the repo root. │\n│ NO_API_KEY                                                              │\n╰─────────────────────────────────────────────────────────────────────────╯\n\n",
+      "stderr": "",
+      "error": null
+    }
+  ]
+}

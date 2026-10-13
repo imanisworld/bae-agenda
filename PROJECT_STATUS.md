@@ -84,6 +84,7 @@ Read-only checks found 3 clients associated with bookings, 0 stored client phone
 2. Let daily discovery runs collect data and evaluate source quality / response / booked economics.
 3. Decide whether to resume the parked Discovery Runs UI.
 4. Prepare and review real Portfolio photo/video media separately before publishing media assets.
+5. Re-run the Abide/Jev agent-workflow eval on a machine with a TypeSafe key before adopting either tool. Checklist: `evals/agent-workflow/README.md`. Current verdict is TEST FURTHER. This is not deployed.
 
 ## Open / Held
 

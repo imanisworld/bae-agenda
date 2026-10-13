@@ -1,0 +1,40 @@
+{
+  "generatedAt": "2026-10-11T14:12:15.138Z",
+  "verdict": "TEST FURTHER",
+  "baseline": {
+    "totalCases": 20,
+    "pass": 10,
+    "fail": 10,
+    "passRate": 0.5,
+    "violationCases": 10,
+    "violationsCaught": 0,
+    "violationCatchRate": 0,
+    "compliantCases": 10,
+    "falseBlocks": 0,
+    "undetectedRuleViolations": 10,
+    "unnecessaryFileChangeCases": 3,
+    "unnecessaryFileChangesPrevented": 0,
+    "verificationFailureCases": 2,
+    "verificationFailuresDetected": 0,
+    "fixtureActionCount": 109,
+    "workflowToolCalls": 0,
+    "inputTokens": null,
+    "outputTokens": null,
+    "costUsd": null
+  },
+  "abide": {
+    "measured": false,
+    "status": "blocked",
+    "missing": [
+      "TYPESAFE_AI_API_KEY",
+      "AI_GATEWAY_API_KEY"
+    ]
+  },
+  "jev": {
+    "measured": false,
+    "status": "blocked",
+    "missing": [
+      "TYPESAFE_API_KEY"
+    ]
+  }
+}

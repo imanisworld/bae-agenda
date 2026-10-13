@@ -37,6 +37,9 @@
 .supabase/
 /supabase/.temp/
 
+# Abide experiment state. Keys, event logs, and generated skill files stay local.
+.abide/
+
 # misc
 .DS_Store
 *.pem

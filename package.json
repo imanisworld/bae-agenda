@@ -10,6 +10,8 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "eval:agent-workflow": "vitest run evals/agent-workflow/agent-workflow.eval.test.ts",
+    "eval:agent-workflow:record": "RECORD_AGENT_EVAL=1 vitest run evals/agent-workflow/record.eval.test.ts",
     "predev": "node scripts/clean-hanging-logos.mjs",
     "predev:staging": "node scripts/clean-hanging-logos.mjs",
     "prebuild": "node scripts/clean-hanging-logos.mjs",
