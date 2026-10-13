@@ -43,3 +43,7 @@ The scheduled Manager discovery task should also search beyond the saved watchli
 - Do not auto-add a source unless it appears likely to produce repeatable DJ-relevant signals.
 - Deduplicate by canonical URL and organization identity.
 - Keep social chronology labeled partial when public indexing is incomplete.
+- Browser-assisted tools are optional research helpers, not a second discovery scheduler or an execution channel.
+- Current evaluation order: test **Ego Lite** against the frozen PR #180 Manager benchmark using the owner's local/logged-in browser; keep **agent-labs-dev/fastbrowse** at TEST FURTHER until its benchmark arm actually runs.
+- Do not use browser automation to submit forms, send outreach, apply, purchase, or take other irreversible actions during discovery evaluation.
+- Logged-in social browsing must stay on a user-controlled local browser/profile. Preserve source evidence and apply the same freshness, dedupe, direct-buyer, and verification rules before a finding can advance.
