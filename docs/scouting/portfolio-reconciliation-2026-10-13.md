@@ -25,8 +25,8 @@ These lineups support date/place of a *scheduled* set. They do not independently
 
 ## Cross-table / data quality blockers
 
-- **Art & Soul Sunday, May 17, 2026:** Bookings says **19:00 UTC** and “Indianapolis Downtown Mall”; Events says **20:00 UTC** and “49 W. Maryland St.” Both may refer to the same place/time after schedule revisions. Keep both untouched pending booking confirmation; don't choose the convenient one.
-- **Private 75+ Birthday:** Events and Bookings store **2026-11-01 03:00 UTC** but event description says **11 AM–2 PM**. Check the intended local event date and timezone; no automatic date adjustment.
+Private booking/event timing discrepancies were inspected, but their details are intentionally excluded from this public-repo file. Handle them privately in Manager or a restricted review.
+
 - **2024 BUTTER records:** “Butter 2024 Art Festival” and “Butter Art Fair” share event/year context. Could be different performances and must remain separate until actual set dates are known. The fair ran **Aug 29–Sep 1, 2024 at The Stutz**: [official release](https://butterartfair.com/press-release-july-9-2024/), [visitor listing](https://downtownindy.org/do/butter-fine-art-fair).
 - **2024 CHREECE records:** “Chreece Music Festival” and “Spark Indy Chreece” might represent different programming. Broad festival date **Aug 24, 2024** is context only. [Local guide](https://mirrorindy.org/chreece-hip-hop-festival-guide-indianapolis-2024/).
 - **2022 Lari Pati:** A historical organizer lineup names DJ B.A.E. at 416 Wabash, but the retrieved post appears **circa 2019**, before the existing archive's 2022 year. Do not overwrite the 2022 row with older event details. [Historic organizer archive](https://www.tumgik.com/laripati).
