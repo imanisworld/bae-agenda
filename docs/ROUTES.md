@@ -8,7 +8,7 @@ step with `app/` when pages are added, moved or removed.
 # Public site
 
 Main nav (dock): Home, Events, Lab, Portfolio, Meet, Book.
-More menu and footer: Contact, Built, Press Kit, Privacy, Terms, Accessibility.
+More menu and footer: Contact, Press Kit, Privacy, Terms, Accessibility. **Built** was taken off public routing in PR #177; source is retained under `app/(public)/_built/`, with redesign postponed to issue #175.
 
 The unfinished Client Portal is temporarily unlinked from public navigation and booking copy. Its routes and code remain available for internal testing; hiding its links does not disable direct URL access.
 
@@ -21,7 +21,6 @@ The unfinished Client Portal is temporarily unlinked from public navigation and 
 | `/portfolio` | Gig history, featured events and press |
 | `/meet` | About DJ B.A.E. |
 | `/book` | Booking form, Contact + FAQ tab, and approved client reviews |
-| `/built` | Custom web development for artists and brands |
 | `/press-kit` | Bio, booking info and selected work |
 | `/privacy` | Privacy and cookies |
 | `/terms` | Booking, payment and site terms |

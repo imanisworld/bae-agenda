@@ -1,107 +1,61 @@
 # Project Status
 
-Last reconciled: 2026-10-07.
+Last reconciled: 2026-10-13 (GitHub, Vercel, and read-only Manager database checks).
 
 ## Current State
 
-Core public-site, booking, admin, payment, invoice, email, analytics, and Manager workflows are implemented. Client Portal code exists but sign-in is not operational for current client records; it is withheld from public navigation until end-to-end testing succeeds.
+- Public site, booking intake, protected admin, invoice/payment operations, email tracking, and DJ Manager workflows are implemented. Booking/Lab end-to-end device QA remains open under issue #157.
+- The Client Portal routes and server code exist, but sign-in is not usable for current client records. Portal links and booking-copy promises are withheld. Do not call this feature released or assume hiding navigation protects direct routes.
+- The current production release includes the public-site visual work from merged PRs #170, #173, #174, #176, #177 and the targeted wording correction in #178. The Built page is no longer publicly routed; redesign is future issue #175.
+- Media Curator scan, human review, and resumable cache (PRs #154/#155) are merged as **local-only** tooling. A real-media pilot is still unverified. No automatic editing/upload/publishing is provided.
 
-Last audited GitHub `main` before this docs-only reconciliation: `ef24ed79f8225d892c382967e5c6720f3746c6f5` (PR #143). This is an audit anchor, not a live pointer; later merges may advance `main`.
+## Verified Deployment — October 13
 
-Latest live Manager work includes warm-rebook scheduling, negotiation guidance, pipeline filters/history, admin pagination, required lead/event details before outreach, Manager lead-save fixes, actual externally sent-message recording, relationship intelligence/warm-rebook views, and source-health/weak-lead guardrails.
+- PR #178 production application commit: `5ab6f49b10ec8692b4def20044e9d15eef90db29` (squash merge). Later docs-only commits can advance `main` without changing this production SHA.
+- Vercel production deployment `dpl_6rNrj7TsjfVjSXMCwQsMnVXbTL33` is `READY`, assigned to `thebaeagenda.com`, and explicitly reports that exact Git commit SHA.
+- The deliberate same-SHA preview was also `READY`; GitHub CI for PR #178 succeeded.
+- PR #178 changed only `components/public/VibeExperience.tsx` and `AGENTS.md`: the two rejected homepage negation-style passages were replaced, and the public-copy writing rule now applies to all agents.
+- **Verification boundary:** source diff, CI, Vercel build/alias and release SHA are verified. This October 13 check could not fetch a fresh browser-rendered homepage or `/api/health`; it does not establish current visual QA, booking submission, Lab interactions, client-portal login, or post-release runtime-log health.
+- The last recorded full public/admin smoke audit was October 7: main public routes and health returned HTTP 200, protected admin redirected unauthenticated visitors, and the audited runtime-log window showed no new warning/error/fatal logs. Do not mislabel that historical audit as a check of today's release.
+- Automatic Vercel Git deployments remain disabled by `vercel.json` (`git.deploymentEnabled: false`). Merge does not deploy. Docs-only changes need no production release.
 
-Discovery Runs backend + daily tracking logic are installed in production; the UI branch remains parked without a PR.
+## Manager — Read-Only Snapshot October 13
 
-## Verified Production
+- 22 opportunities, 67 sources, and 6 recorded Discovery Runs.
+- Most recent run (October 13): 10/10 sources due were checked, 5 signals and 2 opportunities were created; run status **partial** with partial coverage count 4. Complete coverage/research quality is not established by source-check counts alone.
+- Silent Disco (October 23 event) and Elevate Social still show `contacted` with last recorded contact October 5 and follow-ups dated October 10. As of this check those follow-ups are overdue in Manager; external replies have not been checked.
+- Art & Soul 2027 re-engagement remains set for October 20; Punch Bowl Social Galentine's for November 15; Level Up Walkathon 2027 for May 15, 2027. Use the known warm relationship route.
+- Daily Discovery Runs backend is active. The separate Discovery Runs UI remains parked; do not create a second scheduler or infer bookings from signals.
 
-Audit on 2026-10-07:
+## Public Site Finish Line — Issue #157 (Open)
 
-- Home, Book, Portfolio, Lab, Press Kit, and portal login return HTTP 200.
-- Admin/Manager routes fail closed to admin login when unauthenticated.
-- Production `/api/health` returns 200 OK.
-- No production warning/error/fatal runtime logs were found in the post-deploy / post-database-hardening verification windows.
-- Email delivery tracking remains operational.
+1. Verify Book CTAs/navigation, mobile and desktop interaction, and a controlled isolated **non-production** inquiry end to end.
+2. Verify Lab controls, cover taps, swipe/drag, keyboard, reduced-motion, mobile readability, and player persistence on actual devices.
+3. Make client-portal contact verification usable and test an authorized client's own booking/payment access and denial of other-client records; keep public links hidden until it passes.
+4. Collect fresh public routes, `/api/health`, protected-admin, relevant logs, and final visual QA evidence before calling the **full site acceptance** complete.
 
-### Manager current state
+PR #178's copy-only deployment is completed separately and does **not** close any of these gates. Closed, unmerged preview PRs #156/#158 are not outstanding PRs; validate behavior in current `main` rather than trying to merge superseded code.
 
-- Silent Disco: contacted 2026-10-05; follow-up Oct 10.
-- Elevate Social: contacted 2026-10-05; follow-up Oct 10.
-- Jazz Is Dead: passed 2026-10-05 because no Indianapolis date/open DJ slot was verified.
-- Punch Bowl Social: use the existing Rich the Kid relationship before direct outreach.
-- Art & Soul 2027, Punch Bowl Social Galentine's 2027, and Level Up Walkathon 2027 are scheduled warm-rebook work.
+## Events, Media, and Held Work
 
-## Deployment State
+- Club Cunt and Saints and Sinners public TBA notices are **code-level presentations**, without confirmed event dates/locations; issue #171 is the future admin-managed TBA/signup/special-instructions model. The existing `events.event_date` database column is non-nullable. Do not treat a display placeholder as canonical event data.
+- PR #59 for Full Portfolio Archive galleries remains held. Production `portfolio_media` contained 0 rows as of October 13; select and review real photos/videos before considering publication.
+- Built redesign stays in issue #175, held outside current public-site finish work.
+- PRs #179–#183 are optional/tooling experiments (HyperFrames, Fastbrowse, Abide/Jev, CI guardrails, context retention). None is adopted on verified improvement evidence; keep them separate from website release.
+- Manager bot access is not started and stays approval-gated.
 
-Automatic Vercel Git deployments were disabled in PR #135.
+## Database / Safety
 
-Workflow: merge approved PRs into `main` without publishing, QA the intended batch, then create one deliberate production deployment from latest `main`. Do not use Redeploy to publish newly merged commits because it rebuilds an older deployment.
+- Targeted production RLS/grant hardening from PR #101 is complete; migration `20261007171755_harden_legacy_authenticated_policies` was already applied and verified.
+- Production migration history remains historically drifted. **Never run a blanket `supabase db push`**. Review any new migration narrowly and verify grants/RLS/row integrity.
+- Deferred advisory/optional work: leaked-password protection; duplicate-permissive-policy/unused-index cleanup; Manager archival UX if needed; expenses/tax support; e-signatures; richer calendar/analytics; multi-user roles.
 
-Current production application deployment is `11a81157285a748182aca18d9f48b258106e3b92`, deliberately deployed on 2026-10-07 after PR #149 (Public Vibe experience) and PR #152 (event-media lightbox fixes) merged. No new photo/video media assets were included in that release.
+## Immediate To-Do (no open-ended audit)
 
-The payment-reminders cron remains configured against production.
+1. In Manager, check for replies and resolve the overdue Silent Disco/Elevate Social follow-ups. Record only actions actually taken.
+2. Complete the explicit tests in issue #157; fix only specific failures and close the issue when all gates are evidenced.
+3. On October 20, evaluate Art & Soul warm-rebook re-engagement using existing relationship history.
+4. When the Mac/media library is available, run one real-event Media Curator pilot; do not upload or publish without review.
+5. Leave issues #171/#175 and held experimental PRs parked until real requirements justify them.
 
-## Database Hardening
-
-PR #101 is complete.
-
-Applied production migration:
-
-`20261007171755_harden_legacy_authenticated_policies`
-
-Verified:
-
-- all five target tables retain RLS
-- client portal state tables have no anon/authenticated SELECT or INSERT privileges
-- invoices allow authenticated SELECT only through the existing admin helper
-- a non-admin identity fails the admin helper
-- the active allowlisted admin passes the admin helper
-- reviews expose approved rows for public/authenticated reads only
-- no application rows were changed by the migration
-- post-change site health and runtime checks passed
-
-Migration-history drift still exists from older historical migrations. Do not run blanket `supabase db push` against production.
-
-Remaining unrelated advisor items:
-
-- leaked-password protection is disabled
-- service-role-only tables with RLS/no client policies generate informational advisor notices
-- existing unused-index and duplicate-permissive-policy performance notices remain separate cleanup work
-
-## Client Portal Release Gate (2026-10-09)
-
-The portal remains an unreleased feature. A source-only change removes its public More/footer link and the booking FAQ promise; direct routes and data remain intact for development. This is **not live** until deliberately deployed. It is not a security access restriction.
-
-Read-only checks found 3 clients associated with bookings, 0 stored client phone numbers, 1 stored client email, 0 active portal sessions, and 0 change requests. The production Vercel env list does not include the Twilio keys used by phone OTP. Fix an authenticated contact path and test client isolation before advertising the portal. See #157.
-
-## Oct 9 Preview-only Fixes (NOT live)
-
-- Mobile Book dock: use native `/book` navigation, keep the gesture handler off interactive links/buttons; the booking tab resets correctly after Contact/FAQ. Requires real iPhone tap-through QA, and safe preview backend configuration for a non-production inquiry.
-- Club Cunt: the Oct 31 flyer reference is replaced with a dedicated **New flyer coming soon** placeholder; Vercel **preview only** overlays November 21, 2026 for the event's displayed date. The canonical `public.events` record remains Oct 31, 2026 until explicit production-release approval. **Before public production release, update the canonical event date and check the admin/booking calendar; do not rely on a production overlay.** The old slug is retained for link stability.
-
-## Next
-
-1. Follow up Silent Disco and Elevate Social on Oct 10.
-2. Let daily discovery runs collect data and evaluate source quality / response / booked economics.
-3. Decide whether to resume the parked Discovery Runs UI.
-4. Prepare and review real Portfolio photo/video media separately before publishing media assets.
-
-## Open / Held
-
-- Public Vibe experience from PR #149 is live in production.
-- Event-media lightbox fixes from PR #152 are live in production; superseded PR #151 is closed.
-- PR #59: older Full Portfolio Archive media galleries branch — intentionally held/separate while real photo/video media is prepared.
-- Bot access for Manager — not started; approval-gated design only.
-- Discovery Runs UI branch — parked; backend/daily tracking logic already exists.
-
-## Deferred / Optional
-
-- leaked-password protection
-- duplicate-permissive-policy / unused-index cleanup
-- Manager junk/stale archive controls if History/Pass proves insufficient
-- expenses/tax reporting
-- content-publish notifications
-- contracts/e-signature
-- advanced media library
-- richer calendar
-- multi-user roles
-- deeper analytics
+Use `AGENTS.md` and `docs/ROADMAP.MD` for policy and roadmap; do not infer deployment or live-feature completion from stale docs or merged code.

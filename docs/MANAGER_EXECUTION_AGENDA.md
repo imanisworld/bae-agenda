@@ -1,6 +1,6 @@
 # DJ B.A.E. Manager — Ordered Agenda
 
-Last reconciled: 2026-10-07.
+Last reconciled: 2026-10-13 (read-only Manager database review).
 
 ## Standing rules
 
@@ -26,10 +26,10 @@ Manager Today is live and prioritizes:
 
 ## 2. Work eligible live leads — ACTIVE
 
-Current state as of 2026-10-07:
+Current state as of 2026-10-13 (Manager records only; external replies unverified):
 
-- Silent Disco (Oct 23, Westfield): contacted 2026-10-05 via Craigslist reply asking about gear, pickup/return, venue, and preferred music. Follow-up Oct 10 if no reply. Re-check economics against any response.
-- Elevate Social: contacted 2026-10-05 via partner form with a Chicago-leaning pitch. Follow-up Oct 10 if no reply.
+- Silent Disco (Oct 23, Westfield): contacted 2026-10-05 via Craigslist reply asking about gear, pickup/return, venue, and preferred music. October 10 follow-up is overdue; check for external replies before additional outreach. Re-check economics against any response.
+- Elevate Social: contacted 2026-10-05 via partner form with a Chicago-leaning pitch. October 10 follow-up is overdue; check for external replies before additional outreach.
 - Jazz Is Dead: passed 2026-10-05 because no Indianapolis date/open DJ slot was verified.
 - Punch Bowl Social: the Galentine's 2026 booking came through Rich the Kid. Ask Rich before direct outreach about future Punch Bowl DJ nights.
 
@@ -66,7 +66,7 @@ For warm rebooks, reference the prior relationship. Do not cold-pitch or invent 
 
 ### Discovery Runs
 
-Backend + daily tracking logic are installed in production.
+Backend + daily tracking logic are installed in production. As of October 13, the database records 67 sources and 6 runs. The latest run checked 10/10 due sources, generated 5 signals and 2 opportunities, and was marked partial (4 partial-coverage cases). Do not infer paid bookings or full sourcing reliability from these counts.
 
 The Discovery Runs UI branch is parked and has no PR. Let the backend collect useful run history before deciding whether the UI is worth finishing.
 

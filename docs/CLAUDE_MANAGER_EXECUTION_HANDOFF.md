@@ -13,7 +13,7 @@ Then read:
 5. `lib/manager-*.ts`
 6. current production state only through approved/read-only project tools
 
-Treat `PROJECT_STATUS.md` and `docs/MANAGER_EXECUTION_AGENDA.md` as the current source of truth. Old planning docs are historical unless they were reconciled on or after 2026-10-07.
+Treat `PROJECT_STATUS.md` and `docs/MANAGER_EXECUTION_AGENDA.md` as the current source of truth; check the documented as-of dates and live Manager state before acting. Historical planning docs and old chat summaries do not override current evidence.
 
 ## Current Manager state
 
@@ -49,11 +49,12 @@ Do not rebuild these.
 
 ## Current outreach state
 
-- Silent Disco: contacted 2026-10-05; follow up Oct 10 if no reply
-- Elevate Social: contacted 2026-10-05; follow up Oct 10 if no reply
+- Silent Disco: last recorded contact October 5; October 10 follow-up overdue as of October 13. Check for external replies first.
+- Elevate Social: last recorded contact October 5; October 10 follow-up overdue as of October 13. Check for external replies first.
 - Jazz Is Dead: passed
 - Punch Bowl Social: use the existing Rich the Kid relationship first
-- warm rebooks are scheduled for Art & Soul, Punch Bowl Social Galentine's, and Level Up Walkathon
+- warm rebooks: Art & Soul on October 20, Punch Bowl Social Galentine's on November 15, and Level Up Walkathon on May 15, 2027
+- October 13 Manager snapshot: 22 opportunities, 67 sources, 6 Discovery Runs; latest run marked partial. These are not paid-booking results.
 
 ## Important rules
 
@@ -72,7 +73,7 @@ Do not rebuild these.
 
 - Discovery Runs UI branch is parked.
 - Manager bot-access/suggestions design is intentionally not started.
-- Public Vibe work from PR #149 is live and remains separate from Manager logic; closed #142 is obsolete.
+- Public Vibe work from PR #149 and homepage wording correction from merged PR #178 are live and separate from Manager logic; closed #142 is obsolete.
 - Event-media lightbox fixes from PR #152 are live; superseded PR #151 is closed.
 - PR #59 Portfolio Archive media galleries remains separate/held while real photo/video media is prepared.
 
