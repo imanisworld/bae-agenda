@@ -1,6 +1,8 @@
-# DJ B.A.E. scouting to-do — reconciled Oct 7, 2026
+# DJ B.A.E. scouting to-do — reconciled Oct 13, 2026
 
 This list is reconciled against the current Manager state and DJ B.A.E. preferences.
+
+Read-only Manager snapshot (October 13): 22 opportunities, 67 sources, 6 recorded discovery runs. October 13 run created 5 signals and 2 opportunities, but was marked **partial**. These counts are a dated snapshot, not a statement that all opportunities are actionable or booked.
 
 ## Already handled
 
@@ -17,8 +19,8 @@ This list is reconciled against the current Manager state and DJ B.A.E. preferen
 
 ## Current actions
 
-- [ ] Oct 10, 2026: follow up Silent Disco if no reply.
-- [ ] Oct 10, 2026: follow up Elevate Social if no reply.
+- [ ] **Overdue since Oct 10, 2026:** check for an external Silent Disco reply; follow up if none. Manager still showed `contacted` with no newer recorded contact on Oct 13.
+- [ ] **Overdue since Oct 10, 2026:** check for an external Elevate Social reply; follow up if none. Manager still showed `contacted` with no newer recorded contact on Oct 13.
 - [ ] Consider the GANGGANG Artist Directory after reviewing its current terms.
 - [ ] Consider the free Indy Arts Council Artist Directory listing.
 
