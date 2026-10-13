@@ -13,7 +13,7 @@ Then read:
 5. `lib/manager-*.ts`
 6. current production state only through approved/read-only project tools
 
-Treat `PROJECT_STATUS.md` and `docs/MANAGER_EXECUTION_AGENDA.md` as the current source of truth. Old planning docs are historical unless they were reconciled on or after 2026-10-07.
+Treat `PROJECT_STATUS.md` and `docs/MANAGER_EXECUTION_AGENDA.md` as the current source of truth. Old planning docs are historical unless they were reconciled on or after 2026-10-13.
 
 ## Current Manager state
 
@@ -39,18 +39,21 @@ Do not rebuild these.
 
 ## Current execution priority
 
-1. work real eligible leads and scheduled follow-ups
-2. prioritize warm rebooks over equivalent cold leads
-3. let Discovery Runs collect enough history to measure source quality
-4. improve discovery quality/enrichment only where it changes a decision
-5. finish the Discovery Runs UI only if collected data shows it is useful
-6. add Manager automation only after an observed workflow gap
-7. keep content/video tooling separate from Manager business-development logic
+1. reconcile the current Silent Disco and Elevate Social threads before any further outreach
+2. work real eligible leads and scheduled follow-ups
+3. prioritize warm rebooks over equivalent cold leads
+4. let Discovery Runs collect enough history to measure source quality
+5. fix the known recurrence-language gap and reconcile the stale converted agency signal
+6. test Ego Lite against PR #180's frozen Manager benchmark before adding a browser-research dependency
+7. improve discovery quality/enrichment only where it changes a decision
+8. finish the Discovery Runs UI only if collected data shows it is useful
+9. add Manager automation only after an observed workflow gap
+10. keep content/video tooling separate from Manager business-development logic
 
 ## Current outreach state
 
-- Silent Disco: contacted 2026-10-05; follow up Oct 10 if no reply
-- Elevate Social: contacted 2026-10-05; follow up Oct 10 if no reply
+- Silent Disco: contacted 2026-10-05; Oct 10 follow-up outcome is unverified in this Oct 13 reconciliation. Check the current thread before any further message.
+- Elevate Social: contacted 2026-10-05; Oct 10 follow-up outcome is unverified in this Oct 13 reconciliation. Check the current thread before any further message.
 - Jazz Is Dead: passed
 - Punch Bowl Social: use the existing Rich the Kid relationship first
 - warm rebooks are scheduled for Art & Soul, Punch Bowl Social Galentine's, and Level Up Walkathon
@@ -75,6 +78,11 @@ Do not rebuild these.
 - Public Vibe work from PR #149 is live and remains separate from Manager logic; closed #142 is obsolete.
 - Event-media lightbox fixes from PR #152 are live; superseded PR #151 is closed.
 - PR #59 Portfolio Archive media galleries remains separate/held while real photo/video media is prepared.
+- PR #179 HyperFrames experiment is held pending a real-media value test.
+- PR #180 agent-labs Fastbrowse benchmark remains TEST FURTHER; its live arm did not run without a compatible model key.
+- PR #181 Abide/Jev and PR #183 fast-jev-codex remain TEST FURTHER; their frozen evals exist but live external-tool comparisons are unmeasured.
+- PR #182 deterministic CI guardrails is a separate $0 enforcement path and should be reviewed independently.
+- Ego Lite is test-only and is the next browser-research candidate; do not integrate it into Manager production before the frozen benchmark shows a material gain.
 
 ## For every change
 
