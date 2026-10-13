@@ -498,3 +498,10 @@
 @media (prefers-reduced-motion: reduce) {
   .logoBounce, .logoShadow { animation: none; }
 }
+
+/* Preview-only mobile QA: keep the editorial label below the fixed More control. */
+@media (max-width: 560px) {
+  .copy {
+    top: max(128px, calc(var(--safe-top) + 66px));
+  }
+}
