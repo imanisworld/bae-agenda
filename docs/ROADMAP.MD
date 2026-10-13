@@ -70,7 +70,7 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 Added 2026-10-13. **The sorter repository owns this work; no website feature
 or production database change has been authorized.**
 
-- Canonical task list: [remix-edit-sort integration work plan](https://github.com/imanisworld/remix-edit-sort/blob/codex/dj-source-drift-20261013/references/dj-integration-work-plan.md).
+- Canonical task list: [remix-edit-sort integration work plan](https://github.com/imanisworld/remix-edit-sort/pull/42) (`references/dj-integration-work-plan.md` in the PR).
 - Active source-only draft: [sorter PR #42](https://github.com/imanisworld/remix-edit-sort/pull/42). Genre master and folder mapping remain in separate [sorter PR #37](https://github.com/imanisworld/remix-edit-sort/pull/37).
 - Existing website event IDs, dates, time zones, and venues provide **event context**. Event dates do not prove actual **DJ set start/end** or track plays; internal bookings are private. Do not publish private setlists or add a public playback API.
 - Before any integration, establish confirmed actual DJ set windows and real timestamped Serato History / supported Rekordbox history evidence. The Mac is offline; the current phase permits official-source research, offline fixture tests, and preview-only planning.
