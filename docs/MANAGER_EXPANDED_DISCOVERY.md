@@ -1,45 +1,34 @@
 # Manager Expanded Discovery
 
-The Manager discovery layer uses two complementary lanes.
+## Objective
 
-## 1. Curated recurring sources
+Find repeatable, well-paid DJ B.A.E. bookings and aligned relationships with actual decision-makers. Indianapolis is one market, not the default boundary. Include regional and nationwide cultural/music networks; qualify out-of-state gigs against verified travel and economics before promoting them. Prioritize useful buyer and DJ networks over the number of event flyers found.
 
-`scripts/seed-manager-expanded-discovery.sql` adds recurring Indianapolis sources across:
+## Existing discovery infrastructure
 
-- opportunity boards
-- individual DJ network references for venue/promoter discovery
-- festivals and event brands
-- campus programming
-- nightlife venues
-- wedding / corporate event venues
-- local DJ network references
+Reuse the daily **DJ Manager Buyer & Network Watch** automation, existing Discovery Runs ledger, `manager_sources`, `manager_source_signals`, `manager_opportunities`, and Manager Relationships UI. Do **not** create another scheduler or table simply to track a new discovery lane. `scripts/seed-manager-expanded-discovery.sql` is historical Indianapolis source seeding, not the geographic boundary.
 
-The source list is deliberately biased toward official pages and recurring organizations rather than one-off aggregator pages.
+## Discovery lanes
 
-## 2. Broad daily discovery
+1. **Due recurring watchlist.** Search only active sources whose saved cadence is due, using saved seen markers and prior checks. Verify concrete posts/lineups/calls from primary evidence. Label social chronology partial where exhaustive inspection cannot be proven.
+2. **DJ-led / venue / organizer network mapping (priority).** Treat announced events, even with filled lineups, as clues. Trace the DJ, venue, venue programmer, series, co-host and organizer. Verify **who actually controls the booking**; many DJs independently produce, market and book their own events with no promoter. Identify aligned DJs who book guest artists, curate recurring parties or might collaborate on jointly produced events. Distinguish observation from speculation. Look for public contact routes and realistic future relationship actions.
+3. **Broad buyer search.** Discover direct private/corporate/brand/campus/nonprofit/cultural bookings, curated parties, festival DJ calls, LGBTQ+ events, guest DJ opportunities and recurring producers. Explore Chicago, Detroit, Atlanta, DC and other relevant markets as well as Indianapolis. Apply actual travel constraints to paid opportunities; if economics are unknown retain research rather than inventing financial fit.
+4. **Verified warm rebooks.** Compare completed booking/client history and past events with current evidence of recurrence or explicit rebook intent. Keep next_action_at internal. Do not infer a future event date from a historical anniversary.
 
-The scheduled Manager discovery task should also search beyond the saved watchlist for:
+## Relationship intelligence vs. openings
 
-- direct DJ / MC booking calls from venues, promoters, festivals, brands, campuses, and event organizers
-- guest-DJ and residency calls
-- festival and artist submissions that explicitly include DJs
-- campus / university event entertainment
-- corporate, brand, nonprofit, and community-event entertainment
-- LGBTQ+ event and nightlife programming
-- venue calendars that reveal recurring promoters or guest DJs
-- out-of-state venue/promoter relationships discovered through watched DJs
+- **Confirmed open call:** Explicit active direct-buyer request or application that permits DJs. Save as a review opportunity when qualified.
+- **Actionable future buyer / DJ-led collaboration:** Credible evidence of the booker/host, a public contact path and a concrete fit/rationale. May be a `review` opportunity (use `collaboration` for a grounded co-production prospect), but clearly tag `source_payload.lead_origin='relationship_prospect'`, `booking_status='future_relationship'`; keep event_date and unsupported economics NULL.
+- **Filled lineup / discovery clue:** Preserve a relevant source signal or recurring source. Never treat the existing lineup as an open slot. Mere venue DJ programming by itself does not create an opportunity.
 
-### Guardrails
+Store `source_payload` fields for `discovery_role` (`dj_led_organizer`, `dj_collaborator`, `venue_buyer`, `promoter`, `brand_buyer`, `paid_booking`, `warm_rebook`), relationship kind, provenance URLs, verified decision-maker versus unknown, and booking status. Use the DB's existing enumerations (`manager_source_signals.signal_type`: `post`, `event`, `booking_call`, `job`, `application`, `venue_programming`, `other`; `manager_sources.source_kind`: `dj`, `venue`, `promoter`, `event_brand`, `brand`, `agency`, `other`). No schema migration is required.
 
-- Prefer official organization, venue, festival, university, careers, and application pages.
-- Treat directories/job aggregators as discovery clues, then verify against a primary source when possible.
-- Do not contact or apply automatically.
-- Do not create an opportunity merely because an organization books DJs generally.
-- Exclude DJ staffing companies, DJ agencies, roster-building companies, wedding-DJ companies, and entertainment collectives recruiting a staff/house/touring DJ. These are not target leads.
-- Do not auto-add excluded DJ companies as recurring sources, and do not mine them for employment/roster opportunities.
-- Create an opportunity only for a current, actionable booking/application/hiring/partnership signal with a clear route to act.
-- Store lower-confidence but relevant findings as signals for review.
-- Auto-add at most five new recurring sources per discovery run.
-- Do not auto-add a source unless it appears likely to produce repeatable DJ-relevant signals.
-- Deduplicate by canonical URL and organization identity.
-- Keep social chronology labeled partial when public indexing is incomplete.
+## Guardrails
+
+- Prefer verified, culturally/music-aligned audiences and creative direction; do not infer someone's values or discriminatory preferences without evidence.
+- Seek good compensation and repeat clients; deprioritize generic club nights and exposure-only events that lack economic fit.
+- Exclude DJ staffing agencies, wedding-DJ/roster recruiters, house/touring/staff DJ employment and collectives recruiting staff, not legitimate independent DJ organizers.
+- Prefer official pages; confirm aggregator claims against primary sources when possible. No invented event date, pay, contact, travel or hours.
+- Deduplicate signals, sources and opportunities by canonical identity; add at most five repeatable sources per run and keep check_reliability partial unless fully supported.
+- Keep speculative relationships out of Outreach Ready; proposals and outreach drafts always require user approval. Never automatically contact, apply, accept gigs or book.
+- Track buyer/relationship intelligence separately from confirmed paid openings and ensure the daily Discovery Runs ledger records actual observed counts and coverage limitations.
