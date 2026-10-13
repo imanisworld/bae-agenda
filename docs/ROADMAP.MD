@@ -1,6 +1,6 @@
 # Bae Agenda Roadmap
 
-Last reconciled: 2026-10-07.
+Last reconciled: 2026-10-13.
 
 ## Rule
 
@@ -11,13 +11,15 @@ Do not rebuild a feature because it appears in an old plan. Check current code, 
 ### Public site and business operations
 
 - Public booking, events, mixes, portfolio, press kit, reviews, and contact flows
+- Public design/Press Kit revisions merged through #177; Built page removed from public routing for future redesign (#175)
+- Homepage copy clean-up (#178), with shared agent writing rule in `AGENTS.md`
 - Protected admin for bookings, clients, payments, invoices, events, mixes, portfolio, reviews, content, W-9, and Manager
 - Booking intake with availability/conflict checks
 - Supabase-backed booking/client/payment data
 - Stripe Checkout deposit flow with signed webhook handling and payment deduplication
 - Manual Zelle / Cash App payment handling
 - Invoice generation, PDF download, email sending, void/restore
-- Client portal
+- Client Portal code/routes (not publicly released: current client sign-in cannot complete; issue #157)
 - Resend email delivery + signed delivery-status webhook tracking
 - Optional Twilio SMS support
 - Optional Upstash shared rate limiting
@@ -50,7 +52,7 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 
 - Automatic Vercel Git deployments were disabled in PR #135.
 - Production is published deliberately after an intended batch is QA'd.
-- The latest verified application release is `11a81157285a748182aca18d9f48b258106e3b92` and includes the Public Vibe experience from PR #149 plus event-media lightbox fixes from PR #152.
+- Latest verified production release is `5ab6f49b10ec8692b4def20044e9d15eef90db29` (October 13, PR #178), with Vercel deployment `dpl_6rNrj7TsjfVjSXMCwQsMnVXbTL33` READY and assigned to `thebaeagenda.com`. Two homepage copy replacements are in this release; full browser/booking/portal QA remains open in #157.
 - Production database hardening from PR #101 is applied and verified.
 - Older Supabase migration-history drift still exists, so blanket `supabase db push` remains prohibited.
 
@@ -58,12 +60,14 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 
 ### Manager real-use pass
 
-- follow up Silent Disco and Elevate Social on Oct 10 if there is no reply
+- reconcile overdue Silent Disco/Elevate Social (Oct 10), other Oct 12–13 contacted leads, and Room to Bloom warm review (Oct 8) against **actual user communications** before any follow-up.
 - prioritize verified warm rebooks over equivalent cold leads
 - let daily Discovery Runs collect data
 - measure which sources, pitches, and economics produce responses/bookings
 - keep weak/speculative relationship leads out of Outreach Ready
-- improve discovery quality before adding volume
+- improve discovery quality before adding volume: Oct 13 run was **partial**, with 5 sources, 5 signals, 2 review opportunities, but no warm rebooks or outreach. Prioritize who **actually books/pays** and the user-exclusion rules over flyer counts.
+- review WERC Atlanta future collaboration (current buyer/opening, economics unverified) and the Chicago specialized paid-DJ application (user fit/pay/travel not established); keep AfroCode, Sun & Sound and Atlanta Pride as future-watch intelligence.
+- Grok research instructions were updated in PR #185; research-only, not a second scheduler or proof Grok executed. Use `docs/MANAGER_EXECUTION_AGENDA.md` for all Manager next actions and first-party-history safeguards.
 
 ### DJ library event/playback history — cross-repo, source-only
 
@@ -76,13 +80,21 @@ or production database change has been authorized.**
 - No changes to website runtime, Supabase schema, Manager outreach, cron, or deployment are needed for this phase. A private read-only website export is a **later reviewed proposal**, not an existing interface.
 - Keep `docs/GROK_MANAGER_SCOUT_PROMPT.md` scoped to **opportunity scouting**. Technical DJ playback research is a separate, one-time task.
 
+### Current public-site acceptance — #157
+
+- Test Book links/form and one isolated non-production inquiry; confirm mobile and desktop usability
+- Test Lab cover/tap/drag/swipe/keyboard/reduced-motion on real devices
+- Make Client Portal login/contact verification usable before restoring public links; test client isolation
+- Run fresh live health/route/log/browser checks before closing the **full site** milestone; PR #178's targeted release does not satisfy those tests
+
 ### Held / review-on-purpose work
 
-- Public Vibe experience from PR #149 is live.
-- Event-media lightbox fixes from PR #152 are live; PR #151 was superseded.
-- PR #59: older Full Portfolio Archive media galleries implementation — held/separate while real photo/video media is prepared
-- Discovery Runs UI — parked
-- Manager bot-access/suggestions design — parked until there is a demonstrated need
+- Local-only Media Curator #154/#155 is merged; run one real-event review before publishing any assets
+- PR #59: Full Portfolio Archive galleries remain held; 0 `portfolio_media` rows as of October 13
+- Issue #171: admin-managed TBA dates, optional event signup and special instructions — no invented dates
+- Issue #175: Built redesign — backlog, page not publicly routed
+- Discovery Runs UI and Manager bot suggestions — parked
+- PRs #179–#183: tool evaluations/experiments held without proven adoption value
 
 ## Remaining Work — Only When Useful
 
