@@ -1,4 +1,4 @@
-# DJ B.A.E. scouting to-do — reconciled Oct 7, 2026
+# DJ B.A.E. scouting to-do — reconciled Oct 13, 2026
 
 This list is reconciled against the current Manager state and DJ B.A.E. preferences.
 
@@ -17,10 +17,19 @@ This list is reconciled against the current Manager state and DJ B.A.E. preferen
 
 ## Current actions
 
-- [ ] Oct 10, 2026: follow up Silent Disco if no reply.
-- [ ] Oct 10, 2026: follow up Elevate Social if no reply.
+- [ ] Reconcile the Silent Disco thread before any further message; an Oct 10 follow-up was due, but this docs pass did not verify whether it was sent or whether a reply arrived.
+- [ ] Reconcile the Elevate Social thread before any further message; an Oct 10 follow-up was due, but this docs pass did not verify whether it was sent or whether a reply arrived.
+- [ ] Fix/test recurring-event detection for language such as `each year`, `annual fundraising event`, and `every Saturday`.
+- [ ] Clean up the existing DJ Connection agency signal that is already marked `converted`; agency sources remain excluded from target leads.
 - [ ] Consider the GANGGANG Artist Directory after reviewing its current terms.
 - [ ] Consider the free Indy Arts Council Artist Directory listing.
+
+## Browser-research tooling
+
+- [ ] **Ego Lite — test next.** Run the same frozen Manager benchmark from draft PR #180 on the owner's Mac using the local logged-in browser. Research/read only: no submissions, sends, applications, purchases, or other irreversible actions. Measure unique useful leads, source evidence, stale/duplicate rate, login-walled coverage, time/tool use, and cost if measurable.
+- [ ] **agent-labs-dev/fastbrowse — hold / TEST FURTHER.** Its benchmark arm has not run because no compatible model key was available. Rerun only if a key is already available and a side-by-side comparison is still useful after Ego Lite.
+- [x] **UnmappedStack/FastBrowse — ignore for Manager.** It is a Windows file-explorer replacement, not the AI browser-research tool.
+- [ ] Keep browser tooling as a research layer only. Do not create another discovery scheduler, and do not bypass Manager verification, direct-buyer filters, or user-controlled outreach.
 
 ## Scheduled warm rebooks
 
