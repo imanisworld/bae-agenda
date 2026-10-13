@@ -11,7 +11,7 @@ Last reconciled: 2026-10-13 (GitHub, Vercel, and read-only Manager database chec
 
 ## Verified Deployment — October 13
 
-- GitHub `main`: `5ab6f49b10ec8692b4def20044e9d15eef90db29` (squash merge of PR #178).
+- PR #178 production application commit: `5ab6f49b10ec8692b4def20044e9d15eef90db29` (squash merge). Later docs-only commits can advance `main` without changing this production SHA.
 - Vercel production deployment `dpl_6rNrj7TsjfVjSXMCwQsMnVXbTL33` is `READY`, assigned to `thebaeagenda.com`, and explicitly reports that exact Git commit SHA.
 - The deliberate same-SHA preview was also `READY`; GitHub CI for PR #178 succeeded.
 - PR #178 changed only `components/public/VibeExperience.tsx` and `AGENTS.md`: the two rejected homepage negation-style passages were replaced, and the public-copy writing rule now applies to all agents.
