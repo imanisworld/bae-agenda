@@ -60,12 +60,14 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 
 ### Manager real-use pass
 
-- resolve the **overdue October 10** Silent Disco and Elevate Social follow-ups after checking for external replies; Manager still showed `contacted` on October 13
+- reconcile overdue Silent Disco/Elevate Social (Oct 10), other Oct 12–13 contacted leads, and Room to Bloom warm review (Oct 8) against **actual user communications** before any follow-up.
 - prioritize verified warm rebooks over equivalent cold leads
 - let daily Discovery Runs collect data
 - measure which sources, pitches, and economics produce responses/bookings
 - keep weak/speculative relationship leads out of Outreach Ready
-- improve discovery quality before adding volume
+- improve discovery quality before adding volume: Oct 13 run was **partial**, with 5 sources, 5 signals, 2 review opportunities, but no warm rebooks or outreach. Prioritize who **actually books/pays** and the user-exclusion rules over flyer counts.
+- review WERC Atlanta future collaboration (current buyer/opening, economics unverified) and the Chicago specialized paid-DJ application (user fit/pay/travel not established); keep AfroCode, Sun & Sound and Atlanta Pride as future-watch intelligence.
+- Grok research instructions were updated in PR #185; research-only, not a second scheduler or proof Grok executed. Use `docs/MANAGER_EXECUTION_AGENDA.md` for all Manager next actions and first-party-history safeguards.
 
 ### Current public-site acceptance — #157
 
