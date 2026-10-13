@@ -8,12 +8,12 @@ Then read:
 
 1. `PROJECT_STATUS.md`
 2. `docs/MANAGER_EXECUTION_AGENDA.md`
-3. `docs/MANAGER_EXPANDED_DISCOVERY.md`
+3. `docs/MANAGER_EXPANDED_DISCOVERY.md` and `docs/GROK_MANAGER_SCOUT_PROMPT.md` for permanent user exclusions, first-party history and independent DJ network rules
 4. current Manager code under `app/(admin)/admin/(protected)/manager`
 5. `lib/manager-*.ts`
 6. current production state only through approved/read-only project tools
 
-Treat `PROJECT_STATUS.md` and `docs/MANAGER_EXECUTION_AGENDA.md` as the current source of truth. Old planning docs are historical unless they were reconciled on or after 2026-10-07.
+Treat `PROJECT_STATUS.md` and `docs/MANAGER_EXECUTION_AGENDA.md` as the current source of truth. Old planning notes and dated contact statuses are historical. As of 2026-10-13, use live Manager records plus the reconciled agenda and scout to-do; deployment claims retain their own verification dates.
 
 ## Current Manager state
 
@@ -37,27 +37,25 @@ Already live:
 
 Do not rebuild these.
 
-## Current execution priority
+## Manager execution priority — 2026-10-13
 
-1. work real eligible leads and scheduled follow-ups
-2. prioritize warm rebooks over equivalent cold leads
-3. let Discovery Runs collect enough history to measure source quality
-4. improve discovery quality/enrichment only where it changes a decision
-5. finish the Discovery Runs UI only if collected data shows it is useful
-6. add Manager automation only after an observed workflow gap
-7. keep content/video tooling separate from Manager business-development logic
+1. **Check real messages before follow-ups.** Silent Disco and Elevate Social still show `contacted` with Oct 10 next actions; other `contacted` opportunities have Oct 12–13 next actions. Room to Bloom warm rebook remains `review` with an Oct 8 internal date. Stale dates do **not** prove no reply.
+2. **Review actual new choices.** The Oct 13 pass created 5 recurring sources, 5 signals and 2 review opportunities: WERC Crew future Atlanta collaboration (verified organizer's prior DJ payments, current booking route/pay unknown) and Delta Frost Chicago paid application (specialized adult-themed programming; user fit/fee/travel unknown). No external contact/application without user approval.
+3. **Map real independent DJ buyers and repeat organizers.** Find who books **and pays**. Cross-check all discoveries against DJ B.A.E.'s prior portfolio/bookings/events and existing relationships; respect the Rich the Kid introducer route for Punch Bowl Social. Past tags or billed shows do not prove user preference or current relationships.
+4. **Preserve user exclusions before every candidate evaluation.** Read the exact mandatory 2026-10-13 organizer and event aliases in the scout/discovery docs; they are blocked from all Manager/Grok/warm-rebook/new-source lanes. The production suppression row remains inactive/ignored.
+5. **Use existing infrastructure.** Discovery Runs backend and daily tracking exist; Grok's updated social scout instructions were merged in PR #185 and are **read-only**, not proof Grok ran. Keep the Discovery Runs UI, bot database-access design, and third-party browser benchmark parked pending actual value.
 
-## Current outreach state
+## Verified evidence / limits
 
-- Silent Disco: contacted 2026-10-05; follow up Oct 10 if no reply
-- Elevate Social: contacted 2026-10-05; follow up Oct 10 if no reply
-- Jazz Is Dead: passed
-- Punch Bowl Social: use the existing Rich the Kid relationship first
-- warm rebooks are scheduled for Art & Soul, Punch Bowl Social Galentine's, and Level Up Walkathon
+- Oct 13 run `manager-discovery-20261013T140722.305418Z` has status **partial**, with 10 due/attempted, 4 partial, 5 new sources, 5 relevant signals, 2 review opportunities, 0 warm rebooks created or updated and 0 outreach.
+- First-party baseline: 70 portfolio entries, 5 bookings and 14 events. Production currently has 22 opportunities following the new entries. Chronology of public Instagram/X posts is incomplete; private DMs/stories are unavailable.
+- Four existing warm reviews include Room to Bloom, Art & Soul 2027 (Oct 20), Punch Bowl Social Galentine's (Nov 15, through Rich), and Level Up Walkathon 2027 (May 15).
+- WERC opportunity metadata requires provenance check before considering a narrow correction; do not infer missing links or write data from scouting.
+- [PR #184](https://github.com/imanisworld/bae-agenda/pull/184) portfolio evidence and [PR #186](https://github.com/imanisworld/bae-agenda/pull/186) DJ playback-history handoff are separate **draft** work. [PR #180](https://github.com/imanisworld/bae-agenda/pull/180) Fastbrowse benchmark is **not adopted**.
 
 ## Important rules
 
-- Direct buyers are targets: venues, promoters, festivals, brands, campuses, nonprofits/community organizers, and one-off event organizers.
+- Direct buyers are targets: independent DJ-organizers and their own parties, venues, festivals, brands, campuses, nonprofits/community organizers, and genuine one-off event producers. Never assume a separate promoter exists.
 - Exclude DJ staffing companies, DJ agencies, wedding-DJ companies, roster-building companies, house-DJ employment, and entertainment collectives recruiting staff/roster DJs.
 - The press kit already exists at `https://thebaeagenda.com/press-kit`; do not create another EPK.
 - Do not invent contacts, pay, event hours, travel, application routes, or assets.
