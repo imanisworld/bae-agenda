@@ -8,12 +8,13 @@ Booking, admin, content, client-communications, and DJ business-development app 
 - Protected admin for bookings, clients, payments, invoices, events, mixes, portfolio, reviews, content, W-9, and Manager
 - Booking inquiry intake with availability checks, rate limiting, and email/SMS notifications
 - Invoice PDF generation and invoice email sending
-- Client portal
+- Client Portal code/routes (unlisted and not released; current client login is blocked by missing usable verified contact methods — see [issue #157](https://github.com/imanisworld/bae-agenda/issues/157))
 - Manual client email actions from booking detail
 - Daily cron automation for final-payment reminders, post-event follow-ups, and review requests
 - Verified Resend webhook ingestion for sent/delivered/delayed/bounced/complained/failed/suppressed events
 - Manager workflow for sourcing, scoring, economics, outreach prep, follow-ups, warm rebooks, negotiation, relationship intelligence, and source-quality tracking
 - Discovery Runs backend + daily tracking for Manager source discovery
+- Local-only Media Curator scan/review/cache tooling (`tools/media-curator/`; no uploads or auto-publishing)
 
 ## Stack
 
@@ -149,6 +150,13 @@ Supported events:
 - `email.suppressed`
 
 Open/click tracking is intentionally excluded.
+
+## Release Status / Acceptance
+
+- Public site design and homepage wording cleanup are deployed through commit `5ab6f49` (PR #178, October 13); see `PROJECT_STATUS.md` for the verified Vercel deployment ID. The Built page is currently unlisted/unrouted.
+- Full booking/Lab device and safe inquiry tests remain open under [issue #157](https://github.com/imanisworld/bae-agenda/issues/157).
+- Public event TBA notices are code-level placeholders; the future admin-managed date/signup model is [issue #171](https://github.com/imanisworld/bae-agenda/issues/171).
+- For public-facing writing, follow the direct-copy rule in `AGENTS.md`; do not reintroduce rejected negation-to-redefinition wording.
 
 ## Verification Commands
 
