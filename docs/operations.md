@@ -1,6 +1,6 @@
 # Operations Checklist
 
-Last reconciled: 2026-10-07.
+Last reconciled: 2026-10-13.
 
 This file tracks the current operating model for Bae Agenda and the best future automation targets.
 
@@ -73,6 +73,14 @@ Production Supabase migration history is historically drifted.
 - verify RLS/grants and advisors after database changes
 
 PR #101 legacy access hardening is already applied and verified.
+
+## Open public-site release checks
+
+- PR #178's two homepage wording corrections were deployed at `5ab6f49` on October 13; this is a targeted production copy fix, not a full public-site acceptance test.
+- Keep [issue #157](https://github.com/imanisworld/bae-agenda/issues/157) open until Book link/form and an isolated test inquiry, mobile/desktop Lab controls, and a usable client-portal sign-in with client-isolation checks all pass.
+- Client Portal remains unadvertised while its existing phone-login workflow is unusable for current client records. Hiding navigation is not an access-control measure.
+- Club Cunt and Saints and Sinners show TBA notices in code; a managed TBA date/signup/instructions model is future [issue #171](https://github.com/imanisworld/bae-agenda/issues/171). Do not substitute guessed canonical dates.
+- Built was removed from public routing in #177; redesign is deferred to [issue #175](https://github.com/imanisworld/bae-agenda/issues/175).
 
 ## Deployment / Verification
 
