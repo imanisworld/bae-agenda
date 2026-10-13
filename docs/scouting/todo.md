@@ -1,61 +1,55 @@
-# DJ B.A.E. scouting to-do — reconciled Oct 13, 2026
+# DJ B.A.E. Manager scouting — action list
 
-This list is reconciled against the current Manager state and DJ B.A.E. preferences.
+Reconciled **2026-10-13** against `main`, recent open PRs, and read-only production Manager data. Snapshot after the October 13 run: **67 total recurring sources (59 active)**, **6 discovery runs**, **22 opportunities** and **30 relevant signals**; only a subset are qualified open calls. This list is a **review queue**, not permission to send/submit anything. Operational details live in `docs/MANAGER_EXECUTION_AGENDA.md`; evidence/suppression rules live in `docs/MANAGER_EXPANDED_DISCOVERY.md`.
 
-Read-only Manager snapshot (October 13): 22 opportunities, 67 sources, 6 recorded discovery runs. October 13 run created 5 signals and 2 opportunities, but was marked **partial**. These counts are a dated snapshot, not a statement that all opportunities are actionable or booked.
+## Completed / already installed
 
-## Already handled
+- [x] Daily recurring-source + broad discovery and `manager_discovery_runs` tracking exist. Do not duplicate the scheduler.
+- [x] Existing Manager scoring/economics, source quality, relationship view, warm rebooks, controlled outreach, and prior history are available.
+- [x] Existing press kit: https://thebaeagenda.com/press-kit. No new EPK.
+- [x] Grok/X social scout read-only brief refreshed and merged in [PR #185](https://github.com/imanisworld/bae-agenda/pull/185); it is **instructions**, not proof Grok ran.
+- [x] The 2026-10-13 discovery pass created **5 recurring sources**, **5 signals**, **2 review opportunities** (10 due/attempted; 4 incomplete checks); no outreach or new warm rebooks. Findings are **already in Supabase**.
+- [x] User-excluded organizer/event aliases remain suppressed in the Manager database. Do not resurface them, even from another site/agent.
+- [x] Historical sources are preserved for provenance; no automatic portfolio changes or user-fit assumptions from flyers.
 
-- [x] Daily opportunity/source discovery already exists in Manager. Do not create a duplicate weekly scan.
-- [x] DJ staffing companies, DJ agencies, wedding-DJ rosters, and staff/house/touring-DJ employment are excluded.
-- [x] Existing EPK is live at https://thebaeagenda.com/press-kit.
-- [x] Warm-rebook scheduling exists in Manager.
-- [x] Silent Disco contacted 2026-10-05; follow-up Oct 10.
-- [x] Elevate Social contacted 2026-10-05; follow-up Oct 10.
-- [x] Jazz Is Dead passed 2026-10-05 because no Indianapolis date/open DJ slot was verified.
-- [x] Punch Bowl Social relationship route identified: ask Rich the Kid before direct outreach.
-- [x] Level Up Walkathon 2027 is recorded as a high-confidence warm rebook.
-- [x] Manager relationship/warm-rebook views, actual-sent-message recording, and source-health guardrails are live in production.
+## Work from Manager Today (review actual response before any action)
 
-## Current actions
+- [ ] **Overdue since Oct 8:** Room to Bloom monthly warm rebook remains `review`; check existing relationship/history before deciding timing or contacting.
+- [ ] **Overdue since Oct 10:** Silent Disco and Elevate Social both still show `contacted` with Oct 10 `next_action_at`. Verify responses and existing messages first; the database does **not** prove no reply.
+- [ ] **Due Oct 12–13:** review the actual next actions/statuses for Astrea Rooftop, hue., Untitled Supper Club, Vu Rooftop, Club Escape Chicago and Spybar Chicago. No bulk follow-up or autonomous outreach.
+- [ ] **Existing review:** Athenaeum Christkindlmarkt 2026 performer application — confirm DJs are eligible, deadline/open status, event fit and fee before acting; do not mistake a general performer form for a verified DJ call.
 
-- [ ] **Overdue since Oct 10, 2026:** check for an external Silent Disco reply; follow up if none. Manager still showed `contacted` with no newer recorded contact on Oct 13.
-- [ ] **Overdue since Oct 10, 2026:** check for an external Elevate Social reply; follow up if none. Manager still showed `contacted` with no newer recorded contact on Oct 13.
-- [ ] Consider the GANGGANG Artist Directory after reviewing its current terms.
-- [ ] Consider the free Indy Arts Council Artist Directory listing.
+## Two Oct 13 prospects requiring user/business review
+
+- [ ] **WERC Crew / Smothered + Covered, Atlanta — collaboration `review`:** promising documented programming and history of paying guest DJs, but no current opening, verified specific payer/guest curator, fee or travel terms. Research who actually commissions guests and a verified contact route. Review metadata quality: the saved opportunity lacked `lead_origin` and its related signal was not linked when inspected; verify provenance before any narrow, approved correction. Avoid creating another lead.
+- [ ] **Delta Frost Productions, Chicago — application `review`:** specialized adult/kink-themed event format requires explicit DJ B.A.E. fit judgment; the posted call says paid but rate/travel are unknown. This was mentioned in the October 5 scouting report, so this is newly *saved*, not first ever discovered. No application without approval.
+- [ ] **Research-only, already saved:** AfroCode Nation / The Sequel (DC) and Sun & Sound Detroit. Find the actual named buyer/DJ organizer and evidence of recurring paid guest booking; neither is a verified open call.
+- [ ] **Future watch, already saved:** Atlanta Pride 2027 — check official entertainment application in March 2027; currently closed, DJ eligibility/compensation/travel unverified.
 
 ## Scheduled warm rebooks
 
-- [ ] Oct 20, 2026: Art & Soul 2027 re-engagement.
-- [ ] Nov 15, 2026: Punch Bowl Social Galentine's 2027 re-engagement through the existing relationship route.
-- [ ] May 15, 2027: Level Up Walkathon 2027 reconnect to confirm date, role, rate, and logistics. Prior interest is established; do not cold-pitch.
+- [ ] **Oct 20, 2026:** Art & Soul 2027 — existing warm review; confirm actual contact path and scope before proposing a re-engagement.
+- [ ] **Nov 15, 2026:** Punch Bowl Social Galentine's 2027 — approach first through the existing Rich the Kid introduction protocol, not a cold venue email.
+- [ ] **May 15, 2027:** Level Up Walkathon 2027 — reconnect regarding actual date, scope, fee and logistics; recorded verbal interest is not a confirmed booking.
 
-## High-value local watches
+## Local / national seasonal watches (timing may change)
 
-- [ ] Jan 2027: watch for the CHREECE 2027 artist/DJ call.
-- [ ] Jan-Apr 2027: watch for the Indy Pride 2027 entertainment application.
-- [ ] Apr-May 2027: watch for Indy Arts Council Start with Art.
-- [ ] Summer 2027: watch for the next Art & Soul interest cycle.
-- [ ] Continue monitoring GANGGANG, Monsterz Inc., Forty5, Indy Arts Council, Indy Pride, CHREECE, and direct venue/promoter relationships.
+- [ ] Recheck official 2027 CHREECE DJ/artist window around Jan; no unverified date treated as an open application.
+- [ ] Recheck Indy Pride entertainment application Jan–Apr 2027 and Indy Arts Council Start with Art around Apr–May 2027; confirm live 2027 terms.
+- [ ] Preserve useful recurring relationship intelligence from Indy Arts Council, GANGGANG, Monsterz Inc., Forty5, campus/brand/private organizers, and independent DJ-led series. Revisit each only on its source cadence.
+- [ ] Review optional GANGGANG directory and free Indy Arts Council artist listing terms **before** user submission; listings are not paid bookings.
+- [ ] Pride Toronto 2027 public application watch around Nov 2026 — verify official window, authorization and travel economics before promoting.
+- [ ] Out-of-state Chicago/Detroit/Atlanta/DC house, bounce, R&B and culturally aligned events: identify the buyer and compensation route; do not rank speculative travel as a profitable gig.
 
-## Out-of-town: watch, do not prioritize without economics
+## Deferred / separate ownership
 
-- [ ] Nov 1, 2026: Pride Toronto 2027 applications open; evaluate travel/work authorization and economics.
-- [ ] Mar 2027: Atlanta Pride 2027 entertainment application opens.
-- [ ] Watch Chicago queer/house relationships such as Queen!/Smartbar and Party Noire for direct guest-DJ routes.
-- [ ] Watch strong Black/queer/femme party relationships in Atlanta, Detroit, DC, and other strategic markets.
+- [ ] [PR #184](https://github.com/imanisworld/bae-agenda/pull/184) **draft** owns portfolio-history reconciliation evidence. Do not treat archived scheduled sets as performed or publish speculative portfolio additions.
+- [ ] [PR #186](https://github.com/imanisworld/bae-agenda/pull/186) **draft** owns the DJ playback-history cross-repo roadmap handoff. Event calendar metadata is not Serato/Rekordbox playback evidence.
+- [ ] [PR #180](https://github.com/imanisworld/bae-agenda/pull/180) **draft** benchmarks Fastbrowse; not adopted, no measured improvement. Do not install a replacement or create paid infrastructure without verified benefit.
+- [ ] Discovery Runs UI and bot database-access/suggestion infrastructure remain **parked**. Grok research can operate with a read-only prompt; neither warrants a new production integration now.
 
-## Research archive / low priority
+## Archived / weak leads
 
-Do not surface these as normal Manager action items unless new facts materially improve economics or fit:
+Do not promote SXSW, NXNE, The Great Escape, FuTopia or generic international/open-call aggregators without a specifically evidenced paid DJ opening and viable economics. Do not relist historical rejected/expired prospects as novel opportunities.
 
-- SXSW
-- NXNE
-- The Great Escape
-- FuTopia
-- Goin' Social Events
-- other international/open-call aggregators without credible pay, travel support, and DJ fit
-
-## Standing rule
-
-Research may preserve long-shot findings for reference, but the live Manager should prioritize direct buyers, realistic economics, verified action routes, repeat relationships, and user-controlled outreach.
+**Stop rule:** only user-approved outreach/applications; no booking, payment, contact or preference mutations from scouting. The objective is an accurate, small decision queue and actual paid relationships.
