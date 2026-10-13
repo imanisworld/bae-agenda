@@ -92,6 +92,8 @@ Prefer direct buyers and real relationships. Exclude DJ staffing/roster/wedding-
 
 Daily Discovery Runs/source tracking already exist. Do not add a duplicate generic discovery scheduler.
 
+For any Manager/Grok/Claude/Cursor DJ lead research, read `docs/MANAGER_EXPANDED_DISCOVERY.md` and `docs/GROK_MANAGER_SCOUT_PROMPT.md` **before** ranking candidates. Those files contain mandatory user-excluded organizer/handle/event aliases that must be suppressed across all discovery, relationship mapping and warm rebooks, including other sites' reposts. Cross-check first-party portfolio, completed bookings, events, prior contacts and user-confirmed relationship protocol before calling a historical venue or collaborator new. Independent DJs may book and produce their own events; identify the real decision-maker/payer rather than presuming a promoter. Social chronology is incomplete. Research-only agents may return documented leads for review; do not grant them automatic Manager/Supabase write or outreach access.
+
 ## Product / architecture
 
 - prefer current stack and existing services
