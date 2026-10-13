@@ -12,7 +12,10 @@ This file tracks the current operating model for Bae Agenda and the best future 
 - Review recent email activity before manual follow-ups
 - Check upcoming events and confirmed bookings
 - Review Manager Today for follow-ups, negotiations, outreach-ready leads, and blocked leads
-- Let Manager Discovery Runs collect source-quality history; do not create a duplicate generic discovery scheduler
+- Let Manager Discovery Runs collect source-quality history; do not create a duplicate generic discovery scheduler.
+- Review **overdue** Manager actions against exact previous contact and actual external replies; a stale `contacted` status or `next_action_at` does not establish no response.
+- For Manager/Grok research, apply the permanent organizer/event exclusion aliases and first-party history safeguards in `docs/MANAGER_EXPANDED_DISCOVERY.md` and `docs/GROK_MANAGER_SCOUT_PROMPT.md` **before** ranking sources. Independent DJs can be the organizers and payers; do not infer a promoter.
+- Keep source cadence and partial social coverage explicit; only promote verified, deduplicated routes and travel/pay-supported outside-market gigs. Grok is read-only; no automatic outbound messages or Manager DB mutations.
 
 ## Booking Detail Actions
 
@@ -43,6 +46,7 @@ Do not rebuild these as new schedulers unless the current workflow fails.
 - Use a manual final-payment reminder only when the balance is still outstanding and the automated reminder is not sufficient.
 - Keep money-sensitive or ambiguous messages manual.
 - Manager outreach remains user-controlled; Manager may research/draft/record but must not autonomously send or submit.
+- One discovery run row per pass, same run ID completed with exact observed counters. No inventing successful source checks, post timestamps, fee/contact/travel facts or portfolio preferences.
 
 ## Best Automation Candidates Later
 
