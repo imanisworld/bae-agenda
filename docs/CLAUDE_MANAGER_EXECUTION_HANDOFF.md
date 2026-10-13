@@ -8,7 +8,7 @@ Then read:
 
 1. `PROJECT_STATUS.md`
 2. `docs/MANAGER_EXECUTION_AGENDA.md`
-3. `docs/MANAGER_EXPANDED_DISCOVERY.md`
+3. `docs/MANAGER_EXPANDED_DISCOVERY.md` and `docs/GROK_MANAGER_SCOUT_PROMPT.md` for mandatory user exclusions, DJ network sourcing and previous-history guardrails
 4. current Manager code under `app/(admin)/admin/(protected)/manager`
 5. `lib/manager-*.ts`
 6. current production state only through approved/read-only project tools
@@ -56,9 +56,20 @@ Do not rebuild these.
 - warm rebooks: Art & Soul on October 20, Punch Bowl Social Galentine's on November 15, and Level Up Walkathon on May 15, 2027
 - October 13 Manager snapshot: 22 opportunities, 67 sources, 6 Discovery Runs; latest run marked partial. These are not paid-booking results.
 
+## October 13 verified discovery and cross-agent handoff
+
+- Run `manager-discovery-20261013T140722.305418Z` was **partial** (10 due/attempted, 4 partial coverage, 5 sources added, 5 relevant signals, 2 review opportunities, 0 new/updated warm rebooks, 0 outreach). Live snapshot: **67 total sources, 22 opportunities, 6 runs**, with **59 active sources**. These are discovery records, not paid bookings.
+- Room to Bloom monthly warm rebook remains `review` with an **Oct 8** internal date. Several contacted leads have Oct 12–13 internal actions. Check recorded contact and external responses before user-approved follow-up.
+- **WERC Atlanta** is an existing future collaboration `review`: guest DJ payment history verified, but current booking decision-maker/opening, fee and travel are not. Its opportunity's lead-origin and source-signal link need verified provenance before any database correction.
+- **Delta Frost Chicago** is an existing `review` for a paid, specialized adults-only application. Artistic/brand fit requires the user's decision; rate/travel are unknown. Previously appeared in the Oct 5 scouting report, so it is not previously unseen research.
+- AfroCode Nation (DC), Sun & Sound Detroit, Atlanta Pride's expected March 2027 application are **saved recurring research/watch sources**, not verified paid vacancies now.
+- **Permanent exclusions apply across Manager, Grok, Claude, and any broader research lane.** Read exact forbidden organizer/event aliases in the two discovery/scout documents **before** using a line-up or other aggregator. The inactive/ignored production suppression is intentional. Never infer artist preferences, buyer relationships or bookings from a past public flyer, tagged co-DJ, or demographics.
+- Grok's research-only brief is on `main` via PR #185; no Grok run occurred by merging the instructions. Manager owns review and any explicitly approved data changes. Existing bot-access and Discovery Runs UI projects stay parked; Fastbrowse PR #180 remains an unadopted experiment.
+- Portfolio PR #184 and DJ playback-history PR #186 are **separate drafts**, not licenses to publish a scheduled gig as completed or infer a DJ setlist from a calendar event.
+
 ## Important rules
 
-- Direct buyers are targets: venues, promoters, festivals, brands, campuses, nonprofits/community organizers, and one-off event organizers.
+- Direct buyers include **independent DJs running/booking their own parties**, venues, brands, campuses, festivals, nonprofits/community buyers and genuine one-off organizers. Determine who actually commissions and pays. Do not assume a promoter.
 - Exclude DJ staffing companies, DJ agencies, wedding-DJ companies, roster-building companies, house-DJ employment, and entertainment collectives recruiting staff/roster DJs.
 - The press kit already exists at `https://thebaeagenda.com/press-kit`; do not create another EPK.
 - Do not invent contacts, pay, event hours, travel, application routes, or assets.
