@@ -378,3 +378,10 @@
   outline: 2px solid #c28a91;
   outline-offset: 3px;
 }
+
+/* Quick, localized press feedback for touch navigation. Keep swipe and desktop
+   hover behaviour unchanged, and respect reduced-motion preferences. */
+@media (pointer: coarse) and (prefers-reduced-motion: no-preference) {
+  .item:active { transform: scale(.96); transition-duration: 90ms; }
+  .moreButton:active { opacity: .72; }
+}
