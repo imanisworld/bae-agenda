@@ -21,11 +21,13 @@ Last reconciled: 2026-10-13 (GitHub, Vercel, and read-only Manager database chec
 
 ## Manager — Read-Only Snapshot October 13
 
-- 22 opportunities, 67 sources, and 6 recorded Discovery Runs.
-- Most recent run (October 13): 10/10 sources due were checked, 5 signals and 2 opportunities were created; run status **partial** with partial coverage count 4. Complete coverage/research quality is not established by source-check counts alone.
+- 22 opportunities, 67 total sources (**59 active**), 30 relevant signals, and 6 recorded Discovery Runs. Portfolio/event baseline: **70 portfolio entries, 5 booking rows, 14 event rows**.
+- Most recent run (October 13, key `manager-discovery-20261013T140722.305418Z`): 10/10 due sources attempted, **4 partial coverage**, **5 new recurring sources**, **5 signals**, **2 `review` opportunities**, 0 warm-rebook creations/updates, and 0 outreach; final status **partial**. Complete sourcing quality is not established by check counts.
 - Silent Disco (October 23 event) and Elevate Social still show `contacted` with last recorded contact October 5 and follow-ups dated October 10. As of this check those follow-ups are overdue in Manager; external replies have not been checked.
 - Art & Soul 2027 re-engagement remains set for October 20; Punch Bowl Social Galentine's for November 15; Level Up Walkathon 2027 for May 15, 2027. Use the known warm relationship route.
 - Daily Discovery Runs backend is active. The separate Discovery Runs UI remains parked; do not create a second scheduler or infer bookings from signals.
+- Manager follow-up review also includes Room to Bloom (Oct 8) and other `contacted` Oct 12–13 actions, not proof of unanswered messages. The new **WERC future collaboration** and **Delta Frost specialized paid-DJ application** stay review-only with missing buyer/fit/pay/travel evidence; AfroCode (DC), Sun & Sound (Detroit) and Atlanta Pride are recurring watch intelligence. See `docs/scouting/todo.md` for the decision queue.
+- The mandatory user-excluded organizer/event source remains inactive with `USER-EXCLUDED` notes and an ignored signal; no alias may re-enter through Grok or another source. Grok's updated research-only brief in PR #185 was merged, but this **did not trigger a Grok run**.
 
 ## Public Site Finish Line — Issue #157 (Open)
 
@@ -52,7 +54,7 @@ PR #178's copy-only deployment is completed separately and does **not** close an
 
 ## Immediate To-Do (no open-ended audit)
 
-1. In Manager, check for replies and resolve the overdue Silent Disco/Elevate Social follow-ups. Record only actions actually taken.
+1. In Manager, verify external replies before resolving overdue Silent Disco/Elevate Social and other dated contacted/warm-review follow-ups. Evaluate the new two review opportunities and source provenance without autonomous contact or database changes. Record only actions actually taken.
 2. Complete the explicit tests in issue #157; fix only specific failures and close the issue when all gates are evidenced.
 3. On October 20, evaluate Art & Soul warm-rebook re-engagement using existing relationship history.
 4. When the Mac/media library is available, run one real-event Media Curator pilot; do not upload or publish without review.
