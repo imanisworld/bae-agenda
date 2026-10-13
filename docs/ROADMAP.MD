@@ -1,6 +1,6 @@
 # Bae Agenda Roadmap
 
-Last reconciled: 2026-10-07.
+Last reconciled: 2026-10-13 for Manager discovery/action queue; previously verified site/release facts retain their cited dates.
 
 ## Rule
 
@@ -17,7 +17,7 @@ Do not rebuild a feature because it appears in an old plan. Check current code, 
 - Stripe Checkout deposit flow with signed webhook handling and payment deduplication
 - Manual Zelle / Cash App payment handling
 - Invoice generation, PDF download, email sending, void/restore
-- Client portal
+- Client portal code exists; user sign-in/release remains **blocked** pending a verified authenticated contact path and client isolation (see `PROJECT_STATUS.md`).
 - Resend email delivery + signed delivery-status webhook tracking
 - Optional Twilio SMS support
 - Optional Upstash shared rate limiting
@@ -58,12 +58,12 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 
 ### Manager real-use pass
 
-- follow up Silent Disco and Elevate Social on Oct 10 if there is no reply
-- prioritize verified warm rebooks over equivalent cold leads
-- let daily Discovery Runs collect data
-- measure which sources, pitches, and economics produce responses/bookings
-- keep weak/speculative relationship leads out of Outreach Ready
-- improve discovery quality before adding volume
+- **Overdue items in Manager:** Oct 8 Room to Bloom; Oct 10 Silent Disco/Elevate Social; other contacted leads Oct 12–13. Verify actual responses before any user-approved follow-up. Stale due dates do not prove no reply.
+- **Oct 13 review decisions:** WERC Atlanta buyer/co-production relationship (no current opening/pay/travel), Chicago specialized paid-DJ application (user fit, fee, travel unknown), Athenaeum DJ eligibility; preserve prior introducer protocol and warm rebook context.
+- **Oct 13 discovery evidence:** 10 due/attempted, 4 partial checks, 5 new sources, 5 signals, 2 review opportunities, 0 warm rebook creations/updates. Source/metric details: `docs/MANAGER_EXPANDED_DISCOVERY.md`.
+- **Read-only Grok scout:** PR #185 updated the existing X/social prompt and Manager handoff; no Grok run or separate scheduler initiated.
+- prioritize verified warm rebooks over equivalent cold leads and keep weak/speculative relationships out of Outreach Ready.
+- measure whether source and network research produces **verified bookers, replies and paid gigs**, rather than collecting flyer volume. Preserve first-party history, user exclusions and incomplete social coverage.
 
 ### Held / review-on-purpose work
 
