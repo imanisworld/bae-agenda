@@ -70,8 +70,7 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 Added 2026-10-13. **The sorter repository owns this work; no website feature
 or production database change has been authorized.**
 
-- Canonical task list: [remix-edit-sort integration work plan](https://github.com/imanisworld/remix-edit-sort/pull/42) (`references/dj-integration-work-plan.md` in the PR).
-- Active source-only draft: [sorter PR #42](https://github.com/imanisworld/remix-edit-sort/pull/42). Genre master and folder mapping remain in separate [sorter PR #37](https://github.com/imanisworld/remix-edit-sort/pull/37).
+- Canonical task list and implementation evidence are maintained in the **private DJ library sorter repository**, not duplicated here. Reference its `references/dj-integration-work-plan.md` and the source-only integration draft; the genre master/folder map is a separate pending change.
 - Existing website event IDs, dates, time zones, and venues provide **event context**. Event dates do not prove actual **DJ set start/end** or track plays; internal bookings are private. Do not publish private setlists or add a public playback API.
 - Before any integration, establish confirmed actual DJ set windows and real timestamped Serato History / supported Rekordbox history evidence. The Mac is offline; the current phase permits official-source research, offline fixture tests, and preview-only planning.
 - No changes to website runtime, Supabase schema, Manager outreach, cron, or deployment are needed for this phase. A private read-only website export is a **later reviewed proposal**, not an existing interface.
