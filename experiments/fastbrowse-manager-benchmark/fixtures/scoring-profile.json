@@ -1,0 +1,27 @@
+{
+  "profile_key": "dj_bae",
+  "read_only_verified_at": "2026-10-11",
+  "source": "Read-only select from production public.manager_profiles. Fee fields match the fixtures in lib/manager-scoring.test.ts.",
+  "home_market": "Indianapolis, IN",
+  "minimum_fee": 150,
+  "target_hourly_rate": 300,
+  "max_drive_minutes": 90,
+  "preferred_event_types": [
+    "lounge",
+    "bar",
+    "gay",
+    "if club 1hr only",
+    "corporate",
+    "wedding",
+    "stores"
+  ],
+  "excluded_event_types": [],
+  "genres": [
+    "open format",
+    "hip hop",
+    "r&b",
+    "dance",
+    "ghetto tech",
+    "juke"
+  ]
+}

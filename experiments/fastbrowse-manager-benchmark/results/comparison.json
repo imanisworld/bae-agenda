@@ -1,0 +1,22 @@
+{
+  "verdict": "TEST FURTHER",
+  "fastbrowse_benchmark_ran": false,
+  "adopt_bar": "ADOPT requires a measured improvement on the frozen metrics. That bar was not met because Fastbrowse did not run the tasks.",
+  "deltas": null,
+  "regressions_from_fastbrowse": [],
+  "false_positives_introduced_by_fastbrowse": [],
+  "added_complexity_if_integrated_now": [
+    "Python 3.13 runtime via uv",
+    "a model key: OPENROUTER_API_KEY, AI_GATEWAY_API_KEY, or TYPESAFE_API_KEY",
+    "optional paid Browser Use Cloud browser, or local Chrome",
+    "a second research path beside Discovery Runs"
+  ],
+  "baseline_gaps_observed": [
+    "No open, dated Indianapolis DJ booking call was verified on 2026-10-11.",
+    "Instagram watchlist pages returned a login shell.",
+    "Ganggang, IndyFringe, Posh, Complete Weddings, and one wedding-DJ job page returned HTTP 403 to a plain fetch.",
+    "hasRecurringRelationshipEvidence missed three phrases that a person can read as recurring: each year, annual fundraising event, and every Saturday.",
+    "The discovery-run writer and the signal fingerprint algorithm are not in this repository.",
+    "A production signal from djconnection.com/jobs is already status converted, while that source is an inactive agency and current code blocks agency signals."
+  ]
+}
