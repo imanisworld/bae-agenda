@@ -29,10 +29,10 @@ function usePreloadPagePhotos(pathname: string, enabled: boolean) {
       }
     }
     if ('requestIdleCallback' in window) {
-      const id = window.requestIdleCallback(warm, { timeout: 4000 })
+      const id = window.requestIdleCallback(warm, { timeout: 1500 })
       return () => window.cancelIdleCallback(id)
     }
-    const id = setTimeout(warm, 2500)
+    const id = setTimeout(warm, 900)
     return () => clearTimeout(id)
   }, [pathname, enabled])
 }
