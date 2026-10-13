@@ -1,6 +1,6 @@
 # Project Status
 
-Last reconciled: 2026-10-07.
+Last reconciled: 2026-10-13 for Manager records/docs; production deployment and unrelated site state below retain their stated **2026-10-07 / 2026-10-09** verification dates.
 
 ## Current State
 
@@ -22,13 +22,23 @@ Audit on 2026-10-07:
 - No production warning/error/fatal runtime logs were found in the post-deploy / post-database-hardening verification windows.
 - Email delivery tracking remains operational.
 
-### Manager current state
+### Manager state documented on October 7 (historic outreach snapshot)
 
 - Silent Disco: contacted 2026-10-05; follow-up Oct 10.
 - Elevate Social: contacted 2026-10-05; follow-up Oct 10.
 - Jazz Is Dead: passed 2026-10-05 because no Indianapolis date/open DJ slot was verified.
 - Punch Bowl Social: use the existing Rich the Kid relationship before direct outreach.
 - Art & Soul 2027, Punch Bowl Social Galentine's 2027, and Level Up Walkathon 2027 are scheduled warm-rebook work.
+
+### Manager discovery / source of truth — verified October 13
+
+Read-only Supabase project `ldsllgzcburcdqmkpelf` showed **70 portfolio entries**, **5 bookings**, **14 events**, **22 Manager opportunities**, **59 active recurring sources**, and **30 relevant signals** as of this review. These counts are a **snapshot**, not new additions from this docs update.
+
+The Oct 13 discovery run `manager-discovery-20261013T140722.305418Z` is **partial**: 10 sources due/attempted, 4 incomplete coverage checks; 5 sources, 5 relevant signals and 2 review opportunities added; 0 new/updated warm rebooks and no outreach. WERC future collaboration and the Chicago specialized paid-DJ application remain **review-only** with important buyer/fit/pay/travel unknowns. Recurring DC/Detroit and Atlanta Pride sources are watch intelligence, not verified current DJ bookings. Consult `docs/MANAGER_EXECUTION_AGENDA.md` for exact next actions and `docs/scouting/todo.md` for the operational queue.
+
+A previously user-excluded organizer/event source was independently verified **inactive** with `USER-EXCLUDED` notes and one ignored signal. Keep permanent exclusions across any DJ network mapping or social scout. The Grok research-only brief and agenda update were merged as [PR #185](https://github.com/imanisworld/bae-agenda/pull/185). **No Grok research execution, Manager outreach, scheduler, application code or deployment is implied by that docs merge.**
+
+Overdue Manager follow-ups have persisted `contacted`/`review` statuses; do not assume a reply did not occur. Current-user-message history should be reviewed before any follow-up.
 
 ## Deployment State
 
@@ -78,12 +88,13 @@ Read-only checks found 3 clients associated with bookings, 0 stored client phone
 - Mobile Book dock: use native `/book` navigation, keep the gesture handler off interactive links/buttons; the booking tab resets correctly after Contact/FAQ. Requires real iPhone tap-through QA, and safe preview backend configuration for a non-production inquiry.
 - Club Cunt: the Oct 31 flyer reference is replaced with a dedicated **New flyer coming soon** placeholder; Vercel **preview only** overlays November 21, 2026 for the event's displayed date. The canonical `public.events` record remains Oct 31, 2026 until explicit production-release approval. **Before public production release, update the canonical event date and check the admin/booking calendar; do not rely on a production overlay.** The old slug is retained for link stability.
 
-## Next
+## Next — prioritized Manager review (October 13)
 
-1. Follow up Silent Disco and Elevate Social on Oct 10.
-2. Let daily discovery runs collect data and evaluate source quality / response / booked economics.
-3. Decide whether to resume the parked Discovery Runs UI.
-4. Prepare and review real Portfolio photo/video media separately before publishing media assets.
+1. Reconcile overdue Manager next actions (Room to Bloom since Oct 8; Silent Disco and Elevate Social since Oct 10; other contacted leads since Oct 12–13) against actual communications. **Do not send from a documentation review.**
+2. Obtain explicit artist-fit decision on the specialized Chicago application; investigate WERC's true hiring/payer route and review incomplete source→signal→opportunity metadata before considering edits.
+3. Research existing independent DJ-led and direct-buyer networks rather than adding more speculative flyers; preserve repeat-client/introducer context and the user exclusion.
+4. Maintain the scheduled Art & Soul (Oct 20), Galentine's (Nov 15), and Level Up Walkathon (May 15, 2027) warm reviews without inventing confirmed event dates or client commitments.
+5. Keep the Discovery Runs UI and bot access infrastructure parked until an observed need justifies them. Continue separate portfolio/media and deployment work under their own approvals.
 
 ## Open / Held
 
@@ -92,6 +103,9 @@ Read-only checks found 3 clients associated with bookings, 0 stored client phone
 - PR #59: older Full Portfolio Archive media galleries branch — intentionally held/separate while real photo/video media is prepared.
 - Bot access for Manager — not started; approval-gated design only.
 - Discovery Runs UI branch — parked; backend/daily tracking logic already exists.
+- [PR #184](https://github.com/imanisworld/bae-agenda/pull/184) — draft portfolio reconciliation; review scheduled appearances before any archive additions.
+- [PR #186](https://github.com/imanisworld/bae-agenda/pull/186) — draft DJ playback-history cross-repo roadmap handoff; does not change the site or database.
+- [PR #180](https://github.com/imanisworld/bae-agenda/pull/180) — experimental Fastbrowse benchmark, **not adopted**; evidence does not establish superior discovery.
 
 ## Deferred / Optional
 
