@@ -10361,3 +10361,18 @@ a.admin-stat-card:focus-visible {
   --booking-input-bg: rgba(28,17,20,.52);
   --booking-calendar-bg: rgba(28,17,20,.52);
 }
+
+/* Preview-only phone fixes, 2026-10-13.
+   Book tabs sit beneath the fixed More header and the device safe area.
+   Remove the extra blank root-scroll runway; the site already owns its
+   pull-to-refresh gesture in useRouteGestures. Test on actual Safari before release. */
+@media (max-width: 620px) {
+  .public-experience-shell .book-experience {
+    padding-top: max(110px, calc(var(--safe-top) + 54px));
+  }
+}
+@media (max-width: 900px) and (pointer: coarse) {
+  .public-experience-shell {
+    min-height: 100dvh;
+  }
+}
