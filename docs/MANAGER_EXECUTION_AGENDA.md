@@ -114,15 +114,18 @@ Pending only if real usage shows a need:
 
 - junk/stale-record archive controls
 
-## 8. Grok/X scout lane — CONNECTED
+## 8. Grok/X scout lane — RESEARCH-ONLY
 
-Grok has authenticated X access and may be used as a secondary discovery source for:
+The standing task and October 13, 2026 evidence handoff are in `docs/GROK_MANAGER_SCOUT_PROMPT.md`. Grok/X is a secondary social discovery source, **not** a separate daily Manager, independent database writer, or outreach agent.
 
-- X posts from promoters, venues, DJs, and brands
-- venue/promoter relationship discovery
-- event chatter that ordinary indexing misses
+- Map independent DJs who organize and pay for their own parties, DJ co-production partners, actual event buyers, repeat series, and publicly evidenced contact routes. Never assume a promoter exists.
+- Search strategically nationwide (especially Indianapolis, Chicago, Detroit, Atlanta, and DC). Out-of-state paid-gig qualification needs supported travel economics.
+- De-duplicate against portfolio/bookings/events and existing Manager sources/opportunities when trusted first-party history is supplied. Historical participation alone does not establish preference or rebooking interest.
+- Enforce **all user exclusions before returning candidates**, including the permanent October 13 organizer/event exclusion detailed in the scout prompt. Do not resurface through reposts or alternate accounts.
+- Use publicly accessible individual social posts; X access may help discover signals but does not establish comprehensive social chronology or access to private messages.
+- Report only net-new actionable evidence or meaningful updates. Record verified organizer/decision-maker distinctions, uncertainties and sources; Manager validates before changing data.
 
-Treat Grok/X findings as candidate signals. Verify actionable claims through the normal Manager process before advancing them.
+No messages, applications, outreach, Supabase writes, GitHub writes by Grok, booking changes, or parallel scheduled runs.
 
 ## 9. Selective automation later
 
