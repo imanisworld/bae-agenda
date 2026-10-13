@@ -160,6 +160,10 @@ Exact duplicates use SHA-256. Possible image duplicates use dHash distance ≤5 
 
 Videos get 3–24 samples, contact sheets, sampled visual-change signals, and up to three technical candidate ranges. These are **not verified highlights or frame-accurate scene cuts**. No vision/content judgments, audio/shake scoring, cutting, FFmpeg clip exports, social edits, uploads, cloud processing, DB writes, or publishing are added.
 
+## Experiments (not production)
+
+Optional isolated tooling lives under `tools/media-curator-hyperframes/` (HyperFrames promo scaffold from approved highlights). It does not change scan/review behavior here.
+
 ## Verify
 
 ```sh
