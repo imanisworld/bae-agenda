@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "frozen_before_any_model_run": true,
+  "sha256": {
+    "benchmark.json": "9af1a1345f72f997862dfc0048fb01154a4d37107fd76ac45e1a8d5f4d35d8af",
+    "benchmark.py": "edcabcd0c4eb84ef6b143fdc8547017953df64b8609f9d8ded537f98787d47be",
+    "README.md": "a5951a8b962d16cbd2eda9e2be7c2b9ec63118db8874d64b574a8f9a51b58920"
+  }
+}
