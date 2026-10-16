@@ -1,0 +1,154 @@
+# DJ B.A.E. portfolio evidence reconciliation — 2026-10-13
+
+**Scope:** One-time review of the 70 existing `public.portfolio_entries`, comparison with 14 `public.events` and 5 `public.bookings`, plus publicly indexed historic lineups. **This is a candidate-evidence ledger, not a second source of truth or approval to publish unverified performances.** Database remains authoritative; never overwrite a recorded venue/date with general festival calendar details. Evidence of an announced lineup proves a scheduled appearance, not completion, fee, or preference to return.
+
+## Subsequent user-confirmed updates — October 13, 2026 (verified live)
+
+Following the initial evidence pass documented below, the owner **confirmed the researched event matches and authorized narrow existing-row corrections**. Fifteen `portfolio_entries` rows were updated with a guarded transaction (all expected originals had blank dates and venues), and a fresh read verified each new value. **No rows were created, merged, deleted or automatically published, and no outreach was sent.**
+
+The **current live portfolio totals** are: **70 entries; 12 with both exact date and venue; 20 missing only an exact date; 38 missing both an exact date and venue**. Thus **58 lack an exact date, 38 lack a venue**. Earlier baseline totals and the 70-row table below represent the **pre-approval snapshot** and are preserved for historical provenance; they must not be mistaken for current stored field values.
+
+| Existing 2022–2025 entry | New venue | New event date | Notes |
+|---|---|---|---|
+| Damien Center & IYG Garage Dance Party (2024) | 416 Wabash | 2024-04-06 | Artist-specific organizer announcement; [Damien Center](https://damien.org/events/garage-party) |
+| Rock N Roll Festival (2024) | American Legion Mall | 2024-05-18 | DJ-specific [I Made Rock N Roll lineup](https://www.jambase.com/festival/i-made-rock-n-roll-festival-2024) |
+| Boss Babe Brunch (2024) | Madam Walker Legacy Center | 2024-06-02 | [Organizer's exact-year listing](https://embossnetwork.com/upcoming-events/boss-babe-brunch-2023-6lzll) |
+| Boss Ladies Gala (2024) | 502 East Event Centre | 2024-03-15 | **City corrected to Carmel, IN**; [local contemporary listing](https://youarecurrent.com/2024/02/26/carmel-community-events-march-2024/) |
+| Nourishing Well (2024) | Madam Walker Legacy Center | 2024-06-06 | [Exact exhibition opening](https://mirrorindy.org/madam-walker-indianapolis-poetry-arts-event/) |
+| MELT Butter Official Afterparty (2024) | The Vogue | 2024-08-31 | [BUTTER 2024 FAQ](https://butterartfair.com/faq/) |
+| Indy Pride Festival (2024) | Military Park | 2024-06-08 | [Same-year festival listing](https://mokbpresents.com/event/indy-pride-festival-2024/) |
+| Lafayette Pride (2024) | Downtown Lafayette (OUTfest) | 2024-08-17 | [City street-festival notice](https://www.lafayette.in.gov/Calendar.aspx?EID=3731&calType=0&day=3&month=8&year=2024) |
+| Indy Sleaze (2024) | Black Circle Brewing | 2024-07-05 | [Venue's dated SLEAZE/Club Cunt party](https://www.blackcirclebrewing.com/events/indy-sleze-club-cnt-present-sleaze-queer-dance-party) |
+| Trap X Tacos (2024) | CoHatch (49 W. Maryland St.) | 2024-02-17 | [Contemporaneous All-Star weekend listing](https://midwestleak.com/2024/02/indy-allstar-2024-event-list/) |
+| Butter 2024 Art Festival (2024) | The Stutz | *Unresolved* | Multiple-day venue; preserve separate entry |
+| Butter Art Fair (2024) | The Stutz | *Unresolved* | Preserve separate entry; no invented date |
+| Butter Art Fair (2022) | The Stutz | *Unresolved* | [Historical multi-day venue](https://downtownindy.org/do/second-annual-butter-a-fine-art-fair) |
+| Sundry & Vice (2025) | Sundry & Vice | *Unresolved* | Venue name verified, no address/date assigned |
+| Club Cunt (2025) | Black Circle | *Unresolved* | Multiple historical listings; do not pick one date for a series |
+
+**Evidence interpretation:** The owner confirmed matches, but event calendars alone do not independently establish completion or compensation. Do not equate multi-day event windows or a recurring-series schedule with one DJ set; determine distinct performance dates from first-party history or flyers. The temporary 58-row correction worksheet remains local to the user, not an additional database. No Manager sourcing workflow, Supabase schema, cron or website deployment was changed in this pass.
+
+## Results and status
+
+- Portfolio baseline before reconciliation: **70 rows**; **16** with venue, **1** with exact date; **54** venue missing, **69** exact date missing. No existing `portfolio_media` rows or portfolio `notes` at baseline. Post-write verification 2026-10-13: **70 rows**, **17** with venue, **2** with exact date, **53** missing venue, **68** missing date, and **1** provenance note added.
+- **One exact cross-table correction applied and verified:** Events row `3076943c-514d-4abe-9deb-952d7a20ed6a` (“Host/EMCEE for the 1st Annual Level Up Walkathon,” 2026-09-26) originally had null venue/city. First-party portfolio row `32e3ffb0-3e3c-40a9-9e45-ae0a0acdd2fb` is the same event/date, identifying **Pike High School, Indianapolis**. Those two missing Events fields were populated with no change to date, description, or portfolio. Post-update database read confirmed both values. Reverse operation, if needed: set only that Events row's venue and city back to NULL, guarded by currently matching values.
+- **One existing portfolio row amended, no rows created/merged/deleted:** 2024 `Legacy Festival` (id `25580e3c-2058-44df-8e67-8ebf95944e67`) now has date `2024-06-22`, venue `Madam Walker Legacy Center`, and a provenance note referencing [historical lineup](https://hot1009.com/events/madam-cj-walker-legacy-fest-block-party/), which names DJ B.A.E. on June 22, 2024 at 2–2:30pm. Match is supported by name/year/city and DJ-specific lineup; evidence establishes scheduled performance, not independently completed work or pay. SQL updated only when event name/year/city/id, null venue/date/notes matched; fresh Supabase read verified 17 venues/2 dates. Reverse, if required: set only date/venue/notes on that row back to NULL, guarded by the exact current values. Do not assign generic calendar dates to other rows.
+- **Public Instagram is incomplete:** Accessible indexed results do not establish full account chronology, stories, DMs, or private tagging history. A true IG archival reconciliation needs accessible exact posts/flyers or first-party exports, not invented dates.
+- **No preference judgments:** Past booking does not imply suitable venue, fair fee, good treatment, or wish to return. No inferred blacklist.
+- **Remaining unresolved:** 53 venue fields and 68 exact dates. Resolving these needs individual flyer/post/invoice-level evidence, not a guessed date based on event series.
+
+## Verifiable public scheduled appearances absent, ambiguous, or newly reconciled
+
+These are **review candidates**, never published automatically:
+
+1. **2023-06-02 — Spot Patio Friday**: DJ B.A.E. listed at **The Spot Tavern, 409 S Fourth St, Lafayette**, alongside Circle T, Sweater Disco, Genderotic and Kyle Robert Paquin. [Local contemporaneous article](https://www.basedinlafayette.com/p/tims-picks-summer-sounds-mostly-outside). No 2023 portfolio rows.
+2. **2023-12-09 — Public Universal Friend at HI-FI**: HI-FI's original concert archive lists IV King and DJ B.A.E. [Venue 10th Anniversary concert log](https://hifiindy.com/10th-anniversary/). No 2023 portfolio rows.
+3. **2023-12-31 — The Spot Tavern New Year's Eve**: locally published lineup names DJ B.A.E. and Sweater Disco at The Spot, Lafayette. [Contemporaneous article](https://www.basedinlafayette.com/p/tims-picks-whats-up-heading-into). No 2023 portfolio rows.
+4. **2024-06-22 — Madam Walker Legacy Fest Block Party**: radio/talent schedule lists DJ B.A.E. 2:00–2:30pm at Madam Walker Legacy Center. [Historical public lineup](https://hot1009.com/events/madam-cj-walker-legacy-fest-block-party/). **Reconciled to existing 2024 “Legacy Festival” portfolio row**; no duplicate added. This remains evidence of the lineup, not proof of completion or compensation.
+5. **2025-08-31 — BUTTER Fine Art Fair**: official schedule includes B.A.E. 12–1pm in the **10th Street DJs** lineup. [Official 2025 lineup](https://butterartfair.com/schedule-2025/). Existing portfolio has BUTTER entries for 2022 and two for 2024, but **none for 2025**.
+
+These lineups support date/place of a *scheduled* set. They do not independently prove a completed performance or compensation. Before adding to a public portfolio, confirm performance from user media, post-event organizer recap, invoice, or a first-party record.
+
+## Cross-table / data quality blockers
+
+Private booking/event timing discrepancies were inspected, but their details are intentionally excluded from this public-repo file. Handle them privately in Manager or a restricted review.
+
+- **2024 BUTTER records:** “Butter 2024 Art Festival” and “Butter Art Fair” share event/year context. Could be different performances and must remain separate until actual set dates are known. The fair ran **Aug 29–Sep 1, 2024 at The Stutz**: [official release](https://butterartfair.com/press-release-july-9-2024/), [visitor listing](https://downtownindy.org/do/butter-fine-art-fair).
+- **2024 CHREECE records:** “Chreece Music Festival” and “Spark Indy Chreece” might represent different programming. Broad festival date **Aug 24, 2024** is context only. [Local guide](https://mirrorindy.org/chreece-hip-hop-festival-guide-indianapolis-2024/).
+- **2022 Lari Pati:** A historical organizer lineup names DJ B.A.E. at 416 Wabash, but the retrieved post appears **circa 2019**, before the existing archive's 2022 year. Do not overwrite the 2022 row with older event details. [Historic organizer archive](https://www.tumgik.com/laripati).
+- **Public site city mismatch candidate:** A recent homepage search crawl printed “Art Show @ Madam Walker Legacy Center — Chicago, IL,” but Supabase portfolio says Indianapolis. Check the current rendered page before proposing a website edit. No site edit made.
+
+## Full 70-row first-party inventory
+
+Columns are **existing** stored values, except Review Notes which are evidence or unresolved status. “Year + city only” is the actual completeness state.
+
+| # | Year | Portfolio entry | Existing exact date | Existing venue | Field coverage | Review note |
+|---:|---:|---|---|---|---|---|
+| 1 | 2026 | LEVEL UP Walkathon | 2026-09-26 | Pike High School | Date + venue | Strong first-party match to Sep 26, 2026 Events row; blank Events venue/city corrected to Pike High School, Indianapolis and independently re-read. |
+| 2 | 2025 | 6th Annual International Women's Gathering | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 3 | 2025 | Art Show @ Madam Walker Legacy Center | — | Madam Walker Legacy Center | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 4 | 2025 | Chi Chi's Resident DJ | — | Saints and Sinners | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 5 | 2025 | Club Cunt | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 6 | 2025 | Club Plex powered by Karlala Soundsystem | — | Club Plex | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 7 | 2025 | HoopVision | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 8 | 2025 | House of Queer | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 9 | 2025 | Indy Artgarden Art Show | — | Artsgarden | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 10 | 2025 | Indy Gay Market | — | — | Year + city only | Indy Gay Market moves among venues; never infer a particular date/site from the brand. [source](https://indygaymarket.com/about-us/) |
+| 11 | 2025 | Sundry & Vice | — | — | Year + city only | Event name suggests the venue, but available address listings conflict (Bottleworks/Carrollton); verify exact 2025 appearance first. |
+| 12 | 2025 | WNBA All-Star Weekend | — | — | Year + city only | Event weekend Jul 18–19, 2025, multiple sites. Cannot assign exact DJ appearance/date or venue. [source](https://www.wnba.com/news/att-all-star-2025-faq) |
+| 13 | 2024 | 1000 Words Indy Noir Art Show | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 14 | 2024 | All Star Weekend @ The Cultural Corridor | — | The Cultural Corridor | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 15 | 2024 | Boss Babe Brunch | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 16 | 2024 | Boss Ladies Gala | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 17 | 2024 | Butter 2024 Art Festival | — | — | Year + city only | BUTTER 2024 venue was The Stutz; Aug 29–Sep 1 event-wide. May overlap with separate 'Butter Art Fair' record; do not merge or choose performance day. [source](https://butterartfair.com/press-release-july-9-2024/) |
+| 18 | 2024 | Butter Art Fair | — | — | Year + city only | Same BUTTER 2024 fair dates and location as 'Butter 2024 Art Festival'. Could be a distinct set; do not merge. [source](https://downtownindy.org/do/butter-fine-art-fair) |
+| 19 | 2024 | Chreece Music Festival | — | — | Year + city only | Festival-wide Aug 24, 2024 across multiple Fountain Square venues. Artist-specific stage/time unverified. [source](https://mirrorindy.org/chreece-hip-hop-festival-guide-indianapolis-2024/) |
+| 20 | 2024 | Club Plex | — | Club Plex | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 21 | 2024 | Columbus Area Arts | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 22 | 2024 | Damien Center & IYG Garage Dance Party | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 23 | 2024 | Evansville Culture Festival | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 24 | 2024 | Family & Friends R&B Night | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 25 | 2024 | GangGang Game Night | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 26 | 2024 | Harrison Center First Fridays | — | Harrison Center | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 27 | 2024 | Indy Big Gay Market | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 28 | 2024 | Indy Pride Festival | — | — | Year + city only | Event-wide Jun 8, 2024 at Military Park; exact DJ B.A.E. participation/slot unverified independently. [source](https://mokbpresents.com/event/indy-pride-festival-2024/) |
+| 29 | 2024 | Indy Sleaze | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 30 | 2024 | IUPUI The Howl Festival | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 31 | 2024 | IYG Youth Prom | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 32 | 2024 | J.U.I.C.Y | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 33 | 2024 | Juneteenth Columbus Festival | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 34 | 2024 | Lafayette Pride | — | — | Year + city only | Pride Lafayette OUTfest held Aug 17, 2024; determine whether this portfolio entry refers to that specific event. [source](https://lafayette.in.gov/Calendar.aspx?EID=3731&calType=0&day=3&month=8&year=2024) |
+| 35 | 2024 | Legacy Festival | 2024-06-22 | Madam Walker Legacy Center | Date + venue | Reconciled 2026-10-13 using named DJ B.A.E. 2–2:30 PM on [2024 Legacy Fest lineup](https://hot1009.com/events/madam-cj-walker-legacy-fest-block-party/). Performance completion/pay unverified. |
+| 36 | 2024 | Melt Butter Official Afterparty | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 37 | 2024 | MilkTooth Butter Mixer | — | MilkTooth | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 38 | 2024 | Nourishing Well: Black Women and the Poetics of Sacred Space | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 39 | 2024 | One Drop Art Show | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 40 | 2024 | Pacers Bikeshare E-Bike | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 41 | 2024 | Plex Airplay | — | Club Plex | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 42 | 2024 | Purdue Polytechnic Homecoming | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 43 | 2024 | Purdue Polytechnic Prom | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 44 | 2024 | Queer Dance Party w/Indy Pride | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 45 | 2024 | Red Lion Lounge | — | Red Lion Lounge | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 46 | 2024 | Rock N Roll Festival | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 47 | 2024 | Spark Indy Chreece | — | — | Year + city only | Possible CHREECE-related activation. Keep distinct from Chreece Festival pending flyer/timestamp/stage proof. [festival context](https://mirrorindy.org/chreece-hip-hop-festival-guide-indianapolis-2024/) |
+| 48 | 2024 | Spin Warz | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 49 | 2024 | SweatBox | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 50 | 2024 | That Peace Open Mic | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 51 | 2024 | Trap X Tacos | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 52 | 2024 | Ya'll For All | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 53 | 2022 | BossBabeNetwork | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 54 | 2022 | Butter Art Fair | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 55 | 2022 | Lari Pati | — | — | Year + city only | Old organizer archive names DJ B.A.E. and 416 Wabash, but appears years before 2022; does not establish 2022 venue/date. [source](https://www.tumgik.com/laripati) |
+| 56 | 2022 | Mission Control | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 57 | 2022 | PPHS Homecoming | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 58 | 2022 | Trap and Soul Yoga | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 59 | 2019 | 100 Black Men Silent Party | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 60 | 2019 | Chreece Music Festival | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 61 | 2019 | Cubby Bear | — | Cubby Bear | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 62 | 2019 | Sub T | — | SubTerranean | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 63 | 2019 | Urban League | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 64 | 2018 | ATL Center Stage | — | Center Stage | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 65 | 2018 | Bless The Mic Open Mic | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 66 | 2018 | Epic Silent Party | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 67 | 2018 | House of Blues | — | House of Blues | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 68 | 2018 | ICON Lounge | — | ICON Lounge | Venue only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 69 | 2018 | Indiana State University Homecoming | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+| 70 | 2018 | Sycamore Sessions | — | — | Year + city only | No reliable date/venue evidence for this particular DJ B.A.E. appearance in this pass. |
+
+## Follow-up evidence pass — 2026-10-13
+
+Searched publicly indexed event recaps, Instagram-post snippets, images/video references, and available connected first-party Google Drive records for the four unadded historical appearances (2023 Spot June, 2023 HI-FI Dec, 2023 Spot NYE, and BUTTER 2025). **No verified after-event image, video, receipt, or completed-performance record for those exact four appearances was found in accessible sources.** Direct Instagram history could not be fully accessed, and the user's remote Mac was offline. Absence of indexed media is not proof the performance did not occur.
+
+- Connected Drive holds a May 2023 **“2023 Show Schedule – DJ B.A.E.”** with a booked/planned **“lafayette pride”** on **June 2, 2023**. A contemporaneous published [The Spot Patio Friday lineup](https://www.basedinlafayette.com/p/tims-picks-summer-sounds-mostly-outside) names DJ B.A.E. at The Spot Tavern in Lafayette on that day. Same date and city corroborate a scheduled Lafayette appearance, but differently named engagements should not be mechanically merged. **Do not claim payment received or performance completion.** Private financial amounts and the connected file URL are intentionally excluded here.
+- An original June 2023 **Indy Pride Artist Advance & All Schedules** document, accessible through the connected Google Drive, names DJ B.A.E. for the DJ stage on **June 10, 2023, 4:30–5:30 PM**. The private first-party show schedule independently lists an “Indy Pride” booking on June 10. There is no 2023 portfolio year in the current 70 rows. **New candidate for user confirmation**, not an authorized public portfolio addition. No other private advance details reproduced.
+- The available connected Drive “Performance Flyers” directory has generic media files, and the “Performance” directory contains videos but neither offers metadata linking any of the four target appearances to a completed set. Do not tag these unrelated files to historical gigs without provenance.
+- The 2023 first-party sheet also mentions other potential planned performances; a scheduled/planned row, even with a target quote, is not a paid/completed gig. Avoid importing them without corroboration.
+- Public sources still verify **four scheduled lineup appearances** as previously documented, but completed status remains unverified. Avoid repeated generic searches unless new original media, an email invoice/payment receipt, a direct recap, or access to the historical Instagram archive becomes available.
+
+## Bounded next actions
+
+1. Confirm four still-unmatched scheduled-appearance candidates (three 2023 and one 2025) against proof of performance before adding them to the portfolio. Existing 2024 Legacy Festival is now reconciled.
+2. Reconcile the two booking/event date conflicts from event confirmation evidence.
+3. For each remaining undated row, search the exact public flyer/tag/photo or ask for original evidence; mark “unresolved” if unavailable.
+4. Apply only verified narrow database changes with original-value backup and post-write verification, preserving distinct performances; any public-portfolio publication needs confirmed performance.
+5. Keep the Manager's recurring discovery focused on new future buyers. This one-time evidence ledger is an archive, **not** a new scheduler or competing lead pipeline.
