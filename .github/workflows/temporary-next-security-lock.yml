@@ -1,0 +1,61 @@
+# Temporary branch-only helper. Remove before merging the security patch.
+name: Generate Next.js security lockfile
+on:
+  push:
+    branches:
+      - security/next-16-4-2-20261016
+
+permissions:
+  contents: read
+
+jobs:
+  generate-and-test:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - name: Resolve updated lockfile
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+      - name: Confirm exact dependency versions
+        run: |
+          node -e "const p = require('./package-lock.json'); for (const name of ['next', 'eslint-config-next']) { const v = p.packages['node_modules/' + name]?.version; if (v !== '16.4.2') { console.error(name + ': ' + v); process.exit(1); } }"
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Unit tests
+        run: npm test
+      - name: Lint
+        run: npm run lint
+      - name: Production build
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: next-security-lockfile
+          path: package-lock.json
+          retention-days: 1
+
+  commit-lockfile:
+    needs: generate-and-test
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: security/next-16-4-2-20261016
+      - uses: actions/download-artifact@v4
+        with:
+          name: next-security-lockfile
+      - name: Commit verified lockfile to patch branch only
+        run: |
+          node -e "const p = require('./package-lock.json'); for (const name of ['next', 'eslint-config-next']) { if (p.packages['node_modules/' + name]?.version !== '16.4.2') process.exit(1); }"
+          git add package-lock.json
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m 'chore: lock Next.js security patch dependencies'
+            git push origin HEAD:security/next-16-4-2-20261016
+          fi
