@@ -1,0 +1,285 @@
+{
+  "benchmark_id": "fastbrowse-manager-discovery-2026-10-11",
+  "frozen_at": "2026-10-11T14:00:00Z",
+  "as_of_date": "2026-10-11",
+  "purpose": "Compare the current Manager discovery/research workflow with the same workflow plus Fastbrowse. Do not retune tasks, inputs, or metric definitions after either run.",
+  "shared_context": {
+    "buyer_preference": "Direct buyers: venues, promoters, festivals, brands, campuses, nonprofits, community organizers, and one-off event organizers.",
+    "exclusions": [
+      "DJ staffing companies",
+      "DJ agencies",
+      "wedding-DJ companies recruiting DJs",
+      "roster-building companies",
+      "house-DJ employment",
+      "entertainment collectives recruiting staff or roster DJs"
+    ],
+    "wedding_distinction": "A couple or venue booking a DJ for a wedding can be a direct buyer. A wedding-DJ company recruiting staff is excluded. The saved profile prefers playing weddings; that preference does not override the staffing exclusion.",
+    "do_not_invent": [
+      "pay",
+      "duration",
+      "travel time",
+      "contact information",
+      "application routes",
+      "event dates",
+      "assets"
+    ],
+    "known_warm_rebooks": [
+      {
+        "name": "Art & Soul 2027",
+        "reengage_on": "2026-10-20",
+        "route": "Existing Indy Arts Council relationship. Do not invent a new date."
+      },
+      {
+        "name": "Punch Bowl Social Galentine's 2027",
+        "reengage_on": "2026-11-15",
+        "route": "Existing relationship through Rich the Kid. This route is private context, not a public-page finding unless a fetched page says it."
+      },
+      {
+        "name": "Level Up Walkathon 2027",
+        "reengage_on": "2027-05-15",
+        "route": "Organizer previously asked DJ B.A.E. back. Do not cold-pitch or invent the next event date."
+      }
+    ],
+    "known_prior_work": [
+      "Chi Chi's with Brooke Billions and Slim; first night Blind Tiger Indy on 2025-05-08",
+      "Former resident DJ at Club Plex, Indianapolis, including NYE 2024-12-31"
+    ]
+  },
+  "metric_definitions": {
+    "useful_leads": "Direct-buyer or verified warm-rebook records with an original URL and at least one evidenced decision field. A closed annual call counts only when labeled closed or watch, not as an open gig.",
+    "valid_original_sources": "Lead source URLs that returned a successful fetch during the run and support at least one recorded quote.",
+    "duplicates": "Groups of two or more records that are the same call or event. Same-URL repeats count. Different events that only share a name do not.",
+    "stale_or_expired": "Records whose evidenced deadline or event date is before 2026-10-11, or whose page explicitly says the call is closed.",
+    "false_positives": "Excluded staffing/roster/wedding-DJ employment presented as a useful lead, a non-actionable relationship presented as an open booking call, or a closed call presented as open.",
+    "unsupported_or_invented_details": "Decision fields with a value and no evidence quote from a fetched page. Unknown is not an invented detail.",
+    "buyer_contact_clarity": "Leads whose organizer or contact is backed by a quote, versus leads that claim a buyer without a quote. Unknown stays unknown.",
+    "requirements_completeness": "Leads with an evidenced requirements string that splitManagerAsks can turn into at least one ask. Empty requirements are incomplete, not invented.",
+    "annual_or_recurring_detection": "Records the run labels recurring, checked against hasRecurringRelationshipEvidence and against an explicit annual/closed-call quote.",
+    "tool_calls": "Counted HTTP fetches and web searches performed for that system. Do not estimate.",
+    "cost": "Record only a cost the tool reports. If none is reported, the value is null."
+  },
+  "tasks": [
+    {
+      "id": "t1-indy-opportunities",
+      "title": "Indianapolis DJ opportunities",
+      "prompt": "Find legitimate Indianapolis DJ opportunities current as of 2026-10-11. For each, record date, venue or buyer, pay if the page states it, requirements, and the original source URL. Leave unknown fields null.",
+      "queries": [
+        "Indianapolis DJ wanted 2026",
+        "Indianapolis DJ submissions 2026",
+        "site:indyarts.org DJ"
+      ],
+      "start_urls": [
+        "https://indyarts.org/opportunities/",
+        "https://www.indypride.org/events",
+        "https://www.chreeceaf.com/",
+        "https://ganggangculture.com/",
+        "https://www.forty5.com/events",
+        "https://www.themonsterzinc.com/monsterz-inc-events",
+        "https://punchbowlsocial.com/location/indianapolis",
+        "https://waybackwednesdaysindy.com/",
+        "https://www.indycdandvinyl.com/events",
+        "https://www.harrisoncenter.org/first-fridays"
+      ]
+    },
+    {
+      "id": "t2-annual-warm-rebook",
+      "title": "Annual and warm-rebook events",
+      "prompt": "Using the shared warm-rebook context plus public pages, determine which events are annual or recurring and what next date or rebook window is actually evidenced. Do not invent a 2027 date from last year's pattern.",
+      "queries": [
+        "Art & Soul Indianapolis 2027 Indy Arts Council",
+        "Punch Bowl Social Indianapolis DJ",
+        "Level Up Walkathon Indianapolis",
+        "Chi Chi's Indianapolis DJ Brooke Billions",
+        "Club Plex Indianapolis resident DJ"
+      ],
+      "start_urls": [
+        "https://indyarts.org/programs/art-soul",
+        "https://indyarts.org/opportunity/art-soul-2027-activation-grants/",
+        "https://punchbowlsocial.com/location/indianapolis",
+        "https://www.instagram.com/club.plex/",
+        "https://www.instagram.com/blindtigerindy/"
+      ]
+    },
+    {
+      "id": "t3-who-books",
+      "title": "Who books Punch Bowl Social Indianapolis DJs",
+      "prompt": "Determine who actually books DJs at Punch Bowl Social Indianapolis, including Galentine's and other DJ nights. Separate the venue, a corporate booker, a promoter, and the private Rich the Kid route. The private route is context, not public evidence.",
+      "queries": [
+        "Punch Bowl Social Indianapolis Galentine's DJ",
+        "Punch Bowl Social Indianapolis book a DJ"
+      ],
+      "start_urls": [
+        "https://punchbowlsocial.com/location/indianapolis"
+      ]
+    },
+    {
+      "id": "t4-direct-buyer-filter",
+      "title": "Direct buyers versus staffing listings",
+      "prompt": "Classify each frozen candidate as direct_buyer, staffing_or_roster, wedding_dj_employment, directory_listing, relationship_only, or not_a_lead. Do not turn an excluded listing into an opportunity.",
+      "queries": [],
+      "start_urls": [
+        "https://indyarts.org/opportunities/",
+        "https://www.chreeceaf.com/",
+        "https://punchbowlsocial.com/location/indianapolis",
+        "https://ganggangculture.com/directory-application/",
+        "https://www.djconnection.com/jobs",
+        "https://www.indianapolisdj.com/",
+        "https://deckademics.com/book-a-dj/",
+        "https://completewedo.com/indianapolis/about/"
+      ]
+    },
+    {
+      "id": "t5-still-active",
+      "title": "Is the opportunity still active",
+      "prompt": "For each frozen URL, decide active, closed, expired, or unknown as of 2026-10-11. An event date before that day is expired. A page that says submissions are closed is closed even if the event is in the future.",
+      "queries": [],
+      "start_urls": [
+        "https://indyarts.org/opportunity/indy-arts-council-seeks-artists-performers-for-start-with-art-2026/",
+        "https://indyarts.org/opportunity/artist-submissions-are-open-for-chreece-hip-hop-festival/",
+        "https://www.indypride.org/events/scream",
+        "https://posh.vip/e/pretty-please-trick-or-tease",
+        "https://suzyfrombk.com/events",
+        "https://indyarts.org/event/room-to-bloom-6/"
+      ]
+    },
+    {
+      "id": "t6-enrich-sparse",
+      "title": "Enrich a sparse lead without inventing",
+      "prompt": "Enrich the frozen Elevate Social lead with only decision-relevant facts the pages state. Keep every unstated field null.",
+      "queries": [
+        "Elevate Social DJ Indianapolis OR Chicago"
+      ],
+      "start_urls": [
+        "https://www.instagram.com/elevatesocial/"
+      ],
+      "sparse_lead": {
+        "title": "Elevate Social",
+        "organization": "Elevate Social",
+        "source_url": "https://www.instagram.com/elevatesocial/",
+        "known_private_context": "Contacted 2026-10-05 via a partner form with a Chicago-leaning pitch. Follow-up date was 2026-10-10. Do not treat that private context as page evidence.",
+        "event_date": null,
+        "venue_name": null,
+        "compensation_min": null,
+        "compensation_max": null,
+        "requirements": null,
+        "contact_name": null,
+        "contact_email": null,
+        "contact_phone": null
+      }
+    },
+    {
+      "id": "t7-duplicates",
+      "title": "Duplicates and reposts",
+      "prompt": "Judge the frozen records. Mark true duplicates, same-URL repeats, and name collisions that are different events. Do not merge different events because the titles look alike.",
+      "queries": [],
+      "start_urls": [],
+      "records": [
+        {
+          "id": "art-soul-program",
+          "title": "Art & Soul artist program",
+          "url": "https://indyarts.org/programs/art-soul",
+          "organization": "Indy Arts Council"
+        },
+        {
+          "id": "art-soul-grants",
+          "title": "Art & Soul 2027 activation grants",
+          "url": "https://indyarts.org/opportunity/art-soul-2027-activation-grants/",
+          "organization": "Indy Arts Council"
+        },
+        {
+          "id": "art-soul-sunday",
+          "title": "Art & Soul Sunday brunch",
+          "url": "https://www.eventbrite.com/e/art-soul-sunday-tickets-1999025214228",
+          "organization": "Social Haus Rentals"
+        },
+        {
+          "id": "chreece-call",
+          "title": "CHREECE artist submissions",
+          "url": "https://indyarts.org/opportunity/artist-submissions-are-open-for-chreece-hip-hop-festival/",
+          "organization": "CHREECE"
+        },
+        {
+          "id": "chreece-site",
+          "title": "CHREECE festival site",
+          "url": "https://www.chreeceaf.com/",
+          "organization": "CHREECE"
+        },
+        {
+          "id": "fringe-a",
+          "title": "IndyFringe 2027 artist applications",
+          "url": "https://indyfringe.org/for-artists/",
+          "organization": "IndyFringe"
+        },
+        {
+          "id": "fringe-b",
+          "title": "IndyFringe 2027 dates confirmed; applications expected December",
+          "url": "https://indyfringe.org/for-artists/",
+          "organization": "IndyFringe"
+        },
+        {
+          "id": "monsterz-glotaku",
+          "title": "Glotaku Gotta Rave Em All",
+          "url": "https://www.themonsterzinc.com/monsterz-inc-events",
+          "organization": "Monsterz Inc."
+        },
+        {
+          "id": "monsterz-transylvania",
+          "title": "Transylvania Halloween",
+          "url": "https://www.themonsterzinc.com/monsterz-inc-events",
+          "organization": "Monsterz Inc."
+        },
+        {
+          "id": "pretty-please",
+          "title": "Pretty Please: Trick or Tease",
+          "url": "https://posh.vip/e/pretty-please-trick-or-tease",
+          "organization": "Les Go Outside"
+        },
+        {
+          "id": "pretty-please-truncated",
+          "title": "Pretty Please series",
+          "url": "https://posh.vip/e/pretty-please-",
+          "organization": "Les Go Outside"
+        }
+      ]
+    },
+    {
+      "id": "t8-evidence-vs-inference",
+      "title": "Evidence versus inference",
+      "prompt": "Label each frozen claim evidenced, contradicted, inference, or unknown. An inference may be reasonable and still must not be stored as a fact.",
+      "queries": [],
+      "start_urls": [
+        "https://indyarts.org/opportunity/artist-submissions-are-open-for-chreece-hip-hop-festival/",
+        "https://indyarts.org/opportunity/indy-arts-council-seeks-artists-performers-for-start-with-art-2026/",
+        "https://indyarts.org/programs/art-soul",
+        "https://www.indypride.org/events/scream",
+        "https://punchbowlsocial.com/location/indianapolis"
+      ],
+      "claims": [
+        {
+          "id": "chreece-2027-open",
+          "text": "CHREECE 2027 artist submissions are open on 2026-10-11."
+        },
+        {
+          "id": "start-with-art-pay",
+          "text": "Start with Art 2026 stated a $500 to $1,000 honorarium for performers, including a DJ or playlist category."
+        },
+        {
+          "id": "art-soul-2027-open",
+          "text": "The Art & Soul 2027 featured-artist interest form is open on 2026-10-11."
+        },
+        {
+          "id": "galentines-2027-date",
+          "text": "Punch Bowl Social Indianapolis has published a Galentine's 2027 event date."
+        },
+        {
+          "id": "pride-2027-dates",
+          "text": "Indy Pride 2027 festival dates are June 11-13, 2027."
+        },
+        {
+          "id": "scream-booked",
+          "text": "DJ B.A.E. is booked to play Scream, Queens! on 2026-10-23."
+        }
+      ]
+    }
+  ]
+}
