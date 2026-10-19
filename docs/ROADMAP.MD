@@ -52,7 +52,7 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 
 - Automatic Vercel Git deployments were disabled in PR #135.
 - Production is published deliberately after an intended batch is QA'd.
-- Latest verified production deployment is `727e39c149d6264c93fb7e3b64b60b72a916f950` (October 13, approved PR #191), Vercel `dpl_9DkapbZYi5U3WpSu3xXh4tNZFCs5`, READY and explicitly assigned to `thebaeagenda.com`. It includes the earlier #178 homepage copy update and approved mobile navigation/Lab/safe-area fixes. Fresh HTTP health/admin and end-to-end booking/portal checks remain unverified; issue #157 stays open.
+- Latest verified production security release: `9d3b045fa5f0fee9913829ef78de94224d1cbcb7` (October 18, PR #193), Vercel `dpl_DG2rfFw6YUnpUdvhtFFHmwFyKADg`, READY and assigned to `thebaeagenda.com`. Next.js and matching ESLint config are `16.4.2`; six read-only live routes (including health and blocked-date availability) returned HTTP 200 before and after. Full inquiry, invoice, portal and device QA remain open under issue #157. Prior production build was `727e39c` (October 13, PR #191).
 - Production database hardening from PR #101 is applied and verified.
 - Older Supabase migration-history drift still exists, so blanket `supabase db push` remains prohibited.
 
