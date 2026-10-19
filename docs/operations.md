@@ -88,6 +88,8 @@ PR #101 legacy access hardening is already applied and verified.
 
 ## Deployment / Verification
 
+**October 18, 2026:** Security patch PR #193 deployed at exact commit `9d3b045fa5f0fee9913829ef78de94224d1cbcb7` to Vercel `dpl_DG2rfFw6YUnpUdvhtFFHmwFyKADg`, confirmed READY on `thebaeagenda.com`. Final CI passed; six pre/post production read-only routes passed HTTP 200 (see `PROJECT_STATUS.md`). No migration or live booking/payment/email mutation occurred. Full end-to-end site acceptance remains issue #157.
+
 Automatic Vercel Git deployments are disabled.
 
 For an application release:
