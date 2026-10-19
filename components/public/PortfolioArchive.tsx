@@ -160,6 +160,12 @@ function InlineEventDetail({
           </div>
         ) : null}
 
+        {entry.notes ? (
+          <p style={{ margin: '16px 0 0', color: 'var(--muted)', fontSize: '12px', lineHeight: 1.7 }}>
+            {entry.notes}
+          </p>
+        ) : null}
+
         {related.length > 0 ? (
           <div style={{ marginTop: '18px' }}>
             <div style={{ color: 'var(--gold)', fontSize: '8px', letterSpacing: '.17em', textTransform: 'uppercase', marginBottom: '7px' }}>
