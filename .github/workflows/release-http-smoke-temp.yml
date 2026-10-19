@@ -1,0 +1,31 @@
+name: Temporary production read-only release smoke
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/release-http-smoke-temp.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Read-only public HTTP checks (no form submissions)
+        shell: bash
+        run: |
+          set -euo pipefail
+          failed=0
+          for path in / /book /lab /admin/login /api/health /api/booking/blocked-dates; do
+            status="$(curl --silent --show-error --location --max-time 20 --connect-timeout 8 --output /dev/null --write-out '%{http_code}' "https://thebaeagenda.com${path}")" || status="000"
+            printf '%s -> HTTP %s\n' "$path" "$status"
+            if [[ "$status" != "200" ]]; then
+              failed=1
+            fi
+          done
+          if [[ "$failed" -ne 0 ]]; then
+            echo "::error::One or more live read-only endpoints failed"
+            exit 1
+          fi
