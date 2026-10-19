@@ -75,7 +75,7 @@ export default async function PortfolioPage({
         tags: entry.tags ?? [],
         photo_url: entry.photo_url ?? null,
         featured: entry.featured,
-        notes: entry.notes ?? null,
+        // Internal research notes are intentionally excluded from the public payload.
       }))}
       stats={stats}
       mixes={mixes.map((mix) => ({
