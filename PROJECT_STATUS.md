@@ -1,20 +1,27 @@
 # Project Status
 
-Last reconciled: 2026-10-13 (GitHub, Vercel, and read-only Manager database checks).
+Release verification updated: 2026-10-18 (GitHub CI, Vercel and live read-only HTTP). Manager/data snapshots remain dated 2026-10-13.
 
 ## Current State
 
 - Public site, booking intake, protected admin, invoice/payment operations, email tracking, and DJ Manager workflows are implemented. Booking/Lab end-to-end device QA remains open under issue #157.
 - The Client Portal routes and server code exist, but sign-in is not usable for current client records. Portal links and booking-copy promises are withheld. Do not call this feature released or assume hiding navigation protects direct routes.
-- The current production release includes the public-site visual work from merged PRs #170, #173, #174, #176, #177, the wording correction in #178, and approved mobile usability refinements from #191. The Built page remains unrouted; redesign is future issue #175.
+- The current production release includes Next.js 16.4.2 security fixes (PR #193), along with the public-site visual work from merged PRs #170, #173, #174, #176, #177, the wording correction in #178, and approved mobile usability refinements from #191. The Built page remains unrouted; redesign is future issue #175.
 - Media Curator scan, human review, and resumable cache (PRs #154/#155) are merged as **local-only** tooling. A real-media pilot is still unverified. No automatic editing/upload/publishing is provided.
 
-## Verified Deployment — October 13
+## Verified Security Release — October 18, 2026
 
-- **Latest targeted release:** PR #191 was squash-merged and deliberately deployed from `main` commit `727e39c149d6264c93fb7e3b64b60b72a916f950`. Vercel production deployment `dpl_9DkapbZYi5U3WpSu3xXh4tNZFCs5` is `READY`; Vercel's alias lookup confirms `thebaeagenda.com` points to that deployment, with the exact commit SHA. The approved changes cover Book/Portfolio phone spacing, Lab layout/motion, page-transition/preloading timings, and the 44 × 44px More touch target. PR CI passed and the owner approved the phone preview.
+- **Current live deployment:** PR #193 was squash-merged as `9d3b045fa5f0fee9913829ef78de94224d1cbcb7`; Next.js and `eslint-config-next` are pinned at `16.4.2` and the lockfile resolves Sharp `0.35.5`. Vercel production deployment `dpl_DG2rfFw6YUnpUdvhtFFHmwFyKADg` is `READY`; direct alias lookup confirms `thebaeagenda.com` points to that exact-SHA deployment.
+- **Checks:** Post-merge CI passed `npm ci`, tests, lint and build ([run 39181030926](https://github.com/imanisworld/bae-agenda/actions/runs/39181030926)). Before and after release, six live read-only GET requests all returned HTTP 200: `/`, `/book`, `/lab`, `/admin/login`, `/api/health`, and `/api/booking/blocked-dates` ([temporary smoke PR #195](https://github.com/imanisworld/bae-agenda/pull/195), closed unmerged). No new error/fatal runtime logs were returned in the inspected 15-minute postrelease window.
+- **QA limits:** Preview booking availability failed because that branch lacked its own `SUPABASE_SERVICE_ROLE_KEY`; production health and blocked-date checks passed with production configuration. Read-only HTTP checks do **not** prove successful inquiry submission, invoice send, payment, client portal login or full mobile/desktop acceptance. [Issue #157](https://github.com/imanisworld/bae-agenda/issues/157) remains open.
+- **CI protection:** Workflow action locking (PR #194) was separately merged, with final main-branch tests/lint/build successful. No new ongoing service was added.
+
+## Previous Verified Deployment — October 13
+
+- **Prior targeted release:** PR #191 was squash-merged and deliberately deployed from `main` commit `727e39c149d6264c93fb7e3b64b60b72a916f950`. Vercel production deployment `dpl_9DkapbZYi5U3WpSu3xXh4tNZFCs5` is `READY`; Vercel's alias lookup confirms `thebaeagenda.com` points to that deployment, with the exact commit SHA. The approved changes cover Book/Portfolio phone spacing, Lab layout/motion, page-transition/preloading timings, and the 44 × 44px More touch target. PR CI passed and the owner approved the phone preview.
 - **Verification boundary for #191:** merge, SHA, Vercel build, deployment readiness, and live-domain alias are verified. External direct HTTP checks of `/api/health`, `/book`, and protected admin were inaccessible from this session; no fresh live route/health or end-to-end booking/portal pass is claimed. Vercel returned no application logs for the new deployment in the checked window. Issue #157 remains open.
 - **Earlier targeted release:** PR #178 production application commit: `5ab6f49b10ec8692b4def20044e9d15eef90db29` (squash merge).
-- Earlier PR #178 production deployment `dpl_6rNrj7TsjfVjSXMCwQsMnVXbTL33` was `READY` and reported that exact Git commit SHA; the live alias now points to PR #191's deployment.
+- Earlier PR #178 production deployment `dpl_6rNrj7TsjfVjSXMCwQsMnVXbTL33` was `READY` and reported that exact Git commit SHA; the live alias subsequently pointed to PR #191 and was updated again for PR #193 on October 18.
 - The deliberate same-SHA preview was also `READY`; GitHub CI for PR #178 succeeded.
 - PR #178 changed only `components/public/VibeExperience.tsx` and `AGENTS.md`: the two rejected homepage negation-style passages were replaced, and the public-copy writing rule now applies to all agents.
 - **Earlier #178 verification boundary:** source diff, CI, Vercel build/alias and release SHA were verified. That prior check could not fetch a fresh browser-rendered homepage or `/api/health`; it did not establish current visual QA, booking submission, Lab interactions, client-portal login, or post-release runtime-log health.

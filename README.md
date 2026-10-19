@@ -153,7 +153,7 @@ Open/click tracking is intentionally excluded.
 
 ## Release Status / Acceptance
 
-- Public site design, homepage wording, and approved mobile smoothness/layout fixes are deployed through commit `727e39c` (PR #191, October 13); see `PROJECT_STATUS.md` for the verified Vercel deployment ID and live-verification limits. The Built page remains unlisted/unrouted.
+- Current verified production: Next.js `16.4.2` security patch at commit `9d3b045` (PR #193, October 18), Vercel deployment `dpl_DG2rfFw6YUnpUdvhtFFHmwFyKADg`. Six read-only live routes returned HTTP 200 before and after release; see `PROJECT_STATUS.md` for evidence and remaining end-to-end QA limits. The earlier public-site/mobile refinements remain live, and Built remains unlisted/unrouted.
 - Full booking/Lab device and safe inquiry tests remain open under [issue #157](https://github.com/imanisworld/bae-agenda/issues/157).
 - Public event TBA notices are code-level placeholders; the future admin-managed date/signup model is [issue #171](https://github.com/imanisworld/bae-agenda/issues/171).
 - For public-facing writing, follow the direct-copy rule in `AGENTS.md`; do not reintroduce rejected negation-to-redefinition wording.
