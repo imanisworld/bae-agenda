@@ -133,13 +133,14 @@ export default async function EditPortfolioEntryPage({
           </label>
 
           <label style={{ display: 'grid', gap: '7px' }}>
-            <span className="admin-section-title">Notes</span>
+            <span className="admin-section-title">Public event description (optional)</span>
             <textarea
               name="notes"
               rows={3}
               defaultValue={entry.notes ?? ''}
               style={inputStyle()}
             />
+            <small style={{ color: 'var(--muted)', lineHeight: 1.5 }}>Visible to visitors. Keep research findings and source links in the private research archive.</small>
           </label>
 
           <div className="admin-inline-options">
