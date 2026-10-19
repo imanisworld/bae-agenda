@@ -10,6 +10,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "guardrails:report": "vitest run scripts/ci-guardrails/guardrails.test.ts",
     "predev": "node scripts/clean-hanging-logos.mjs",
     "predev:staging": "node scripts/clean-hanging-logos.mjs",
     "prebuild": "node scripts/clean-hanging-logos.mjs",
