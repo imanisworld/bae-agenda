@@ -51,7 +51,6 @@ export async function getPortfolioEntries(): Promise<PortfolioEntry[]> {
     const { data, error } = await supabase
       .from('portfolio_entries')
       .select('*')
-      .eq('status', 'published')
       .order('year', { ascending: false })
       .order('event_name', { ascending: true })
     if (error) {
@@ -72,7 +71,6 @@ export async function getFeaturedPortfolioEntries(): Promise<PortfolioEntry[]> {
       .from('portfolio_entries')
       .select('*')
       .eq('featured', true)
-      .eq('status', 'published')
       .order('year', { ascending: false })
       .limit(6)
     if (error) {
@@ -92,7 +90,6 @@ export async function getPortfolioStats() {
     const { data, error } = await supabase
       .from('portfolio_entries')
       .select('year, city, featured')
-      .eq('status', 'published')
     if (error) {
       logError('Portfolio stats query failed', error, { operation: 'getPortfolioStats' })
       return { total: 0, cities: 0, yearsActive: '—', featured: 0 }
