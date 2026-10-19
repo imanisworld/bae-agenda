@@ -17,7 +17,6 @@ interface PortfolioEntry {
   tags:       string[]
   featured:   boolean
   photo_url:  string | null
-  notes:      string | null
 }
 
 function contextualLabel(entry: PortfolioEntry) {
@@ -30,8 +29,9 @@ async function getFeatured(): Promise<PortfolioEntry[]> {
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('portfolio_entries')
-      .select('id, event_name, city, year, tags, featured, photo_url, notes')
+      .select('id, event_name, city, year, tags, featured, photo_url')
       .eq('featured', true)
+      .eq('status', 'published')
       .order('year', { ascending: false })
       .limit(3)
     if (error) {
@@ -177,17 +177,6 @@ export default async function PortfolioTeaserSection() {
                   <div style={{ fontSize: '12px', color: 'var(--muted)' }}>
                     {entry.city}
                   </div>
-                  {entry.notes ? (
-                    <p style={{
-                      margin: '2px 0 0',
-                      fontSize: '12px',
-                      lineHeight: 1.6,
-                      color: 'rgba(250,248,243,0.7)',
-                      fontStyle: 'italic',
-                    }}>
-                      {entry.notes}
-                    </p>
-                  ) : null}
                   {entry.tags.length > 0 && (
                     <div style={{
                       marginTop: '2px',
