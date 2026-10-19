@@ -26,7 +26,7 @@ jobs:
           set -euo pipefail
           gh extension install github/gh-actions-lock
           gh actions-lock .github/workflows/ci.yml
-          gh actions-lock --verify
+          gh actions-lock --verify .github/workflows/ci.yml
           test -s .github/workflows/actions.lock
           echo '=== GENERATED LOCKFILE START ==='
           cat .github/workflows/actions.lock
