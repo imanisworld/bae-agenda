@@ -42,6 +42,50 @@ export default function PublicPageStage({ children }: { children: React.ReactNod
   const experienceMode = EXPERIENCE_ROUTES.has(pathname)
   usePreloadPagePhotos(pathname, experienceMode)
 
+  useEffect(() => {
+    // Text-only entrance: don't change markup, card motion, or controls.
+    // An unenhanced page stays readable if JS is unavailable.
+    const stage = document.querySelector<HTMLElement>('.public-page-stage-inner')
+    if (!stage || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const text = Array.from(
+      stage.querySelectorAll<HTMLElement>('h1, h2, h3, h4, h5, h6, p, blockquote, .section-label')
+    ).filter((element) => {
+      if (element.closest('a, button, [role="button"], [aria-hidden="true"], [aria-live], [data-no-text-slide]')) {
+        return false
+      }
+      // Preserve authored motion, opacity and positioning on specialty text.
+      const style = getComputedStyle(element)
+      return style.animationName === 'none' && style.opacity === '1' && style.translate === 'none'
+    })
+
+    if (!('IntersectionObserver' in window)) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue
+          ;(entry.target as HTMLElement).dataset.textSlide = 'visible'
+          observer.unobserve(entry.target)
+        }
+      },
+      { threshold: 0.08, rootMargin: '0px 0px -20px 0px' }
+    )
+
+    for (const element of text) {
+      element.dataset.textSlide = 'pending'
+      observer.observe(element)
+    }
+
+    return () => {
+      observer.disconnect()
+      // Never leave readable content hidden after a route change.
+      for (const element of text) {
+        if (element.dataset.textSlide === 'pending') element.dataset.textSlide = 'visible'
+      }
+    }
+  }, [pathname])
+
   return (
     <div
       className={experienceMode ? 'public-page-stage public-page-stage--experience' : 'public-page-stage'}

@@ -95,7 +95,14 @@ function adminFallback(adminMixes: CrateMix[]): Crate[] {
  * mixes appear after a few seconds, swapped for the full crates if they arrive.
  */
 export function useLabCrates(adminMixes: CrateMix[]): CratesState {
-  const [state, setState] = useState<CratesState>({ status: 'loading', crates: [] })
+  // Server-provided published mixes are available on first paint.
+  // Render them immediately instead of waiting for SoundCloud; the
+  // background playlist refresh and no-data loading path remain unchanged.
+  const [state, setState] = useState<CratesState>(() =>
+    adminMixes.length
+      ? { status: 'ready', crates: adminFallback(adminMixes) }
+      : { status: 'loading', crates: [] },
+  )
 
   useEffect(() => {
     let cancelled = false

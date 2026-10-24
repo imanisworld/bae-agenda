@@ -24,6 +24,8 @@ const FLYERS: Record<string, string> = {
   'club-cunt-oct-31-2026': '/photos/flyers/club-cunt-flyer-coming-soon.svg',
   'innaspace-radio-nov-1-2026': '/photos/flyers/innaspace-radio-nov-1-2026.jpg',
   'room-to-bloom-jun-25-2026': '/photos/flyers/room-to-bloom-jun-25-2026.jpg',
+  'sunday-sunday-oct-18-2026-preview': '/photos/flyers/sunday-sunday-concept.svg',
+  'sunday-sunday-oct-25-2026-preview': '/photos/flyers/sunday-sunday-concept.svg',
 }
 
 // Hand-picked photos for events where the automatic pick doubled up.
@@ -118,7 +120,7 @@ export default function EventPoster({
         <div className={styles.flyer}>
           <Image
             src={flyer}
-            alt={event.slug === 'club-cunt-oct-31-2026' ? `${event.title} — new flyer coming soon` : `${event.title} flyer`}
+            alt={event.slug.includes('sunday-sunday-') && event.slug.endsWith('-preview') ? `${event.title} flyer concept, final artwork pending` : event.slug === 'club-cunt-oct-31-2026' ? `${event.title} — new flyer coming soon` : `${event.title} flyer`}
             fill
             priority={priority}
             loading={priority ? undefined : 'lazy'}
