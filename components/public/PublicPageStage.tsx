@@ -54,8 +54,9 @@ export default function PublicPageStage({ children }: { children: React.ReactNod
       if (element.closest('a, button, [role="button"], [aria-hidden="true"], [aria-live], [data-no-text-slide]')) {
         return false
       }
-      // Preserve any heading/copy animation already authored by a page.
-      return getComputedStyle(element).animationName === 'none'
+      // Preserve authored motion, opacity and positioning on specialty text.
+      const style = getComputedStyle(element)
+      return style.animationName === 'none' && style.opacity === '1' && style.translate === 'none'
     })
 
     if (!('IntersectionObserver' in window)) return
