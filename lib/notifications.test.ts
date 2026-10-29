@@ -140,97 +140,123 @@ function enableLiveAlerts() {
   vi.stubEnv('EMAIL_DELIVERY_MODE', '')
   vi.stubEnv('RESEND_API_KEY', 'test-key')
   vi.stubEnv('BOOKING_FROM_EMAIL', 'DJ B.A.E. <bookings@example.com>')
+  vi.stubEnv('BOOKING_ALERT_EMAIL', 'owner@example.com')
+  vi.stubEnv('BOOKING_BACKUP_ALERT_EMAIL', '')
+  vi.stubEnv('BOOKING_ALERT_PHONE', '')
+  vi.stubEnv('TWILIO_ACCOUNT_SID', '')
+  vi.stubEnv('TWILIO_AUTH_TOKEN', '')
+  vi.stubEnv('TWILIO_FROM_NUMBER', '')
+}
+
+function enableSms() {
+  vi.stubEnv('BOOKING_ALERT_PHONE', '3175550199')
   vi.stubEnv('TWILIO_ACCOUNT_SID', 'AC_test')
   vi.stubEnv('TWILIO_AUTH_TOKEN', 'twilio-token')
   vi.stubEnv('TWILIO_FROM_NUMBER', '+13175550000')
 }
 
-function twilioBodies(fetchMock: ReturnType<typeof vi.fn>) {
-  return fetchMock.mock.calls
-    .filter((call) => String(call[0]).includes('api.twilio.com'))
-    .map((call) => String(call[1]?.body))
+function twilioCalls(fetchMock: ReturnType<typeof vi.fn>) {
+  return fetchMock.mock.calls.filter((call) => String(call[0]).includes('api.twilio.com'))
 }
 
-function resendSubjects(fetchMock: ReturnType<typeof vi.fn>) {
+function resendMessages(fetchMock: ReturnType<typeof vi.fn>) {
   return fetchMock.mock.calls
     .filter((call) => String(call[0]).includes('api.resend.com'))
-    .map((call) => JSON.parse(String(call[1]?.body)).subject as string)
+    .map((call) => JSON.parse(String(call[1]?.body)) as { to: string[]; subject: string; text: string })
 }
 
 describe('booking notification alerts', () => {
-  it('sends one SMS with the booking id when an email fails and the first SMS did not land', async () => {
+  it('emails the backup address when the owner alert fails', async () => {
     enableLiveAlerts()
-    const fetchMock = vi.fn(async (url: string, init?: { body?: string }) => {
-      if (String(url).includes('api.resend.com')) {
-        const subject = JSON.parse(String(init?.body)).subject as string
-        if (subject.startsWith('New booking inquiry')) {
-          return new Response('no', { status: 500 })
-        }
-        return new Response(null, { status: 200 })
-      }
-      return new Response(null, { status: 500 })
+    vi.stubEnv('BOOKING_BACKUP_ALERT_EMAIL', 'backup@example.com')
+    const fetchMock = vi.fn(async (_url: string, init?: { body?: string }) => {
+      const body = JSON.parse(String(init?.body)) as { to?: string[] }
+      if (body.to?.includes('owner@example.com')) return new Response('no', { status: 500 })
+      return new Response(null, { status: 200 })
     })
     vi.stubGlobal('fetch', fetchMock)
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     const summary = await sendBookingNotifications(inquiry)
 
-    expect(summary.ownerEmailSent).toBe(false)
-    expect(summary.clientReceiptSent).toBe(true)
-    expect(summary.failures).toEqual(['owner_email', 'owner_sms'])
-    const fallbackSms = twilioBodies(fetchMock).filter((body) => body.includes('booking-new'))
-    expect(fallbackSms).toHaveLength(1)
+    expect(summary.failures).toEqual(['owner_email'])
+    expect(summary.ownerSmsSent).toBe(false)
+    expect(twilioCalls(fetchMock)).toHaveLength(0)
+    const backup = resendMessages(fetchMock).find((message) => message.to.includes('backup@example.com'))
+    expect(backup?.subject).toBe('Booking alert failed: booking-new')
+    expect(backup?.text).toContain('booking-new')
+    expect(backup?.text).toContain('Imani Crumble')
+    expect(backup?.text).toContain('2026')
+    expect(backup?.text).toContain('owner_email')
     expect(errorSpy.mock.calls.some((call) => String(call[0]).includes('[BOOKING_ALERT_FAILED]'))).toBe(false)
   })
 
-  it('sends a fallback email when the owner SMS fails and the owner email did not land', async () => {
+  it('logs BOOKING_ALERT_FAILED and skips the backup when the address is unset', async () => {
     enableLiveAlerts()
-    const fetchMock = vi.fn(async (url: string, init?: { body?: string }) => {
-      if (String(url).includes('api.twilio.com')) {
-        return new Response('no', { status: 500 })
-      }
-      const subject = JSON.parse(String(init?.body)).subject as string
-      if (subject.startsWith('New booking inquiry')) {
-        return new Response('no', { status: 500 })
-      }
+    const fetchMock = vi.fn(async (_url: string, init?: { body?: string }) => {
+      const body = JSON.parse(String(init?.body)) as { to?: string[] }
+      if (body.to?.includes('owner@example.com')) return new Response('no', { status: 500 })
+      return new Response(null, { status: 200 })
+    })
+    vi.stubGlobal('fetch', fetchMock)
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    const summary = await sendBookingNotifications(inquiry)
+
+    expect(summary.failures).toEqual(['owner_email'])
+    expect(resendMessages(fetchMock).some((message) => message.subject.startsWith('Booking alert failed'))).toBe(false)
+    expect(twilioCalls(fetchMock)).toHaveLength(0)
+    expect(errorSpy.mock.calls.some((call) => String(call[0]).includes('[BOOKING_ALERT_FAILED] bookingId=booking-new'))).toBe(true)
+  })
+
+  it('does not treat a skipped SMS as a failure', async () => {
+    enableLiveAlerts()
+    vi.stubEnv('BOOKING_ALERT_PHONE', '3175550199')
+    const fetchMock = vi.fn(async () => new Response(null, { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+
+    const summary = await sendBookingNotifications(inquiry)
+
+    expect(summary.failures).toEqual([])
+    expect(summary.ownerEmailSent).toBe(true)
+    expect(summary.ownerSmsSent).toBe(false)
+    expect(twilioCalls(fetchMock)).toHaveLength(0)
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+  })
+
+  it('sends SMS only when the phone and Twilio config are all set, and backs that up by email', async () => {
+    enableLiveAlerts()
+    enableSms()
+    vi.stubEnv('BOOKING_BACKUP_ALERT_EMAIL', 'backup@example.com')
+    const fetchMock = vi.fn(async (url: string) => {
+      if (String(url).includes('api.twilio.com')) return new Response('no', { status: 500 })
       return new Response(null, { status: 200 })
     })
     vi.stubGlobal('fetch', fetchMock)
 
     const summary = await sendBookingNotifications(inquiry)
 
-    expect(summary.failures).toContain('owner_sms')
-    expect(summary.failures).toContain('owner_email')
-    expect(resendSubjects(fetchMock)).toContain('Booking alert failed: booking-new')
+    expect(summary.ownerEmailSent).toBe(true)
+    expect(summary.failures).toEqual(['owner_sms'])
+    expect(twilioCalls(fetchMock)).toHaveLength(1)
+    const backup = resendMessages(fetchMock).find((message) => message.to.includes('backup@example.com'))
+    expect(backup?.text).toContain('booking-new')
+    expect(backup?.text).toContain('Imani Crumble')
+    expect(backup?.text).toContain('2026')
+    expect(backup?.text).toContain('owner_sms')
   })
 
-  it('logs BOOKING_ALERT_FAILED when neither email nor SMS reaches the owner', async () => {
+  it('logs BOOKING_ALERT_FAILED when the owner email and the backup email both fail', async () => {
     enableLiveAlerts()
+    vi.stubEnv('BOOKING_BACKUP_ALERT_EMAIL', 'backup@example.com')
     const fetchMock = vi.fn(async () => new Response('no', { status: 500 }))
     vi.stubGlobal('fetch', fetchMock)
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     const summary = await sendBookingNotifications(inquiry)
 
-    expect(summary.failures).toEqual(['owner_email', 'client_receipt', 'owner_sms'])
-    expect(twilioBodies(fetchMock).some((body) => body.includes('booking-new'))).toBe(true)
-    expect(resendSubjects(fetchMock)).toContain('Booking alert failed: booking-new')
+    expect(summary.failures).toEqual(['owner_email', 'client_receipt'])
+    expect(resendMessages(fetchMock).some((message) => message.to.includes('backup@example.com'))).toBe(true)
     expect(errorSpy.mock.calls.some((call) => String(call[0]).includes('[BOOKING_ALERT_FAILED] bookingId=booking-new'))).toBe(true)
-  })
-
-  it('does not send a second alert when every notification succeeds', async () => {
-    enableLiveAlerts()
-    const fetchMock = vi.fn(async () => new Response(null, { status: 200 }))
-    vi.stubGlobal('fetch', fetchMock)
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-
-    const summary = await sendBookingNotifications(inquiry)
-
-    expect(summary.failures).toEqual([])
-    expect(summary.ownerEmailSent).toBe(true)
-    expect(summary.clientReceiptSent).toBe(true)
-    expect(summary.ownerSmsSent).toBe(true)
-    expect(fetchMock).toHaveBeenCalledTimes(3)
-    expect(errorSpy.mock.calls.some((call) => String(call[0]).includes('[BOOKING_ALERT_FAILED]'))).toBe(false)
   })
 })

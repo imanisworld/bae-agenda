@@ -98,8 +98,22 @@ type W9NotificationPayload = {
   pdfFilename: string
 }
 
-const OWNER_ALERT_EMAIL = process.env.BOOKING_ALERT_EMAIL ?? 'baebookings@proton.me'
-const OWNER_ALERT_PHONE = normalizeUsPhone(process.env.BOOKING_ALERT_PHONE ?? '7087522820')
+function configuredOwnerAlertEmail() {
+  return process.env.BOOKING_ALERT_EMAIL?.trim() || 'baebookings@proton.me'
+}
+
+function configuredBackupAlertEmail() {
+  return process.env.BOOKING_BACKUP_ALERT_EMAIL?.trim() || null
+}
+
+function configuredOwnerAlertPhone() {
+  const phone = normalizeUsPhone(process.env.BOOKING_ALERT_PHONE)
+  const accountSid = process.env.TWILIO_ACCOUNT_SID?.trim()
+  const authToken = process.env.TWILIO_AUTH_TOKEN?.trim()
+  const from = process.env.TWILIO_FROM_NUMBER?.trim()
+  if (!phone || !accountSid || !authToken || !from) return null
+  return phone
+}
 
 type NotificationResult =
   | { ok: true }
@@ -453,9 +467,11 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
   const eventDateTime = formatEventDateTime(payload.eventDate, payload.eventTimeZone)
   const guestName = [payload.firstName, payload.lastName].filter(Boolean).join(' ')
 
+  const ownerEmail = configuredOwnerAlertEmail()
+  const smsTo = configuredOwnerAlertPhone()
   const tasks: Array<Promise<NotificationResult>> = [
     sendEmailNotification({
-      to: OWNER_ALERT_EMAIL,
+      to: ownerEmail,
       subject: `New booking inquiry: ${payload.eventName}`,
       replyTo: payload.email,
       text: `A new booking inquiry was submitted.\n\n${ownerSummary}`,
@@ -473,10 +489,10 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
     }),
   ]
 
-  if (OWNER_ALERT_PHONE) {
+  if (smsTo) {
     tasks.push(
       sendSms(
-        OWNER_ALERT_PHONE,
+        smsTo,
         `New inquiry from ${guestName || payload.firstName} for ${payload.eventName} on ${eventDateTime}.`
       )
     )
@@ -508,38 +524,34 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
 
   if (!summary.ownerEmailSent) summary.failures.push('owner_email')
   if (!summary.clientReceiptSent) summary.failures.push('client_receipt')
-  if (OWNER_ALERT_PHONE && !summary.ownerSmsSent) summary.failures.push('owner_sms')
+  if (smsTo && !summary.ownerSmsSent) summary.failures.push('owner_sms')
 
-  const emailFailed = summary.failures.some((failure) => failure !== 'owner_sms')
-  let fallbackEmailSent = false
-  let fallbackSmsSent = false
-
-  if (emailFailed && OWNER_ALERT_PHONE) {
-    const sms = await sendSms(
-      OWNER_ALERT_PHONE,
-      `Booking ${payload.bookingId}: ${summary.failures.filter((failure) => failure !== 'owner_sms').join(', ')} failed.`
-    )
-    fallbackSmsSent = sms.ok
-    if (!sms.ok) {
-      console.error('[booking-notification:fallback-sms]', sms.reason, sms.detail ?? '')
-    }
-  }
-
-  if (summary.failures.includes('owner_sms')) {
+  const needsBackup = summary.failures.includes('owner_email') || summary.failures.includes('owner_sms')
+  const backupTo = configuredBackupAlertEmail()
+  let backupEmailSent = false
+  if (needsBackup && backupTo) {
+    const clientName = guestName || payload.firstName
+    const failed = summary.failures.join(', ')
+    const text = [
+      `Booking ${payload.bookingId}`,
+      `Client: ${clientName}`,
+      `Date: ${eventDateTime}`,
+      `Failed: ${failed}`,
+    ].join('\n')
     const email = await sendEmailNotification({
-      to: OWNER_ALERT_EMAIL,
+      to: backupTo,
       subject: `Booking alert failed: ${payload.bookingId}`,
-      text: `Booking ${payload.bookingId}: owner SMS failed.\n\n${ownerSummary}`,
-      html: `<p>Booking ${escapeHtml(payload.bookingId)}: owner SMS failed.</p><pre>${escapeHtml(ownerSummary)}</pre>`,
+      text,
+      html: `<p>Booking ${escapeHtml(payload.bookingId)}</p><p>Client: ${escapeHtml(clientName)}</p><p>Date: ${escapeHtml(eventDateTime)}</p><p>Failed: ${escapeHtml(failed)}</p>`,
     })
-    fallbackEmailSent = email.ok
+    backupEmailSent = email.ok
     if (!email.ok) {
-      console.error('[booking-notification:fallback-email]', email.reason, email.detail ?? '')
+      console.error('[booking-notification:backup-email]', email.reason, email.detail ?? '')
     }
   }
 
-  const ownerReached = summary.ownerEmailSent || summary.ownerSmsSent || fallbackEmailSent || fallbackSmsSent
-  if (summary.failures.length > 0 && !ownerReached) {
+  const ownerReached = summary.ownerEmailSent || summary.ownerSmsSent || backupEmailSent
+  if (needsBackup && !ownerReached) {
     console.error(`[BOOKING_ALERT_FAILED] bookingId=${payload.bookingId} failures=${summary.failures.join(',')}`)
   }
 

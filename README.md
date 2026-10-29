@@ -96,7 +96,8 @@ Not used by this codebase:
 - Availability is checked before a booking is created
 - Client contact is upserted in Supabase
 - Booking is stored as an inquiry
-- Owner alert email and optional SMS are sent
+- Owner alert email is sent. If it fails, a backup email goes to `BOOKING_BACKUP_ALERT_EMAIL` when that variable is set.
+- SMS is sent only when `BOOKING_ALERT_PHONE` and the Twilio variables are all set.
 - Client inquiry receipt email is sent
 
 ### Admin booking operations
