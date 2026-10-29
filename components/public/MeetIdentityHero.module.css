@@ -488,7 +488,8 @@
 }
 @media (max-width: 560px) {
   .portraitWrap {
-    width: min(73%, 330px);
+    /* Keep both bio lines and the actions above the dock on a one-screen phone. */
+    width: min(73%, 330px, max(140px, calc(100svh - 600px)));
     margin-left: 8%;
   }
   .portrait {
@@ -534,4 +535,59 @@
 /* Get to know: the gold tag sits clean on the page, no dark shadow behind it. */
 .title .titleTag img {
   filter: none;
+}
+
+/* Very short phones: the tap hint sits on the buttons once both bios wrap. */
+@media (max-width: 560px) and (max-height: 680px) {
+  .portraitWrap {
+    width: min(70%, max(108px, calc(100svh - 552px)));
+    margin-left: 8%;
+  }
+}
+
+/* Narrow phones and a tall fold cover wrap the bios further, so the portrait yields. */
+@media (max-width: 360px) {
+  .portraitWrap {
+    width: min(66%, max(60px, calc(100svh - 688px)));
+    margin-left: 8%;
+  }
+}
+
+/* Near-square widths between phone and desktop. Keep a square portrait and
+   leave the bios, chips, and actions above the dock. */
+@media (min-width: 561px) and (max-width: 860px) and (max-height: 920px) {
+  .hero {
+    padding-top: 64px;
+    padding-bottom: 96px;
+  }
+
+  .portraitWrap {
+    width: min(48%, 280px, max(150px, calc(100svh - 542px)));
+    min-width: 0;
+    margin-left: 8%;
+  }
+
+  .copy {
+    margin: 16px 6% 0 8%;
+  }
+
+  .copy h1 {
+    font-size: clamp(28px, 4.4vw, 42px);
+  }
+
+  .details {
+    padding-top: clamp(40px, 5vw, 54px);
+  }
+
+  .summary {
+    margin-top: 12px;
+  }
+
+  .signals {
+    margin-top: 12px;
+  }
+
+  .actions {
+    margin-top: 14px;
+  }
 }

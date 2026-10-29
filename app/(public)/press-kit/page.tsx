@@ -34,7 +34,7 @@ export default async function PressKitPage() {
         : social.label === 'SoundCloud' ? content.soundcloud_url || social.url
           : social.url,
     }))
-  const about = 'From Chicago’s South Side and now based in Indianapolis, DJ B.A.E. draws on music, visual art, and years across different scenes, including time in Boston. Her sets move through hip-hop, R&B, house, juke, club, jungle, bass, baile, and underground edits with a simple approach: read the room, respect the music, and make every transition make sense.'
+  const about = "I'm DJ B.A.E., an Indianapolis open-format DJ who plays the songs you forgot you loved or didn't know you did. B-sides, deep cuts, old favorites and fresh edits. Rooted in Black and queer nightlife, I play for crowds from 25 to 75+."
 
   return (
     <div className="press-kit-page">
@@ -76,6 +76,7 @@ export default async function PressKitPage() {
             <section className="press-kit-bio">
               <SectionLabel>Artist Bio</SectionLabel>
               <p>{about}</p>
+              <p>{"Born on Chicago's South Side, with years in Boston, now based in Indy. Hip-hop, R&B, house, juke, club, jungle, bass, baile and underground edits."}</p>
               <p>Available for club nights, private events, weddings, brand activations, and events that need a set tailored to the room.</p>
             </section>
 
