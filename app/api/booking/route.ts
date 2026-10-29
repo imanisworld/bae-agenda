@@ -378,6 +378,7 @@ export async function POST(req: NextRequest) {
     await recordBookingSourceContext(admin, booking.id, data.sourceContext);
 
     const notificationSummary = await sendBookingNotifications({
+      bookingId: booking.id,
       firstName: clientPayload.first_name,
       lastName: clientPayload.last_name,
       email: clientPayload.email,
@@ -394,6 +395,17 @@ export async function POST(req: NextRequest) {
 
     if (notificationSummary.clientReceiptSent) {
       await stampBookingEmailSentAt(admin, booking.id, "inquiry_receipt_sent_at");
+    }
+
+    if (notificationSummary.failures?.length) {
+      const { error: failureError } = await admin
+        .from("bookings")
+        .update({ notification_failure: notificationSummary.failures.join(",") })
+        .eq("id", booking.id);
+
+      if (failureError) {
+        console.error("[booking-notification-failure] record failed", booking.id, failureError.message);
+      }
     }
   } catch (error) {
     logError("Booking request save failed", error, {

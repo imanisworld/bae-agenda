@@ -1,7 +1,10 @@
 import { getPaymentInstructionRows, getPaymentInstructionTextLines } from '@/lib/payment-instructions'
 import { resolveEmailDelivery } from '@/lib/email-delivery'
 
+type BookingNotificationFailure = 'owner_email' | 'client_receipt' | 'owner_sms'
+
 type BookingNotificationPayload = {
+  bookingId: string
   firstName: string
   lastName?: string | null
   email: string
@@ -106,6 +109,7 @@ type BookingNotificationDispatchSummary = {
   ownerEmailSent: boolean
   clientReceiptSent: boolean
   ownerSmsSent: boolean
+  failures: BookingNotificationFailure[]
 }
 
 function normalizeUsPhone(value: string | null | undefined): string | null {
@@ -483,6 +487,7 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
     ownerEmailSent: false,
     clientReceiptSent: false,
     ownerSmsSent: false,
+    failures: [],
   }
 
   results.forEach((result, index) => {
@@ -500,6 +505,43 @@ export async function sendBookingNotifications(payload: BookingNotificationPaylo
     if (index === 1) summary.clientReceiptSent = true
     if (index === 2) summary.ownerSmsSent = true
   })
+
+  if (!summary.ownerEmailSent) summary.failures.push('owner_email')
+  if (!summary.clientReceiptSent) summary.failures.push('client_receipt')
+  if (OWNER_ALERT_PHONE && !summary.ownerSmsSent) summary.failures.push('owner_sms')
+
+  const emailFailed = summary.failures.some((failure) => failure !== 'owner_sms')
+  let fallbackEmailSent = false
+  let fallbackSmsSent = false
+
+  if (emailFailed && OWNER_ALERT_PHONE) {
+    const sms = await sendSms(
+      OWNER_ALERT_PHONE,
+      `Booking ${payload.bookingId}: ${summary.failures.filter((failure) => failure !== 'owner_sms').join(', ')} failed.`
+    )
+    fallbackSmsSent = sms.ok
+    if (!sms.ok) {
+      console.error('[booking-notification:fallback-sms]', sms.reason, sms.detail ?? '')
+    }
+  }
+
+  if (summary.failures.includes('owner_sms')) {
+    const email = await sendEmailNotification({
+      to: OWNER_ALERT_EMAIL,
+      subject: `Booking alert failed: ${payload.bookingId}`,
+      text: `Booking ${payload.bookingId}: owner SMS failed.\n\n${ownerSummary}`,
+      html: `<p>Booking ${escapeHtml(payload.bookingId)}: owner SMS failed.</p><pre>${escapeHtml(ownerSummary)}</pre>`,
+    })
+    fallbackEmailSent = email.ok
+    if (!email.ok) {
+      console.error('[booking-notification:fallback-email]', email.reason, email.detail ?? '')
+    }
+  }
+
+  const ownerReached = summary.ownerEmailSent || summary.ownerSmsSent || fallbackEmailSent || fallbackSmsSent
+  if (summary.failures.length > 0 && !ownerReached) {
+    console.error(`[BOOKING_ALERT_FAILED] bookingId=${payload.bookingId} failures=${summary.failures.join(',')}`)
+  }
 
   return summary
 }

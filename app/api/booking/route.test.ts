@@ -85,6 +85,8 @@ function adminForBooking(args: {
   })
   const existingEq = vi.fn(() => ({ maybeSingle: existingMaybeSingle }))
   const existingSelect = vi.fn(() => ({ eq: existingEq }))
+  const bookingUpdateEq = vi.fn().mockResolvedValue({ error: null })
+  const bookingUpdate = vi.fn(() => ({ eq: bookingUpdateEq }))
 
   let bookingFromCalls = 0
   const from = vi.fn((table: string) => {
@@ -95,9 +97,9 @@ function adminForBooking(args: {
     if (table === 'bookings') {
       bookingFromCalls += 1
       if (bookingFromCalls === 1) {
-        return { insert: bookingInsert }
+        return { insert: bookingInsert, update: bookingUpdate }
       }
-      return { select: existingSelect }
+      return { select: existingSelect, update: bookingUpdate }
     }
 
     throw new Error(`Unexpected table: ${table}`)
@@ -106,6 +108,7 @@ function adminForBooking(args: {
   return {
     admin: { from },
     bookingInsert,
+    bookingUpdate,
   }
 }
 
@@ -198,5 +201,31 @@ describe('booking endpoint', () => {
       'booking-new',
       'inquiry_receipt_sent_at'
     )
+    expect(setup.bookingUpdate).not.toHaveBeenCalled()
+  })
+
+  it('records a notification failure and still tells the client the booking was saved', async () => {
+    const setup = adminForBooking({
+      bookingResult: {
+        data: { id: 'booking-new' },
+        error: null,
+      },
+    })
+    mocks.createAdminClient.mockReturnValue(setup.admin)
+    mocks.sendBookingNotifications.mockResolvedValue({
+      ownerEmailSent: false,
+      clientReceiptSent: false,
+      ownerSmsSent: false,
+      failures: ['owner_email', 'client_receipt', 'owner_sms'],
+    })
+
+    const response = await POST(requestWith(validBody))
+
+    expect(response.status).toBe(201)
+    await expect(response.json()).resolves.toMatchObject({ success: true })
+    expect(mocks.stampBookingEmailSentAt).not.toHaveBeenCalled()
+    expect(setup.bookingUpdate).toHaveBeenCalledWith({
+      notification_failure: 'owner_email,client_receipt,owner_sms',
+    })
   })
 })
