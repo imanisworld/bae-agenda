@@ -210,11 +210,11 @@ button,
 /* Section eye-brow label (MIXES / EVENTS / etc.) */
 .section-label {
   display: block;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: #ffe3b0;
   margin-bottom: 14px;
 }
 
@@ -1264,16 +1264,19 @@ button,
   align-items: center;
   justify-content: center;
   padding: 14px 24px;
-  background: var(--violet);
-  color: var(--white);
+  min-height: 44px;
+  background: #9a3450;
+  color: #fff6ec;
   text-decoration: none;
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0.03em;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1px solid #9a3450;
+  border-radius: 4px;
   transition: background var(--motion-fast) var(--ease-standard);
 }
-.btn-primary:hover { background: var(--violet-light); }
+.btn-primary:hover { background: #b24a62; border-color: #b24a62; color: #fff6ec; }
 
 .btn-ghost {
   display: inline-flex;
@@ -1281,18 +1284,21 @@ button,
   justify-content: center;
   gap: 8px;
   padding: 13px 22px;
+  min-height: 44px;
   background: transparent;
-  color: var(--white);
+  color: #fff6ec;
   text-decoration: none;
   font-family: 'DM Sans', sans-serif;
   font-size: 13px;
-  font-weight: 400;
-  letter-spacing: 0.03em;
-  border: 1px solid var(--border);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  border: 1.5px solid rgba(246,226,210,.78);
+  border-radius: 4px;
   transition: border-color var(--motion-fast) var(--ease-standard),
+              background var(--motion-fast) var(--ease-standard),
               color var(--motion-fast) var(--ease-standard);
 }
-.btn-ghost:hover { border-color: rgba(143,45,60,0.5); color: var(--violet); }
+.btn-ghost:hover { border-color: #f6e7d8; background: rgba(154,52,80,.28); color: #fff6ec; }
 
 .btn-white {
   display: inline-flex;
@@ -6357,8 +6363,9 @@ body.has-custom-cursor * { cursor: none !important; }
    ================================================================ */
 
 .book-experience .section-label {
-  color: #d4b47f;
-  font-weight: 500;
+  color: #ffe3b0;
+  font-weight: 600;
+  font-size: 12px;
 }
 
 .book-experience-form input::placeholder,
@@ -10309,12 +10316,19 @@ a.admin-stat-card:focus-visible {
   }
 }
 
-/* The Press Kit has its own Back link. Hide only the fixed navigation dock,
-   retaining the site's accessible topbar / More menu. The dock obscures
-   editorial content on 320–430px displays while scrolling. */
+/* Screen Press Kit uses the same bottom pill nav as the rest of the site.
+   Print rules still remove it so the PDF stays a clean sheet. */
 @media screen {
-  body:has(.press-kit-page) .public-navigation-chrome [class*="dockWrap"] {
-    display: none !important;
+  body:has(.press-kit-page) .press-kit-page {
+    padding-bottom: calc(112px + var(--safe-bottom, 0px)) !important;
+  }
+}
+@media screen and (max-width: 700px) {
+  .press-kit-sheet .press-kit-left,
+  body:has(.press-kit-page) .press-kit-sheet .press-kit-left {
+    height: 200px !important;
+    min-height: 180px !important;
+    max-height: 200px !important;
   }
 }
 
@@ -10397,5 +10411,55 @@ a.admin-stat-card:focus-visible {
   to {
     opacity: 1;
     translate: 0 0;
+  }
+}
+
+/* Screen-only press kit type. Print rules keep the compact PDF sheet. */
+@media screen {
+  .press-kit-bio p,
+  .press-kit-intro p,
+  .press-kit-work-copy p {
+    color: #fff7f2;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  .press-kit-bio p:last-child { color: #fff1e6; font-size: 15px; }
+  .press-kit-section-label { color: #ffe3b0; font-size: 12px; }
+  .press-kit-mail-cta,
+  .press-kit-footer-book {
+    background: #9a3450;
+    color: #fff6ec;
+    border-color: #9a3450;
+  }
+  .press-kit-mail-cta:hover,
+  .press-kit-footer-book:hover { background: #b24a62; color: #fff6ec; }
+}
+@media screen and (max-width: 700px) {
+  .press-kit-bio p,
+  .press-kit-intro p,
+  .press-kit-work-copy p { font-size: 16px; }
+}
+
+/* Meet profile chips are labels, not buttons. Kept out of the Meet hero module. */
+.meet-experience [class*="signals"] span {
+  background: transparent;
+  box-shadow: none;
+  border-color: rgba(246,226,210,.28);
+  color: rgba(255,246,236,.72);
+  letter-spacing: .06em;
+}
+
+.booking-choice:hover,
+.booking-day:hover:not(:disabled) {
+  background: #b24a62 !important;
+  border-color: #f6d5dc !important;
+  color: #fff6ec !important;
+}
+
+@media (min-width: 1100px) {
+  .public-experience-shell .public-page-stage--experience[data-experience-route='/lab'],
+  .public-experience-shell .public-page-stage--experience[data-experience-route='/portfolio'] {
+    --page-photo-brightness: .38;
+    --page-photo-blur: 10px;
   }
 }

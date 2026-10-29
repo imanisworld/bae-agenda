@@ -21,14 +21,14 @@
   letter-spacing: -.095em;
   font-weight: 600;
   color: #8f2d3c;
-  opacity: .96;
+  opacity: .16;
 }
 
 .wordmarkOutline {
   z-index: 3;
   color: transparent;
-  -webkit-text-stroke: 1.5px rgba(184,90,102,.72);
-  opacity: 1;
+  -webkit-text-stroke: 1.5px rgba(184,90,102,.28);
+  opacity: .35;
   pointer-events: none;
 }
 
@@ -405,10 +405,19 @@
     left: 12px;
     top: var(--wm-top);
     font-size: var(--wm);
+    opacity: .08;
+  }
+
+  .wordmarkOutline {
+    opacity: .18;
   }
 
   .photo {
-    width: 83%;
+    flex: 0 0 auto;
+    width: 62%;
+    height: auto;
+    max-height: none;
+    aspect-ratio: 1;
     margin-left: 8%;
     transform: rotate(1deg);
     animation-name: hero-photo-gravity-mobile;
@@ -750,7 +759,7 @@
     white-space: nowrap;
     font-size: clamp(150px, 17vw, 290px);
     color: transparent;
-    -webkit-text-stroke: 1.5px rgba(214,120,138,.42);
+    -webkit-text-stroke: 1.5px rgba(214,120,138,.22);
     opacity: 1;
   }
   .wordmarkOutline { display: none; }
@@ -760,7 +769,7 @@
    outline so it reads over the background photo. */
 .actions :global(.btn-ghost) {
   background: rgba(34,20,27,.82);
-  border: 1px solid rgba(246,226,210,.55);
+  border: 1.5px solid #f6e7d8;
   color: #fff7ef;
   font-weight: 500;
   text-shadow: none;
@@ -770,4 +779,9 @@
   background: rgba(48,28,37,.9);
   border-color: rgba(246,226,210,.8);
   color: #fff7ef;
+}
+
+@media (max-width: 900px) {
+  .wordmark { opacity: .1; }
+  .wordmarkOutline { opacity: .16; }
 }
