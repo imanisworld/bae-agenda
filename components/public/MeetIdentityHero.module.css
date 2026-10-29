@@ -531,7 +531,7 @@
    locked to one screen: the copy takes the height it needs and the square
    portrait shrinks into whatever is left, so the heading, bio, pills and both
    buttons always sit above the dock, however long the bio is. */
-@media (min-width: 561px) and (max-width: 860px) and (max-aspect-ratio: 1 / 1) {
+@media (min-width: 561px) and (max-width: 860px) and (orientation: portrait) {
   .hero {
     box-sizing: border-box;
     height: 100svh;
@@ -550,7 +550,7 @@
 
 /* Wide unfolded foldables (Galaxy Fold sideways, Pixel Fold open): too short
    to stack, so sit the portrait beside the copy as on desktop. */
-@media (min-width: 561px) and (max-width: 860px) and (min-aspect-ratio: 1 / 1) {
+@media (min-width: 561px) and (max-width: 860px) and (orientation: landscape) {
   .hero {
     display: grid;
     grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
