@@ -1,13 +1,29 @@
 import type { Metadata } from 'next'
 import UtilityPageShell, { UtilitySection } from '@/components/public/UtilityPageShell'
 import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
+import { PUBLIC_SHARE_IMAGE } from '@/lib/constants'
+
+const PRIVACY_TITLE = 'Privacy & Cookies | DJ B.A.E.'
+const PRIVACY_DESCRIPTION = 'Privacy and cookie information for thebaeagenda.com and The Bae Agenda client portal.'
 
 export const metadata: Metadata = {
-  title: 'Privacy & Cookies',
+  title: { absolute: PRIVACY_TITLE },
   alternates: {
     canonical: '/privacy',
   },
-  description: 'Privacy and cookie information for thebaeagenda.com and The Bae Agenda client portal.',
+  description: PRIVACY_DESCRIPTION,
+  openGraph: {
+    title: PRIVACY_TITLE,
+    description: PRIVACY_DESCRIPTION,
+    url: 'https://thebaeagenda.com/privacy',
+    images: [PUBLIC_SHARE_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: PRIVACY_TITLE,
+    description: PRIVACY_DESCRIPTION,
+    images: [PUBLIC_SHARE_IMAGE.url],
+  },
 }
 
 export default function PrivacyPage() {

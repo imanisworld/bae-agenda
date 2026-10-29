@@ -3,8 +3,8 @@
 /**
  * STICKY BOOKING CTA
  * Appears after the visitor moves past most of the hero and hides while the
- * homepage booking section is visible. Kept available on mobile so booking
- * never requires reopening the navigation drawer.
+ * homepage booking section is visible. The top bar keeps "Book DJ B.A.E."
+ * one tap away before this appears.
  */
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'

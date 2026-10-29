@@ -3,16 +3,36 @@ import Image from 'next/image'
 import Link from 'next/link'
 import PrintPressKitButton from '@/components/public/PrintPressKitButton'
 import { SELECTED_WORK } from '@/lib/portfolio-data'
-import { SOCIALS } from '@/lib/constants'
+import { PUBLIC_SHARE_IMAGE, SOCIALS } from '@/lib/constants'
 import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
 import { getContentMap } from '@/lib/db/content'
 
 export const revalidate = 300
 
+const PRESS_KIT_TITLE = 'DJ B.A.E. Press Kit | Bio, Booking, and Selected Work'
+const PRESS_KIT_DESCRIPTION = 'Press kit for DJ B.A.E., an Indianapolis open-format DJ. Artist bio, a live set clip, the SoundCloud mix, booking, and selected work.'
+const PRESS_KIT_IMAGE = PUBLIC_SHARE_IMAGE
+const LIVE_CLIP = {
+  src: '/videos/e67f0964-8763-4658-bbba-4cc322727d68.mp4',
+  label: 'DJ B.A.E. performing an outdoor evening set',
+}
+
 export const metadata: Metadata = {
-  title: 'Press Kit',
+  title: { absolute: PRESS_KIT_TITLE },
   alternates: { canonical: '/press-kit' },
-  description: 'DJ B.A.E. press kit with artist bio, booking information, and selected work.',
+  description: PRESS_KIT_DESCRIPTION,
+  openGraph: {
+    title: PRESS_KIT_TITLE,
+    description: PRESS_KIT_DESCRIPTION,
+    url: 'https://thebaeagenda.com/press-kit',
+    images: [PRESS_KIT_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: PRESS_KIT_TITLE,
+    description: PRESS_KIT_DESCRIPTION,
+    images: [PRESS_KIT_IMAGE.url],
+  },
 }
 
 const CONTENT_KEYS = ['hero_title', 'hero_subtitle', 'booking_email', 'instagram_url', 'soundcloud_url'] as const
@@ -72,6 +92,24 @@ export default async function PressKitPage() {
               <h1>{title}</h1>
               <p>{subtitle}</p>
             </header>
+
+            <section className="press-kit-media" aria-label="Media">
+              <SectionLabel>Media</SectionLabel>
+              <div className="press-kit-media-row">
+                <figure className="press-kit-live">
+                  <video controls playsInline preload="metadata" aria-label={LIVE_CLIP.label} src={LIVE_CLIP.src}>
+                    {LIVE_CLIP.label}
+                  </video>
+                  <figcaption>Live clip · {LIVE_CLIP.label}</figcaption>
+                </figure>
+                <div className="press-kit-mix-card">
+                  <span>Featured mix</span>
+                  <a className="press-kit-mail-cta" href={socials.find((social) => social.label === 'SoundCloud')?.url} target="_blank" rel="noopener noreferrer">
+                    SoundCloud · deejaybae <span aria-hidden="true">↗</span>
+                  </a>
+                </div>
+              </div>
+            </section>
 
             <section className="press-kit-bio">
               <SectionLabel>Artist Bio</SectionLabel>

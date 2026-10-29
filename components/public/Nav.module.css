@@ -83,6 +83,32 @@
   color: #f6f1e8;
 }
 
+.bookCta {
+  pointer-events: auto;
+  justify-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  max-width: 100%;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--violet);
+  color: #fff6ec;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.bookCta:hover,
+.bookCta:focus-visible {
+  background: #a84355;
+  color: #fff6ec;
+}
+
 .route {
   justify-self: end;
   color: rgba(246,241,232,.5);
@@ -257,7 +283,13 @@
 
 @media (max-width: 620px) {
   .topbar {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 10px;
+  }
+
+  .bookCta {
+    padding-inline: 8px;
+    letter-spacing: .08em;
   }
 
   .route { display: none; }

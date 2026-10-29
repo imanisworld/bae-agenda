@@ -107,6 +107,13 @@ export const LAB_CRATES = [
   { key: 'mashups', label: 'Mashups / Experiments',     url: 'https://soundcloud.com/deejaybae/sets/mashups' },
 ] as const
 
+export const PUBLIC_SHARE_IMAGE = {
+  url: '/photos/PlexMix19-DJBAE.JPEG',
+  width: 1637,
+  height: 1411,
+  alt: 'DJ B.A.E. performing live',
+} as const
+
 export const SOCIALS = [
   { label: 'Instagram', url: 'https://www.instagram.com/dj_b.a.e/',                      icon: 'IG' },
   { label: 'TikTok',    url: 'https://www.tiktok.com/@djbae1',                            icon: 'TT' },

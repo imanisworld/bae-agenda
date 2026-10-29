@@ -1,13 +1,29 @@
 import type { Metadata } from 'next'
 import UtilityPageShell, { UtilitySection } from '@/components/public/UtilityPageShell'
 import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
+import { PUBLIC_SHARE_IMAGE } from '@/lib/constants'
+
+const ACCESSIBILITY_TITLE = 'Accessibility | DJ B.A.E.'
+const ACCESSIBILITY_DESCRIPTION = 'Accessibility information for The Bae Agenda website and client portal.'
 
 export const metadata: Metadata = {
-  title: 'Accessibility',
+  title: { absolute: ACCESSIBILITY_TITLE },
   alternates: {
     canonical: '/accessibility',
   },
-  description: 'Accessibility information for The Bae Agenda website and client portal.',
+  description: ACCESSIBILITY_DESCRIPTION,
+  openGraph: {
+    title: ACCESSIBILITY_TITLE,
+    description: ACCESSIBILITY_DESCRIPTION,
+    url: 'https://thebaeagenda.com/accessibility',
+    images: [PUBLIC_SHARE_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: ACCESSIBILITY_TITLE,
+    description: ACCESSIBILITY_DESCRIPTION,
+    images: [PUBLIC_SHARE_IMAGE.url],
+  },
 }
 
 export default function AccessibilityPage() {

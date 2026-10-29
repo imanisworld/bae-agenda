@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { DM_Sans } from 'next/font/google'
+import { PUBLIC_SHARE_IMAGE } from '@/lib/constants'
 import { Analytics } from '@vercel/analytics/next'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
@@ -37,9 +38,11 @@ export const metadata: Metadata = {
     siteName: 'DJ B.A.E. | The Bae Agenda',
     locale: 'en_US',
     type: 'website',
+    images: [PUBLIC_SHARE_IMAGE],
   },
   twitter: {
     card: 'summary_large_image',
+    images: [PUBLIC_SHARE_IMAGE.url],
   },
   appleWebApp: {
     capable: true,

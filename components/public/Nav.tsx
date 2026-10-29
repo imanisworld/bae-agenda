@@ -129,7 +129,9 @@ export default function Nav() {
             </div>
           ) : null}
         </div>
-        <span aria-hidden="true" />
+        <Link href="/book#inquiry" className={styles.bookCta} data-route-swipe-block>
+          Book DJ B.A.E.
+        </Link>
         <NowPlayingPill fallback={<span className={styles.route}>{routeLabel}</span>} />
       </div>
 

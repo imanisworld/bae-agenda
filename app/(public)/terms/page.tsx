@@ -1,13 +1,29 @@
 import type { Metadata } from 'next'
 import UtilityPageShell, { UtilitySection } from '@/components/public/UtilityPageShell'
 import { DEFAULT_BOOKING_EMAIL } from '@/lib/content-schema'
+import { PUBLIC_SHARE_IMAGE } from '@/lib/constants'
+
+const TERMS_TITLE = 'Booking & Site Terms | DJ B.A.E.'
+const TERMS_DESCRIPTION = 'Booking, payment, and site terms for DJ B.A.E. and The Bae Agenda.'
 
 export const metadata: Metadata = {
-  title: 'Booking & Site Terms',
+  title: { absolute: TERMS_TITLE },
   alternates: {
     canonical: '/terms',
   },
-  description: 'Booking, payment, and site terms for DJ B.A.E. and The Bae Agenda.',
+  description: TERMS_DESCRIPTION,
+  openGraph: {
+    title: TERMS_TITLE,
+    description: TERMS_DESCRIPTION,
+    url: 'https://thebaeagenda.com/terms',
+    images: [PUBLIC_SHARE_IMAGE],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: TERMS_TITLE,
+    description: TERMS_DESCRIPTION,
+    images: [PUBLIC_SHARE_IMAGE.url],
+  },
 }
 
 export default function TermsPage() {
