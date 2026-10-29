@@ -34,7 +34,7 @@ export default async function PressKitPage() {
         : social.label === 'SoundCloud' ? content.soundcloud_url || social.url
           : social.url,
     }))
-  const about = "Helloooooo, I'm DJ B.A.E., an Indianapolis open-format DJ who plays the songs you forgot you loved or didn't know you did. B-sides, deep cuts and old favorites, next to new drops at the right time. Rooted in Black and queer nightlife, I play for crowds from 25 to 75+, and every set feels like a conversation with the room."
+  const about = "I'm DJ B.A.E., an Indianapolis open-format DJ who plays the songs you forgot you loved or didn't know you did. B-sides, deep cuts, old favorites and fresh edits. Rooted in Black and queer nightlife, I play for crowds from 25 to 75+."
 
   return (
     <div className="press-kit-page">
