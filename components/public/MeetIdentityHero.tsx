@@ -12,6 +12,7 @@ function clamp(value: number, min: number, max: number) {
 }
 
 const ABOUT_COPY = "I'm DJ B.A.E., an Indianapolis open-format DJ who plays the songs you forgot you loved or didn't know you did. B-sides, deep cuts, old favorites and fresh edits. Rooted in Black and queer nightlife, I play for crowds from 25 to 75+."
+const BACKGROUND_COPY = "Born on Chicago's South Side, with years in Boston, now based in Indy. Hip-hop, R&B, house, juke, club, jungle, bass, baile and underground edits."
 
 export default function MeetIdentityHero() {
   const [tilt, setTilt] = useState({ x: 0, y: 0 })
@@ -98,6 +99,9 @@ export default function MeetIdentityHero() {
         <div className={styles.details}>
           <div className={styles.summary}>
             {ABOUT_COPY}
+          </div>
+          <div className={styles.summary}>
+            {BACKGROUND_COPY}
           </div>
 
           <div className={styles.signals} aria-label="DJ B.A.E. profile highlights">

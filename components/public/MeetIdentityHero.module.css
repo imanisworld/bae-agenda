@@ -488,7 +488,8 @@
 }
 @media (max-width: 560px) {
   .portraitWrap {
-    width: min(73%, 330px);
+    /* Keep both bio lines and the actions above the dock on a one-screen phone. */
+    width: min(73%, 330px, max(140px, calc(100svh - 600px)));
     margin-left: 8%;
   }
   .portrait {
