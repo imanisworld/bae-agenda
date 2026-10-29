@@ -363,15 +363,6 @@
   }
 }
 
-/* Stacked layout on short windows: shrink the portrait so the copy and its
-   pills stay above the floating dock. */
-@media (max-width: 860px) and (min-width: 561px) and (max-height: 1000px) {
-  .portraitWrap {
-    width: min(86%, 620px, calc((100svh - 470px) * 4 / 3));
-    min-width: 240px;
-  }
-}
-
 
 /* Public contrast lift — portrait, words and controls remain legible. */
 .hero {
@@ -534,4 +525,56 @@
 /* Get to know: the gold tag sits clean on the page, no dark shadow behind it. */
 .title .titleTag img {
   filter: none;
+}
+
+/* Tablets and unfolded foldables (561–860px wide, portrait). The page is
+   locked to one screen: the copy takes the height it needs and the square
+   portrait shrinks into whatever is left, so the heading, bio, pills and both
+   buttons always sit above the dock, however long the bio is. */
+@media (min-width: 561px) and (max-width: 860px) and (max-aspect-ratio: 1 / 1) {
+  .hero {
+    box-sizing: border-box;
+    height: 100svh;
+  }
+  .portraitWrap {
+    flex: 1 1 0;
+    min-height: 120px;
+    width: min(86%, 620px);
+    container-type: size;
+  }
+  .portrait {
+    width: min(100cqw, 100cqh);
+    height: auto;
+  }
+}
+
+/* Wide unfolded foldables (Galaxy Fold sideways, Pixel Fold open): too short
+   to stack, so sit the portrait beside the copy as on desktop. */
+@media (min-width: 561px) and (max-width: 860px) and (min-aspect-ratio: 1 / 1) {
+  .hero {
+    display: grid;
+    grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+    align-items: center;
+    column-gap: clamp(24px, 4vw, 40px);
+    min-height: 100svh;
+    padding: 64px clamp(24px, 4vw, 40px) calc(112px + var(--safe-bottom, 0px));
+  }
+  .portraitWrap {
+    grid-column: 1;
+    grid-row: 1;
+    width: min(100%, calc(100svh - 220px));
+    margin: 0 auto;
+    justify-self: center;
+  }
+  .copy {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+  .copy h1 { font-size: clamp(30px, 4.6vw, 40px); line-height: 1.05; }
+  .details { padding-top: 34px; }
+  .summary { font-size: 15px; }
+  .title .titleTag { --size: clamp(50px, 6vw, 62px); }
 }
