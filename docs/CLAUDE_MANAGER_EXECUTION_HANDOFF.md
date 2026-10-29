@@ -64,7 +64,7 @@ Do not rebuild these.
 - **Delta Frost Chicago** is an existing `review` for a paid, specialized adults-only application. Artistic/brand fit requires the user's decision; rate/travel are unknown. Previously appeared in the Oct 5 scouting report, so it is not previously unseen research.
 - AfroCode Nation (DC), Sun & Sound Detroit, Atlanta Pride's expected March 2027 application are **saved recurring research/watch sources**, not verified paid vacancies now.
 - **Permanent exclusions apply across Manager, Grok, Claude, and any broader research lane.** Read exact forbidden organizer/event aliases in the two discovery/scout documents **before** using a line-up or other aggregator. The inactive/ignored production suppression is intentional. Never infer artist preferences, buyer relationships or bookings from a past public flyer, tagged co-DJ, or demographics.
-- Grok's research-only brief is on `main` via PR #185; no Grok run occurred by merging the instructions. Manager owns review and any explicitly approved data changes. Existing bot-access and Discovery Runs UI projects stay parked; Fastbrowse PR #180 remains an unadopted experiment.
+- Grok's research-only brief is on `main` via PR #185; no Grok run occurred by merging the instructions. Manager owns review and any explicitly approved data changes. Existing bot-access and Discovery Runs UI projects stay parked; Fastbrowse PR #180 was closed unmerged October 29 as an unadopted experiment.
 - Portfolio PR #184 and DJ playback-history PR #186 are **separate drafts**, not licenses to publish a scheduled gig as completed or infer a DJ setlist from a calendar event.
 
 ## Important rules
