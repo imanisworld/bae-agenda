@@ -83,7 +83,7 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 - Issue #171: admin-managed TBA dates, optional event signup and special instructions — no invented dates
 - Issue #175: Built redesign — backlog, page not publicly routed
 - Discovery Runs UI and Manager bot suggestions — parked
-- PRs #179–#183: tool evaluations/experiments held without proven adoption value
+- PRs #179–#183: tool evaluations/experiments closed unmerged October 29 without proven adoption value; branches kept
 
 ## Remaining Work — Only When Useful
 

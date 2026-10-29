@@ -478,10 +478,6 @@
   }
 }
 @media (max-width: 560px) {
-  .portraitWrap {
-    width: min(73%, 330px);
-    margin-left: 8%;
-  }
   .portrait {
     border-radius: 3px;
   }
@@ -527,6 +523,37 @@
   filter: none;
 }
 
+/* Phones: the copy takes the height it needs and the square portrait shrinks
+   into whatever is left, so both bios and the buttons stay above the dock. */
+@media (max-width: 560px) {
+  .hero {
+    box-sizing: border-box;
+    height: 100%;
+    padding-bottom: calc(116px + var(--safe-bottom));
+  }
+
+  .title {
+    margin-top: 0;
+  }
+
+  .details {
+    margin-bottom: 0;
+  }
+
+  .portraitWrap {
+    flex: 1 1 0;
+    min-height: 0;
+    width: min(78%, 330px);
+    margin-left: 8%;
+    container-type: size;
+  }
+
+  .portrait {
+    width: min(100cqw, 100cqh);
+    height: auto;
+  }
+}
+
 /* Tablets and unfolded foldables (561–860px wide, portrait). The page is
    locked to one screen: the copy takes the height it needs and the square
    portrait shrinks into whatever is left, so the heading, bio, pills and both
@@ -535,16 +562,41 @@
   .hero {
     box-sizing: border-box;
     height: 100svh;
+    padding-bottom: calc(132px + var(--safe-bottom, 0px));
   }
   .portraitWrap {
     flex: 1 1 0;
-    min-height: 120px;
+    min-height: 0;
     width: min(86%, 620px);
     container-type: size;
   }
   .portrait {
     width: min(100cqw, 100cqh);
     height: auto;
+  }
+}
+
+/* Short stacked screens (a square fold, a short tablet): keep the headline
+   from eating the portrait. */
+@media (min-width: 561px) and (max-width: 860px) and (orientation: portrait) and (max-height: 820px) {
+  .hero {
+    padding-top: 56px;
+  }
+
+  .copy {
+    margin-top: 16px;
+  }
+
+  .copy h1 {
+    font-size: clamp(28px, 5vw, 40px);
+  }
+
+  .details {
+    padding-top: 44px;
+  }
+
+  .summary {
+    margin-top: 12px;
   }
 }
 
