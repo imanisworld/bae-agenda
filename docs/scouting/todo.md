@@ -45,7 +45,7 @@ Reconciled **2026-10-13** against `main`, recent open PRs, and read-only product
 
 - [ ] [PR #184](https://github.com/imanisworld/bae-agenda/pull/184) **draft** owns portfolio-history reconciliation evidence. Do not treat archived scheduled sets as performed or publish speculative portfolio additions.
 - [ ] [PR #186](https://github.com/imanisworld/bae-agenda/pull/186) **draft** owns the DJ playback-history cross-repo roadmap handoff. Event calendar metadata is not Serato/Rekordbox playback evidence.
-- [ ] [PR #180](https://github.com/imanisworld/bae-agenda/pull/180) **draft** benchmarks Fastbrowse; not adopted, no measured improvement. Do not install a replacement or create paid infrastructure without verified benefit.
+- [x] [PR #180](https://github.com/imanisworld/bae-agenda/pull/180) Fastbrowse benchmark closed unmerged October 29: not adopted, no measured improvement. Do not install a replacement or create paid infrastructure without verified benefit.
 - [ ] Discovery Runs UI and bot database-access/suggestion infrastructure remain **parked**. Grok research can operate with a read-only prompt; neither warrants a new production integration now.
 
 ## Archived / weak leads

@@ -1,6 +1,6 @@
 # Project Status
 
-Release verification updated: 2026-10-18 (GitHub CI, Vercel and live read-only HTTP). Manager/data snapshots remain dated 2026-10-13.
+Release verification updated: 2026-10-18 (GitHub CI, Vercel and live read-only HTTP). GitHub PR/branch state reconciled 2026-10-29. Manager/data snapshots remain dated 2026-10-13 and were **not** re-read on October 29.
 
 ## Current State
 
@@ -32,11 +32,22 @@ Release verification updated: 2026-10-18 (GitHub CI, Vercel and live read-only H
 
 - 22 opportunities, 67 total sources (**59 active**), 30 relevant signals, and 6 recorded Discovery Runs. Portfolio/event baseline: **70 portfolio entries, 5 booking rows, 14 event rows**.
 - Most recent run (October 13, key `manager-discovery-20261013T140722.305418Z`): 10/10 due sources attempted, **4 partial coverage**, **5 new recurring sources**, **5 signals**, **2 `review` opportunities**, 0 warm-rebook creations/updates, and 0 outreach; final status **partial**. Complete sourcing quality is not established by check counts.
-- Silent Disco (October 23 event) and Elevate Social still show `contacted` with last recorded contact October 5 and follow-ups dated October 10. As of this check those follow-ups are overdue in Manager; external replies have not been checked.
-- Art & Soul 2027 re-engagement remains set for October 20; Punch Bowl Social Galentine's for November 15; Level Up Walkathon 2027 for May 15, 2027. Use the known warm relationship route.
+- As of October 13, Silent Disco (October 23 event, now past) and Elevate Social still showed `contacted` with last recorded contact October 5 and follow-ups dated October 10. As of this check those follow-ups are overdue in Manager; external replies have not been checked.
+- As of October 13, Art & Soul 2027 re-engagement was set for October 20 (now past; outcome unverified); Punch Bowl Social Galentine's for November 15; Level Up Walkathon 2027 for May 15, 2027. Use the known warm relationship route.
 - Daily Discovery Runs backend is active. The separate Discovery Runs UI remains parked; do not create a second scheduler or infer bookings from signals.
 - Manager follow-up review also includes Room to Bloom (Oct 8) and other `contacted` Oct 12–13 actions, not proof of unanswered messages. The new **WERC future collaboration** and **Delta Frost specialized paid-DJ application** stay review-only with missing buyer/fit/pay/travel evidence; AfroCode (DC), Sun & Sound (Detroit) and Atlanta Pride are recurring watch intelligence. See `docs/scouting/todo.md` for the decision queue.
 - The mandatory user-excluded organizer/event source remains inactive with `USER-EXCLUDED` notes and an ignored signal; no alias may re-enter through Grok or another source. Grok's updated research-only brief in PR #185 was merged, but this **did not trigger a Grok run**.
+
+## Open PRs — GitHub State October 29
+
+- [#199](https://github.com/imanisworld/bae-agenda/pull/199) Update the public DJ B.A.E. bio — open, not reviewed in this pass.
+- [#198](https://github.com/imanisworld/bae-agenda/pull/198) Preview text slide-in and Sunday Sunday event cards — open, not reviewed in this pass.
+- [#197](https://github.com/imanisworld/bae-agenda/pull/197) **draft** Separate internal portfolio research from public descriptions — not reviewed in this pass.
+- [#186](https://github.com/imanisworld/bae-agenda/pull/186) (playback-history handoff, open) and [#184](https://github.com/imanisworld/bae-agenda/pull/184) (**draft** portfolio evidence) stay parked.
+- [#59](https://github.com/imanisworld/bae-agenda/pull/59) **draft** stays held (Full Portfolio Archive media).
+- PR #187 was closed unmerged on October 29: merged #188/#190 superseded it and it conflicted with `main`.
+
+None of these is deployed. Merge does not deploy.
 
 ## Public Site Finish Line — Issue #157 (Open)
 
@@ -52,7 +63,7 @@ PRs #178 and #191 were completed as targeted releases; neither closes these full
 - Club Cunt and Saints and Sinners public TBA notices are **code-level presentations**, without confirmed event dates/locations; issue #171 is the future admin-managed TBA/signup/special-instructions model. The existing `events.event_date` database column is non-nullable. Do not treat a display placeholder as canonical event data.
 - PR #59 for Full Portfolio Archive galleries remains held. Production `portfolio_media` contained 0 rows as of October 13; select and review real photos/videos before considering publication.
 - Built redesign stays in issue #175, held outside current public-site finish work.
-- PRs #179–#183 are optional/tooling experiments (HyperFrames, Fastbrowse, Abide/Jev, CI guardrails, context retention). None is adopted on verified improvement evidence; keep them separate from website release.
+- PRs #179–#183 (HyperFrames, Fastbrowse, Abide/Jev, CI guardrails, context retention) were closed unmerged on October 29 at the owner's direction: none had adoption evidence. Their branches are kept; reopen only with a concrete workflow gap.
 - Manager bot access is not started and stays approval-gated.
 
 ## Database / Safety
@@ -65,8 +76,8 @@ PRs #178 and #191 were completed as targeted releases; neither closes these full
 
 1. In Manager, verify external replies before resolving overdue Silent Disco/Elevate Social and other dated contacted/warm-review follow-ups. Evaluate the new two review opportunities and source provenance without autonomous contact or database changes. Record only actions actually taken.
 2. Complete the explicit tests in issue #157; fix only specific failures and close the issue when all gates are evidenced.
-3. On October 20, evaluate Art & Soul warm-rebook re-engagement using existing relationship history.
+3. Art & Soul warm-rebook re-engagement was due October 20; whether it was handled is unverified since the October 13 snapshot. Check Manager before acting, using existing relationship history.
 4. When the Mac/media library is available, run one real-event Media Curator pilot; do not upload or publish without review.
-5. Leave issues #171/#175 and held experimental PRs parked until real requirements justify them.
+5. Leave issues #171/#175 and held PRs #59/#184/#186 parked until real requirements justify them.
 
 Use `AGENTS.md` and `docs/ROADMAP.MD` for policy and roadmap; do not infer deployment or live-feature completion from stale docs or merged code.
