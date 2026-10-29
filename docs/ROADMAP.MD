@@ -69,6 +69,17 @@ The Discovery Runs UI is intentionally parked while the backend collects useful 
 - review WERC Atlanta future collaboration (current buyer/opening, economics unverified) and the Chicago specialized paid-DJ application (user fit/pay/travel not established); keep AfroCode, Sun & Sound and Atlanta Pride as future-watch intelligence.
 - Grok research instructions were updated in PR #185; research-only, not a second scheduler or proof Grok executed. Use `docs/MANAGER_EXECUTION_AGENDA.md` for all Manager next actions and first-party-history safeguards.
 
+### DJ library event/playback history — cross-repo, source-only
+
+Added 2026-10-13. **The sorter repository owns this work; no website feature
+or production database change has been authorized.**
+
+- Canonical task list and implementation evidence are maintained in the **private DJ library sorter repository**, not duplicated here. Reference its `references/dj-integration-work-plan.md` and the source-only integration draft; the genre master/folder map is a separate pending change.
+- Existing website event IDs, dates, time zones, and venues provide **event context**. Event dates do not prove actual **DJ set start/end** or track plays; internal bookings are private. Do not publish private setlists or add a public playback API.
+- Before any integration, establish confirmed actual DJ set windows and real timestamped Serato History / supported Rekordbox history evidence. The Mac is offline; the current phase permits official-source research, offline fixture tests, and preview-only planning.
+- No changes to website runtime, Supabase schema, Manager outreach, cron, or deployment are needed for this phase. A private read-only website export is a **later reviewed proposal**, not an existing interface.
+- Keep `docs/GROK_MANAGER_SCOUT_PROMPT.md` scoped to **opportunity scouting**. Technical DJ playback research is a separate, one-time task.
+
 ### Current public-site acceptance — #157
 
 - Test Book links/form and one isolated non-production inquiry; confirm mobile and desktop usability

@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Sunday Sunday flyer concept</title>
+  <desc id="desc">Typographic Sunday Sunday event concept for Saints and Sinners. Dates and DJs are listed separately in the event details.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2a1018"/><stop offset=".56" stop-color="#0e0b0a"/><stop offset="1" stop-color="#241016"/></linearGradient>
+    <radialGradient id="wash"><stop stop-color="#9e3445" stop-opacity=".45"/><stop offset="1" stop-color="#9e3445" stop-opacity="0"/></radialGradient>
+    <pattern id="grain" width="35" height="35" patternUnits="userSpaceOnUse"><circle cx="2" cy="3" r=".65" fill="#f6f1e8" opacity=".09"/><circle cx="25" cy="18" r=".7" fill="#f6f1e8" opacity=".07"/></pattern>
+  </defs>
+  <rect width="900" height="1200" fill="url(#bg)"/>
+  <circle cx="640" cy="590" r="490" fill="url(#wash)"/>
+  <rect width="900" height="1200" fill="url(#grain)"/>
+  <g fill="none" stroke="#b85a66" stroke-width="1.8" opacity=".32">
+    <circle cx="654" cy="670" r="377"/><circle cx="654" cy="670" r="346"/><circle cx="654" cy="670" r="318"/>
+    <circle cx="654" cy="670" r="286"/><circle cx="654" cy="670" r="248"/><circle cx="654" cy="670" r="210"/>
+    <circle cx="654" cy="670" r="174"/><circle cx="654" cy="670" r="134"/><circle cx="654" cy="670" r="92"/>
+  </g>
+  <circle cx="654" cy="670" r="61" fill="#c4a574" opacity=".78"/><circle cx="654" cy="670" r="11" fill="#190e12"/>
+  <path d="M45 45H855M45 1155H855" stroke="#c4a574" stroke-width="2" opacity=".75"/>
+  <g font-family="Arial, Helvetica, sans-serif" font-weight="700">
+    <text x="64" y="108" font-size="19" letter-spacing="8" fill="#c4a574">SAINTS &amp; SINNERS</text>
+    <text x="64" y="165" font-size="13" letter-spacing="7" fill="#f6f1e8" opacity=".76">INDIANAPOLIS / SUNDAY SERIES</text>
+    <text x="43" y="400" font-size="154" letter-spacing="-12" fill="#f6f1e8" textLength="811" lengthAdjust="spacingAndGlyphs">SUNDAY</text>
+    <text x="43" y="565" font-size="154" letter-spacing="-12" fill="none" stroke="#c4a574" stroke-width="2.8" textLength="811" lengthAdjust="spacingAndGlyphs">SUNDAY</text>
+  </g>
+  <path d="M64 604H305" stroke="#c4a574" stroke-width="4"/>
+  <text x="64" y="989" fill="#f6f1e8" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" letter-spacing="7">MUSIC / COMMUNITY / SUNDAYS</text>
+  <text x="64" y="1047" fill="#c4a574" font-family="Arial, Helvetica, sans-serif" font-size="17" letter-spacing="5">DATE + FEATURED DJ SHOWN WITH EVENT DETAILS</text>
+  <text x="64" y="1124" fill="#f6f1e8" opacity=".55" font-family="Arial, Helvetica, sans-serif" font-size="13" letter-spacing="4">PREVIEW ARTWORK — FINAL FLYER PENDING</text>
+</svg>
