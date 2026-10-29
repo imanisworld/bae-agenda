@@ -25,6 +25,8 @@ const deploymentEnvironment = resolveDeploymentEnvironment()
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  // Next sends X-Powered-By: Next.js unless this is turned off.
+  poweredByHeader: false,
   // Compile one non-secret environment label into both server and client code.
   // This makes staging logs distinguishable from generic Vercel previews.
   env: {
