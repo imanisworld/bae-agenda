@@ -699,7 +699,7 @@ export default function BookingForm({ embedded = false, initialEventType = '', i
             border: embedded ? '1px solid rgba(255,235,219,.25)' : '1px solid var(--border)',
             padding: 'clamp(20px, 4vw, 32px)',
             display: 'grid',
-            gap: '20px',
+            gap: '32px',
           }}>
             <div aria-live="polite" style={{ position: 'absolute', left: '-9999px', width: '1px', height: '1px', overflow: 'hidden' }}>
               {checkingAvailability
@@ -976,23 +976,24 @@ function EventStep({
 
   return (
     <>
-      <div style={{ display: 'grid', gap: '8px' }}>
+      <div style={{ display: 'grid', gap: '16px' }}>
         <span className="section-label" style={{ marginBottom: 0 }}>Event Type</span>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '8px' }}>
           {EVENT_TYPES.map((type) => (
             <button
               key={type}
               type="button"
+              className="booking-choice"
               onClick={() => set('eventType', form.eventType === type ? '' : type)}
               style={{
                 padding: '10px 12px',
                 minHeight: '44px',
-                fontSize: '11px',
+                fontSize: '12px',
                 letterSpacing: '0.08em',
                 textAlign: 'left',
-                background: form.eventType === type ? 'var(--booking-choice-selected, rgba(143,45,60,0.15))' : 'var(--booking-choice-bg, var(--off-black))',
-                border: `1px solid ${form.eventType === type ? 'var(--violet)' : 'var(--border)'}`,
-                color: form.eventType === type ? 'var(--white)' : 'var(--muted)',
+                background: form.eventType === type ? '#9a3450' : 'var(--booking-choice-bg, var(--off-black))',
+                border: `1px solid ${form.eventType === type ? '#f3c3cc' : 'rgba(246,226,210,0.55)'}`,
+                color: form.eventType === type ? '#fff6ec' : '#f3e6dc',
                 cursor: 'pointer',
                 transition: 'background 150ms ease, border-color 150ms ease, color 150ms ease',
                 fontFamily: 'DM Sans, sans-serif',
@@ -1004,7 +1005,7 @@ function EventStep({
         </div>
       </div>
 
-      <div style={{ display: 'grid', gap: '8px' }}>
+      <div style={{ display: 'grid', gap: '16px' }}>
         <span className="section-label" style={{ marginBottom: 0 }}>Event Date *</span>
         <div
           data-booking-field="eventDate"
@@ -1056,6 +1057,7 @@ function EventStep({
                 <button
                   key={dateValue}
                   type="button"
+                  className="booking-day"
                   onClick={() => set('eventDate', dateValue)}
                   disabled={disabled}
                   aria-pressed={isSelected}
@@ -1518,10 +1520,10 @@ function calendarGridStyle(): React.CSSProperties {
 
 function calendarWeekdayStyle(): React.CSSProperties {
   return {
-    fontSize: '11px',
+    fontSize: '12px',
     letterSpacing: '0.08em',
     textTransform: 'uppercase',
-    color: 'var(--muted)',
+    color: '#ffe3b0',
     textAlign: 'center',
     paddingBottom: '4px',
   }
@@ -1541,20 +1543,21 @@ function calendarDayStyle({
   return {
     minHeight: '44px',
     border: `1px solid ${
-      isSelected ? 'var(--violet)' : isBlocked ? 'rgba(232, 93, 117, 0.4)' : 'var(--border)'
+      isSelected ? '#f3c3cc' : isBlocked ? 'rgba(232, 93, 117, 0.55)' : 'rgba(246,226,210,0.55)'
     }`,
     background: isSelected
-      ? 'rgba(143,45,60,0.18)'
+      ? '#9a3450'
       : isBlocked
-        ? 'rgba(232, 93, 117, 0.08)'
+        ? 'rgba(232, 93, 117, 0.12)'
         : 'var(--surface)',
     color: isDisabled
-      ? (isBlocked ? '#ff8da0' : 'var(--muted)')
-      : (isCurrentMonth ? 'var(--white)' : 'rgba(255,255,255,0.4)'),
+      ? (isBlocked ? '#ffb3c0' : '#cbb8b4')
+      : (isCurrentMonth ? '#fff8f2' : 'rgba(255,248,242,0.72)'),
+    fontWeight: 600,
     cursor: isDisabled ? 'not-allowed' : 'pointer',
     opacity: isCurrentMonth ? 1 : 0.6,
     fontFamily: 'DM Sans, sans-serif',
-    fontSize: '14px',
+    fontSize: '15px',
     transition: 'background 150ms ease, border-color 150ms ease, color 150ms ease, opacity 150ms ease',
   }
 }
