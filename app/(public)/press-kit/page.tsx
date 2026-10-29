@@ -76,6 +76,7 @@ export default async function PressKitPage() {
             <section className="press-kit-bio">
               <SectionLabel>Artist Bio</SectionLabel>
               <p>{about}</p>
+              <p>{"Born on Chicago's South Side, with years in Boston, now based in Indy. Hip-hop, R&B, house, juke, club, jungle, bass, baile and underground edits."}</p>
               <p>Available for club nights, private events, weddings, brand activations, and events that need a set tailored to the room.</p>
             </section>
 
