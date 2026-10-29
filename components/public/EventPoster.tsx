@@ -20,6 +20,7 @@ const POSTER_PHOTOS = [
 const FLYERS: Record<string, string> = {
   'chi-chis-oct-3-2026': '/photos/flyers/chi-chis-original.jpg',
   'dy2k-sep-11-2026': '/photos/flyers/dy2k-lineup.jpg',
+  'dyke2k-nov-25-2026': '/photos/flyers/dyke2k-nov-25-2026.jpg',
   'cat-calls-oct-16-2026': '/photos/flyers/cat-calls-oct-16-2026.jpg',
   'club-cunt-oct-31-2026': '/photos/flyers/club-cunt-flyer-coming-soon.svg',
   'innaspace-radio-nov-1-2026': '/photos/flyers/innaspace-radio-nov-1-2026.jpg',
